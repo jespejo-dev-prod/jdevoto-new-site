@@ -201,5 +201,3 @@ DATABASE_URL=           # Conexión PostgreSQL
 JWT_SECRET=             # Clave para firmar tokens JWT
 NEXT_PUBLIC_BASE_URL=   # URL pública del sitio
 ```
-#   j d e v o t o - n e w - s i t e  
- 
