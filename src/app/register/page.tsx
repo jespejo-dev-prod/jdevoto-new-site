@@ -71,22 +71,12 @@ export default function RegisterPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/50" />
         
-        <div className="relative z-20 flex items-center text-xl font-bold tracking-tight">
-          <div className="mr-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-            >
-              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-            </svg>
-          </div>
-          Antigravity <span className="text-muted-foreground font-light ml-1">B2B</span>
+        <div className="relative z-20 flex items-center">
+          <img 
+            src="https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png" 
+            alt="JDevoto Logo" 
+            className="h-10 w-auto filter invert brightness-200"
+          />
         </div>
         
         <div className="relative z-20 mt-auto">

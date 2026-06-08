@@ -50,8 +50,12 @@ export function PublicHeader() {
     <header className="sticky top-0 z-50 w-full flex flex-col">
       <nav className="bg-zinc-950 text-white p-4 px-4 sm:px-8 flex items-center justify-between border-b border-zinc-800 shadow-md">
         <div className="flex items-center gap-4 sm:gap-8">
-          <Link href="/" className="text-xl sm:text-2xl font-black italic tracking-tighter hover:scale-105 transition-transform shrink-0">
-            antigravity<span className="text-primary">.</span>
+          <Link href="/" className="hover:scale-105 transition-transform shrink-0">
+            <img 
+              src="https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png" 
+              alt="JDevoto Logo" 
+              className="h-8 w-auto filter invert brightness-200"
+            />
           </Link>
           
           <button

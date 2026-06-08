@@ -92,13 +92,11 @@ export function Sidebar() {
     <div className="flex flex-col h-full bg-zinc-950">
       <div className="p-6 flex-grow overflow-y-auto custom-scrollbar">
         <div className="flex items-center gap-3 px-2 mb-8">
-          <div className="h-8 w-8 rounded bg-primary flex items-center justify-center text-primary-foreground">
-            <Layers className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-white tracking-tight leading-tight">Antigravity B2B</h2>
-            <p className="text-[10px] text-zinc-500 font-medium">ID: CMP-1006</p>
-          </div>
+          <img 
+            src="https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png" 
+            alt="JDevoto Logo" 
+            className="h-8 w-auto filter invert brightness-200"
+          />
         </div>
 
         <nav className="space-y-6">
