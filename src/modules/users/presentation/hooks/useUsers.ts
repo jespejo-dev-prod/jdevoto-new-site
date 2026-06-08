@@ -2,22 +2,29 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/shared/infrastructure/api/use-api";
 import { toast } from "sonner";
 
-export function useUsers() {
-  const api = useApi();
+export function useUsers(filters: {
+  page?: number;
+  limit?: number;
+  search?: string;
+} = {}) {
+  const { get, post, delete: del } = useApi();
   const queryClient = useQueryClient();
 
-  const query = useQuery({
-    queryKey: ["users"],
+  const queryParams = new URLSearchParams();
+  if (filters.page) queryParams.set("page", filters.page.toString());
+  if (filters.limit) queryParams.set("limit", filters.limit.toString());
+  if (filters.search) queryParams.set("search", filters.search);
+
+  const query = useQuery<any>({
+    queryKey: ["users", filters],
     queryFn: async () => {
-      const res = await api.get("/api/users");
-      // Maneja caso de res.data (paginado/meta) o res directo
-      return (res as any).data || res;
+      return get(`/api/users?${queryParams.toString()}`);
     },
   });
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      return api.post("/api/users", data);
+      return post("/api/users", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -29,7 +36,7 @@ export function useUsers() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return api.delete(`/api/users/${id}`);
+      return del(`/api/users/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -40,8 +47,19 @@ export function useUsers() {
     },
   });
 
+  const usersList = query.data && typeof query.data === "object" && "data" in query.data
+    ? (query.data as any).data
+    : (query.data as any) ?? [];
+
+  const meta = query.data && typeof query.data === "object" && "meta" in query.data
+    ? (query.data as any).meta
+    : undefined;
+
   return {
-    users: (query.data as any[]) ?? [],
+    ...query,
+    users: usersList,
+    data: usersList,
+    meta,
     isLoading: query.isLoading,
     create: createMutation.mutateAsync,
     isCreating: createMutation.isPending,

@@ -19,21 +19,57 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const user = extractUserFromRequest(req);
   requireRole(user, [UserRole.ADMIN, UserRole.COMPANY_ADMIN]);
 
-  const whereClause = user.role === UserRole.COMPANY_ADMIN 
+  const { searchParams } = req.nextUrl;
+  const search = searchParams.get("search") || "";
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const skip = (page - 1) * limit;
+
+  const baseWhere = user.role === UserRole.COMPANY_ADMIN 
     ? { companyId: user.companyId } 
     : {};
 
-  const users = await prisma.user.findMany({
-    where: whereClause,
-    include: {
-      company: {
-        select: { razonSocial: true }
-      }
-    },
-    orderBy: { createdAt: 'desc' }
-  });
+  const whereClause = {
+    ...baseWhere,
+    ...(search
+      ? {
+          OR: [
+            { firstName: { contains: search, mode: "insensitive" as const } },
+            { lastName: { contains: search, mode: "insensitive" as const } },
+            { email: { contains: search, mode: "insensitive" as const } },
+            {
+              company: {
+                razonSocial: { contains: search, mode: "insensitive" as const }
+              }
+            }
+          ]
+        }
+      : {})
+  };
 
-  return ok(users);
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where: whereClause,
+      include: {
+        company: {
+          select: { razonSocial: true }
+        }
+      },
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' }
+    }),
+    prisma.user.count({ where: whereClause })
+  ]);
+
+  return ok(users, 200, {
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  });
 });
 
 export const POST = withApiHandler(async (req: NextRequest) => {

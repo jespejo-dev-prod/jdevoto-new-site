@@ -12,19 +12,36 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search") || "";
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const skip = (page - 1) * limit;
 
-  const customers = await prisma.company.findMany({
-    where: {
-      OR: [
-        { razonSocial: { contains: search, mode: 'insensitive' } },
-        { rut: { contains: search, mode: 'insensitive' } },
-        { nombreFantasia: { contains: search, mode: 'insensitive' } },
-      ]
-    },
-    orderBy: { razonSocial: "asc" },
+  const whereClause = {
+    OR: [
+      { razonSocial: { contains: search, mode: "insensitive" as const } },
+      { rut: { contains: search, mode: "insensitive" as const } },
+      { nombreFantasia: { contains: search, mode: "insensitive" as const } },
+    ]
+  };
+
+  const [customers, total] = await Promise.all([
+    prisma.company.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy: { razonSocial: "asc" },
+    }),
+    prisma.company.count({ where: whereClause })
+  ]);
+
+  return ok(customers, 200, {
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
   });
-
-  return ok(customers);
 });
 
 export const POST = withApiHandler(async (req: NextRequest) => {

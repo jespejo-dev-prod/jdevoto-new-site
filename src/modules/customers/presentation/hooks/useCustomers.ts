@@ -4,13 +4,36 @@ import { Company } from "@prisma/client";
 import { RegisterCompanyDto, UpdateCompanyDto } from "@/validations/company.schemas";
 import { toast } from "sonner";
 
-export function useCustomers(search?: string) {
+export function useCustomers(filters: string | {
+  page?: number;
+  limit?: number;
+  search?: string;
+} = {}) {
   const { fetcher } = useApi();
   const queryClient = useQueryClient();
 
-  const query = useQuery<Company[]>({
-    queryKey: ["customers", search],
-    queryFn: () => fetcher(`/api/customers${search ? `?search=${encodeURIComponent(search)}` : ""}`),
+  // Normalizar los filtros para soportar firma heredada useCustomers(searchString) y la nueva firma con objeto
+  let page = 1;
+  let limit = 10;
+  let search = "";
+  if (typeof filters === "string") {
+    search = filters;
+    // Si es búsqueda clásica, podemos usar un límite mayor para autocompletado (por ejemplo, 50)
+    limit = 50;
+  } else {
+    page = filters.page ?? 1;
+    limit = filters.limit ?? 10;
+    search = filters.search ?? "";
+  }
+
+  const queryParams = new URLSearchParams();
+  if (page) queryParams.set("page", page.toString());
+  if (limit) queryParams.set("limit", limit.toString());
+  if (search) queryParams.set("search", search);
+
+  const query = useQuery<any>({
+    queryKey: ["customers", { page, limit, search }],
+    queryFn: () => fetcher(`/api/customers?${queryParams.toString()}`),
   });
 
   const createMutation = useMutation({
@@ -41,8 +64,19 @@ export function useCustomers(search?: string) {
     onError: (error: any) => toast.error(error.message || "Error al reactivar"),
   });
 
+  const customersList = query.data && typeof query.data === "object" && "data" in query.data
+    ? (query.data as any).data
+    : (query.data as any) ?? [];
+
+  const meta = query.data && typeof query.data === "object" && "meta" in query.data
+    ? (query.data as any).meta
+    : undefined;
+
   return { 
     ...query, 
+    data: customersList,
+    customers: customersList,
+    meta,
     createCustomer: createMutation, 
     deleteCustomer: deleteMutation,
     reactivateCustomer: reactivateMutation 
