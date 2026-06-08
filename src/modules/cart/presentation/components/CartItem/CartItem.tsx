@@ -1,0 +1,99 @@
+'use client';
+
+import React from 'react';
+import { Trash2, CheckCircle2 } from 'lucide-react';
+import { QuantitySelector } from '@/components/ui/quantity-selector';
+import { CartItem as CartItemType, useCart } from '@/context/CartContext';
+import Link from 'next/link';
+import { useAuth } from '@/context/auth-context';
+
+interface CartItemProps {
+  item: CartItemType;
+}
+
+export function CartItem({ item }: CartItemProps) {
+  const { updateQuantity, removeItem } = useCart();
+  const { user } = useAuth();
+
+  const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
+  const isExcluded = item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET';
+  const companyDiscount = isExcluded ? 0 : companyDiscountPercent;
+
+  const discountedPrice = item.price * (1 - companyDiscount / 100);
+  const lineTotal = Math.round(discountedPrice * item.quantity);
+
+  return (
+    <div className="bg-white p-4 sm:p-6 rounded-[24px] sm:rounded-[32px] border border-zinc-200 shadow-sm hover:shadow-md transition-shadow flex gap-4 sm:gap-6 items-start sm:items-center">
+      <Link 
+        href={`/products/${item.slug}`}
+        className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl bg-zinc-50 p-2 sm:p-4 border border-zinc-100 flex items-center justify-center shrink-0 hover:border-primary transition-colors group"
+      >
+        <img 
+          src={item.image} 
+          alt={item.name} 
+          className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300" 
+        />
+      </Link>
+      
+      <div className="flex-grow space-y-2 min-w-0">
+        <div className="flex justify-between items-start gap-2">
+          <div className="space-y-1 min-w-0">
+            <Link href={`/products/${item.slug}`} className="hover:text-primary transition-colors block">
+              <h3 className="text-xs sm:text-sm font-black text-zinc-900 leading-tight uppercase truncate sm:whitespace-normal max-w-xs sm:max-w-md">
+                {item.name}
+              </h3>
+            </Link>
+            {item.discountPercent > 0 && (
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-[8px] sm:text-[9px] font-bold text-emerald-600 uppercase tracking-tight">
+                {item.discountPercent}% OFF • {item.priceSource.replace('_', ' ')}
+              </div>
+            )}
+            {companyDiscount > 0 && (
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-[8px] sm:text-[9px] font-bold text-blue-600 uppercase tracking-tight ml-2">
+                -{companyDiscount}% DCTO. EMPRESA
+              </div>
+            )}
+          </div>
+          <button 
+            onClick={() => removeItem(item.id)} 
+            className="text-zinc-400 hover:text-red-500 transition-colors p-1"
+          >
+            <Trash2 className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+          </button>
+        </div>
+        
+        <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-green-600 uppercase tracking-widest">
+          <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" /> En stock despacho inmediato
+        </div>
+        
+        <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-3 sm:gap-4 pt-2">
+          <QuantitySelector 
+            value={item.quantity}
+            min={item.inner || 1}
+            max={item.stockQuantity}
+            step={item.inner || 1}
+            onChange={(val) => updateQuantity(item.id, val)}
+            className="h-9 sm:h-10 w-fit"
+          />
+          
+          <div className="text-left sm:text-right">
+            <div className="text-base sm:text-lg font-black text-zinc-900">
+              $ {lineTotal.toLocaleString('es-CL')}{' '}
+              <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase">Neto</span>
+            </div>
+            <div className="flex flex-col items-start sm:items-end">
+              {item.discountPercent > 0 && (
+                <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 line-through uppercase tracking-tighter">
+                  $ {Math.round(item.originalPrice).toLocaleString('es-CL')}
+                </span>
+              )}
+              <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">
+                $ {Math.round(item.price).toLocaleString('es-CL')} c/u Neto {companyDiscount > 0 && `(-${companyDiscount}% Dcto. Empresa)`}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

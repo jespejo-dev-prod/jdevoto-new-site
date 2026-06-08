@@ -1,0 +1,45 @@
+import { NextRequest } from "next/server";
+import { withApiHandler, ok } from "@/lib/api-handler";
+import { prisma } from "@/lib/client";
+import { sendPasswordResetEmail } from "@/lib/email";
+import crypto from "crypto";
+
+export const POST = withApiHandler(async (req: NextRequest) => {
+  const body = await req.json();
+  const email = body.email?.trim().toLowerCase();
+
+  if (!email) {
+    return ok({ message: "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación." });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email }
+  });
+
+  // Always return success to prevent email enumeration attacks
+  if (!user) {
+    return ok({ message: "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación." });
+  }
+
+  // Delete any existing tokens for this email
+  await prisma.passwordResetToken.deleteMany({
+    where: { email }
+  });
+
+  // Generate new token (64 hex characters = 32 bytes)
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 3600000); // 1 hour
+
+  await prisma.passwordResetToken.create({
+    data: {
+      email,
+      token,
+      expires
+    }
+  });
+
+  // Send the email (do not await, let it run in background to return quickly, or await if preferred. Awaiting is safer to catch setup errors in dev)
+  await sendPasswordResetEmail(email, token);
+
+  return ok({ message: "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación." });
+});

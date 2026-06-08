@@ -1,0 +1,472 @@
+import React, { Suspense, cache } from 'react';
+import { Metadata } from 'next';
+import { getProductDetailsUseCase } from '@/modules/catalog/application/getProductDetails.use-case';
+import { getRelatedProductsUseCase } from '@/modules/catalog/application/getRelatedProducts.use-case';
+import { getBundleSuggestionUseCase } from '@/modules/catalog/application/getBundleSuggestion.use-case';
+import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { PublicHeader } from '@/components/layout/public-header';
+import { PublicFooter } from '@/components/layout/public-footer';
+import { getServerUser } from '@/lib/server-auth';
+import { Pencil } from 'lucide-react';
+import {
+  Star, Truck,
+  ChevronRight, ChevronLeft, Plus,
+  ChevronDown, Package,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ProductGallery } from '@/modules/catalog/presentation/components/ProductGallery/ProductGallery';
+import { BuyBox } from '@/modules/catalog/presentation/components/BuyBox/BuyBox';
+import { ProductSlider } from '@/components/ui/product-slider';
+import { BundleAction } from '@/modules/catalog/presentation/components/BundleAction/BundleAction';
+import { prisma } from '@/lib/client';
+import { TAX_RATE } from '@/types/domain';
+import { TrackProduct } from '@/components/catalog/track-product';
+
+/**
+ * Request-level cache:
+ * Compartido entre generateMetadata y el componente de página.
+ * Una sola query a la DB por request, sin duplicación (DRY).
+ *
+ * CRÍTICO: getProductDetailsUseCase NO llama al PriceService.
+ * Resultado: el critical path de la página solo hace 1 query a la DB.
+ *
+ * El precio B2B se calcula de forma asíncrona en el BuyBox (cliente)
+ * a través de /api/products/[slug]/price → patrón "Opción A".
+ */
+const getCachedProduct = cache(getProductDetailsUseCase);
+
+interface ProductPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+/**
+ * generateStaticParams
+ * Pre-construye todas las páginas de producto activas en build time.
+ * En dev no tiene efecto, pero en producción sirve HTML pre-generado → velocidad máxima.
+ */
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    select: { slug: true },
+  });
+  return products.map((p) => ({ slug: p.slug }));
+}
+
+// ─── SEO Metadata ─────────────────────────────────────────────────────────────
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const product = await getCachedProduct(slug);
+    return {
+      title: `${product.name} | Antigravity B2B`,
+      description: product.description || `Compra ${product.name} al mejor precio mayorista en Antigravity.`,
+      openGraph: {
+        title: product.name,
+        description: product.description || '',
+        type: 'website',
+        images: product.images.length > 0 ? [{ url: (product.images[0] as any).url }] : [],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: product.name,
+        description: product.description || '',
+      },
+    };
+  } catch {
+    return { title: 'Producto no encontrado | Antigravity' };
+  }
+}
+
+// ─── Page Component ────────────────────────────────────────────────────────────
+export default async function DynamicProductPage(props: ProductPageProps) {
+  const params = await props.params;
+  const user = await getServerUser();
+  const isAdmin = user?.role === 'ADMIN';
+
+
+  /**
+   * CRITICAL PATH — UNA sola query a la DB.
+   * Sin getServerUser(), sin PriceService, sin listas de precios.
+   * El servidor genera el HTML en ~20-50ms de proceso.
+   *
+   * El precio B2B se calcula en el BuyBox (cliente) de forma asíncrona.
+   */
+  let product: Awaited<ReturnType<typeof getProductDetailsUseCase>>;
+
+  try {
+    product = await getCachedProduct(params.slug);
+  } catch {
+    notFound();
+    return; // TypeScript guard
+  }
+
+  // Redireccionamiento estilo WordPress:
+  // Si el usuario entró al producto usando su ID en lugar del slug en la URL,
+  // redirigimos de forma limpia a su slug oficial para asegurar SEO.
+  if (product.id === params.slug) {
+    const { redirect } = await import('next/navigation');
+    redirect(`/products/${product.slug}`);
+  }
+
+  const primaryImage = (product.images.find((img: any) => img.isPrimary) || product.images[0]) as any;
+  const brandName = typeof product.brand === 'string'
+    ? product.brand
+    : (product.brand as any)?.name || '';
+
+  // Precio base con IVA para el JSON-LD (el BuyBox lo actualizará con precio B2B)
+  const basePriceGross = Math.round(Number(product.basePrice) * (1 + TAX_RATE));
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: product.images.map((img: any) => img.url),
+    description: product.description,
+    sku: product.sku,
+    brand: { '@type': 'Brand', name: brandName || 'Antigravity' },
+    offers: {
+      '@type': 'Offer',
+      url: `https://antigravity.cl/products/${product.slug}`,
+      priceCurrency: 'CLP',
+      price: basePriceGross,
+      availability: product.stockQuantity > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: 'Antigravity Technology Chile Ltd.' },
+    },
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans selection:bg-primary/20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <PublicHeader />
+      <TrackProduct slug={product.slug} />
+
+      <main className="flex-grow max-w-[1500px] mx-auto p-6 lg:px-12 pt-8 pb-24 w-full">
+
+        {/* Navegación y Botón de Edición */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+          <nav className="flex items-center gap-2.5 text-xs font-bold text-zinc-400 uppercase tracking-widest overflow-hidden">
+            <Link 
+              href={product.category?.slug ? `/products?category=${product.category.slug}` : '/products'} 
+              className="flex items-center gap-1 text-blue-600 hover:text-blue-700 transition-colors font-black shrink-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>{(product.category as any)?.name || 'Catálogo General'}</span>
+            </Link>
+            <span className="text-zinc-300 shrink-0">/</span>
+            <span className="text-zinc-900 truncate font-black max-w-[150px] xs:max-w-none">{product.name}</span>
+          </nav>
+
+          {isAdmin && (
+            <Link href={`/dashboard/products/${product.id}/edit`} className="shrink-0">
+              <Button className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 transition-all shadow-md active:scale-95 hover:scale-[1.02]">
+                <Pencil className="h-3.5 w-3.5 text-white" />
+                Editar Producto
+              </Button>
+            </Link>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          {/* GALLERY & INFO (9 cols on desktop, stacks first on mobile) */}
+          <div className="lg:col-span-9">
+            <div className="grid grid-cols-1 md:grid-cols-9 gap-8 lg:gap-12 items-start">
+              {/* GALLERY (6 cols on md+) */}
+              <ProductGallery images={product.images as any} productName={product.name} />
+
+              {/* PRODUCT INFO (3 cols on md+) */}
+              <div className="md:col-span-3 space-y-6 lg:space-y-8">
+                <div className="space-y-3 lg:space-y-4">
+                  {brandName && (
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                      <span className="text-blue-600">{brandName}</span>
+                    </div>
+                  )}
+
+                  <h1 className="text-[28px] sm:text-[38px] lg:text-[44px] font-black text-zinc-950 leading-[1.1] tracking-tight">
+                    {product.name}
+                  </h1>
+
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center text-orange-400">
+                      {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 sm:h-5 sm:w-5 fill-current" />)}
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-bold text-blue-600 hover:underline cursor-pointer">
+                      Valorado por clientes B2B
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+                  <Button className="h-9 px-4 sm:h-10 sm:px-6 bg-zinc-950 text-white rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all">
+                    <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    Entrega Priority Chile
+                  </Button>
+                  <Link href="#" className="text-[9px] sm:text-[10px] font-black text-blue-600 uppercase tracking-widest border-b-2 border-blue-600/20 hover:border-blue-600 transition-all">
+                    Logística
+                  </Link>
+                </div>
+
+                {/* Specs compactas */}
+                <div className="pt-6 lg:pt-8 border-t border-zinc-100">
+                  <table className="w-full text-[11px] font-bold uppercase tracking-tight">
+                    <tbody className="divide-y divide-zinc-50">
+                      <tr className="group">
+                        <td className="py-2.5 text-zinc-400 group-hover:text-zinc-600 transition-colors">SKU</td>
+                        <td className="py-2.5 text-right text-zinc-950">{product.sku}</td>
+                      </tr>
+                      <tr className="group">
+                        <td className="py-2.5 text-zinc-400 group-hover:text-zinc-600 transition-colors">Marca</td>
+                        <td className="py-2.5 text-right text-zinc-950">{brandName || '—'}</td>
+                      </tr>
+                      <tr className="group">
+                        <td className="py-2.5 text-zinc-400 group-hover:text-zinc-600 transition-colors">Unidad</td>
+                        <td className="py-2.5 text-right text-zinc-950">{product.unit}</td>
+                      </tr>
+                      <tr className="group">
+                        <td className="py-2.5 text-zinc-400 group-hover:text-zinc-600 transition-colors">Unidades Inner</td>
+                        <td className="py-2.5 text-right text-zinc-950">{product.inner ?? 1}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* BUY BOX (3 cols on desktop, stacks second on mobile - right below Gallery & Info) */}
+          <div className="lg:col-span-3 self-start w-full">
+            <div className="sticky top-12 space-y-6">
+              <BuyBox product={product} slug={product.slug} />
+
+              {/* MEDIOS DE PAGO */}
+              <div className="p-6 sm:p-8 rounded-[36px] sm:rounded-[48px] border border-zinc-100 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.05)] space-y-6">
+                <h3 className="text-base sm:text-lg font-black text-zinc-950 tracking-tight">Medios de pago</h3>
+                <div className="bg-[#00a650] p-4 rounded-xl flex items-center gap-3 text-white">
+                  <Package className="h-5 w-5 shrink-0" />
+                  <p className="text-[12px] font-bold leading-snug">
+                    ¡Compra ahora y paga en 30, 60 o 90 días con tu crédito B2B!
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-[10px] sm:text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-3">Crédito Directo</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Contado', '30 días', '60 días', '90 días'].map(term => (
+                        <div key={term} className="px-2.5 py-1.5 rounded-lg bg-zinc-50 border border-zinc-100 text-[10px] sm:text-[11px] font-bold text-zinc-650">
+                          {term}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] sm:text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-3">Tarjetas de Crédito y Débito</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Visa', 'Mastercard', 'Mercado Pago', 'Transferencia'].map(method => (
+                        <div key={method} className="px-2.5 py-1.5 rounded-lg bg-zinc-50 border border-zinc-100 text-[10px] sm:text-[11px] font-bold text-zinc-650">
+                          {method}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-zinc-50">
+                  <a href="#" className="text-[11px] sm:text-[12px] font-bold text-blue-600 hover:underline">Conoce nuestros términos de crédito</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* DESCRIPCIÓN DEL PRODUCTO (9 cols on desktop, stacks third on mobile) */}
+          <div className="lg:col-span-9 pt-8 lg:pt-16 border-t border-zinc-100 mt-4 lg:mt-8">
+            <section className="max-w-4xl">
+              <h2 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-4 lg:mb-6">Descripción del producto</h2>
+              <div className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+                {product.description || 'No hay descripción disponible.'}
+              </div>
+            </section>
+          </div>
+        </div>
+
+        {/* MÁS INFORMACIÓN DEL PRODUCTO (Full Width) */}
+        <div className="mt-20 border-t border-zinc-200 pt-16 space-y-12">
+          <section className="space-y-10">
+            <div className="bg-blue-600 text-white px-6 py-2.5 text-lg font-black uppercase tracking-widest w-fit rounded-lg shadow-lg shadow-blue-600/20">
+              Más información del producto
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+              {/* Características */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b-2 border-zinc-100 pb-4">
+                  <h3 className="text-xl font-black text-zinc-950 tracking-tight">Características y especificaciones</h3>
+                  <ChevronDown className="h-5 w-5 text-zinc-400" />
+                </div>
+                <table className="w-full text-sm">
+                  <tbody className="divide-y divide-zinc-50">
+                    {product.specifications && Array.isArray(product.specifications) && product.specifications.length > 0 ? (
+                      product.specifications.map((spec: any, idx: number) => (
+                        <tr key={idx} className={idx % 2 === 0 ? 'bg-zinc-50/30' : ''}>
+                          <td className="py-4 px-4 font-bold text-zinc-900 w-1/2 uppercase text-[11px] tracking-wider">{spec.label || spec.name}</td>
+                          <td className="py-4 px-4 text-zinc-600 font-medium">{spec.value}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td className="py-4 px-4 text-zinc-400 italic" colSpan={2}>No hay especificaciones disponibles.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Detalles */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b-2 border-zinc-100 pb-4">
+                  <h3 className="text-xl font-black text-zinc-950 tracking-tight">Detalles del producto</h3>
+                  <ChevronDown className="h-5 w-5 text-zinc-400" />
+                </div>
+                <div className="p-8 rounded-3xl bg-zinc-50 border border-zinc-100 text-[13px] text-zinc-600 space-y-5 font-medium">
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-400 uppercase font-black text-[10px] tracking-widest">Dimensiones</span>
+                    <span className="text-zinc-900">{Number(product.length) || '—'} x {Number(product.width) || '—'} x {Number(product.height) || '—'} cm; {Number(product.weight) || '—'} kg</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-400 uppercase font-black text-[10px] tracking-widest">Fabricante</span>
+                    <span className="text-zinc-900">{brandName || '—'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-400 uppercase font-black text-[10px] tracking-widest">SKU</span>
+                    <span className="text-zinc-900 font-mono font-bold">{product.sku}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/*
+          SECCIONES SECUNDARIAS — carga en streaming (no bloquean el HTML inicial).
+          Usan companyId=null → precios base. No bloquean el render principal.
+        */}
+        <Suspense fallback={null}>
+          <BundleSuggestionSection
+            product={product}
+            primaryImageUrl={primaryImage?.url}
+          />
+        </Suspense>
+
+        <Suspense fallback={null}>
+          <RelatedProductsSection
+            categoryId={product.categoryId}
+            currentProductId={product.id}
+          />
+        </Suspense>
+
+      </main>
+
+      <PublicFooter />
+
+    </div>
+  );
+}
+
+// ─── Server Components Secundarios ─────────────────────────────────────────────
+// Cargan en streaming (Suspense fallback=null).
+// Usan companyId=null para no bloquear — precios base, no B2B.
+
+async function RelatedProductsSection({
+  categoryId, currentProductId,
+}: {
+  categoryId: string | null;
+  currentProductId: string;
+}) {
+  const related = await getRelatedProductsUseCase(categoryId, currentProductId, null);
+  if (!related || related.length === 0) return null;
+
+  return (
+    <div className="mt-12 border-t border-zinc-100 pt-16">
+      <ProductSlider title="Productos Relacionados" products={related} />
+    </div>
+  );
+}
+
+async function BundleSuggestionSection({
+  product, primaryImageUrl,
+}: {
+  product: any;
+  primaryImageUrl: string;
+}) {
+  const cookieStore = await cookies();
+  const isAuthenticated = !!cookieStore.get('refresh_token')?.value;
+  if (!isAuthenticated) return null;
+
+  const bundle = await getBundleSuggestionUseCase(product.categoryId, product.brandId, product.id, null);
+  if (!bundle) return null;
+
+  return (
+    <section className="mt-20 p-8 lg:p-10 rounded-[48px] border-2 border-zinc-50 bg-zinc-50/30 overflow-hidden relative">
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full" />
+      <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 max-w-6xl mx-auto relative z-10">
+        <div className="flex flex-col gap-6 flex-1">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xl font-black text-zinc-950 tracking-tight">Sugerencia de compra</h2>
+            <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">Aumenta tu rentabilidad combinando estos productos</p>
+          </div>
+          <div className="flex items-center gap-6">
+            {/* Producto Actual */}
+            <div className="group relative">
+              <div className="w-32 h-32 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden">
+                <Image
+                  src={primaryImageUrl || '/placeholder-product.png'}
+                  fill
+                  sizes="128px"
+                  className="object-contain p-4 mix-blend-multiply"
+                  alt="Producto actual"
+                />
+              </div>
+              <div className="absolute -bottom-2 -right-2 bg-zinc-900 text-white text-[10px] font-black px-2 py-1 rounded-lg">
+                x{product.inner || product.minOrderQty || 1}
+              </div>
+            </div>
+
+            <Plus className="h-5 w-5 text-zinc-300 shrink-0" />
+
+            {/* Producto Sugerido */}
+            <div className="group relative">
+              <Link href={`/products/${bundle.slug}`} className="block w-32 h-32 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden">
+                <Image
+                  src={(bundle.images as any)?.[0]?.url || '/placeholder-product.png'}
+                  fill
+                  sizes="128px"
+                  className="object-contain p-4 mix-blend-multiply"
+                  alt={bundle.name}
+                />
+              </Link>
+              <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-black px-2 py-1 rounded-lg">
+                x{bundle.inner || bundle.minOrderQty || 1}
+              </div>
+            </div>
+            
+            <div className="flex flex-col gap-1 max-w-[200px]">
+              <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Sugerido</div>
+              <Link href={`/products/${bundle.slug}`} className="text-sm font-bold text-zinc-900 hover:text-blue-600 transition-colors line-clamp-2 uppercase">
+                {bundle.name}
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <BundleAction currentProduct={product} suggestedProduct={bundle} />
+      </div>
+    </section>
+  );
+}

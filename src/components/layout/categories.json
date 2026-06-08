@@ -1,0 +1,2462 @@
+[
+  {
+    "id": "cmpwywts0000bu5n0zqehbkpq",
+    "name": "ESCOLAR",
+    "slug": "escolar",
+    "description": "Categoría Padre: ESCOLAR",
+    "parentId": null,
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.672Z",
+    "updatedAt": "2026-06-02T18:25:24.672Z"
+  },
+  {
+    "id": "cmpwywu2k0089u5n0ytj5l6xz",
+    "name": "ESCOLAR > ACRILICO",
+    "slug": "escolar-acrilico",
+    "description": "Categoría Hija: ESCOLAR > ACRILICO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.052Z",
+    "updatedAt": "2026-06-02T18:25:25.052Z"
+  },
+  {
+    "id": "cmpwywu2c0083u5n0qwwrg5ny",
+    "name": "ESCOLAR > ACTIVADOR",
+    "slug": "escolar-activador",
+    "description": "Categoría Hija: ESCOLAR > ACTIVADOR",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.044Z",
+    "updatedAt": "2026-06-02T18:25:25.044Z"
+  },
+  {
+    "id": "cmpwywtvw0038u5n0f68two8j",
+    "name": "ESCOLAR > ACUARELA",
+    "slug": "escolar-acuarela",
+    "description": "Categoría Hija: ESCOLAR > ACUARELA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.812Z",
+    "updatedAt": "2026-06-02T18:25:24.812Z"
+  },
+  {
+    "id": "cmpwywu25007xu5n0tjotld3o",
+    "name": "ESCOLAR > ADHESIVO",
+    "slug": "escolar-adhesivo",
+    "description": "Categoría Hija: ESCOLAR > ADHESIVO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.037Z",
+    "updatedAt": "2026-06-02T18:25:25.037Z"
+  },
+  {
+    "id": "cmpwywtz2005qu5n0whebbsby",
+    "name": "ESCOLAR > ARENA",
+    "slug": "escolar-arena",
+    "description": "Categoría Hija: ESCOLAR > ARENA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.926Z",
+    "updatedAt": "2026-06-02T18:25:24.926Z"
+  },
+  {
+    "id": "cmpwywuaw00dwu5n072z5lg7c",
+    "name": "ESCOLAR > BARNIZ",
+    "slug": "escolar-barniz",
+    "description": "Categoría Hija: ESCOLAR > BARNIZ",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.352Z",
+    "updatedAt": "2026-06-02T18:25:25.352Z"
+  },
+  {
+    "id": "cmpwywuaj00dmu5n0cmg3y7eo",
+    "name": "ESCOLAR > BLOCK",
+    "slug": "escolar-block",
+    "description": "Categoría Hija: ESCOLAR > BLOCK",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.340Z",
+    "updatedAt": "2026-06-02T18:25:25.340Z"
+  },
+  {
+    "id": "cmpwywtw8003iu5n05qiphdm6",
+    "name": "ESCOLAR > BOLIGRAFO",
+    "slug": "escolar-boligrafo",
+    "description": "Categoría Hija: ESCOLAR > BOLIGRAFO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.824Z",
+    "updatedAt": "2026-06-02T18:25:24.824Z"
+  },
+  {
+    "id": "cmpwywtv9002ou5n07bwnp9ju",
+    "name": "ESCOLAR > BOLIGRAFOS",
+    "slug": "escolar-boligrafos",
+    "description": "Categoría Hija: ESCOLAR > BOLIGRAFOS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.789Z",
+    "updatedAt": "2026-06-02T18:25:24.789Z"
+  },
+  {
+    "id": "cmpwywu7y00bru5n0ywxy3jaa",
+    "name": "ESCOLAR > BORRADOR",
+    "slug": "escolar-borrador",
+    "description": "Categoría Hija: ESCOLAR > BORRADOR",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.247Z",
+    "updatedAt": "2026-06-02T18:25:25.247Z"
+  },
+  {
+    "id": "cmpwywtxq004mu5n0fqxyqdzu",
+    "name": "ESCOLAR > CARTON",
+    "slug": "escolar-carton",
+    "description": "Categoría Hija: ESCOLAR > CARTON",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.878Z",
+    "updatedAt": "2026-06-02T18:25:24.878Z"
+  },
+  {
+    "id": "cmpwywtxf004eu5n0j53es7hu",
+    "name": "ESCOLAR > CARTULINA",
+    "slug": "escolar-cartulina",
+    "description": "Categoría Hija: ESCOLAR > CARTULINA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.867Z",
+    "updatedAt": "2026-06-02T18:25:24.867Z"
+  },
+  {
+    "id": "cmpwywu4n009pu5n0hrjf7q8n",
+    "name": "ESCOLAR > CASITA",
+    "slug": "escolar-casita",
+    "description": "Categoría Hija: ESCOLAR > CASITA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.128Z",
+    "updatedAt": "2026-06-02T18:25:25.128Z"
+  },
+  {
+    "id": "cmpwywu3w0098u5n0rww4t71o",
+    "name": "ESCOLAR > CHICOS",
+    "slug": "escolar-chicos",
+    "description": "Categoría Hija: ESCOLAR > CHICOS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.101Z",
+    "updatedAt": "2026-06-02T18:25:25.101Z"
+  },
+  {
+    "id": "cmpwywu290081u5n06amr83ik",
+    "name": "ESCOLAR > CINTA",
+    "slug": "escolar-cinta",
+    "description": "Categoría Hija: ESCOLAR > CINTA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.042Z",
+    "updatedAt": "2026-06-02T18:25:25.042Z"
+  },
+  {
+    "id": "cmpwywu6e00atu5n0ols8o125",
+    "name": "ESCOLAR > CLIP",
+    "slug": "escolar-clip",
+    "description": "Categoría Hija: ESCOLAR > CLIP",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.190Z",
+    "updatedAt": "2026-06-02T18:25:25.190Z"
+  },
+  {
+    "id": "cmpwywtw3003eu5n02bvfeljh",
+    "name": "ESCOLAR > COLA",
+    "slug": "escolar-cola",
+    "description": "Categoría Hija: ESCOLAR > COLA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.819Z",
+    "updatedAt": "2026-06-02T18:25:24.819Z"
+  },
+  {
+    "id": "cmpwywtw1003cu5n05uhqwosj",
+    "name": "ESCOLAR > COLORES",
+    "slug": "escolar-colores",
+    "description": "Categoría Hija: ESCOLAR > COLORES",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.817Z",
+    "updatedAt": "2026-06-02T18:25:24.817Z"
+  },
+  {
+    "id": "cmpwywtvd002su5n0iurhyh9g",
+    "name": "ESCOLAR > CRAYON",
+    "slug": "escolar-crayon",
+    "description": "Categoría Hija: ESCOLAR > CRAYON",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.794Z",
+    "updatedAt": "2026-06-02T18:25:24.794Z"
+  },
+  {
+    "id": "cmpwywtvi002wu5n0eevhh27b",
+    "name": "ESCOLAR > CRAYONES",
+    "slug": "escolar-crayones",
+    "description": "Categoría Hija: ESCOLAR > CRAYONES",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.798Z",
+    "updatedAt": "2026-06-02T18:25:24.798Z"
+  },
+  {
+    "id": "cmpwywtx00044u5n0dqp6wr66",
+    "name": "ESCOLAR > CREPE",
+    "slug": "escolar-crepe",
+    "description": "Categoría Hija: ESCOLAR > CREPE",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.853Z",
+    "updatedAt": "2026-06-02T18:25:24.853Z"
+  },
+  {
+    "id": "cmpwywu6n00azu5n0ke2phzzs",
+    "name": "ESCOLAR > CUADERNO",
+    "slug": "escolar-cuaderno",
+    "description": "Categoría Hija: ESCOLAR > CUADERNO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.199Z",
+    "updatedAt": "2026-06-02T18:25:25.199Z"
+  },
+  {
+    "id": "cmpwywtsx000yu5n0vuhq0a5n",
+    "name": "ESCOLAR > CUCHILLO",
+    "slug": "escolar-cuchillo",
+    "description": "Categoría Hija: ESCOLAR > CUCHILLO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.706Z",
+    "updatedAt": "2026-06-02T18:25:24.706Z"
+  },
+  {
+    "id": "cmpwywtwh003qu5n0tmy2q7ml",
+    "name": "ESCOLAR > DELANTAL",
+    "slug": "escolar-delantal",
+    "description": "Categoría Hija: ESCOLAR > DELANTAL",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.833Z",
+    "updatedAt": "2026-06-02T18:25:24.833Z"
+  },
+  {
+    "id": "cmpwywu8f00c1u5n03fq1rgf6",
+    "name": "ESCOLAR > DESTACADOR",
+    "slug": "escolar-destacador",
+    "description": "Categoría Hija: ESCOLAR > DESTACADOR",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.263Z",
+    "updatedAt": "2026-06-02T18:25:25.263Z"
+  },
+  {
+    "id": "cmpwywtv4002ku5n0saqqao1d",
+    "name": "ESCOLAR > DESTACADORES",
+    "slug": "escolar-destacadores",
+    "description": "Categoría Hija: ESCOLAR > DESTACADORES",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.785Z",
+    "updatedAt": "2026-06-02T18:25:24.785Z"
+  },
+  {
+    "id": "cmpwywtwk003su5n027l6orz9",
+    "name": "ESCOLAR > DIBUJO",
+    "slug": "escolar-dibujo",
+    "description": "Categoría Hija: ESCOLAR > DIBUJO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.836Z",
+    "updatedAt": "2026-06-02T18:25:24.836Z"
+  },
+  {
+    "id": "cmpwywts2000du5n0jh7d5ln8",
+    "name": "ESCOLAR > DISPENSADOR",
+    "slug": "escolar-dispensador",
+    "description": "Categoría Hija: ESCOLAR > DISPENSADOR",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.675Z",
+    "updatedAt": "2026-06-02T18:25:24.675Z"
+  },
+  {
+    "id": "cmpwywu05006ku5n0v6aifclm",
+    "name": "ESCOLAR > ESCALIMETRO",
+    "slug": "escolar-escalimetro",
+    "description": "Categoría Hija: ESCOLAR > ESCALIMETRO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.965Z",
+    "updatedAt": "2026-06-02T18:25:24.965Z"
+  },
+  {
+    "id": "cmpwywtts001mu5n0a204jhzy",
+    "name": "ESCOLAR > ESCARCHA",
+    "slug": "escolar-escarcha",
+    "description": "Categoría Hija: ESCOLAR > ESCARCHA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.736Z",
+    "updatedAt": "2026-06-02T18:25:24.736Z"
+  },
+  {
+    "id": "cmpwywu07006mu5n0mmcusr1q",
+    "name": "ESCOLAR > ESCUADRA",
+    "slug": "escolar-escuadra",
+    "description": "Categoría Hija: ESCOLAR > ESCUADRA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.967Z",
+    "updatedAt": "2026-06-02T18:25:24.967Z"
+  },
+  {
+    "id": "cmpwywttd001au5n05ahn9osu",
+    "name": "ESCOLAR > ESTECAS",
+    "slug": "escolar-estecas",
+    "description": "Categoría Hija: ESCOLAR > ESTECAS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.721Z",
+    "updatedAt": "2026-06-02T18:25:24.721Z"
+  },
+  {
+    "id": "cmpwywtu2001uu5n072fd9jam",
+    "name": "ESCOLAR > ESTUCHE",
+    "slug": "escolar-estuche",
+    "description": "Categoría Hija: ESCOLAR > ESTUCHE",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.746Z",
+    "updatedAt": "2026-06-02T18:25:24.746Z"
+  },
+  {
+    "id": "cmpwywuam00dou5n0io310ra3",
+    "name": "ESCOLAR > EVA",
+    "slug": "escolar-eva",
+    "description": "Categoría Hija: ESCOLAR > EVA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.342Z",
+    "updatedAt": "2026-06-02T18:25:25.342Z"
+  },
+  {
+    "id": "cmpwywtwa003ku5n0i35fzi7r",
+    "name": "ESCOLAR > EXPOSITOR",
+    "slug": "escolar-expositor",
+    "description": "Categoría Hija: ESCOLAR > EXPOSITOR",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.826Z",
+    "updatedAt": "2026-06-02T18:25:24.826Z"
+  },
+  {
+    "id": "cmpwywu1t007nu5n0umli2z12",
+    "name": "ESCOLAR > FOTOPOLIMERO",
+    "slug": "escolar-fotopolimero",
+    "description": "Categoría Hija: ESCOLAR > FOTOPOLIMERO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.025Z",
+    "updatedAt": "2026-06-02T18:25:25.025Z"
+  },
+  {
+    "id": "cmpwywtvg002uu5n0mwkl1fvj",
+    "name": "ESCOLAR > GRASO",
+    "slug": "escolar-graso",
+    "description": "Categoría Hija: ESCOLAR > GRASO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.796Z",
+    "updatedAt": "2026-06-02T18:25:24.796Z"
+  },
+  {
+    "id": "cmpwywtus002bu5n0la9tr8gc",
+    "name": "ESCOLAR > LAPICES",
+    "slug": "escolar-lapices",
+    "description": "Categoría Hija: ESCOLAR > LAPICES",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.773Z",
+    "updatedAt": "2026-06-02T18:25:24.773Z"
+  },
+  {
+    "id": "cmpwywuab00dgu5n0j2j3sijt",
+    "name": "ESCOLAR > LAPIZ",
+    "slug": "escolar-lapiz",
+    "description": "Categoría Hija: ESCOLAR > LAPIZ",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.332Z",
+    "updatedAt": "2026-06-02T18:25:25.332Z"
+  },
+  {
+    "id": "cmpwywu22007vu5n0nnprclge",
+    "name": "ESCOLAR > LUPA",
+    "slug": "escolar-lupa",
+    "description": "Categoría Hija: ESCOLAR > LUPA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.035Z",
+    "updatedAt": "2026-06-02T18:25:25.035Z"
+  },
+  {
+    "id": "cmpwywtv6002mu5n009w1jo31",
+    "name": "ESCOLAR > MARCADOR",
+    "slug": "escolar-marcador",
+    "description": "Categoría Hija: ESCOLAR > MARCADOR",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.787Z",
+    "updatedAt": "2026-06-02T18:25:24.787Z"
+  },
+  {
+    "id": "cmpwywtw5003gu5n0hl2njbch",
+    "name": "ESCOLAR > MASA",
+    "slug": "escolar-masa",
+    "description": "Categoría Hija: ESCOLAR > MASA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.822Z",
+    "updatedAt": "2026-06-02T18:25:24.822Z"
+  },
+  {
+    "id": "cmpwywu27007zu5n0p8qbmmk5",
+    "name": "ESCOLAR > MASILLA",
+    "slug": "escolar-masilla",
+    "description": "Categoría Hija: ESCOLAR > MASILLA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.039Z",
+    "updatedAt": "2026-06-02T18:25:25.039Z"
+  },
+  {
+    "id": "cmpwywtv2002iu5n0p0clhdds",
+    "name": "ESCOLAR > METALICA",
+    "slug": "escolar-metalica",
+    "description": "Categoría Hija: ESCOLAR > METALICA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.782Z",
+    "updatedAt": "2026-06-02T18:25:24.782Z"
+  },
+  {
+    "id": "cmpwywu8n00c7u5n0fwhqs7ed",
+    "name": "ESCOLAR > MINAS",
+    "slug": "escolar-minas",
+    "description": "Categoría Hija: ESCOLAR > MINAS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.271Z",
+    "updatedAt": "2026-06-02T18:25:25.271Z"
+  },
+  {
+    "id": "cmpwywtvk002yu5n0ryamlq2b",
+    "name": "ESCOLAR > MOCHILA",
+    "slug": "escolar-mochila",
+    "description": "Categoría Hija: ESCOLAR > MOCHILA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.800Z",
+    "updatedAt": "2026-06-02T18:25:24.800Z"
+  },
+  {
+    "id": "cmpwywu4f009ku5n0idwelj9i",
+    "name": "ESCOLAR > MUÑECA",
+    "slug": "escolar-muneca",
+    "description": "Categoría Hija: ESCOLAR > MUÑECA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.119Z",
+    "updatedAt": "2026-06-02T18:25:25.119Z"
+  },
+  {
+    "id": "cmpwywuah00dku5n0elbzmx8y",
+    "name": "ESCOLAR > PAÑO",
+    "slug": "escolar-pano",
+    "description": "Categoría Hija: ESCOLAR > PAÑO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.337Z",
+    "updatedAt": "2026-06-02T18:25:25.337Z"
+  },
+  {
+    "id": "cmpwywtxk004iu5n0g9fpfnj5",
+    "name": "ESCOLAR > PAPEL",
+    "slug": "escolar-papel",
+    "description": "Categoría Hija: ESCOLAR > PAPEL",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.873Z",
+    "updatedAt": "2026-06-02T18:25:24.873Z"
+  },
+  {
+    "id": "cmpwywu4q009ru5n0w8lwn5ok",
+    "name": "ESCOLAR > PARLANTE",
+    "slug": "escolar-parlante",
+    "description": "Categoría Hija: ESCOLAR > PARLANTE",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.130Z",
+    "updatedAt": "2026-06-02T18:25:25.130Z"
+  },
+  {
+    "id": "cmpwywtvp0032u5n00jdmnumh",
+    "name": "ESCOLAR > PASTA",
+    "slug": "escolar-pasta",
+    "description": "Categoría Hija: ESCOLAR > PASTA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.805Z",
+    "updatedAt": "2026-06-02T18:25:24.805Z"
+  },
+  {
+    "id": "cmpwywtxw004qu5n0faipyotk",
+    "name": "ESCOLAR > PEGAMENTO",
+    "slug": "escolar-pegamento",
+    "description": "Categoría Hija: ESCOLAR > PEGAMENTO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.884Z",
+    "updatedAt": "2026-06-02T18:25:24.884Z"
+  },
+  {
+    "id": "cmpwywu2h0087u5n0i7m6jhpi",
+    "name": "ESCOLAR > PINTACARITAS",
+    "slug": "escolar-pintacaritas",
+    "description": "Categoría Hija: ESCOLAR > PINTACARITAS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.050Z",
+    "updatedAt": "2026-06-02T18:25:25.050Z"
+  },
+  {
+    "id": "cmpwywtvu0036u5n0fblqmfi8",
+    "name": "ESCOLAR > PINTURA",
+    "slug": "escolar-pintura",
+    "description": "Categoría Hija: ESCOLAR > PINTURA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.810Z",
+    "updatedAt": "2026-06-02T18:25:24.810Z"
+  },
+  {
+    "id": "cmpwywtxy004su5n0jnvf57hi",
+    "name": "ESCOLAR > PISTOLA",
+    "slug": "escolar-pistola",
+    "description": "Categoría Hija: ESCOLAR > PISTOLA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.886Z",
+    "updatedAt": "2026-06-02T18:25:24.886Z"
+  },
+  {
+    "id": "cmpwywu8100btu5n0dedkovi2",
+    "name": "ESCOLAR > PIZARRA",
+    "slug": "escolar-pizarra",
+    "description": "Categoría Hija: ESCOLAR > PIZARRA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.249Z",
+    "updatedAt": "2026-06-02T18:25:25.249Z"
+  },
+  {
+    "id": "cmpwywu0g006uu5n060w5ikg7",
+    "name": "ESCOLAR > PLANTILLA",
+    "slug": "escolar-plantilla",
+    "description": "Categoría Hija: ESCOLAR > PLANTILLA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.976Z",
+    "updatedAt": "2026-06-02T18:25:24.976Z"
+  },
+  {
+    "id": "cmpwywtvy003au5n0ecv294bn",
+    "name": "ESCOLAR > PLASTICINA",
+    "slug": "escolar-plasticina",
+    "description": "Categoría Hija: ESCOLAR > PLASTICINA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.815Z",
+    "updatedAt": "2026-06-02T18:25:24.815Z"
+  },
+  {
+    "id": "cmpwywtwc003mu5n0telbp58t",
+    "name": "ESCOLAR > PLUMA",
+    "slug": "escolar-pluma",
+    "description": "Categoría Hija: ESCOLAR > PLUMA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.829Z",
+    "updatedAt": "2026-06-02T18:25:24.829Z"
+  },
+  {
+    "id": "cmpwywtwf003ou5n0yj4bz7cc",
+    "name": "ESCOLAR > PLUMAS",
+    "slug": "escolar-plumas",
+    "description": "Categoría Hija: ESCOLAR > PLUMAS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.831Z",
+    "updatedAt": "2026-06-02T18:25:24.831Z"
+  },
+  {
+    "id": "cmpwywtux002fu5n001wbdxue",
+    "name": "ESCOLAR > PLUMONES",
+    "slug": "escolar-plumones",
+    "description": "Categoría Hija: ESCOLAR > PLUMONES",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.777Z",
+    "updatedAt": "2026-06-02T18:25:24.777Z"
+  },
+  {
+    "id": "cmpwywtyn005cu5n0f74myan5",
+    "name": "ESCOLAR > PORTA",
+    "slug": "escolar-porta",
+    "description": "Categoría Hija: ESCOLAR > PORTA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.911Z",
+    "updatedAt": "2026-06-02T18:25:24.911Z"
+  },
+  {
+    "id": "cmpwywtvb002qu5n0h497riha",
+    "name": "ESCOLAR > PORTAMINAS",
+    "slug": "escolar-portaminas",
+    "description": "Categoría Hija: ESCOLAR > PORTAMINAS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.792Z",
+    "updatedAt": "2026-06-02T18:25:24.792Z"
+  },
+  {
+    "id": "cmpwywtvm0030u5n0m2t8crhh",
+    "name": "ESCOLAR > PUZLE",
+    "slug": "escolar-puzle",
+    "description": "Categoría Hija: ESCOLAR > PUZLE",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.803Z",
+    "updatedAt": "2026-06-02T18:25:24.803Z"
+  },
+  {
+    "id": "cmpwywu09006ou5n05otgff8e",
+    "name": "ESCOLAR > REGLA",
+    "slug": "escolar-regla",
+    "description": "Categoría Hija: ESCOLAR > REGLA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.970Z",
+    "updatedAt": "2026-06-02T18:25:24.970Z"
+  },
+  {
+    "id": "cmpwywts8000hu5n0e1qpbgmm",
+    "name": "ESCOLAR > SACACORCHETES",
+    "slug": "escolar-sacacorchetes",
+    "description": "Categoría Hija: ESCOLAR > SACACORCHETES",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.680Z",
+    "updatedAt": "2026-06-02T18:25:24.680Z"
+  },
+  {
+    "id": "cmpwywu1y007ru5n03k6p20gr",
+    "name": "ESCOLAR > SACAPUNTAS",
+    "slug": "escolar-sacapuntas",
+    "description": "Categoría Hija: ESCOLAR > SACAPUNTAS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.030Z",
+    "updatedAt": "2026-06-02T18:25:25.030Z"
+  },
+  {
+    "id": "cmpwywu1e007cu5n0oio3s9gu",
+    "name": "ESCOLAR > SELLOS",
+    "slug": "escolar-sellos",
+    "description": "Categoría Hija: ESCOLAR > SELLOS",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.011Z",
+    "updatedAt": "2026-06-02T18:25:25.011Z"
+  },
+  {
+    "id": "cmpwywtzc005xu5n0edfd888v",
+    "name": "ESCOLAR > SET",
+    "slug": "escolar-set",
+    "description": "Categoría Hija: ESCOLAR > SET",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.936Z",
+    "updatedAt": "2026-06-02T18:25:24.936Z"
+  },
+  {
+    "id": "cmpwywty0004uu5n02h4wtbg3",
+    "name": "ESCOLAR > SILICONA",
+    "slug": "escolar-silicona",
+    "description": "Categoría Hija: ESCOLAR > SILICONA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.889Z",
+    "updatedAt": "2026-06-02T18:25:24.889Z"
+  },
+  {
+    "id": "cmpwywu2e0085u5n00efk1imh",
+    "name": "ESCOLAR > SLIME",
+    "slug": "escolar-slime",
+    "description": "Categoría Hija: ESCOLAR > SLIME",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.047Z",
+    "updatedAt": "2026-06-02T18:25:25.047Z"
+  },
+  {
+    "id": "cmpwywtvr0034u5n07n2huqjv",
+    "name": "ESCOLAR > TEMPERA",
+    "slug": "escolar-tempera",
+    "description": "Categoría Hija: ESCOLAR > TEMPERA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.807Z",
+    "updatedAt": "2026-06-02T18:25:24.807Z"
+  },
+  {
+    "id": "cmpwywub600e4u5n03c8psrqy",
+    "name": "ESCOLAR > TERMOIMPRESIÓN",
+    "slug": "escolar-termoimpresion",
+    "description": "Categoría Hija: ESCOLAR > TERMOIMPRESIÓN",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.362Z",
+    "updatedAt": "2026-06-02T18:25:25.362Z"
+  },
+  {
+    "id": "cmpwywttk001gu5n0w986xiia",
+    "name": "ESCOLAR > TIJERA",
+    "slug": "escolar-tijera",
+    "description": "Categoría Hija: ESCOLAR > TIJERA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.729Z",
+    "updatedAt": "2026-06-02T18:25:24.729Z"
+  },
+  {
+    "id": "cmpwywtuv002du5n0whx19jks",
+    "name": "ESCOLAR > TIZA",
+    "slug": "escolar-tiza",
+    "description": "Categoría Hija: ESCOLAR > TIZA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.775Z",
+    "updatedAt": "2026-06-02T18:25:24.775Z"
+  },
+  {
+    "id": "cmpwywtzf005zu5n0teq6lh2j",
+    "name": "ESCOLAR > TORNETA",
+    "slug": "escolar-torneta",
+    "description": "Categoría Hija: ESCOLAR > TORNETA",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.939Z",
+    "updatedAt": "2026-06-02T18:25:24.939Z"
+  },
+  {
+    "id": "cmpwywuao00dqu5n0d1u0w8zx",
+    "name": "ESCOLAR > TRANSPORTADOR",
+    "slug": "escolar-transportador",
+    "description": "Categoría Hija: ESCOLAR > TRANSPORTADOR",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.344Z",
+    "updatedAt": "2026-06-02T18:25:25.344Z"
+  },
+  {
+    "id": "cmpwywu4t009tu5n065df7kd3",
+    "name": "ESCOLAR > TROMPO",
+    "slug": "escolar-trompo",
+    "description": "Categoría Hija: ESCOLAR > TROMPO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.133Z",
+    "updatedAt": "2026-06-02T18:25:25.133Z"
+  },
+  {
+    "id": "cmpwywu4w009vu5n0auwucxa1",
+    "name": "ESCOLAR > YOYO",
+    "slug": "escolar-yoyo",
+    "description": "Categoría Hija: ESCOLAR > YOYO",
+    "parentId": "cmpwywts0000bu5n0zqehbkpq",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.136Z",
+    "updatedAt": "2026-06-02T18:25:25.136Z"
+  },
+  {
+    "id": "cmpwywtrj0004u5n0cs6scapy",
+    "name": "FERRETERIA",
+    "slug": "ferreteria",
+    "description": "Categoría Padre: FERRETERIA",
+    "parentId": null,
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.656Z",
+    "updatedAt": "2026-06-02T18:25:24.656Z"
+  },
+  {
+    "id": "cmpwywtzs0069u5n0t67jdjrv",
+    "name": "FERRETERIA > ADHESIVO",
+    "slug": "ferreteria-adhesivo",
+    "description": "Categoría Hija: FERRETERIA > ADHESIVO",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.952Z",
+    "updatedAt": "2026-06-02T18:25:24.952Z"
+  },
+  {
+    "id": "cmpwywtzn0065u5n0voq7e3y0",
+    "name": "FERRETERIA > BLADES",
+    "slug": "ferreteria-blades",
+    "description": "Categoría Hija: FERRETERIA > BLADES",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.947Z",
+    "updatedAt": "2026-06-02T18:25:24.947Z"
+  },
+  {
+    "id": "cmpwywttn001iu5n00i0c7x5f",
+    "name": "FERRETERIA > CAJA",
+    "slug": "ferreteria-caja",
+    "description": "Categoría Hija: FERRETERIA > CAJA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.731Z",
+    "updatedAt": "2026-06-02T18:25:24.731Z"
+  },
+  {
+    "id": "cmpwywua100d8u5n075qhxwdx",
+    "name": "FERRETERIA > CARRO",
+    "slug": "ferreteria-carro",
+    "description": "Categoría Hija: FERRETERIA > CARRO",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.321Z",
+    "updatedAt": "2026-06-02T18:25:25.321Z"
+  },
+  {
+    "id": "cmpwywtrn0006u5n0n482jtcq",
+    "name": "FERRETERIA > CINTA",
+    "slug": "ferreteria-cinta",
+    "description": "Categoría Hija: FERRETERIA > CINTA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.659Z",
+    "updatedAt": "2026-06-02T18:25:24.659Z"
+  },
+  {
+    "id": "cmpwywu9500cku5n0ujntturo",
+    "name": "FERRETERIA > CLAVADORA",
+    "slug": "ferreteria-clavadora",
+    "description": "Categoría Hija: FERRETERIA > CLAVADORA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.289Z",
+    "updatedAt": "2026-06-02T18:25:25.289Z"
+  },
+  {
+    "id": "cmpwywu9700cmu5n081nz52br",
+    "name": "FERRETERIA > CLAVOS",
+    "slug": "ferreteria-clavos",
+    "description": "Categoría Hija: FERRETERIA > CLAVOS",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.291Z",
+    "updatedAt": "2026-06-02T18:25:25.291Z"
+  },
+  {
+    "id": "cmpwywtzy006eu5n0nj4cdhgf",
+    "name": "FERRETERIA > COLA",
+    "slug": "ferreteria-cola",
+    "description": "Categoría Hija: FERRETERIA > COLA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.958Z",
+    "updatedAt": "2026-06-02T18:25:24.958Z"
+  },
+  {
+    "id": "cmpwywtzj0062u5n0na835ld0",
+    "name": "FERRETERIA > CUTTER",
+    "slug": "ferreteria-cutter",
+    "description": "Categoría Hija: FERRETERIA > CUTTER",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.943Z",
+    "updatedAt": "2026-06-02T18:25:24.943Z"
+  },
+  {
+    "id": "cmpwywu9000chu5n0a39q4dyv",
+    "name": "FERRETERIA > GRAPADORA",
+    "slug": "ferreteria-grapadora",
+    "description": "Categoría Hija: FERRETERIA > GRAPADORA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.284Z",
+    "updatedAt": "2026-06-02T18:25:25.284Z"
+  },
+  {
+    "id": "cmpwywu9s00d2u5n0tar9tze0",
+    "name": "FERRETERIA > GRAPAS",
+    "slug": "ferreteria-grapas",
+    "description": "Categoría Hija: FERRETERIA > GRAPAS",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.312Z",
+    "updatedAt": "2026-06-02T18:25:25.312Z"
+  },
+  {
+    "id": "cmpwywttp001ku5n0l541mpff",
+    "name": "FERRETERIA > LLAVERO",
+    "slug": "ferreteria-llavero",
+    "description": "Categoría Hija: FERRETERIA > LLAVERO",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.734Z",
+    "updatedAt": "2026-06-02T18:25:24.734Z"
+  },
+  {
+    "id": "cmpwywtzw006cu5n0t5c4y4kt",
+    "name": "FERRETERIA > MASILLA",
+    "slug": "ferreteria-masilla",
+    "description": "Categoría Hija: FERRETERIA > MASILLA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.956Z",
+    "updatedAt": "2026-06-02T18:25:24.956Z"
+  },
+  {
+    "id": "cmpwywtzp0067u5n0kjmpoqwr",
+    "name": "FERRETERIA > MEDICION",
+    "slug": "ferreteria-medicion",
+    "description": "Categoría Hija: FERRETERIA > MEDICION",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.950Z",
+    "updatedAt": "2026-06-02T18:25:24.950Z"
+  },
+  {
+    "id": "cmpwywu9p00d0u5n0rlqkmx7s",
+    "name": "FERRETERIA > OJALES",
+    "slug": "ferreteria-ojales",
+    "description": "Categoría Hija: FERRETERIA > OJALES",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.310Z",
+    "updatedAt": "2026-06-02T18:25:25.310Z"
+  },
+  {
+    "id": "cmpwywu9k00cwu5n0nsjr4z4t",
+    "name": "FERRETERIA > OJETILLADORA",
+    "slug": "ferreteria-ojetilladora",
+    "description": "Categoría Hija: FERRETERIA > OJETILLADORA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.305Z",
+    "updatedAt": "2026-06-02T18:25:25.305Z"
+  },
+  {
+    "id": "cmpwywu9n00cyu5n0wc74iog9",
+    "name": "FERRETERIA > OJETILLOS",
+    "slug": "ferreteria-ojetillos",
+    "description": "Categoría Hija: FERRETERIA > OJETILLOS",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.307Z",
+    "updatedAt": "2026-06-02T18:25:25.307Z"
+  },
+  {
+    "id": "cmpwywu9v00d4u5n0emuiofvb",
+    "name": "FERRETERIA > PISTOLA",
+    "slug": "ferreteria-pistola",
+    "description": "Categoría Hija: FERRETERIA > PISTOLA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.316Z",
+    "updatedAt": "2026-06-02T18:25:25.316Z"
+  },
+  {
+    "id": "cmpwywu9y00d6u5n06ossbsn0",
+    "name": "FERRETERIA > PRENSA",
+    "slug": "ferreteria-prensa",
+    "description": "Categoría Hija: FERRETERIA > PRENSA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.319Z",
+    "updatedAt": "2026-06-02T18:25:25.319Z"
+  },
+  {
+    "id": "cmpwywu9c00cqu5n0npfgyt7p",
+    "name": "FERRETERIA > REMACHADORA",
+    "slug": "ferreteria-remachadora",
+    "description": "Categoría Hija: FERRETERIA > REMACHADORA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.296Z",
+    "updatedAt": "2026-06-02T18:25:25.296Z"
+  },
+  {
+    "id": "cmpwywu9f00csu5n0ynzy2l2g",
+    "name": "FERRETERIA > REMACHES",
+    "slug": "ferreteria-remaches",
+    "description": "Categoría Hija: FERRETERIA > REMACHES",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.299Z",
+    "updatedAt": "2026-06-02T18:25:25.299Z"
+  },
+  {
+    "id": "cmpwywu9i00cuu5n0kg7ph1dg",
+    "name": "FERRETERIA > SACABOCADOS",
+    "slug": "ferreteria-sacabocados",
+    "description": "Categoría Hija: FERRETERIA > SACABOCADOS",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.302Z",
+    "updatedAt": "2026-06-02T18:25:25.302Z"
+  },
+  {
+    "id": "cmpwywu02006iu5n0ker4rvz9",
+    "name": "FERRETERIA > SELLADOR",
+    "slug": "ferreteria-sellador",
+    "description": "Categoría Hija: FERRETERIA > SELLADOR",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.963Z",
+    "updatedAt": "2026-06-02T18:25:24.963Z"
+  },
+  {
+    "id": "cmpwywu00006gu5n0vbgj40pk",
+    "name": "FERRETERIA > SILICONA",
+    "slug": "ferreteria-silicona",
+    "description": "Categoría Hija: FERRETERIA > SILICONA",
+    "parentId": "cmpwywtrj0004u5n0cs6scapy",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.961Z",
+    "updatedAt": "2026-06-02T18:25:24.961Z"
+  },
+  {
+    "id": "cmpwywtsk000ou5n0ly34mhb4",
+    "name": "MANUALIDADES",
+    "slug": "manualidades",
+    "description": "Categoría Padre: MANUALIDADES",
+    "parentId": null,
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.693Z",
+    "updatedAt": "2026-06-02T18:25:24.693Z"
+  },
+  {
+    "id": "cmpwywtyv005ku5n0nn86j6tc",
+    "name": "MANUALIDADES > ACRILICO",
+    "slug": "manualidades-acrilico",
+    "description": "Categoría Hija: MANUALIDADES > ACRILICO",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.920Z",
+    "updatedAt": "2026-06-02T18:25:24.920Z"
+  },
+  {
+    "id": "cmpwywtyr005gu5n0lqkal7i4",
+    "name": "MANUALIDADES > ACUARELA",
+    "slug": "manualidades-acuarela",
+    "description": "Categoría Hija: MANUALIDADES > ACUARELA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.915Z",
+    "updatedAt": "2026-06-02T18:25:24.915Z"
+  },
+  {
+    "id": "cmpwywtz4005su5n0k5sg2bb4",
+    "name": "MANUALIDADES > ARCILLA",
+    "slug": "manualidades-arcilla",
+    "description": "Categoría Hija: MANUALIDADES > ARCILLA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.929Z",
+    "updatedAt": "2026-06-02T18:25:24.929Z"
+  },
+  {
+    "id": "cmpwywtyi0058u5n0whqsseoh",
+    "name": "MANUALIDADES > ATRIL",
+    "slug": "manualidades-atril",
+    "description": "Categoría Hija: MANUALIDADES > ATRIL",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.906Z",
+    "updatedAt": "2026-06-02T18:25:24.906Z"
+  },
+  {
+    "id": "cmpwywtt70016u5n055778noq",
+    "name": "MANUALIDADES > BASE",
+    "slug": "manualidades-base",
+    "description": "Categoría Hija: MANUALIDADES > BASE",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.716Z",
+    "updatedAt": "2026-06-02T18:25:24.716Z"
+  },
+  {
+    "id": "cmpwywtyc0054u5n035zccn0q",
+    "name": "MANUALIDADES > BASTIDOR",
+    "slug": "manualidades-bastidor",
+    "description": "Categoría Hija: MANUALIDADES > BASTIDOR",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.901Z",
+    "updatedAt": "2026-06-02T18:25:24.901Z"
+  },
+  {
+    "id": "cmpwywtsp000su5n03ebts4wy",
+    "name": "MANUALIDADES > CORTADOR",
+    "slug": "manualidades-cortador",
+    "description": "Categoría Hija: MANUALIDADES > CORTADOR",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.698Z",
+    "updatedAt": "2026-06-02T18:25:24.698Z"
+  },
+  {
+    "id": "cmpwywu0b006qu5n0njvex932",
+    "name": "MANUALIDADES > COSTURA",
+    "slug": "manualidades-costura",
+    "description": "Categoría Hija: MANUALIDADES > COSTURA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.972Z",
+    "updatedAt": "2026-06-02T18:25:24.972Z"
+  },
+  {
+    "id": "cmpwywtt00010u5n06pb6jetz",
+    "name": "MANUALIDADES > CUCHILLO",
+    "slug": "manualidades-cuchillo",
+    "description": "Categoría Hija: MANUALIDADES > CUCHILLO",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.708Z",
+    "updatedAt": "2026-06-02T18:25:24.708Z"
+  },
+  {
+    "id": "cmpwywtta0018u5n0v6vhykie",
+    "name": "MANUALIDADES > GUILLOTINA",
+    "slug": "manualidades-guillotina",
+    "description": "Categoría Hija: MANUALIDADES > GUILLOTINA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.719Z",
+    "updatedAt": "2026-06-02T18:25:24.719Z"
+  },
+  {
+    "id": "cmpwywtt20012u5n0h3p9s52u",
+    "name": "MANUALIDADES > HOJAS",
+    "slug": "manualidades-hojas",
+    "description": "Categoría Hija: MANUALIDADES > HOJAS",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.711Z",
+    "updatedAt": "2026-06-02T18:25:24.711Z"
+  },
+  {
+    "id": "cmpwywu6t00b3u5n0f12h3pdy",
+    "name": "MANUALIDADES > LANA",
+    "slug": "manualidades-lana",
+    "description": "Categoría Hija: MANUALIDADES > LANA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.206Z",
+    "updatedAt": "2026-06-02T18:25:25.206Z"
+  },
+  {
+    "id": "cmpwywtyf0056u5n05rc61vwn",
+    "name": "MANUALIDADES > MANIQUI",
+    "slug": "manualidades-maniqui",
+    "description": "Categoría Hija: MANUALIDADES > MANIQUI",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.904Z",
+    "updatedAt": "2026-06-02T18:25:24.904Z"
+  },
+  {
+    "id": "cmpwywtz0005ou5n0hbrhct5x",
+    "name": "MANUALIDADES > MEZCLADOR",
+    "slug": "manualidades-mezclador",
+    "description": "Categoría Hija: MANUALIDADES > MEZCLADOR",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.924Z",
+    "updatedAt": "2026-06-02T18:25:24.924Z"
+  },
+  {
+    "id": "cmpwywtyt005iu5n0zlsy2r3k",
+    "name": "MANUALIDADES > OLEO",
+    "slug": "manualidades-oleo",
+    "description": "Categoría Hija: MANUALIDADES > OLEO",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.918Z",
+    "updatedAt": "2026-06-02T18:25:24.918Z"
+  },
+  {
+    "id": "cmpwywtyx005mu5n0mtgs681m",
+    "name": "MANUALIDADES > PALETA",
+    "slug": "manualidades-paleta",
+    "description": "Categoría Hija: MANUALIDADES > PALETA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.922Z",
+    "updatedAt": "2026-06-02T18:25:24.922Z"
+  },
+  {
+    "id": "cmpwywty5004yu5n0utmhzx3s",
+    "name": "MANUALIDADES > PALOS",
+    "slug": "manualidades-palos",
+    "description": "Categoría Hija: MANUALIDADES > PALOS",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.893Z",
+    "updatedAt": "2026-06-02T18:25:24.893Z"
+  },
+  {
+    "id": "cmpwywty70050u5n0nap7vzc6",
+    "name": "MANUALIDADES > PINCEL",
+    "slug": "manualidades-pincel",
+    "description": "Categoría Hija: MANUALIDADES > PINCEL",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.895Z",
+    "updatedAt": "2026-06-02T18:25:24.895Z"
+  },
+  {
+    "id": "cmpwywtyp005eu5n00eok095k",
+    "name": "MANUALIDADES > PINTURA",
+    "slug": "manualidades-pintura",
+    "description": "Categoría Hija: MANUALIDADES > PINTURA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.913Z",
+    "updatedAt": "2026-06-02T18:25:24.913Z"
+  },
+  {
+    "id": "cmpwywtyk005au5n0slo3moaj",
+    "name": "MANUALIDADES > PORTA",
+    "slug": "manualidades-porta",
+    "description": "Categoría Hija: MANUALIDADES > PORTA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.909Z",
+    "updatedAt": "2026-06-02T18:25:24.909Z"
+  },
+  {
+    "id": "cmpwywtsn000qu5n07c63yp9d",
+    "name": "MANUALIDADES > ROTATORIO",
+    "slug": "manualidades-rotatorio",
+    "description": "Categoría Hija: MANUALIDADES > ROTATORIO",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.695Z",
+    "updatedAt": "2026-06-02T18:25:24.695Z"
+  },
+  {
+    "id": "cmpwywtya0052u5n05j3nk8s5",
+    "name": "MANUALIDADES > SET",
+    "slug": "manualidades-set",
+    "description": "Categoría Hija: MANUALIDADES > SET",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.898Z",
+    "updatedAt": "2026-06-02T18:25:24.898Z"
+  },
+  {
+    "id": "cmpwywtti001eu5n0ute5oh1l",
+    "name": "MANUALIDADES > TIJERA",
+    "slug": "manualidades-tijera",
+    "description": "Categoría Hija: MANUALIDADES > TIJERA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.726Z",
+    "updatedAt": "2026-06-02T18:25:24.726Z"
+  },
+  {
+    "id": "cmpwywtza005vu5n0tvm1g72u",
+    "name": "MANUALIDADES > TORNETA",
+    "slug": "manualidades-torneta",
+    "description": "Categoría Hija: MANUALIDADES > TORNETA",
+    "parentId": "cmpwywtsk000ou5n0ly34mhb4",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.934Z",
+    "updatedAt": "2026-06-02T18:25:24.934Z"
+  },
+  {
+    "id": "cmpwywtqt0000u5n0g2c8w0b7",
+    "name": "OFICINA",
+    "slug": "oficina",
+    "description": "Categoría Padre: OFICINA",
+    "parentId": null,
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.629Z",
+    "updatedAt": "2026-06-02T18:25:24.629Z"
+  },
+  {
+    "id": "cmpwywu7g00bfu5n02sk6hviv",
+    "name": "OFICINA > ACOCLIP",
+    "slug": "oficina-acoclip",
+    "description": "Categoría Hija: OFICINA > ACOCLIP",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.228Z",
+    "updatedAt": "2026-06-02T18:25:25.228Z"
+  },
+  {
+    "id": "cmpwywu6r00b1u5n0neadt3vt",
+    "name": "OFICINA > ALFILER",
+    "slug": "oficina-alfiler",
+    "description": "Categoría Hija: OFICINA > ALFILER",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.203Z",
+    "updatedAt": "2026-06-02T18:25:25.203Z"
+  },
+  {
+    "id": "cmpwywu1o007ju5n0x4akrzla",
+    "name": "OFICINA > ALMOHADILLA",
+    "slug": "oficina-almohadilla",
+    "description": "Categoría Hija: OFICINA > ALMOHADILLA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.020Z",
+    "updatedAt": "2026-06-02T18:25:25.020Z"
+  },
+  {
+    "id": "cmpwywu1v007pu5n015rx947a",
+    "name": "OFICINA > AMPOLLETA",
+    "slug": "oficina-ampolleta",
+    "description": "Categoría Hija: OFICINA > AMPOLLETA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.027Z",
+    "updatedAt": "2026-06-02T18:25:25.027Z"
+  },
+  {
+    "id": "cmpwywu5q00adu5n09r2nmehy",
+    "name": "OFICINA > ANOTADOR",
+    "slug": "oficina-anotador",
+    "description": "Categoría Hija: OFICINA > ANOTADOR",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.167Z",
+    "updatedAt": "2026-06-02T18:25:25.167Z"
+  },
+  {
+    "id": "cmpwywu7a00bbu5n0iv7fjqla",
+    "name": "OFICINA > APRETADOR",
+    "slug": "oficina-apretador",
+    "description": "Categoría Hija: OFICINA > APRETADOR",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.223Z",
+    "updatedAt": "2026-06-02T18:25:25.223Z"
+  },
+  {
+    "id": "cmpwywu5h00a7u5n0zojh5jwv",
+    "name": "OFICINA > ARCHIVADOR",
+    "slug": "oficina-archivador",
+    "description": "Categoría Hija: OFICINA > ARCHIVADOR",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.158Z",
+    "updatedAt": "2026-06-02T18:25:25.158Z"
+  },
+  {
+    "id": "cmpwywtwm003uu5n0eq5h14o1",
+    "name": "OFICINA > BLOCK",
+    "slug": "oficina-block",
+    "description": "Categoría Hija: OFICINA > BLOCK",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.839Z",
+    "updatedAt": "2026-06-02T18:25:24.839Z"
+  },
+  {
+    "id": "cmpwywu8400bvu5n09vdw9asi",
+    "name": "OFICINA > BOLIGRAFO",
+    "slug": "oficina-boligrafo",
+    "description": "Categoría Hija: OFICINA > BOLIGRAFO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.252Z",
+    "updatedAt": "2026-06-02T18:25:25.252Z"
+  },
+  {
+    "id": "cmpwywu7m00bju5n0uftf8kn4",
+    "name": "OFICINA > BROCHES",
+    "slug": "oficina-broches",
+    "description": "Categoría Hija: OFICINA > BROCHES",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.235Z",
+    "updatedAt": "2026-06-02T18:25:25.235Z"
+  },
+  {
+    "id": "cmpwywtsh000nu5n0d5v16n1y",
+    "name": "OFICINA > CALCULADORA",
+    "slug": "oficina-calculadora",
+    "description": "Categoría Hija: OFICINA > CALCULADORA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.690Z",
+    "updatedAt": "2026-06-02T18:25:24.690Z"
+  },
+  {
+    "id": "cmpwywu5n00abu5n0bbp99c9x",
+    "name": "OFICINA > CARPETA",
+    "slug": "oficina-carpeta",
+    "description": "Categoría Hija: OFICINA > CARPETA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.163Z",
+    "updatedAt": "2026-06-02T18:25:25.163Z"
+  },
+  {
+    "id": "cmpwywuae00diu5n0a1rh1z6l",
+    "name": "OFICINA > CHEQUE",
+    "slug": "oficina-cheque",
+    "description": "Categoría Hija: OFICINA > CHEQUE",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.334Z",
+    "updatedAt": "2026-06-02T18:25:25.334Z"
+  },
+  {
+    "id": "cmpwywu7400b7u5n06wvfwsmi",
+    "name": "OFICINA > CHINCHES",
+    "slug": "oficina-chinches",
+    "description": "Categoría Hija: OFICINA > CHINCHES",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.216Z",
+    "updatedAt": "2026-06-02T18:25:25.216Z"
+  },
+  {
+    "id": "cmpwywtrc0002u5n0gujnvnn6",
+    "name": "OFICINA > CINTA",
+    "slug": "oficina-cinta",
+    "description": "Categoría Hija: OFICINA > CINTA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.649Z",
+    "updatedAt": "2026-06-02T18:25:24.649Z"
+  },
+  {
+    "id": "cmpwywu6w00b5u5n00nua95u5",
+    "name": "OFICINA > CLAVO",
+    "slug": "oficina-clavo",
+    "description": "Categoría Hija: OFICINA > CLAVO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.209Z",
+    "updatedAt": "2026-06-02T18:25:25.209Z"
+  },
+  {
+    "id": "cmpwywu6b00aru5n0fribps99",
+    "name": "OFICINA > CLIP",
+    "slug": "oficina-clip",
+    "description": "Categoría Hija: OFICINA > CLIP",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.188Z",
+    "updatedAt": "2026-06-02T18:25:25.188Z"
+  },
+  {
+    "id": "cmpwywu7d00bdu5n0itsbuk87",
+    "name": "OFICINA > CLIPERA",
+    "slug": "oficina-clipera",
+    "description": "Categoría Hija: OFICINA > CLIPERA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.225Z",
+    "updatedAt": "2026-06-02T18:25:25.225Z"
+  },
+  {
+    "id": "cmpwywtse000lu5n0njmjp2rz",
+    "name": "OFICINA > COMPAS",
+    "slug": "oficina-compas",
+    "description": "Categoría Hija: OFICINA > COMPAS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.686Z",
+    "updatedAt": "2026-06-02T18:25:24.686Z"
+  },
+  {
+    "id": "cmpwywu0e006su5n0t6c7ynv1",
+    "name": "OFICINA > CONTADOR",
+    "slug": "oficina-contador",
+    "description": "Categoría Hija: OFICINA > CONTADOR",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.974Z",
+    "updatedAt": "2026-06-02T18:25:24.974Z"
+  },
+  {
+    "id": "cmpwywu8p00c9u5n0j36ll1uz",
+    "name": "OFICINA > CORCHETERA",
+    "slug": "oficina-corchetera",
+    "description": "Categoría Hija: OFICINA > CORCHETERA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.273Z",
+    "updatedAt": "2026-06-02T18:25:25.273Z"
+  },
+  {
+    "id": "cmpwywu8r00cbu5n09gxrxpne",
+    "name": "OFICINA > CORCHETES",
+    "slug": "oficina-corchetes",
+    "description": "Categoría Hija: OFICINA > CORCHETES",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.276Z",
+    "updatedAt": "2026-06-02T18:25:25.276Z"
+  },
+  {
+    "id": "cmpwywtu90020u5n008mgc46f",
+    "name": "OFICINA > CORRECTOR",
+    "slug": "oficina-corrector",
+    "description": "Categoría Hija: OFICINA > CORRECTOR",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.753Z",
+    "updatedAt": "2026-06-02T18:25:24.753Z"
+  },
+  {
+    "id": "cmpwywtss000uu5n0sg99h8l3",
+    "name": "OFICINA > CUCHILLO",
+    "slug": "oficina-cuchillo",
+    "description": "Categoría Hija: OFICINA > CUCHILLO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.701Z",
+    "updatedAt": "2026-06-02T18:25:24.701Z"
+  },
+  {
+    "id": "cmpwywttu001ou5n0se6a53d3",
+    "name": "OFICINA > DEDAL",
+    "slug": "oficina-dedal",
+    "description": "Categoría Hija: OFICINA > DEDAL",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.739Z",
+    "updatedAt": "2026-06-02T18:25:24.739Z"
+  },
+  {
+    "id": "cmpwywtru0009u5n00xd05u6g",
+    "name": "OFICINA > DISPENSADOR",
+    "slug": "oficina-dispensador",
+    "description": "Categoría Hija: OFICINA > DISPENSADOR",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.666Z",
+    "updatedAt": "2026-06-02T18:25:24.666Z"
+  },
+  {
+    "id": "cmpwywttx001qu5n0ra67lh8a",
+    "name": "OFICINA > ELASTICO",
+    "slug": "oficina-elastico",
+    "description": "Categoría Hija: OFICINA > ELASTICO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.741Z",
+    "updatedAt": "2026-06-02T18:25:24.741Z"
+  },
+  {
+    "id": "cmpwywu7q00blu5n03bhjcwak",
+    "name": "OFICINA > ESCRITORIO",
+    "slug": "oficina-escritorio",
+    "description": "Categoría Hija: OFICINA > ESCRITORIO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.238Z",
+    "updatedAt": "2026-06-02T18:25:25.238Z"
+  },
+  {
+    "id": "cmpwywttz001su5n0j3jwiu34",
+    "name": "OFICINA > ESPONJERO",
+    "slug": "oficina-esponjero",
+    "description": "Categoría Hija: OFICINA > ESPONJERO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.744Z",
+    "updatedAt": "2026-06-02T18:25:24.744Z"
+  },
+  {
+    "id": "cmpwywua600dcu5n0ljz5a1kz",
+    "name": "OFICINA > ETIQUETA",
+    "slug": "oficina-etiqueta",
+    "description": "Categoría Hija: OFICINA > ETIQUETA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.327Z",
+    "updatedAt": "2026-06-02T18:25:25.327Z"
+  },
+  {
+    "id": "cmpwywtu7001yu5n0fbzaim6p",
+    "name": "OFICINA > ETIQUETADORA",
+    "slug": "oficina-etiquetadora",
+    "description": "Categoría Hija: OFICINA > ETIQUETADORA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.751Z",
+    "updatedAt": "2026-06-02T18:25:24.751Z"
+  },
+  {
+    "id": "cmpwywu7j00bhu5n05wrqg8rl",
+    "name": "OFICINA > FASTENER",
+    "slug": "oficina-fastener",
+    "description": "Categoría Hija: OFICINA > FASTENER",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.232Z",
+    "updatedAt": "2026-06-02T18:25:25.232Z"
+  },
+  {
+    "id": "cmpwywtxc004cu5n02wlyw0tv",
+    "name": "OFICINA > FILM",
+    "slug": "oficina-film",
+    "description": "Categoría Hija: OFICINA > FILM",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.864Z",
+    "updatedAt": "2026-06-02T18:25:24.864Z"
+  },
+  {
+    "id": "cmpwywuar00dsu5n080qmpmxg",
+    "name": "OFICINA > FOLIADORA",
+    "slug": "oficina-foliadora",
+    "description": "Categoría Hija: OFICINA > FOLIADORA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.347Z",
+    "updatedAt": "2026-06-02T18:25:25.347Z"
+  },
+  {
+    "id": "cmpwywu1l007hu5n0vxxwlc1o",
+    "name": "OFICINA > FOTOPOLIMERO",
+    "slug": "oficina-fotopolimero",
+    "description": "Categoría Hija: OFICINA > FOTOPOLIMERO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.018Z",
+    "updatedAt": "2026-06-02T18:25:25.018Z"
+  },
+  {
+    "id": "cmpwywu5u00afu5n0s31ep74o",
+    "name": "OFICINA > FUNDA",
+    "slug": "oficina-funda",
+    "description": "Categoría Hija: OFICINA > FUNDA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.171Z",
+    "updatedAt": "2026-06-02T18:25:25.171Z"
+  },
+  {
+    "id": "cmpwywtsa000ju5n0ws81cvic",
+    "name": "OFICINA > GABINETE",
+    "slug": "oficina-gabinete",
+    "description": "Categoría Hija: OFICINA > GABINETE",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.683Z",
+    "updatedAt": "2026-06-02T18:25:24.683Z"
+  },
+  {
+    "id": "cmpwywu8u00cdu5n06ltwrvmj",
+    "name": "OFICINA > GRAPAS",
+    "slug": "oficina-grapas",
+    "description": "Categoría Hija: OFICINA > GRAPAS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.278Z",
+    "updatedAt": "2026-06-02T18:25:25.278Z"
+  },
+  {
+    "id": "cmpwywtt50014u5n07gu76w8a",
+    "name": "OFICINA > HOJAS",
+    "slug": "oficina-hojas",
+    "description": "Categoría Hija: OFICINA > HOJAS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.713Z",
+    "updatedAt": "2026-06-02T18:25:24.713Z"
+  },
+  {
+    "id": "cmpwywu5k00a9u5n0ntqrvyqo",
+    "name": "OFICINA > INDICE",
+    "slug": "oficina-indice",
+    "description": "Categoría Hija: OFICINA > INDICE",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.161Z",
+    "updatedAt": "2026-06-02T18:25:25.161Z"
+  },
+  {
+    "id": "cmpwywua400dau5n0rmow16yn",
+    "name": "OFICINA > LACRE",
+    "slug": "oficina-lacre",
+    "description": "Categoría Hija: OFICINA > LACRE",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.324Z",
+    "updatedAt": "2026-06-02T18:25:25.324Z"
+  },
+  {
+    "id": "cmpwywu6000aju5n0bgcwzumy",
+    "name": "OFICINA > LAMINADO",
+    "slug": "oficina-laminado",
+    "description": "Categoría Hija: OFICINA > LAMINADO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.176Z",
+    "updatedAt": "2026-06-02T18:25:25.176Z"
+  },
+  {
+    "id": "cmpwywu6k00axu5n0464sty8q",
+    "name": "OFICINA > LANYARD",
+    "slug": "oficina-lanyard",
+    "description": "Categoría Hija: OFICINA > LANYARD",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.196Z",
+    "updatedAt": "2026-06-02T18:25:25.196Z"
+  },
+  {
+    "id": "cmpwywuat00duu5n0pdmvmn8a",
+    "name": "OFICINA > LLAVERO",
+    "slug": "oficina-llavero",
+    "description": "Categoría Hija: OFICINA > LLAVERO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.350Z",
+    "updatedAt": "2026-06-02T18:25:25.350Z"
+  },
+  {
+    "id": "cmpwywu6800apu5n0ttrknmxf",
+    "name": "OFICINA > MALETÍN",
+    "slug": "oficina-maletin",
+    "description": "Categoría Hija: OFICINA > MALETÍN",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.184Z",
+    "updatedAt": "2026-06-02T18:25:25.184Z"
+  },
+  {
+    "id": "cmpwywu8700bxu5n0qxj19dak",
+    "name": "OFICINA > MARCADOR",
+    "slug": "oficina-marcador",
+    "description": "Categoría Hija: OFICINA > MARCADOR",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.255Z",
+    "updatedAt": "2026-06-02T18:25:25.255Z"
+  },
+  {
+    "id": "cmpwywu0n006zu5n0gvj5nvs7",
+    "name": "OFICINA > NOTA",
+    "slug": "oficina-nota",
+    "description": "Categoría Hija: OFICINA > NOTA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.983Z",
+    "updatedAt": "2026-06-02T18:25:24.983Z"
+  },
+  {
+    "id": "cmpwywu0i006wu5n0dlv6ijhn",
+    "name": "OFICINA > NOTAS",
+    "slug": "oficina-notas",
+    "description": "Categoría Hija: OFICINA > NOTAS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.979Z",
+    "updatedAt": "2026-06-02T18:25:24.979Z"
+  },
+  {
+    "id": "cmpwywub100e0u5n07emsd3qc",
+    "name": "OFICINA > PAPEL TERMICO",
+    "slug": "oficina-papel-termico",
+    "description": "Categoría Hija: OFICINA > PAPEL TERMICO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.357Z",
+    "updatedAt": "2026-06-02T18:25:25.357Z"
+  },
+  {
+    "id": "cmpwywu7v00bpu5n07qeyar8c",
+    "name": "OFICINA > PAPELERO",
+    "slug": "oficina-papelero",
+    "description": "Categoría Hija: OFICINA > PAPELERO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.244Z",
+    "updatedAt": "2026-06-02T18:25:25.244Z"
+  },
+  {
+    "id": "cmpwywty2004wu5n06jsk1h6o",
+    "name": "OFICINA > PERFORADOR",
+    "slug": "oficina-perforador",
+    "description": "Categoría Hija: OFICINA > PERFORADOR",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.891Z",
+    "updatedAt": "2026-06-02T18:25:24.891Z"
+  },
+  {
+    "id": "cmpwywu1q007lu5n0y5t3dap7",
+    "name": "OFICINA > PLACAS",
+    "slug": "oficina-placas",
+    "description": "Categoría Hija: OFICINA > PLACAS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.023Z",
+    "updatedAt": "2026-06-02T18:25:25.023Z"
+  },
+  {
+    "id": "cmpwywtsv000wu5n0m1wnio4e",
+    "name": "OFICINA > PLASTICO",
+    "slug": "oficina-plastico",
+    "description": "Categoría Hija: OFICINA > PLASTICO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.703Z",
+    "updatedAt": "2026-06-02T18:25:24.703Z"
+  },
+  {
+    "id": "cmpwywu8k00c5u5n0pv6dpg8v",
+    "name": "OFICINA > PLUMA",
+    "slug": "oficina-pluma",
+    "description": "Categoría Hija: OFICINA > PLUMA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.269Z",
+    "updatedAt": "2026-06-02T18:25:25.269Z"
+  },
+  {
+    "id": "cmpwywu7700b9u5n0s8k1qws3",
+    "name": "OFICINA > PORTACLIP",
+    "slug": "oficina-portaclip",
+    "description": "Categoría Hija: OFICINA > PORTACLIP",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.220Z",
+    "updatedAt": "2026-06-02T18:25:25.220Z"
+  },
+  {
+    "id": "cmpwywu6h00avu5n0yyu0stg2",
+    "name": "OFICINA > PORTACREDENCIAL",
+    "slug": "oficina-portacredencial",
+    "description": "Categoría Hija: OFICINA > PORTACREDENCIAL",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.193Z",
+    "updatedAt": "2026-06-02T18:25:25.193Z"
+  },
+  {
+    "id": "cmpwywtuc0022u5n0j8rub9jb",
+    "name": "OFICINA > PORTAGOMA",
+    "slug": "oficina-portagoma",
+    "description": "Categoría Hija: OFICINA > PORTAGOMA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.756Z",
+    "updatedAt": "2026-06-02T18:25:24.756Z"
+  },
+  {
+    "id": "cmpwywu7t00bnu5n0u5xjpqbq",
+    "name": "OFICINA > PORTALÁPIZ",
+    "slug": "oficina-portalapiz",
+    "description": "Categoría Hija: OFICINA > PORTALÁPIZ",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.241Z",
+    "updatedAt": "2026-06-02T18:25:25.241Z"
+  },
+  {
+    "id": "cmpwywua900deu5n0bdpwgdn4",
+    "name": "OFICINA > RECAMBIO",
+    "slug": "oficina-recambio",
+    "description": "Categoría Hija: OFICINA > RECAMBIO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.329Z",
+    "updatedAt": "2026-06-02T18:25:25.329Z"
+  },
+  {
+    "id": "cmpwywtue0024u5n05ywy7m1e",
+    "name": "OFICINA > REPUESTO",
+    "slug": "oficina-repuesto",
+    "description": "Categoría Hija: OFICINA > REPUESTO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.758Z",
+    "updatedAt": "2026-06-02T18:25:24.758Z"
+  },
+  {
+    "id": "cmpwywtu4001wu5n0ev9vgpi9",
+    "name": "OFICINA > ROLLO",
+    "slug": "oficina-rollo",
+    "description": "Categoría Hija: OFICINA > ROLLO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.749Z",
+    "updatedAt": "2026-06-02T18:25:24.749Z"
+  },
+  {
+    "id": "cmpwywu8x00cfu5n092jg3aqg",
+    "name": "OFICINA > SACACORCHETES",
+    "slug": "oficina-sacacorchetes",
+    "description": "Categoría Hija: OFICINA > SACACORCHETES",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.281Z",
+    "updatedAt": "2026-06-02T18:25:25.281Z"
+  },
+  {
+    "id": "cmpwywu9900cou5n0994e0qxw",
+    "name": "OFICINA > SACAGRAPAS",
+    "slug": "oficina-sacagrapas",
+    "description": "Categoría Hija: OFICINA > SACAGRAPAS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.294Z",
+    "updatedAt": "2026-06-02T18:25:25.294Z"
+  },
+  {
+    "id": "cmpwywu20007tu5n0yd54svoe",
+    "name": "OFICINA > SACAPUNTAS",
+    "slug": "oficina-sacapuntas",
+    "description": "Categoría Hija: OFICINA > SACAPUNTAS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.032Z",
+    "updatedAt": "2026-06-02T18:25:25.032Z"
+  },
+  {
+    "id": "cmpwywu190079u5n0w9zmtnot",
+    "name": "OFICINA > SELLOS",
+    "slug": "oficina-sellos",
+    "description": "Categoría Hija: OFICINA > SELLOS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.006Z",
+    "updatedAt": "2026-06-02T18:25:25.006Z"
+  },
+  {
+    "id": "cmpwywtwp003wu5n0zqrr5hjz",
+    "name": "OFICINA > SEPARADORES",
+    "slug": "oficina-separadores",
+    "description": "Categoría Hija: OFICINA > SEPARADORES",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.841Z",
+    "updatedAt": "2026-06-02T18:25:24.841Z"
+  },
+  {
+    "id": "cmpwywu5x00ahu5n0y3hism0r",
+    "name": "OFICINA > SOBRE",
+    "slug": "oficina-sobre",
+    "description": "Categoría Hija: OFICINA > SOBRE",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.173Z",
+    "updatedAt": "2026-06-02T18:25:25.173Z"
+  },
+  {
+    "id": "cmpwywu0p0071u5n02h4kbzol",
+    "name": "OFICINA > TABLERO",
+    "slug": "oficina-tablero",
+    "description": "Categoría Hija: OFICINA > TABLERO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.986Z",
+    "updatedAt": "2026-06-02T18:25:24.986Z"
+  },
+  {
+    "id": "cmpwywu120073u5n0hvwnd5rh",
+    "name": "OFICINA > TAMPON",
+    "slug": "oficina-tampon",
+    "description": "Categoría Hija: OFICINA > TAMPON",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.998Z",
+    "updatedAt": "2026-06-02T18:25:24.998Z"
+  },
+  {
+    "id": "cmpwywu6200alu5n0fyexdn0h",
+    "name": "OFICINA > TERMOLAMINADO",
+    "slug": "oficina-termolaminado",
+    "description": "Categoría Hija: OFICINA > TERMOLAMINADO",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.179Z",
+    "updatedAt": "2026-06-02T18:25:25.179Z"
+  },
+  {
+    "id": "cmpwywu6500anu5n0r62fbeea",
+    "name": "OFICINA > TERMOLAMINADORA",
+    "slug": "oficina-termolaminadora",
+    "description": "Categoría Hija: OFICINA > TERMOLAMINADORA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.181Z",
+    "updatedAt": "2026-06-02T18:25:25.181Z"
+  },
+  {
+    "id": "cmpwywttf001cu5n0rv3gzorc",
+    "name": "OFICINA > TIJERA",
+    "slug": "oficina-tijera",
+    "description": "Categoría Hija: OFICINA > TIJERA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.724Z",
+    "updatedAt": "2026-06-02T18:25:24.724Z"
+  },
+  {
+    "id": "cmpwywu170077u5n0964jwfqn",
+    "name": "OFICINA > TIMBRE",
+    "slug": "oficina-timbre",
+    "description": "Categoría Hija: OFICINA > TIMBRE",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.003Z",
+    "updatedAt": "2026-06-02T18:25:25.003Z"
+  },
+  {
+    "id": "cmpwywu150075u5n0iwc731a0",
+    "name": "OFICINA > TINTA",
+    "slug": "oficina-tinta",
+    "description": "Categoría Hija: OFICINA > TINTA",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.001Z",
+    "updatedAt": "2026-06-02T18:25:25.001Z"
+  },
+  {
+    "id": "cmpwywu8h00c3u5n03gx0sa6y",
+    "name": "OFICINA > TIRALINEAS",
+    "slug": "oficina-tiralineas",
+    "description": "Categoría Hija: OFICINA > TIRALINEAS",
+    "parentId": "cmpwywtqt0000u5n0g2c8w0b7",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.266Z",
+    "updatedAt": "2026-06-02T18:25:25.266Z"
+  },
+  {
+    "id": "cmpwywtrq0007u5n05mmcmksp",
+    "name": "OUTLET",
+    "slug": "outlet",
+    "description": "Categoría Padre: OUTLET",
+    "parentId": null,
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.663Z",
+    "updatedAt": "2026-06-02T18:25:24.663Z"
+  },
+  {
+    "id": "cmpwywts5000fu5n0d2ei7mn0",
+    "name": "OUTLET > ESCOLAR",
+    "slug": "outlet-escolar",
+    "description": "Categoría Hija: OUTLET > ESCOLAR",
+    "parentId": "cmpwywtrq0007u5n05mmcmksp",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.677Z",
+    "updatedAt": "2026-06-02T18:25:24.677Z"
+  },
+  {
+    "id": "cmpwywub300e2u5n0de46ysxp",
+    "name": "OUTLET > FERRETERIA",
+    "slug": "outlet-ferreteria",
+    "description": "Categoría Hija: OUTLET > FERRETERIA",
+    "parentId": "cmpwywtrq0007u5n05mmcmksp",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.360Z",
+    "updatedAt": "2026-06-02T18:25:25.360Z"
+  },
+  {
+    "id": "cmpwywu1h007eu5n0lydldntm",
+    "name": "OUTLET > OFICINA",
+    "slug": "outlet-oficina",
+    "description": "Categoría Hija: OUTLET > OFICINA",
+    "parentId": "cmpwywtrq0007u5n05mmcmksp",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.014Z",
+    "updatedAt": "2026-06-02T18:25:25.014Z"
+  },
+  {
+    "id": "cmpwywuaz00dyu5n035gsji9c",
+    "name": "OUTLET > REGALOS",
+    "slug": "outlet-regalos",
+    "description": "Categoría Hija: OUTLET > REGALOS",
+    "parentId": "cmpwywtrq0007u5n05mmcmksp",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.355Z",
+    "updatedAt": "2026-06-02T18:25:25.355Z"
+  },
+  {
+    "id": "cmpwywtwr003xu5n0p814p1k2",
+    "name": "PAPELERIA",
+    "slug": "papeleria",
+    "description": "Categoría Padre: PAPELERIA",
+    "parentId": null,
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.843Z",
+    "updatedAt": "2026-06-02T18:25:24.843Z"
+  },
+  {
+    "id": "cmpwywtxn004ku5n0d6ky4z71",
+    "name": "PAPELERIA > CARTON",
+    "slug": "papeleria-carton",
+    "description": "Categoría Hija: PAPELERIA > CARTON",
+    "parentId": "cmpwywtwr003xu5n0p814p1k2",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.876Z",
+    "updatedAt": "2026-06-02T18:25:24.876Z"
+  },
+  {
+    "id": "cmpwywtxi004gu5n01llp3cbv",
+    "name": "PAPELERIA > CARTULINA",
+    "slug": "papeleria-cartulina",
+    "description": "Categoría Hija: PAPELERIA > CARTULINA",
+    "parentId": "cmpwywtwr003xu5n0p814p1k2",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.870Z",
+    "updatedAt": "2026-06-02T18:25:24.870Z"
+  },
+  {
+    "id": "cmpwywtx9004au5n0mq27yiiv",
+    "name": "PAPELERIA > CELOFAN",
+    "slug": "papeleria-celofan",
+    "description": "Categoría Hija: PAPELERIA > CELOFAN",
+    "parentId": "cmpwywtwr003xu5n0p814p1k2",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.861Z",
+    "updatedAt": "2026-06-02T18:25:24.861Z"
+  },
+  {
+    "id": "cmpwywtwy0042u5n0aadj4be3",
+    "name": "PAPELERIA > CREPE",
+    "slug": "papeleria-crepe",
+    "description": "Categoría Hija: PAPELERIA > CREPE",
+    "parentId": "cmpwywtwr003xu5n0p814p1k2",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.850Z",
+    "updatedAt": "2026-06-02T18:25:24.850Z"
+  },
+  {
+    "id": "cmpwywtxt004ou5n09jomvuj8",
+    "name": "PAPELERIA > EVA",
+    "slug": "papeleria-eva",
+    "description": "Categoría Hija: PAPELERIA > EVA",
+    "parentId": "cmpwywtwr003xu5n0p814p1k2",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.881Z",
+    "updatedAt": "2026-06-02T18:25:24.881Z"
+  },
+  {
+    "id": "cmpwywtx60048u5n0akq0j0rw",
+    "name": "PAPELERIA > FILM",
+    "slug": "papeleria-film",
+    "description": "Categoría Hija: PAPELERIA > FILM",
+    "parentId": "cmpwywtwr003xu5n0p814p1k2",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.858Z",
+    "updatedAt": "2026-06-02T18:25:24.858Z"
+  },
+  {
+    "id": "cmpwywtx30046u5n0w35h6sqd",
+    "name": "PAPELERIA > PAÑO",
+    "slug": "papeleria-pano",
+    "description": "Categoría Hija: PAPELERIA > PAÑO",
+    "parentId": "cmpwywtwr003xu5n0p814p1k2",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.855Z",
+    "updatedAt": "2026-06-02T18:25:24.855Z"
+  },
+  {
+    "id": "cmpwywtwt003zu5n0lv98cxzs",
+    "name": "PAPELERIA > PAPEL",
+    "slug": "papeleria-papel",
+    "description": "Categoría Hija: PAPELERIA > PAPEL",
+    "parentId": "cmpwywtwr003xu5n0p814p1k2",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:24.846Z",
+    "updatedAt": "2026-06-02T18:25:24.846Z"
+  },
+  {
+    "id": "cmpwywu2m008au5n08znbqxh3",
+    "name": "REGALOS",
+    "slug": "regalos",
+    "description": "Categoría Padre: REGALOS",
+    "parentId": null,
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.055Z",
+    "updatedAt": "2026-06-02T18:25:25.055Z"
+  },
+  {
+    "id": "cmpwywu3h008xu5n0letwyr23",
+    "name": "REGALOS > BANDEJA",
+    "slug": "regalos-bandeja",
+    "description": "Categoría Hija: REGALOS > BANDEJA",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.085Z",
+    "updatedAt": "2026-06-02T18:25:25.085Z"
+  },
+  {
+    "id": "cmpwywu2p008cu5n0suxfa6ui",
+    "name": "REGALOS > BILLETERA",
+    "slug": "regalos-billetera",
+    "description": "Categoría Hija: REGALOS > BILLETERA",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.057Z",
+    "updatedAt": "2026-06-02T18:25:25.057Z"
+  },
+  {
+    "id": "cmpwywu3j008zu5n0hh3t8ref",
+    "name": "REGALOS > BOLITAS",
+    "slug": "regalos-bolitas",
+    "description": "Categoría Hija: REGALOS > BOLITAS",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.088Z",
+    "updatedAt": "2026-06-02T18:25:25.088Z"
+  },
+  {
+    "id": "cmpwywu3b008tu5n0hzh4yspx",
+    "name": "REGALOS > CACHO",
+    "slug": "regalos-cacho",
+    "description": "Categoría Hija: REGALOS > CACHO",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.079Z",
+    "updatedAt": "2026-06-02T18:25:25.079Z"
+  },
+  {
+    "id": "cmpwywu2y008ju5n0oky2t942",
+    "name": "REGALOS > CARPETA",
+    "slug": "regalos-carpeta",
+    "description": "Categoría Hija: REGALOS > CARPETA",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.066Z",
+    "updatedAt": "2026-06-02T18:25:25.066Z"
+  },
+  {
+    "id": "cmpwywu2t008fu5n0ssdw4448",
+    "name": "REGALOS > CHEQUERA",
+    "slug": "regalos-chequera",
+    "description": "Categoría Hija: REGALOS > CHEQUERA",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.062Z",
+    "updatedAt": "2026-06-02T18:25:25.062Z"
+  },
+  {
+    "id": "cmpwywu5400a0u5n09rfr8d9d",
+    "name": "REGALOS > DADOS",
+    "slug": "regalos-dados",
+    "description": "Categoría Hija: REGALOS > DADOS",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.145Z",
+    "updatedAt": "2026-06-02T18:25:25.145Z"
+  },
+  {
+    "id": "cmpwywu47009eu5n0bw91o2fo",
+    "name": "REGALOS > DIDACTICOS",
+    "slug": "regalos-didacticos",
+    "description": "Categoría Hija: REGALOS > DIDACTICOS",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.111Z",
+    "updatedAt": "2026-06-02T18:25:25.111Z"
+  },
+  {
+    "id": "cmpwywu35008pu5n0ysmeegyv",
+    "name": "REGALOS > DOMINO",
+    "slug": "regalos-domino",
+    "description": "Categoría Hija: REGALOS > DOMINO",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.074Z",
+    "updatedAt": "2026-06-02T18:25:25.074Z"
+  },
+  {
+    "id": "cmpwywu3e008vu5n025lf100h",
+    "name": "REGALOS > ESCRITORIO",
+    "slug": "regalos-escritorio",
+    "description": "Categoría Hija: REGALOS > ESCRITORIO",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.083Z",
+    "updatedAt": "2026-06-02T18:25:25.083Z"
+  },
+  {
+    "id": "cmpwywu5b00a4u5n0dnbfuyzx",
+    "name": "REGALOS > FICHAS",
+    "slug": "regalos-fichas",
+    "description": "Categoría Hija: REGALOS > FICHAS",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.151Z",
+    "updatedAt": "2026-06-02T18:25:25.151Z"
+  },
+  {
+    "id": "cmpwywu3m0091u5n0f0g1t5jl",
+    "name": "REGALOS > FLAUTA",
+    "slug": "regalos-flauta",
+    "description": "Categoría Hija: REGALOS > FLAUTA",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.090Z",
+    "updatedAt": "2026-06-02T18:25:25.090Z"
+  },
+  {
+    "id": "cmpwywu4a009gu5n0oj1xqqeg",
+    "name": "REGALOS > JUEGOS",
+    "slug": "regalos-juegos",
+    "description": "Categoría Hija: REGALOS > JUEGOS",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.114Z",
+    "updatedAt": "2026-06-02T18:25:25.114Z"
+  },
+  {
+    "id": "cmpwywu2w008hu5n0tal71tfd",
+    "name": "REGALOS > MONEDERO",
+    "slug": "regalos-monedero",
+    "description": "Categoría Hija: REGALOS > MONEDERO",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.064Z",
+    "updatedAt": "2026-06-02T18:25:25.064Z"
+  },
+  {
+    "id": "cmpwywu4c009iu5n0am0l2lgq",
+    "name": "REGALOS > MUÑECA",
+    "slug": "regalos-muneca",
+    "description": "Categoría Hija: REGALOS > MUÑECA",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.117Z",
+    "updatedAt": "2026-06-02T18:25:25.117Z"
+  },
+  {
+    "id": "cmpwywu4i009mu5n0d8mzfam6",
+    "name": "REGALOS > NAIPE",
+    "slug": "regalos-naipe",
+    "description": "Categoría Hija: REGALOS > NAIPE",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.122Z",
+    "updatedAt": "2026-06-02T18:25:25.122Z"
+  },
+  {
+    "id": "cmpwywu30008lu5n0abb9dsx4",
+    "name": "REGALOS > NAIPES",
+    "slug": "regalos-naipes",
+    "description": "Categoría Hija: REGALOS > NAIPES",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.069Z",
+    "updatedAt": "2026-06-02T18:25:25.069Z"
+  },
+  {
+    "id": "cmpwywu3u0096u5n08cty2wsu",
+    "name": "REGALOS > PISTA",
+    "slug": "regalos-pista",
+    "description": "Categoría Hija: REGALOS > PISTA",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.098Z",
+    "updatedAt": "2026-06-02T18:25:25.098Z"
+  },
+  {
+    "id": "cmpwywu33008nu5n05ns168sp",
+    "name": "REGALOS > POKER",
+    "slug": "regalos-poker",
+    "description": "Categoría Hija: REGALOS > POKER",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.071Z",
+    "updatedAt": "2026-06-02T18:25:25.071Z"
+  },
+  {
+    "id": "cmpwywu41009bu5n0b78g3doa",
+    "name": "REGALOS > PUZZLES",
+    "slug": "regalos-puzzles",
+    "description": "Categoría Hija: REGALOS > PUZZLES",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.105Z",
+    "updatedAt": "2026-06-02T18:25:25.105Z"
+  },
+  {
+    "id": "cmpwywu3o0093u5n03f94unyk",
+    "name": "REGALOS > RADIOCONTROLADOS",
+    "slug": "regalos-radiocontrolados",
+    "description": "Categoría Hija: REGALOS > RADIOCONTROLADOS",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.093Z",
+    "updatedAt": "2026-06-02T18:25:25.093Z"
+  },
+  {
+    "id": "cmpwywu38008ru5n0z0mq8zkq",
+    "name": "REGALOS > SET",
+    "slug": "regalos-set",
+    "description": "Categoría Hija: REGALOS > SET",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.076Z",
+    "updatedAt": "2026-06-02T18:25:25.076Z"
+  },
+  {
+    "id": "cmpwywu5700a2u5n0k5x0v6xz",
+    "name": "REGALOS > TABLERO",
+    "slug": "regalos-tablero",
+    "description": "Categoría Hija: REGALOS > TABLERO",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.148Z",
+    "updatedAt": "2026-06-02T18:25:25.148Z"
+  },
+  {
+    "id": "cmpwywu51009yu5n0scnjks9k",
+    "name": "REGALOS > TAROT",
+    "slug": "regalos-tarot",
+    "description": "Categoría Hija: REGALOS > TAROT",
+    "parentId": "cmpwywu2m008au5n08znbqxh3",
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.141Z",
+    "updatedAt": "2026-06-02T18:25:25.141Z"
+  },
+  {
+    "id": "cmpwywu8c00bzu5n08mmnpgar",
+    "name": "Sin categoría",
+    "slug": "sin-categoria",
+    "description": "Categoría Padre: Sin categoría",
+    "parentId": null,
+    "isOutlet": false,
+    "createdAt": "2026-06-02T18:25:25.260Z",
+    "updatedAt": "2026-06-02T18:25:25.260Z"
+  }
+]
