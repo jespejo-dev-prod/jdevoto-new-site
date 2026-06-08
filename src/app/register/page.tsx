@@ -75,7 +75,8 @@ export default function RegisterPage() {
           <img 
             src="https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png" 
             alt="JDevoto Logo" 
-            className="h-10 w-auto filter invert brightness-200"
+            className="h-14 w-auto"
+            style={{ filter: 'brightness(0) invert(1)' }}
           />
         </div>
         

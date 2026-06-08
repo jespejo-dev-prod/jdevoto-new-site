@@ -95,7 +95,8 @@ export function Sidebar() {
           <img 
             src="https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png" 
             alt="JDevoto Logo" 
-            className="h-8 w-auto filter invert brightness-200"
+            className="h-10 w-auto"
+            style={{ filter: 'brightness(0) invert(1)' }}
           />
         </div>
 
