@@ -1,8 +1,16 @@
+import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 
-// 1. Configurar conexiones
-const LOCAL_DB_URL = "postgresql://root:root@localhost:5432/b2b_ecommerce?schema=public";
-const CLOUD_DB_URL = "postgresql://neondb_owner:npg_rcTx7gWqnzC5@ep-red-dawn-ap7qw888.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require";
+// 1. Obtener las URLs de conexión desde variables de entorno locales (que NO se suben a Git)
+const LOCAL_DB_URL = process.env.DATABASE_URL_LOCAL || "postgresql://root:root@localhost:5432/b2b_ecommerce?schema=public";
+const CLOUD_DB_URL = process.env.DATABASE_URL_CLOUD;
+
+if (!CLOUD_DB_URL) {
+  console.error('❌ Error: Debes definir la variable DATABASE_URL_CLOUD en tu archivo .env local para poder realizar la sincronización.');
+  console.error('Ejemplo en tu .env:');
+  console.error('DATABASE_URL_CLOUD="postgresql://neondb_owner:NUEVA_CLAVE@ep-xxx.neon.tech/neondb?sslmode=require"');
+  process.exit(1);
+}
 
 async function main() {
   console.log('🔌 Conectando a bases de datos...');
@@ -66,7 +74,6 @@ async function main() {
     const localProducts = await localPrisma.product.findMany();
     console.log(`   Encontrados ${localProducts.length} productos en local.`);
     if (localProducts.length > 0) {
-      // Prisma createMany con tipos de Decimal y BigInt
       // Mapeamos los datos para asegurarnos de que se inserten correctamente
       const mappedProducts = localProducts.map(p => ({
         ...p,
@@ -84,7 +91,7 @@ async function main() {
           skipDuplicates: true
         });
       }
-      console.log('   ✅ Productos clonados.');
+      console.log('   ✅ Productos clonadas.');
     }
 
     // 6. Clonar Imágenes de Productos (ProductImages)
