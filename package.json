@@ -1,5 +1,6 @@
 {
-  "name": "scratch",
+  "name": "jdevoto-new-site",
+  "description": "jdevoto new site nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
