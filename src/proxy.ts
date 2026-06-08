@@ -5,7 +5,7 @@ import { jwtVerify } from 'jose';
 // Rate limit en memoria (Edge-compatible, estado por worker)
 const rateLimitMap = new Map<string, { count: number, resetAt: number }>();
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutos
-const MAX_REQUESTS = 100; // 100 peticiones cada 15 min por IP
+const MAX_REQUESTS = 1000; // 1000 peticiones cada 15 min por IP (evita bloqueos de Next.js prefetch)
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
