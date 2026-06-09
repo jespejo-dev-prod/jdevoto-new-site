@@ -1,9 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useOrder } from '@/modules/orders/presentation/hooks/useOrders';
 import { OrderItemsTable } from '@/modules/orders/presentation/components/OrderItemsTable';
 import { OrderStatusBadge, STATUS_CONFIG } from '@/modules/orders/presentation/components/OrderStatusBadge';
 import { useAuth } from '@/context/auth-context';
+import { useApi } from '@/shared/infrastructure/api/use-api';
+import { toast } from 'sonner';
 import { OrderMessagesPanel } from '@/modules/orders/presentation/components/OrderMessagesPanel';
 import { useParams, useRouter } from 'next/navigation';
 import { 
@@ -34,6 +37,21 @@ export default function OrderDetailPage() {
   const { data: order, isLoading, updateStatus, deleteOrder } = useOrder(id);
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SALES_REP';
+  const { fetcher } = useApi();
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  const handleSendEmail = async () => {
+    setIsSendingEmail(true);
+    const toastId = toast.loading("Enviando correo...");
+    try {
+      await fetcher(`/api/orders/${id}/send-email`, { method: 'POST' });
+      toast.success("Correo enviado correctamente", { id: toastId });
+    } catch (err: any) {
+      toast.error(err.message || "Error al enviar correo", { id: toastId });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-CL', {
@@ -107,19 +125,26 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 no-print">
           {order.status === OrderStatus.DRAFT && (
             <Link href={`/dashboard/orders/${id}/edit`}>
-              <button className="px-6 py-3 bg-zinc-800 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all shadow-xl flex items-center gap-2">
+              <button className="px-6 py-3 bg-zinc-800 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all shadow-xl flex items-center gap-2 cursor-pointer">
                 <Pencil className="h-4 w-4 text-primary" />
                 Editar Borrador
               </button>
             </Link>
           )}
-          <button className="p-3 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-2xl transition-all shadow-lg">
+          <button 
+            onClick={() => window.print()}
+            className="p-3 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-2xl transition-all shadow-lg cursor-pointer"
+            title="Imprimir Pedido"
+          >
             <Printer className="h-5 w-5" />
           </button>
-          <button className="px-6 py-3 bg-primary text-black rounded-2xl font-bold text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center gap-2">
+          <button 
+            onClick={() => window.print()}
+            className="px-6 py-3 bg-primary text-black rounded-2xl font-bold text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center gap-2 cursor-pointer"
+          >
             Imprimir Picking List
             <ArrowRight className="h-4 w-4" />
           </button>
@@ -242,8 +267,13 @@ export default function OrderDetailPage() {
             </div>
 
             <div className="space-y-3 pt-4">
-               <button className="w-full py-3 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
-                  Enviar por Email
+               <button 
+                 onClick={handleSendEmail}
+                 disabled={isSendingEmail}
+                 className="w-full py-3 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+               >
+                 {isSendingEmail && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                 Enviar por Email
                </button>
                
                {order.status === OrderStatus.DRAFT ? (

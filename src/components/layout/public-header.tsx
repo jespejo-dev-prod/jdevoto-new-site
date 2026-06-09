@@ -52,10 +52,9 @@ export function PublicHeader() {
         <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="hover:scale-105 transition-transform shrink-0">
             <img 
-              src="https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png" 
+              src="/home/devoto.png" 
               alt="JDevoto Logo" 
               className="h-11 w-auto"
-              style={{ filter: 'invert(1) grayscale(1) brightness(2)' }}
             />
           </Link>
           
@@ -227,7 +226,7 @@ export function PublicHeader() {
                     logout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-zinc-900 text-left text-zinc-450 hover:text-red-400 transition-all text-sm font-bold uppercase tracking-wider mt-auto"
+                  className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-zinc-900 text-left text-zinc-400 hover:text-red-400 transition-all text-sm font-bold uppercase tracking-wider mt-auto"
                 >
                   <LogOut className="h-5 w-5 text-red-500" />
                   Cerrar Sesión

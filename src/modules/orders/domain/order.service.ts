@@ -42,7 +42,7 @@ export class OrderService {
    * Toda la operación es atómica (Prisma transaction).
    */
   async createOrder(input: CreateOrderInput) {
-    const { companyId, createdById, items, notes, shippingAddress, paymentMethod, status = OrderStatus.PENDING } = input;
+    const { companyId, createdById, items, notes, shippingAddress, paymentMethod, status = OrderStatus.CONFIRMED } = input;
 
     // 1. Verificar que la empresa existe y está activa
     const company = await prisma.company.findUnique({
@@ -317,16 +317,9 @@ export class OrderService {
    * Máquina de estados para las transiciones válidas de un pedido.
    */
   private readonly VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-    [OrderStatus.DRAFT]: [OrderStatus.PENDING, OrderStatus.CANCELLED],
-    [OrderStatus.PENDING]: [
-      OrderStatus.CONFIRMED,
-      OrderStatus.REJECTED,
-      OrderStatus.CANCELLED,
-    ],
-    [OrderStatus.CONFIRMED]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
-    [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-    [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
-    [OrderStatus.DELIVERED]: [],
+    [OrderStatus.DRAFT]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+    [OrderStatus.CONFIRMED]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED, OrderStatus.REJECTED],
+    [OrderStatus.SHIPPED]: [],
     [OrderStatus.CANCELLED]: [OrderStatus.DRAFT],
     [OrderStatus.REJECTED]: [OrderStatus.DRAFT],
   };
@@ -351,7 +344,7 @@ export class OrderService {
 
     const updated = await prisma.$transaction(async (tx) => {
       // SI PASA DE DRAFT A PENDING/CONFIRMED Y ES CON CRÉDITO, VALIDAR LÍMITE DE CRÉDITO
-      if (order.status === OrderStatus.DRAFT && (newStatus === OrderStatus.PENDING || newStatus === OrderStatus.CONFIRMED) && order.paymentMethod === 'credit_b2b') {
+      if (order.status === OrderStatus.DRAFT && newStatus === OrderStatus.CONFIRMED && order.paymentMethod === 'credit_b2b') {
         const company = await tx.company.findUnique({ where: { id: order.companyId } });
         if (!company) throw new NotFoundError("Empresa", order.companyId);
 
@@ -387,6 +380,17 @@ export class OrderService {
 
       return updatedOrder;
     });
+
+    if (newStatus === OrderStatus.SHIPPED) {
+      import('@/lib/email').then(async ({ sendOrderShippedEmail }) => {
+        let customerEmail = (updated.billingAddress as any)?.email;
+        if (!customerEmail) {
+          const user = await prisma.user.findUnique({ where: { id: updated.createdById }, select: { email: true } });
+          customerEmail = user?.email || "ventas@tutiendab2b.cl";
+        }
+        sendOrderShippedEmail(updated, customerEmail).catch(console.error);
+      });
+    }
 
     return updated;
   }
@@ -705,7 +709,6 @@ export class OrderService {
     const map: Partial<Record<OrderStatus, Partial<Record<string, Date>>>> = {
       [OrderStatus.CONFIRMED]: { confirmedAt: now },
       [OrderStatus.SHIPPED]: { shippedAt: now },
-      [OrderStatus.DELIVERED]: { deliveredAt: now },
       [OrderStatus.CANCELLED]: { cancelledAt: now },
     };
     return map[status] ?? {};

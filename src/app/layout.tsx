@@ -7,6 +7,7 @@ import { QueryProvider } from '@/providers/query-provider';
 import { Metadata } from 'next';
 import { CartProvider } from '@/context/CartContext';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
+import { CookieBanner } from '@/components/layout/cookie-banner';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
@@ -33,6 +34,7 @@ export default function RootLayout({
                 {children}
                 <Toaster position="bottom-right" richColors closeButton />
                 <WhatsAppButton />
+                <CookieBanner />
               </CartProvider>
             </AuthProvider>
           </QueryProvider>

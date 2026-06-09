@@ -91,12 +91,19 @@ export const POST = withApiHandler(async (
   if (isAdmin) {
     // Notificar al comprador
     if (order.createdById !== user.id) {
-      await prisma.notification.create({
+      const notif = await prisma.notification.create({
         data: {
           userId: order.createdById,
           title: `Nuevo mensaje en Pedido #${order.orderNumber}`,
           message: `El administrador ha enviado un mensaje o factura.`,
           link: `/dashboard/orders/${order.id}`
+        }
+      });
+      // Enviar correo de notificación
+      import('@/lib/email').then(async ({ sendNotificationEmail }) => {
+        const recipient = await prisma.user.findUnique({ where: { id: order.createdById }, select: { email: true } });
+        if (recipient?.email) {
+          sendNotificationEmail(recipient.email, notif.title, notif.message, notif.link || undefined).catch(console.error);
         }
       });
     }
@@ -115,6 +122,21 @@ export const POST = withApiHandler(async (
           message: `${user.firstName} ${user.lastName} (Pedido #${order.orderNumber}) ha enviado un mensaje.`,
           link: `/dashboard/orders/${order.id}`
         }))
+      });
+      // Enviar correos de notificación a los administradores
+      import('@/lib/email').then(async ({ sendNotificationEmail }) => {
+        const adminUsers = await prisma.user.findMany({
+          where: { id: { in: admins.map(a => a.id) } },
+          select: { email: true }
+        });
+        const title = `Nuevo mensaje de Cliente`;
+        const msg = `${user.firstName} ${user.lastName} (Pedido #${order.orderNumber}) ha enviado un mensaje.`;
+        const link = `/dashboard/orders/${order.id}`;
+        for (const admin of adminUsers) {
+          if (admin.email) {
+            sendNotificationEmail(admin.email, title, msg, link).catch(console.error);
+          }
+        }
       });
     }
   }

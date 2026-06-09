@@ -1,11 +1,13 @@
 'use client';
 
 import { 
-  MessageSquare, Mail, Phone, 
-  ChevronRight, Search, ArrowRight
+  MapPin, Mail, Phone, 
+  ChevronRight, ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { PublicHeader } from '@/components/layout/public-header';
+import { PublicFooter } from '@/components/layout/public-footer';
 
 export default function SupportPage() {
   const faqs = [
@@ -15,17 +17,14 @@ export default function SupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-zinc-50 flex flex-col">
+      <PublicHeader />
       
       {/* HERO SUPPORT */}
-      <section className="bg-zinc-950 text-white py-24 px-8 border-b border-zinc-800">
-         <div className="max-w-[1000px] mx-auto text-center space-y-8">
+      <section className="bg-zinc-950 text-white py-20 px-8 border-b border-zinc-800">
+         <div className="max-w-[1000px] mx-auto text-center space-y-4">
             <h1 className="text-5xl font-black italic tracking-tighter">Centro de Ayuda<span className="text-primary">.</span></h1>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Estamos aquí para potenciar tu infraestructura. Busca soluciones técnicas o contacta con nuestro equipo especializado.</p>
-            <div className="max-w-2xl mx-auto relative">
-               <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-zinc-600" />
-               <input placeholder="¿Cómo podemos ayudarte hoy?" className="w-full h-16 rounded-2xl bg-zinc-900 border border-zinc-800 px-16 text-lg outline-none focus:ring-4 focus:ring-primary/20 transition-all" />
-            </div>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Estamos aquí para potenciar tu infraestructura. Contacta con nuestro equipo especializado o revisa las preguntas frecuentes.</p>
          </div>
       </section>
 
@@ -33,23 +32,50 @@ export default function SupportPage() {
          
          {/* CONTACT CARDS */}
          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-10 rounded-[40px] border border-zinc-100 bg-zinc-50/50 space-y-6 hover:shadow-xl transition-all">
-               <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><MessageSquare className="h-7 w-7" /></div>
-               <h3 className="text-xl font-black uppercase tracking-tighter text-zinc-900">Chat en Vivo</h3>
-               <p className="text-sm text-zinc-500">Soporte técnico inmediato para clientes con contrato Priority.</p>
-               <Button className="w-full rounded-xl bg-zinc-950 text-white font-bold h-12 uppercase text-[10px]">Iniciar Chat</Button>
+            <div className="p-10 rounded-[40px] border border-zinc-100 bg-white space-y-6 hover:shadow-xl transition-all flex flex-col justify-between">
+               <div className="space-y-6">
+                  <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><MapPin className="h-7 w-7" /></div>
+                  <h3 className="text-xl font-black uppercase tracking-tighter text-zinc-900">Oficina Central</h3>
+                  <p className="text-sm text-zinc-500 font-semibold leading-relaxed">
+                     Décima Avenida 1740, Placilla, Valparaíso
+                  </p>
+               </div>
+               <a 
+                  href="https://maps.google.com/?q=Décima+Avenida+1740,+Placilla,+Valparaíso" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-full rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold h-12 uppercase text-[10px] flex items-center justify-center transition-all mt-4"
+               >
+                  Ver en Google Maps
+               </a>
             </div>
-            <div className="p-10 rounded-[40px] border border-zinc-100 bg-zinc-50/50 space-y-6 hover:shadow-xl transition-all">
-               <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><Mail className="h-7 w-7" /></div>
-               <h3 className="text-xl font-black uppercase tracking-tighter text-zinc-900">Email Corporativo</h3>
-               <p className="text-sm text-zinc-500">Para consultas comerciales, RMA y facturación masiva.</p>
-               <Button className="w-full rounded-xl bg-zinc-950 text-white font-bold h-12 uppercase text-[10px]">Enviar Correo</Button>
+            <div className="p-10 rounded-[40px] border border-zinc-100 bg-white space-y-6 hover:shadow-xl transition-all flex flex-col justify-between">
+               <div className="space-y-6">
+                  <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><Mail className="h-7 w-7" /></div>
+                  <h3 className="text-xl font-black uppercase tracking-tighter text-zinc-900">Email Corporativo</h3>
+                  <p className="text-sm text-zinc-500">Para consultas comerciales, RMA y facturación masiva.</p>
+                  <div className="text-lg font-black text-primary break-all">contactoweb@jdevoto.cl</div>
+               </div>
+               <a 
+                  href="mailto:contactoweb@jdevoto.cl" 
+                  className="w-full rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold h-12 uppercase text-[10px] flex items-center justify-center transition-all mt-4"
+               >
+                  Enviar Correo
+               </a>
             </div>
-            <div className="p-10 rounded-[40px] border border-zinc-100 bg-zinc-50/50 space-y-6 hover:shadow-xl transition-all">
-               <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><Phone className="h-7 w-7" /></div>
-               <h3 className="text-xl font-black uppercase tracking-tighter text-zinc-900">Línea Directa</h3>
-               <p className="text-sm text-zinc-500">Lunes a Viernes, 09:00 a 18:00 hrs. Exclusivo empresas.</p>
-               <div className="text-xl font-black text-primary">+56 2 2938 4800</div>
+            <div className="p-10 rounded-[40px] border border-zinc-100 bg-white space-y-6 hover:shadow-xl transition-all flex flex-col justify-between">
+               <div className="space-y-6">
+                  <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><Phone className="h-7 w-7" /></div>
+                  <h3 className="text-xl font-black uppercase tracking-tighter text-zinc-900">Línea Directa</h3>
+                  <p className="text-sm text-zinc-500">Lunes a Viernes, 09:00 a 18:00 hrs. Exclusivo empresas.</p>
+                  <div className="text-xl font-black text-primary">(32) 331 5100</div>
+               </div>
+               <a 
+                  href="tel:+56323315100" 
+                  className="w-full rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold h-12 uppercase text-[10px] flex items-center justify-center transition-all mt-4"
+               >
+                  Llamar Ahora
+               </a>
             </div>
          </div>
 
@@ -81,12 +107,7 @@ export default function SupportPage() {
 
       </main>
 
-      <footer className="bg-zinc-950 text-white py-12 px-12 border-t border-zinc-800">
-         <div className="max-w-[1200px] mx-auto text-center">
-            <span className="text-2xl font-black italic tracking-tighter">antigravity<span className="text-primary">.</span></span>
-            <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-[0.4em] pt-4">© 2026 Antigravity Support Hub.</p>
-         </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

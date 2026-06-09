@@ -18,36 +18,46 @@ import {
   AlertCircle,
   Truck
 } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { OrderStatus } from '@prisma/client';
 import { cn } from '@/lib/utils';
 
 const TABS = [
   { id: '', label: 'Todas', icon: ShoppingBag },
   { id: OrderStatus.DRAFT, label: 'Borradores', icon: LayoutGrid },
-  { id: OrderStatus.PENDING, label: 'En espera', icon: Clock },
   { id: OrderStatus.CONFIRMED, label: 'Confirmados', icon: CheckCircle2 },
-  { id: OrderStatus.PROCESSING, label: 'En proceso', icon: List },
   { id: OrderStatus.SHIPPED, label: 'Enviados', icon: Truck },
-  { id: OrderStatus.DELIVERED, label: 'Completados', icon: CheckCircle2 },
   { id: OrderStatus.CANCELLED, label: 'Cancelados', icon: XCircle },
+  { id: OrderStatus.REJECTED, label: 'Rechazados', icon: XCircle },
 ];
 
 export default function OrdersPage() {
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+
   const [activeTab, setActiveTab] = useState<OrderStatus | ''>('');
   const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState(urlSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(urlSearch);
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
 
+  // Sync state with URL search param
+  useEffect(() => {
+    setSearchTerm(urlSearch);
+    setDebouncedSearch(urlSearch);
+    setPage(1);
+  }, [urlSearch]);
+
   // Debounce search
   useEffect(() => {
+    if (searchTerm === urlSearch) return; // avoid double execution on mount
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
       setPage(1);
     }, 400);
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, urlSearch]);
 
   const { data, isLoading } = useOrders({ 
     page, 

@@ -11,7 +11,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     where: { id },
     data: {
       paymentStatus: PaymentStatus.PAID,
-      status: OrderStatus.PENDING, // PENDING represents an order awaiting admin processing
+      status: OrderStatus.CONFIRMED, // CONFIRMED represents an order confirmed for processing
     },
   });
 

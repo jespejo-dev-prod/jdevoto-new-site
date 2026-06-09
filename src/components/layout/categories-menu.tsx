@@ -19,11 +19,32 @@ interface CategoriesMenuProps {
 }
 
 export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuProps) {
+  const [categories, setCategories] = useState<Category[]>(staticCategories as Category[]);
   const [activeParentId, setActiveParentId] = useState<string | null>(null);
   const [mobileExpandedId, setMobileExpandedId] = useState<string | null>(null);
 
-  // Carga estática inmediata
-  const categories = staticCategories as Category[];
+  // Fetch dynamic categories from the database API
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((res) => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            slug: c.slug,
+            parentId: c.parentId || null
+          }));
+          setCategories(mapped);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching categories dynamically, using fallback JSON:', err);
+      });
+  }, []);
 
   const parentCategories = categories
     .filter((c) => !c.parentId)

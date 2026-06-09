@@ -27,9 +27,6 @@ import { useDashboard } from '@/app/dashboard/layout';
 const menuItems = [
   { icon: Home, label: 'Home', href: '/dashboard' },
   { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
-  { icon: PieChart, label: 'Sales Overview', href: '/dashboard/sales' },
-  { icon: ClipboardList, label: 'Top Products', href: '/dashboard/top-products' },
-  { icon: Layers, label: 'Stock Status', href: '/dashboard/stock' },
 ];
 
 const mainItems = [
@@ -91,14 +88,13 @@ export function Sidebar() {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-zinc-950">
       <div className="p-6 flex-grow overflow-y-auto custom-scrollbar">
-        <div className="flex items-center gap-3 px-2 mb-8">
+        <Link href="/" className="flex items-center gap-3 px-2 mb-8 w-fit hover:opacity-85 transition-opacity">
           <img 
-            src="https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png" 
+            src="/home/devoto.png" 
             alt="JDevoto Logo" 
             className="h-10 w-auto"
-            style={{ filter: 'invert(1) grayscale(1) brightness(2)' }}
           />
-        </div>
+        </Link>
 
         <nav className="space-y-6">
           <div>

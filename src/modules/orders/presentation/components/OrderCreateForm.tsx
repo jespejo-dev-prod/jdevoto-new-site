@@ -41,7 +41,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Estados de la Orden
-  const [orderStatus, setOrderStatus] = useState<OrderStatus>(initialData?.status || OrderStatus.PENDING);
+  const [orderStatus, setOrderStatus] = useState<OrderStatus>(initialData?.status || OrderStatus.CONFIRMED);
   const [creationDate, setCreationDate] = useState(
     initialData?.createdAt ? format(new Date(initialData.createdAt), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd')
   );
@@ -263,11 +263,8 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
 
   const statusLabels: Record<OrderStatus, string> = {
     [OrderStatus.DRAFT]: 'Borrador',
-    [OrderStatus.PENDING]: 'Pendiente de Pago',
     [OrderStatus.CONFIRMED]: 'Confirmado',
-    [OrderStatus.PROCESSING]: 'En Preparación',
-    [OrderStatus.SHIPPED]: 'Despachado',
-    [OrderStatus.DELIVERED]: 'Entregado',
+    [OrderStatus.SHIPPED]: 'Enviado',
     [OrderStatus.CANCELLED]: 'Cancelado',
     [OrderStatus.REJECTED]: 'Rechazado'
   };
@@ -685,12 +682,8 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
           </div>
 
           <div className="p-6 border-t border-zinc-800 bg-zinc-950/20 flex gap-3">
-             <button className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">Agregar artículo(s)</button>
-             <button className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">Agregar cargo</button>
-             <button className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">Agregar envío</button>
-             <button className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">Agregar impuesto</button>
-             <div className="flex-1" />
              <button onClick={() => router.back()} className="px-6 py-2 bg-zinc-950 border border-zinc-800 text-zinc-500 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">Cancelar</button>
+             <div className="flex-1" />
               {isClient ? (
                 <>
                   <button 
@@ -701,7 +694,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                     Guardar Borrador
                   </button>
                   <button 
-                    onClick={() => handleSubmit(OrderStatus.PENDING)} 
+                    onClick={() => handleSubmit(OrderStatus.CONFIRMED)} 
                     disabled={isSubmitting}
                     className="px-8 py-2 bg-primary text-black rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-2"
                   >
@@ -744,7 +737,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                     Guardar Borrador
                   </button>
                   <button 
-                    onClick={() => handleSubmit(OrderStatus.PENDING)} 
+                    onClick={() => handleSubmit(OrderStatus.CONFIRMED)} 
                     disabled={isSubmitting}
                     className="w-full h-11 bg-primary text-black rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
                   >

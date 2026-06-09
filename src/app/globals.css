@@ -111,3 +111,55 @@
     scrollbar-color: #a1a1aa transparent;
   }
 }
+
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  /* Hide unnecessary elements during print */
+  aside,
+  header,
+  button,
+  a,
+  .no-print,
+  .lg\:col-span-3, /* Sidebar details */
+  .bg-zinc-950\/50,
+  .sticky {
+    display: none !important;
+  }
+
+  .lg\:col-span-9 {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+  }
+  
+  /* Reset container properties */
+  .max-w-\[1600px\],
+  .grid {
+    display: block !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+  
+  /* Make text legible in black/white */
+  .text-white {
+    color: black !important;
+  }
+  .text-zinc-300, .text-zinc-400, .text-zinc-500, .text-zinc-600 {
+    color: #374151 !important;
+  }
+  
+  .border, .border-zinc-800, .border-zinc-800\/50 {
+    border-color: #e5e7eb !important;
+  }
+  
+  .bg-zinc-900, .bg-zinc-900\/40, .bg-zinc-950\/40, .bg-zinc-950\/20 {
+    background-color: transparent !important;
+    background: transparent !important;
+  }
+}

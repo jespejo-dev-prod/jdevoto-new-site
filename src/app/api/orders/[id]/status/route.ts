@@ -27,8 +27,8 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       throw new ForbiddenError("No puedes modificar un pedido que no pertenece a tu empresa.");
     }
 
-    if (order.status !== OrderStatus.DRAFT && order.status !== OrderStatus.PENDING) {
-      throw new ForbiddenError("Solo puedes cancelar pedidos en estado Borrador o Pendiente.");
+    if (order.status !== OrderStatus.DRAFT && order.status !== OrderStatus.CONFIRMED) {
+      throw new ForbiddenError("Solo puedes cancelar pedidos en estado Borrador o Confirmado.");
     }
   }
 

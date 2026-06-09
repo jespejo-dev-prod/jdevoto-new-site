@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 
 // Hooks
 import { useProducts } from '@/modules/catalog/presentation/hooks/useProducts';
@@ -63,11 +64,20 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(urlSearch);
   const [categoryId, setCategoryId] = useState('');
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<'all' | 'published' | 'draft' | 'trash'>('all');
+
+  // Sync state with URL search param
+  useEffect(() => {
+    setSearch(urlSearch);
+    setPage(1);
+  }, [urlSearch]);
 
   const { data, isLoading, isFetching } = useProducts({
     search,

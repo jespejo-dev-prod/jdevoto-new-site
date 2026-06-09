@@ -13,6 +13,7 @@ import {
   SearchHistorySlider, 
   RelatedToViewedSlider 
 } from '@/components/home/client-sliders';
+import { ScrollReveal } from '@/components/home/scroll-reveal';
 
 export default async function HomePage() {
   const user = await getServerUser();
@@ -171,44 +172,60 @@ export default async function HomePage() {
         {/* Hero Section */}
         <HeroSlider />
 
-        {/* Feature Cards */}
-        <FeatureCards />
+        {/* Feature Cards with scroll entry animation */}
+        <ScrollReveal>
+          <FeatureCards />
+        </ScrollReveal>
 
         {/* Ofertas del mes */}
-        <ProductSlider 
-          title="Ofertas del Mes" 
-          products={serializedOfertas} 
-          linkHref="/products?offers=true" 
-          linkLabel="Ver todas las ofertas" 
-        />
+        <ScrollReveal>
+          <ProductSlider 
+            title="Ofertas del Mes" 
+            products={serializedOfertas} 
+            linkHref="/products?offers=true" 
+            linkLabel="Ver todas las ofertas" 
+          />
+        </ScrollReveal>
 
         {/* Más vendidos */}
-        <ProductSlider 
-          title="Productos Más Vendidos" 
-          products={serializedMasVendidos} 
-          linkHref="/products?bestSellers=true" 
-          linkLabel="Ir a más vendidos" 
-        />
+        <ScrollReveal>
+          <ProductSlider 
+            title="Productos Más Vendidos" 
+            products={serializedMasVendidos} 
+            linkHref="/products?bestSellers=true" 
+            linkLabel="Ir a más vendidos" 
+          />
+        </ScrollReveal>
 
         {/* Categorías */}
-        <CategoriesSlider categories={categories} />
+        <ScrollReveal>
+          <CategoriesSlider categories={categories} />
+        </ScrollReveal>
 
         {/* Vistos Recientemente */}
-        <RecentlyViewedSlider fallbackProducts={rvFallback} />
+        <ScrollReveal>
+          <RecentlyViewedSlider fallbackProducts={rvFallback} />
+        </ScrollReveal>
 
         {/* Tu Historial de Búsqueda */}
-        <SearchHistorySlider fallbackProducts={shFallback} />
+        <ScrollReveal>
+          <SearchHistorySlider fallbackProducts={shFallback} />
+        </ScrollReveal>
 
         {/* Imprescindibles */}
-        <ProductSlider 
-          title="Imprescindibles" 
-          products={serializedImprescindibles} 
-          linkHref="/products?essentials=true" 
-          linkLabel="Ver todas las ofertas" 
-        />
+        <ScrollReveal>
+          <ProductSlider 
+            title="Imprescindibles" 
+            products={serializedImprescindibles} 
+            linkHref="/products?essentials=true" 
+            linkLabel="Ver todas las ofertas" 
+          />
+        </ScrollReveal>
 
         {/* Relacionado con lo que viste */}
-        <RelatedToViewedSlider fallbackProducts={relFallback} />
+        <ScrollReveal>
+          <RelatedToViewedSlider fallbackProducts={relFallback} />
+        </ScrollReveal>
         
         {/* Spacer before footer */}
         <div className="h-12" />

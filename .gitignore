@@ -60,3 +60,7 @@ next-env.d.ts
 *.zip
 *.rar
 /excel_users
+
+# Scripts
+/scripts
+/src/scripts

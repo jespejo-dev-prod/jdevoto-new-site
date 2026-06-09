@@ -26,13 +26,10 @@ enum UserRole {
 
 enum OrderStatus {
   DRAFT // Borrador, aún no confirmado
-  PENDING // Confirmado, esperando procesamiento
-  CONFIRMED // Aprobado por el equipo de ventas
-  PROCESSING // En preparación / bodega
-  SHIPPED // Despachado
-  DELIVERED // Entregado al cliente
+  CONFIRMED // Confirmado
+  SHIPPED // Enviado / Despachado
   CANCELLED // Cancelado
-  REJECTED // Rechazado (crédito insuficiente, stock, etc.)
+  REJECTED // Rechazado
 }
 
 enum PaymentStatus {

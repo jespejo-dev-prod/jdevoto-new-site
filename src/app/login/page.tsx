@@ -148,10 +148,9 @@ export default function LoginPage() {
         
         <div className="relative z-20 flex items-center">
           <img 
-            src="https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png" 
+            src="/home/devoto.png" 
             alt="JDevoto Logo" 
             className="h-14 w-auto"
-            style={{ filter: 'invert(1) grayscale(1) brightness(2)' }}
           />
         </div>
         

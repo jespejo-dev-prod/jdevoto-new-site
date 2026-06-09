@@ -335,3 +335,111 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     return { success: false, error };
   }
 }
+
+export async function sendOrderShippedEmail(order: any, customerEmail: string) {
+  try {
+    const transporter = await getTransporter();
+
+    const shipping = order.shippingAddress || {};
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .btn { display: inline-block; background-color: #16a34a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+      </style>
+    </head>
+    <body style="background-color: #f9fafb; padding: 40px 0;">
+      <div class="container">
+        <h2 style="color: #16a34a; margin-top: 0;">¡Tu pedido ha sido enviado! 🚚</h2>
+        <p>Hola,</p>
+        <p>Nos complace informarte que tu pedido <strong>#${order.orderNumber}</strong> ha sido despachado y está en camino a la dirección de envío registrada.</p>
+        
+        <div style="margin: 20px 0; padding: 15px; background-color: #f3f4f6; border-radius: 6px; font-size: 14px; color: #374151;">
+          <strong>Dirección de Despacho:</strong><br>
+          ${shipping.street || ''} ${shipping.number || ''}<br>
+          ${shipping.comuna || ''}, ${shipping.region || ''}
+        </div>
+        
+        <div style="text-align: center;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/orders/${order.id}" class="btn">Ver Estado del Pedido</a>
+        </div>
+        
+        <p style="font-size: 12px; color: #9ca3af; margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          Si tienes alguna consulta, por favor contáctanos respondiendo a este correo.
+        </p>
+      </div>
+    </body>
+    </html>
+    `;
+
+    const info = await transporter.sendMail({
+      from: '"Tu Tienda B2B" <despachos@tutiendab2b.cl>',
+      to: customerEmail,
+      subject: `Tu pedido #${order.orderNumber} ha sido enviado 🚚`,
+      html: htmlContent,
+    });
+
+    console.log("==========================================");
+    console.log(`📧 Correo de despacho enviado a ${customerEmail}`);
+    if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_HOST) {
+      console.log("👀 Preview URL:", nodemailer.getTestMessageUrl(info));
+    }
+    console.log("==========================================");
+
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error enviando correo de despacho:", error);
+    return { success: false, error };
+  }
+}
+
+export async function sendNotificationEmail(email: string, title: string, message: string, link?: string) {
+  try {
+    const transporter = await getTransporter();
+    
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff; }
+        .btn { display: inline-block; background-color: #1e40af; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+      </style>
+    </head>
+    <body style="background-color: #f9fafb; padding: 20px;">
+      <div class="container">
+        <h2 style="color: #1e40af; margin-top: 0;">${title}</h2>
+        <p>${message}</p>
+        ${link ? `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${link}" class="btn">Ver en la plataforma</a>` : ''}
+      </div>
+    </body>
+    </html>
+    `;
+
+    const info = await transporter.sendMail({
+      from: '"Tu Tienda B2B" <notificaciones@tutiendab2b.cl>',
+      to: email,
+      subject: title,
+      html: htmlContent,
+    });
+
+    console.log("==========================================");
+    console.log(`📧 Notificación de correo enviada a ${email}`);
+    if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_HOST) {
+      console.log("👀 Preview URL:", nodemailer.getTestMessageUrl(info));
+    }
+    console.log("==========================================");
+
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error enviando correo de notificación:", error);
+    return { success: false, error };
+  }
+}
