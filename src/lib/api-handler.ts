@@ -119,12 +119,17 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
     }
   }
 
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  const stack = error instanceof Error ? error.stack : undefined;
+  const errorName = error instanceof Error ? error.name : 'UnknownError';
+
   return NextResponse.json<ApiError>(
     {
       success: false,
       error: {
         code: "INTERNAL_ERROR",
-        message: "Error interno del servidor",
+        message: `Error interno: ${errorMessage}`,
+        details: { stack, errorName } as any,
       },
     },
     { status: 500 }
