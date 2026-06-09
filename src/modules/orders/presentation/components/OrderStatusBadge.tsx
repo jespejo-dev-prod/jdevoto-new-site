@@ -22,6 +22,14 @@ export const STATUS_CONFIG: Record<OrderStatus, { label: string; className: stri
     label: "Rechazado", 
     className: "bg-rose-500/10 text-rose-400 border-rose-500/20" 
   },
+  [OrderStatus.DELIVERED]: { 
+    label: "Entregado", 
+    className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
+  },
+  [OrderStatus.PENDING]: { 
+    label: "Pendiente", 
+    className: "bg-amber-500/10 text-amber-400 border-amber-500/20" 
+  },
 };
 
 export function OrderStatusBadge({ status, className }: { status: OrderStatus; className?: string }) {

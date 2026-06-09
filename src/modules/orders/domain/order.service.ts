@@ -317,9 +317,11 @@ export class OrderService {
    * Máquina de estados para las transiciones válidas de un pedido.
    */
   private readonly VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-    [OrderStatus.DRAFT]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
+    [OrderStatus.DRAFT]: [OrderStatus.CONFIRMED, OrderStatus.PENDING, OrderStatus.CANCELLED],
+    [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED, OrderStatus.REJECTED],
     [OrderStatus.CONFIRMED]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED, OrderStatus.REJECTED],
-    [OrderStatus.SHIPPED]: [],
+    [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
+    [OrderStatus.DELIVERED]: [],
     [OrderStatus.CANCELLED]: [OrderStatus.DRAFT],
     [OrderStatus.REJECTED]: [OrderStatus.DRAFT],
   };

@@ -265,6 +265,8 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     [OrderStatus.DRAFT]: 'Borrador',
     [OrderStatus.CONFIRMED]: 'Confirmado',
     [OrderStatus.SHIPPED]: 'Enviado',
+    [OrderStatus.DELIVERED]: 'Entregado',
+    [OrderStatus.PENDING]: 'Pendiente',
     [OrderStatus.CANCELLED]: 'Cancelado',
     [OrderStatus.REJECTED]: 'Rechazado'
   };

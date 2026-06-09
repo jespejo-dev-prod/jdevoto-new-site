@@ -30,6 +30,8 @@ enum OrderStatus {
   SHIPPED // Enviado / Despachado
   CANCELLED // Cancelado
   REJECTED // Rechazado
+  DELIVERED // Entregado
+  PENDING // Pendiente
 }
 
 enum PaymentStatus {
