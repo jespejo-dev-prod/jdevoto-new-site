@@ -55,16 +55,18 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
   }
 
   // Errores de dominio conocidos
-  if (error instanceof AppError) {
+  const isAppError = error && typeof error === 'object' && ('isAppError' in error || (error as any).isAppError === true || error instanceof AppError);
+  if (isAppError) {
+    const appError = error as any;
     const body: ApiError = {
       success: false,
       error: {
-        code: error.code,
-        message: error.message,
-        details: error instanceof ValidationError ? error.details : undefined,
+        code: appError.code,
+        message: appError.message,
+        details: appError.code === "VALIDATION_ERROR" ? appError.details : undefined,
       },
     };
-    return NextResponse.json<ApiError>(body, { status: error.statusCode });
+    return NextResponse.json<ApiError>(body, { status: appError.statusCode });
   }
 
   // Errores de Prisma (ej: duplicados)
@@ -119,17 +121,12 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
     }
   }
 
-  const errorMessage = error instanceof Error ? error.message : String(error);
-  const stack = error instanceof Error ? error.stack : undefined;
-  const errorName = error instanceof Error ? error.name : 'UnknownError';
-
   return NextResponse.json<ApiError>(
     {
       success: false,
       error: {
         code: "INTERNAL_ERROR",
-        message: `Error interno: ${errorMessage}`,
-        details: { stack, errorName } as any,
+        message: "Error interno del servidor",
       },
     },
     { status: 500 }
