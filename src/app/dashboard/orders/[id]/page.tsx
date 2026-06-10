@@ -258,11 +258,19 @@ export default function OrderDetailPage() {
                 onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
               >
-                {Object.values(OrderStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {STATUS_CONFIG[status]?.label || status}
-                  </option>
-                ))}
+                {/* Estados principales */}
+                <option value={OrderStatus.PENDING}>{STATUS_CONFIG[OrderStatus.PENDING]?.label || "Pendiente"}</option>
+                <option value={OrderStatus.CONFIRMED}>{STATUS_CONFIG[OrderStatus.CONFIRMED]?.label || "Confirmado"}</option>
+                <option value={OrderStatus.SHIPPED}>{STATUS_CONFIG[OrderStatus.SHIPPED]?.label || "Enviado"}</option>
+                <option value={OrderStatus.DELIVERED}>{STATUS_CONFIG[OrderStatus.DELIVERED]?.label || "Entregado"}</option>
+
+                {/* Separador */}
+                <option disabled>────────────────────</option>
+
+                {/* Estados secundarios */}
+                <option value={OrderStatus.DRAFT}>{STATUS_CONFIG[OrderStatus.DRAFT]?.label || "Borrador"}</option>
+                <option value={OrderStatus.REJECTED}>{STATUS_CONFIG[OrderStatus.REJECTED]?.label || "Rechazado"}</option>
+                <option value={OrderStatus.CANCELLED}>{STATUS_CONFIG[OrderStatus.CANCELLED]?.label || "Cancelado"}</option>
               </select>
             </div>
 

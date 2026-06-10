@@ -175,8 +175,10 @@ export const ProductCard = memo(function ProductCard({
               {product.brand?.name || 'SIN MARCA'}
             </p>
             <h3 className={cn(
-              "text-sm font-bold leading-tight transition-colors truncate",
-              isDashboard ? "text-white group-hover:text-primary" : "text-zinc-900 group-hover:text-primary"
+              "transition-colors",
+              isDashboard 
+                ? "text-sm font-bold leading-tight truncate text-white group-hover:text-primary" 
+                : "text-base sm:text-lg font-bold leading-snug line-clamp-2 h-11 sm:h-12 overflow-hidden text-zinc-900 group-hover:text-primary"
             )}>
               {product.name}
             </h3>
