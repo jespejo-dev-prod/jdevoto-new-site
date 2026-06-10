@@ -211,10 +211,10 @@ export const ProductCard = memo(function ProductCard({
               </div>
             ) : (
               <div className="flex flex-col">
-                <p className="text-lg font-bold text-zinc-900 tracking-tight">
-                  $ {Math.round(product.basePrice || 0).toLocaleString('es-CL')}
-                </p>
-                <span className="text-[9px] text-zinc-400 font-bold uppercase">P. Sugerido</span>
+                <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider">
+                  🔒 Inicia sesión
+                </span>
+                <span className="text-[9px] text-zinc-400 font-bold uppercase">Para ver precios</span>
               </div>
             )}
           </div>
@@ -235,17 +235,9 @@ export const ProductCard = memo(function ProductCard({
                 <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">Entrega mañana</span>
               </div>
             ) : (
-              <div className="flex flex-col items-end gap-1">
-                <span className={cn(
-                  "text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-widest",
-                  product.stockQuantity > 0 ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"
-                )}>
-                  {product.stockQuantity > 0 ? "Disponible" : "Agotado"}
-                </span>
-                {product.stockQuantity > 0 && (
-                  <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">Entrega rápida</span>
-                )}
-              </div>
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                Stock Privado
+              </span>
             )}
           </div>
         </div>
