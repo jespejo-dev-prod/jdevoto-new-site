@@ -73,11 +73,48 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<'all' | 'published' | 'draft' | 'trash'>('all');
 
+  const [hideOutOfStock, setHideOutOfStock] = useState(false);
+  const [isUpdatingSetting, setIsUpdatingSetting] = useState(false);
+
   // Sync state with URL search param
   useEffect(() => {
     setSearch(urlSearch);
     setPage(1);
   }, [urlSearch]);
+
+  // Load initial setting on component mount
+  useEffect(() => {
+    fetch('/api/settings?key=hideOutOfStock')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.value !== null) {
+          setHideOutOfStock(data.value);
+        }
+      })
+      .catch((err) => console.error('Error fetching setting:', err));
+  }, []);
+
+  const handleToggleHideOutOfStock = async () => {
+    setIsUpdatingSetting(true);
+    const newValue = !hideOutOfStock;
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'hideOutOfStock', value: newValue }),
+      });
+      if (res.ok) {
+        setHideOutOfStock(newValue);
+      } else {
+        alert('Error al guardar la configuración');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error de red al guardar la configuración');
+    } finally {
+      setIsUpdatingSetting(false);
+    }
+  };
 
   const { data, isLoading, isFetching } = useProducts({
     search,
@@ -129,15 +166,34 @@ export default function ProductsPage() {
             {isLoading ? 'Cargando inventario...' : `${total} productos en total`}
           </p>
         </div>
-        <Link href="/dashboard/products/new">
+        <div className="flex items-center gap-3">
           <button
-            id="btn-new-product"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs transition-all shadow-lg shadow-primary/20"
+            onClick={handleToggleHideOutOfStock}
+            disabled={isUpdatingSetting}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md active:scale-[0.98] hover:scale-[1.01] cursor-pointer ${
+              hideOutOfStock
+                ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/20 border border-rose-500/30'
+                : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800'
+            }`}
           >
-            <Plus className="h-4 w-4" />
-            Nuevo Producto
+            {isUpdatingSetting ? (
+              <span className="animate-spin h-3.5 w-3.5 border-2 border-current border-t-transparent rounded-full" />
+            ) : (
+              <span className={`h-2 w-2 rounded-full ${hideOutOfStock ? 'bg-white animate-pulse' : 'bg-zinc-500'}`} />
+            )}
+            {hideOutOfStock ? 'Ocultando Sin Stock' : 'Ocultar Sin Stock del Catálogo'}
           </button>
-        </Link>
+
+          <Link href="/dashboard/products/new">
+            <button
+              id="btn-new-product"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs transition-all shadow-lg shadow-primary/20 cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              Nuevo Producto
+            </button>
+          </Link>
+        </div>
       </div>
 
       {/* WordPress-like status tabs filter */}

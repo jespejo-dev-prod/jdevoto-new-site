@@ -17,6 +17,11 @@ export async function getBundleSuggestionUseCase(
   currentProductId: string,
   companyId: string | null
 ) {
+  const hideSetting = await prisma.storeSettings.findUnique({
+    where: { key: 'hideOutOfStock' },
+  });
+  const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
+
   // Busca UN producto de la misma marca y categoría (excluye el actual)
   const product = await prisma.product.findFirst({
     where: {
@@ -24,6 +29,8 @@ export async function getBundleSuggestionUseCase(
       ...(brandId ? { brandId } : {}),
       id: { not: currentProductId },
       isActive: true,
+      isDeleted: false,
+      ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
     },
     select: {
       id: true,

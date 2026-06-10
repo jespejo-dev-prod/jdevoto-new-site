@@ -44,10 +44,10 @@ export const ProductCard = memo(function ProductCard({
     : null;
 
   const cardClasses = cn(
-    "group relative rounded-[28px] border transition-all duration-500 ease-out flex flex-col overflow-hidden",
+    "group relative rounded-2xl border transition-all duration-300 ease-out flex flex-col overflow-hidden",
     isDashboard 
-      ? "border-zinc-800 bg-zinc-900/40 hover:border-zinc-650 hover:shadow-primary/5 hover:-translate-y-0.5" 
-      : "border-zinc-200/40 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.012)] hover:border-zinc-300 hover:scale-[1.015] hover:shadow-[0_20px_35px_-8px_rgba(0,0,0,0.12)]"
+      ? "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:shadow-primary/5 hover:-translate-y-0.5" 
+      : "border-zinc-100 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-zinc-200 hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1"
   );
 
   const linkHref = isDashboard 
@@ -66,7 +66,7 @@ export const ProductCard = memo(function ProductCard({
       {/* Image Container */}
       <div className={cn(
         "aspect-[4/3] relative overflow-hidden flex-shrink-0 z-0",
-        isDashboard ? "bg-zinc-950" : "bg-zinc-50"
+        isDashboard ? "bg-zinc-950" : "bg-zinc-50/60"
       )}>
         <Image
           src={primaryImage?.url || '/placeholder-product.png'}
@@ -175,7 +175,7 @@ export const ProductCard = memo(function ProductCard({
               {product.brand?.name || 'SIN MARCA'}
             </p>
             <h3 className={cn(
-              "text-sm font-bold leading-tight transition-colors truncate uppercase tracking-tight",
+              "text-sm font-bold leading-tight transition-colors truncate",
               isDashboard ? "text-white group-hover:text-primary" : "text-zinc-900 group-hover:text-primary"
             )}>
               {product.name}
@@ -183,14 +183,7 @@ export const ProductCard = memo(function ProductCard({
           </div>
         </div>
 
-        {!isDashboard && (
-          <div className="flex items-center gap-1.5 pointer-events-none">
-             <div className="flex items-center text-orange-400">
-               {[...Array(5)].map((_, j) => <Star key={j} className={cn("h-3 w-3 fill-current", j >= 4 && "text-zinc-200 fill-none")} />)}
-             </div>
-             <span className="text-[10px] text-zinc-400 font-bold">({(product.id.charCodeAt(0) % 80) + 12})</span>
-          </div>
-        )}
+        {/* Rating removed to keep clean Retail aesthetic */}
 
         <div className={cn(
           "flex items-center justify-between pt-2 border-t mt-auto pointer-events-none",
@@ -217,9 +210,12 @@ export const ProductCard = memo(function ProductCard({
                 <span className="text-[9px] text-zinc-400 font-bold uppercase">Neto</span>
               </div>
             ) : (
-              <span className="text-[11px] font-bold text-blue-600 uppercase tracking-tight">
-                🔒 Inicia sesión
-              </span>
+              <div className="flex flex-col">
+                <p className="text-lg font-bold text-zinc-900 tracking-tight">
+                  $ {Math.round(product.basePrice || 0).toLocaleString('es-CL')}
+                </p>
+                <span className="text-[9px] text-zinc-400 font-bold uppercase">P. Sugerido</span>
+              </div>
             )}
           </div>
           <div className="text-right">
@@ -239,9 +235,17 @@ export const ProductCard = memo(function ProductCard({
                 <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">Entrega mañana</span>
               </div>
             ) : (
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight">
-                Stock Privado
-              </span>
+              <div className="flex flex-col items-end gap-1">
+                <span className={cn(
+                  "text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-widest",
+                  product.stockQuantity > 0 ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"
+                )}>
+                  {product.stockQuantity > 0 ? "Disponible" : "Agotado"}
+                </span>
+                {product.stockQuantity > 0 && (
+                  <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">Entrega rápida</span>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -250,6 +254,16 @@ export const ProductCard = memo(function ProductCard({
         {!isDashboard && isAuthenticated && (
           <div className="pt-2 relative z-10">
             <AddToCartAction product={product} variant="compact" />
+          </div>
+        )}
+        {!isDashboard && !isAuthenticated && (
+          <div className="pt-2 relative z-10 text-center border-t border-zinc-150/60 mt-1">
+            <Link 
+              href="/login" 
+              className="text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-widest block py-1"
+            >
+              Inicia sesión para precio B2B
+            </Link>
           </div>
         )}
       </div>

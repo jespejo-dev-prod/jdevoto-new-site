@@ -11,8 +11,19 @@ export default async function CartPage() {
   const user = await getServerUser();
   const companyId = user?.companyId || null;
 
+  // Check if we should hide out-of-stock products for customers/guests
+  const hideSetting = await prisma.storeSettings.findUnique({
+    where: { key: 'hideOutOfStock' },
+  });
+  const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
+
   // Fetch recommended products (Top sellers or just some products)
   const recommendedProductsRaw = await prisma.product.findMany({
+    where: {
+      isActive: true,
+      isDeleted: false,
+      ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
+    },
     take: 12,
     include: {
       images: true,

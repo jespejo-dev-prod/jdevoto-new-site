@@ -40,11 +40,12 @@ export function PublicHeader() {
     ? (isMobile ? '119px' : '123px')
     : (isMobile ? '73px' : '77px');
 
-  const formattedSubtotal = subtotal.toLocaleString('es-CL');
-  const missingAmount = Math.max(0, 100000 - subtotal);
+  const roundedSubtotal = Math.round(subtotal);
+  const formattedSubtotal = roundedSubtotal.toLocaleString('es-CL');
+  const missingAmount = Math.max(0, 100000 - roundedSubtotal);
   const formattedMissing = missingAmount.toLocaleString('es-CL');
-  const percent = Math.min(100, (subtotal / 100000) * 100);
-  const isMinimumMet = subtotal >= 100000;
+  const percent = Math.min(100, (roundedSubtotal / 100000) * 100);
+  const isMinimumMet = roundedSubtotal >= 100000;
 
   return (
     <header className="sticky top-0 z-50 w-full flex flex-col">
@@ -137,26 +138,32 @@ export function PublicHeader() {
 
       {/* Barra de progreso de compra mínima */}
       {showProgressBar && (
-        <div className="h-[46px] bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-4 sm:px-8 text-xs sm:text-[13px] font-black uppercase tracking-wider text-zinc-400 select-none gap-4">
-          <div className="flex items-center gap-2 truncate">
+        <div className={`h-[46px] flex items-center justify-center gap-4 sm:gap-6 px-4 sm:px-8 text-xs sm:text-[13px] font-bold uppercase tracking-wider select-none transition-all duration-300 ${
+          isMinimumMet 
+            ? 'bg-emerald-600 text-white border-b border-emerald-700' 
+            : 'bg-sky-500 text-white border-b border-sky-600'
+        }`}>
+          <div className="flex items-center gap-2 truncate font-black">
             {isMinimumMet ? (
-              <span className="text-emerald-400 font-black flex items-center gap-1.5 animate-pulse">
-                🎉 Mínimo alcanzado: <span className="text-white">${formattedSubtotal} neto</span>
+              <span>
+                🎉 ¡Mínimo Alcanzado! | Neto: ${formattedSubtotal}
               </span>
             ) : (
-              <span className="truncate">
-                Neto: <span className="text-white">${formattedSubtotal}</span> / $100.000 (Falta <span className="text-primary">${formattedMissing}</span>)
+              <span>
+                Compra Mínima: <span className="text-yellow-300 font-black">$100.000</span> | Neto: ${formattedSubtotal} (Te faltan: <span className="text-yellow-300 font-black">${formattedMissing}</span>)
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="w-28 sm:w-56 h-2.5 bg-zinc-800 rounded-full overflow-hidden relative border border-zinc-750">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className={`w-20 sm:w-44 h-2.5 rounded-full overflow-hidden relative border ${
+              isMinimumMet ? 'bg-emerald-800 border-emerald-700' : 'bg-sky-700/30 border-sky-600/30'
+            }`}>
               <div 
-                className={`h-full transition-all duration-500 ease-out bg-gradient-to-r ${isMinimumMet ? 'from-emerald-500 to-green-400' : 'from-rose-500 via-amber-500 to-emerald-500'}`}
+                className="h-full transition-all duration-500 ease-out bg-white"
                 style={{ width: `${percent}%` }}
               />
             </div>
-            <span className={isMinimumMet ? "text-emerald-400 font-black" : "text-zinc-550 font-bold"}>
+            <span className="text-xs font-black">
               {Math.round(percent)}%
             </span>
           </div>

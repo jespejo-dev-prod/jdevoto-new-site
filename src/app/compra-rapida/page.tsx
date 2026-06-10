@@ -7,7 +7,7 @@ import { PublicFooter } from '@/components/layout/public-footer';
 import { QuickBuyView } from '@/modules/catalog/presentation/components/QuickBuy/QuickBuyView';
 
 export const metadata = {
-  title: 'Compra Rápida | Antigravity B2B',
+  title: 'Compra Rápida',
   description: 'Ingresa SKUs de forma manual, carga archivos de Excel o busca por categoría para acelerar tus compras B2B.',
 };
 

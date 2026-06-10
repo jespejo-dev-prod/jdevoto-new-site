@@ -43,6 +43,7 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
     const info = await transporter.sendMail({
       from: '"Tu Tienda B2B" <ventas@tutiendab2b.cl>',
       to: customerEmail,
+      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Nuevo pedido (${order.orderNumber})`,
       html: htmlContent,
     });
@@ -255,6 +256,7 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
     const info = await transporter.sendMail({
       from: '"Tu Tienda B2B" <ventas@tutiendab2b.cl>',
       to: customerEmail,
+      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Actualización de pedido #${order.orderNumber}`,
       html: htmlContent,
       attachments
@@ -318,6 +320,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     const info = await transporter.sendMail({
       from: '"Tu Tienda B2B" <soporte@tutiendab2b.cl>',
       to: email,
+      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: 'Restablecer contraseña - Tu Tienda B2B',
       html: htmlContent,
     });
@@ -380,6 +383,7 @@ export async function sendOrderShippedEmail(order: any, customerEmail: string) {
     const info = await transporter.sendMail({
       from: '"Tu Tienda B2B" <despachos@tutiendab2b.cl>',
       to: customerEmail,
+      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Tu pedido #${order.orderNumber} ha sido enviado 🚚`,
       html: htmlContent,
     });
@@ -426,6 +430,7 @@ export async function sendNotificationEmail(email: string, title: string, messag
     const info = await transporter.sendMail({
       from: '"Tu Tienda B2B" <notificaciones@tutiendab2b.cl>',
       to: email,
+      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: title,
       html: htmlContent,
     });
@@ -440,6 +445,57 @@ export async function sendNotificationEmail(email: string, title: string, messag
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Error enviando correo de notificación:", error);
+    return { success: false, error };
+  }
+}
+
+export async function sendOrderStatusUpdateEmail(order: any, customerEmail: string) {
+  try {
+    const transporter = await getTransporter();
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .btn { display: inline-block; background-color: #1e40af; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+      </style>
+    </head>
+    <body style="background-color: #f9fafb; padding: 40px 0;">
+      <div class="container">
+        <h2 style="color: #1e40af; margin-top: 0;">Actualización de Estado de Pedido 📋</h2>
+        <p>Hola,</p>
+        <p>El estado de tu pedido <strong>#${order.orderNumber}</strong> ha sido actualizado a: <strong>${order.status}</strong>.</p>
+        
+        <div style="text-align: center; margin-top: 30px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/orders/${order.id}" class="btn">Ver Pedido en la Tienda</a>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+
+    const info = await transporter.sendMail({
+      from: '"Tu Tienda B2B" <ventas@tutiendab2b.cl>',
+      to: customerEmail,
+      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
+      subject: `Actualización de estado pedido #${order.orderNumber} -> ${order.status}`,
+      html: htmlContent,
+    });
+
+    console.log("==========================================");
+    console.log(`📧 Correo de cambio de estado enviado a ${customerEmail}`);
+    if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_HOST) {
+      console.log("👀 Preview URL:", nodemailer.getTestMessageUrl(info));
+    }
+    console.log("==========================================");
+
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error enviando correo de cambio de estado:", error);
     return { success: false, error };
   }
 }

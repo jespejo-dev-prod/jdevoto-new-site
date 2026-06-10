@@ -18,12 +18,19 @@ export async function getRelatedProductsUseCase(
   companyId: string | null,
   limit = 8
 ) {
+  const hideSetting = await prisma.storeSettings.findUnique({
+    where: { key: 'hideOutOfStock' },
+  });
+  const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
+
   // Busca productos de la misma categoría excluyendo el producto actual
   const products = await prisma.product.findMany({
     where: {
       ...(categoryId ? { categoryId } : {}),
       id: { not: currentProductId },
       isActive: true,
+      isDeleted: false,
+      ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
     },
     take: limit,
     orderBy: { createdAt: "desc" },

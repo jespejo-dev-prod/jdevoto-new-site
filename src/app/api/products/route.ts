@@ -48,6 +48,15 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
   const statusParam = req.nextUrl.searchParams.get("status") || "all";
 
+  // Check if we should hide out-of-stock products for customers/guests
+  let hideOutOfStock = false;
+  if (!isPrivileged) {
+    const hideSetting = await prisma.storeSettings.findUnique({
+      where: { key: 'hideOutOfStock' },
+    });
+    hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
+  }
+
   // Construir filtros
   const where: any = {
     ...(isPrivileged
@@ -73,7 +82,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
           ],
         }
       : {}),
-    ...(query.inStock ? { stockQuantity: { gt: 0 } } : {}),
+    ...((query.inStock || hideOutOfStock) ? { stockQuantity: { gt: 0 } } : {}),
   };
 
   const skip = (query.page - 1) * query.limit;

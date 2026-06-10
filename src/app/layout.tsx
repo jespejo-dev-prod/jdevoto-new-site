@@ -8,11 +8,27 @@ import { Metadata } from 'next';
 import { CartProvider } from '@/context/CartContext';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { CookieBanner } from '@/components/layout/cookie-banner';
+import { Roboto } from 'next/font/google';
+
+const roboto = Roboto({
+  weight: ['300', '400', '500', '700', '900'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  title: 'Antigravity B2B',
+  title: {
+    default: 'Home - Jdevoto',
+    template: '%s - Jdevoto',
+  },
   description: 'Plataforma de ventas corporativas B2B',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
   robots: {
     index: false,
     follow: false,
@@ -26,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className="antialiased min-h-screen">
+      <body className={`${roboto.variable} font-sans antialiased min-h-screen`}>
         <ThemeProvider>
           <QueryProvider>
             <AuthProvider>

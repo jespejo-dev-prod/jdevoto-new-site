@@ -392,6 +392,15 @@ export class OrderService {
         }
         sendOrderShippedEmail(updated, customerEmail).catch(console.error);
       });
+    } else {
+      import('@/lib/email').then(async ({ sendOrderStatusUpdateEmail }) => {
+        let customerEmail = (updated.billingAddress as any)?.email;
+        if (!customerEmail) {
+          const user = await prisma.user.findUnique({ where: { id: updated.createdById }, select: { email: true } });
+          customerEmail = user?.email || "ventas@tutiendab2b.cl";
+        }
+        sendOrderStatusUpdateEmail(updated, customerEmail).catch(console.error);
+      });
     }
 
     return updated;

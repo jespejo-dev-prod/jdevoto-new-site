@@ -12,12 +12,12 @@ const slides = [
     image: '/home/outlet.jpg',
     badge: '⚡ Precios Especiales B2B',
     badgeIcon: Zap,
-    badgeColor: 'text-sky-400 bg-sky-400/10 border-sky-400/20',
+    badgeColor: 'text-sky-700 bg-sky-50 border-sky-100',
     title: 'Productos en Outlet',
     description: 'Aprovecha precios rebajados en una gran variedad de productos destacados.',
     cta: 'Ver Ofertas',
     href: '/products?category=outlet',
-    gradient: 'from-sky-500/10 via-zinc-950 to-zinc-950',
+    gradient: 'from-sky-100/30 via-zinc-100/50 to-transparent',
     imageClass: 'object-center scale-110 md:scale-120 translate-x-[3%] md:translate-x-[8%] origin-center',
   },
   {
@@ -25,12 +25,12 @@ const slides = [
     image: '/home/despacho-gratis.png',
     badge: '🚚 Logística a costo cero',
     badgeIcon: Truck,
-    badgeColor: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+    badgeColor: 'text-amber-700 bg-amber-50 border-amber-100',
     title: 'Despacho Gratis',
     description: 'Recibe tu compra sin costo en zonas seleccionadas según monto mínimo de compra.',
     cta: 'Ver Cobertura',
     href: '/support',
-    gradient: 'from-amber-500/10 via-zinc-950 to-zinc-950',
+    gradient: 'from-amber-100/30 via-zinc-100/50 to-transparent',
     imageClass: 'object-right scale-105 md:scale-115 origin-right',
   },
   {
@@ -38,12 +38,12 @@ const slides = [
     image: '/home/linea-credito.jpg',
     badge: '💼 Pago diferido a 30 días',
     badgeIcon: ShieldCheck,
-    badgeColor: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
+    badgeColor: 'text-emerald-700 bg-emerald-50 border-emerald-100',
     title: 'Línea de Crédito para Empresas',
     description: 'Contáctanos para evaluar tu crédito y acceder a compras con pago diferido.',
     cta: 'Evaluar Crédito',
     href: '/support',
-    gradient: 'from-emerald-500/10 via-zinc-950 to-zinc-950',
+    gradient: 'from-emerald-100/30 via-zinc-100/50 to-transparent',
     imageClass: 'object-left scale-120 md:scale-[1.45] translate-x-[8%] md:translate-x-[22%] origin-left',
   },
 ];
@@ -67,10 +67,10 @@ export function HeroSlider() {
   const activeSlide = slides[current];
 
   return (
-    <div className="relative h-[420px] md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-950 border border-zinc-800/80 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.7)] group">
+    <div className="relative h-[420px] md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group">
       
       {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000004_1px,transparent_1px),linear-gradient(to_bottom,#00000004_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none z-10" />
       
       {/* Light glow effects */}
       <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[60%] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
@@ -89,12 +89,12 @@ export function HeroSlider() {
               src={activeSlide.image}
               alt={activeSlide.title}
               fill
-              className={`object-cover opacity-35 md:opacity-45 filter grayscale contrast-125 transition-all duration-700 ${activeSlide.imageClass}`}
+              className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${activeSlide.imageClass}`}
               priority
             />
-            {/* Dark gradient fade for text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent hidden md:block" />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/35 to-transparent md:hidden" />
+            {/* Light gradient fade for text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent md:hidden" />
             
             {/* Subtle color highlight gradient glow */}
             <div className={`absolute inset-0 bg-gradient-to-r ${activeSlide.gradient} opacity-40 pointer-events-none`} />
@@ -128,7 +128,7 @@ export function HeroSlider() {
                 hidden: { opacity: 0, y: 20, filter: 'blur(4px)' },
                 visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
               }}
-              className="text-4xl md:text-5xl lg:text-6xl font-black text-white max-w-xl leading-[1.1] tracking-tight uppercase"
+              className="text-4xl md:text-5xl lg:text-6xl font-black text-zinc-950 max-w-xl leading-[1.1] tracking-tight uppercase"
             >
               {activeSlide.title}
             </motion.h1>
@@ -139,7 +139,7 @@ export function HeroSlider() {
                 hidden: { opacity: 0, y: 15 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }
               }}
-              className="text-sm md:text-base lg:text-lg text-zinc-400 mt-4 max-w-md font-medium leading-relaxed"
+              className="text-sm md:text-base lg:text-lg text-zinc-600 mt-4 max-w-md font-semibold leading-relaxed"
             >
               {activeSlide.description}
             </motion.p>
@@ -154,7 +154,7 @@ export function HeroSlider() {
             >
               <Link
                 href={activeSlide.href}
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-primary text-zinc-950 font-black uppercase tracking-widest text-xs rounded-xl hover:bg-white transition-all shadow-xl shadow-primary/10 hover:scale-[1.03] active:scale-95 duration-300"
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-zinc-950 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 transition-all shadow-xl shadow-zinc-900/10 hover:scale-[1.03] active:scale-95 duration-300"
               >
                 {activeSlide.cta}
               </Link>
@@ -166,7 +166,7 @@ export function HeroSlider() {
       {/* Navigation Buttons (Sleek Circle Controls) */}
       <button
         onClick={prevSlide}
-        className="absolute left-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-zinc-900/40 backdrop-blur-md border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-zinc-800/80 z-20"
+        className="absolute left-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/90 shadow-sm z-20"
         aria-label="Anterior"
       >
         <ChevronLeft className="h-5 w-5" />
@@ -174,7 +174,7 @@ export function HeroSlider() {
 
       <button
         onClick={nextSlide}
-        className="absolute right-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-zinc-900/40 backdrop-blur-md border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-zinc-800/80 z-20"
+        className="absolute right-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/90 shadow-sm z-20"
         aria-label="Siguiente"
       >
         <ChevronRight className="h-5 w-5" />
@@ -187,7 +187,7 @@ export function HeroSlider() {
             key={idx}
             onClick={() => setCurrent(idx)}
             className={`h-1.5 rounded-full transition-all duration-500 ${
-              idx === current ? 'w-8 bg-primary' : 'w-2 bg-white/20 hover:bg-white/40'
+              idx === current ? 'w-8 bg-zinc-950' : 'w-2 bg-zinc-300 hover:bg-zinc-400'
             }`}
             aria-label={`Slide ${idx + 1}`}
           />

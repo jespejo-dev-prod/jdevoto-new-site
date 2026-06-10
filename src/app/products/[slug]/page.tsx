@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   try {
     const product = await getCachedProduct(slug);
     return {
-      title: `${product.name} | Antigravity B2B`,
+      title: product.name,
       description: product.description || `Compra ${product.name} al mejor precio mayorista en Antigravity.`,
       openGraph: {
         title: product.name,
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       },
     };
   } catch {
-    return { title: 'Producto no encontrado | Antigravity' };
+    return { title: 'Producto no encontrado' };
   }
 }
 

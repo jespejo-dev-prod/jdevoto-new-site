@@ -79,10 +79,17 @@ export default async function CatalogPage(props: {
   const bestSellersOnly = searchParams.bestSellers === 'true';
   const essentialsOnly = searchParams.essentials === 'true';
 
+  // Check if we should hide out-of-stock products for customers/guests
+  const hideSetting = await prisma.storeSettings.findUnique({
+    where: { key: 'hideOutOfStock' },
+  });
+  const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
+
   // Build filtered Prisma query
   const where: any = { 
     isActive: true,
-    isDeleted: false
+    isDeleted: false,
+    ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
   };
 
   if (offersOnly) {
