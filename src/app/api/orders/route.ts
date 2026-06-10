@@ -57,7 +57,12 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       );
     }
 
-    if (data.status && data.status !== OrderStatus.DRAFT && data.status !== OrderStatus.CONFIRMED) {
+    if (
+      data.status &&
+      data.status !== OrderStatus.DRAFT &&
+      data.status !== OrderStatus.PENDING &&
+      data.status !== OrderStatus.CONFIRMED
+    ) {
       throw new ForbiddenError(
         `No estás autorizado a crear un pedido con estado '${data.status}'`
       );

@@ -41,7 +41,7 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
     const htmlContent = generateOrderHtml(order, customerEmail);
 
     const info = await transporter.sendMail({
-      from: '"Tu Tienda B2B" <ventas@tutiendab2b.cl>',
+      from: '"Jdevoto.cl" <ventas@jdevoto.cl>',
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Nuevo pedido (${order.orderNumber})`,
@@ -64,7 +64,7 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
 
 function generateOrderHtml(order: any, customerEmail: string) {
   const formatMoney = (val: number) => 
-    `$${Number(val).toLocaleString('es-CL')}`;
+    `$${Math.round(Number(val)).toLocaleString('es-CL')}`;
 
   const company = order.company || {};
   const createdBy = order.createdBy || {};
@@ -73,11 +73,11 @@ function generateOrderHtml(order: any, customerEmail: string) {
   const shipping = order.shippingAddress || {};
   const salesRep = order.salesRep || null;
 
-  const subtotalNet = Number(order.subtotalNet) || 0;
-  const taxAmount = Number(order.taxAmount) || 0;
   const discountAmount = Number(order.discountAmount) || 0;
+  const totalNet = Number(order.subtotalNet) || 0;
+  const baseSubtotalNet = totalNet + discountAmount;
+  const taxAmount = Number(order.taxAmount) || 0;
   const totalGross = Number(order.totalGross) || 0;
-  const totalNet = subtotalNet - discountAmount;
 
   const itemsHtml = items.map((item: any) => `
     <tr>
@@ -119,7 +119,7 @@ function generateOrderHtml(order: any, customerEmail: string) {
   <body>
     <div class="container">
       <div style="text-align: left; margin-bottom: 30px;">
-        <img src="${process.env.NEXT_PUBLIC_APP_URL && process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_APP_URL + '/logo.png' : 'https://placehold.co/200x50/1e40af/ffffff?text=Tu+Tienda+B2B'}" alt="Logo de la Empresa" style="max-height: 50px;" />
+        <img src="${process.env.NEXT_PUBLIC_APP_URL ? process.env.NEXT_PUBLIC_APP_URL + '/logo-svg.png' : 'https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png'}" alt="Logo Jdevoto" style="max-height: 50px;" />
       </div>
       <div class="header">
         <h2 style="margin-bottom: 4px; color: #1e40af; font-size: 16px;">Datos del Cliente</h2>
@@ -146,8 +146,8 @@ function generateOrderHtml(order: any, customerEmail: string) {
           ${itemsHtml}
           
           <tr class="totals-row">
-            <td colspan="2" class="totals-label">Subtotal:</td>
-            <td colspan="2" class="totals-value">${formatMoney(subtotalNet)}</td>
+            <td colspan="2" class="totals-label">Subtotal Neto:</td>
+            <td colspan="2" class="totals-value">${formatMoney(baseSubtotalNet)}</td>
           </tr>
           
           ${discountAmount > 0 ? `
@@ -156,15 +156,15 @@ function generateOrderHtml(order: any, customerEmail: string) {
             <td colspan="2" class="totals-value">-${formatMoney(discountAmount)}</td>
           </tr>
           ` : ''}
-          
-          <tr class="totals-row">
-            <td colspan="2" class="totals-label">IVA:</td>
-            <td colspan="2" class="totals-value">${formatMoney(taxAmount)}</td>
-          </tr>
 
           <tr class="totals-row">
             <td colspan="2" class="totals-label">Total Neto:</td>
             <td colspan="2" class="totals-value">${formatMoney(totalNet)}</td>
+          </tr>
+          
+          <tr class="totals-row">
+            <td colspan="2" class="totals-label">IVA (19%):</td>
+            <td colspan="2" class="totals-value">${formatMoney(taxAmount)}</td>
           </tr>
 
           <tr class="totals-row">
@@ -197,7 +197,7 @@ function generateOrderHtml(order: any, customerEmail: string) {
       ` : ''}
 
       <div class="footer">
-        Tu Tienda B2B — Hecho con tecnología moderna
+        Jdevoto.cl
       </div>
     </div>
   </body>
@@ -254,7 +254,7 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
     `;
 
     const info = await transporter.sendMail({
-      from: '"Tu Tienda B2B" <ventas@tutiendab2b.cl>',
+      from: '"Jdevoto.cl" <ventas@jdevoto.cl>',
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Actualización de pedido #${order.orderNumber}`,
@@ -297,7 +297,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
       <div class="container">
         <h2 style="color: #1e40af; margin-top: 0;">Restablecer contraseña</h2>
         <p>Hola,</p>
-        <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en Tu Tienda B2B asociada a este correo electrónico.</p>
+        <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en Jdevoto.cl asociada a este correo electrónico.</p>
         <p>Si fuiste tú, haz clic en el siguiente botón para elegir una nueva contraseña:</p>
         
         <div style="text-align: center;">
@@ -318,10 +318,10 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     `;
 
     const info = await transporter.sendMail({
-      from: '"Tu Tienda B2B" <soporte@tutiendab2b.cl>',
+      from: '"Jdevoto.cl" <soporte@jdevoto.cl>',
       to: email,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
-      subject: 'Restablecer contraseña - Tu Tienda B2B',
+      subject: 'Restablecer contraseña - Jdevoto.cl',
       html: htmlContent,
     });
 
@@ -381,7 +381,7 @@ export async function sendOrderShippedEmail(order: any, customerEmail: string) {
     `;
 
     const info = await transporter.sendMail({
-      from: '"Tu Tienda B2B" <despachos@tutiendab2b.cl>',
+      from: '"Jdevoto.cl" <despachos@jdevoto.cl>',
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Tu pedido #${order.orderNumber} ha sido enviado 🚚`,
@@ -428,7 +428,7 @@ export async function sendNotificationEmail(email: string, title: string, messag
     `;
 
     const info = await transporter.sendMail({
-      from: '"Tu Tienda B2B" <notificaciones@tutiendab2b.cl>',
+      from: '"Jdevoto.cl" <notificaciones@jdevoto.cl>',
       to: email,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: title,
@@ -479,7 +479,7 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
     `;
 
     const info = await transporter.sendMail({
-      from: '"Tu Tienda B2B" <ventas@tutiendab2b.cl>',
+      from: '"Jdevoto.cl" <ventas@jdevoto.cl>',
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Actualización de estado pedido #${order.orderNumber} -> ${order.status}`,
