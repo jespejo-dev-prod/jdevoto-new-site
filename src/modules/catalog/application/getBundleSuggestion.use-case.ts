@@ -22,10 +22,32 @@ export async function getBundleSuggestionUseCase(
   });
   const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
 
-  // Busca UN producto de la misma marca y categoría (excluye el actual)
-  const product = await prisma.product.findFirst({
+  // 1. Obtener la categoría actual y resolver la categoría padre (incluyendo subcategorías)
+  let categoryIds: string[] = [];
+  if (categoryId) {
+    const currentCategory = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { id: true, parentId: true }
+    });
+
+    if (currentCategory) {
+      const parentId = currentCategory.parentId || currentCategory.id;
+      const subcategories = await prisma.category.findMany({
+        where: { parentId: parentId },
+        select: { id: true }
+      });
+      categoryIds = [parentId, ...subcategories.map(c => c.id)];
+    } else {
+      categoryIds = [categoryId];
+    }
+  }
+
+  const categoryFilter = categoryIds.length > 0 ? { categoryId: { in: categoryIds } } : {};
+
+  // 2. Intentar encontrar un producto de la misma marca dentro de la categoría padre
+  let product = await prisma.product.findFirst({
     where: {
-      ...(categoryId ? { categoryId } : {}),
+      ...categoryFilter,
       ...(brandId ? { brandId } : {}),
       id: { not: currentProductId },
       isActive: true,
@@ -47,6 +69,33 @@ export async function getBundleSuggestionUseCase(
       },
     },
   });
+
+  // 3. Fallback: buscar un producto de cualquier marca dentro de la categoría padre
+  if (!product && categoryIds.length > 0) {
+    product = await prisma.product.findFirst({
+      where: {
+        ...categoryFilter,
+        id: { not: currentProductId },
+        isActive: true,
+        isDeleted: false,
+        ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
+      },
+      select: {
+        id: true,
+        sku: true,
+        name: true,
+        slug: true,
+        basePrice: true,
+        minOrderQty: true,
+        inner: true,
+        images: {
+          where: { isPrimary: true },
+          take: 1,
+          select: { url: true },
+        },
+      },
+    });
+  }
 
   if (!product) return null;
 

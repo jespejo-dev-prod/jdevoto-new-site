@@ -57,7 +57,8 @@ export function AddToCartAction({
         max={product.stockQuantity}
         step={minQty}
         onChange={setQuantity}
-        className={cn(isCompact ? "h-9 text-xs" : "h-11")}
+        size={isCompact ? 'sm' : 'default'}
+        className={cn(isCompact ? "text-xs" : "")}
       />
       
       <Button 
@@ -68,7 +69,7 @@ export function AddToCartAction({
         )}
       >
         <Plus className={cn(isCompact ? "h-3 w-3" : "h-4 w-4")} />
-        <span className="truncate">{isCompact ? "Añadir" : "Agregar al carro"}</span>
+        <span className="hidden sm:inline truncate">{isCompact ? "Añadir" : "Agregar"}</span>
       </Button>
     </div>
   );

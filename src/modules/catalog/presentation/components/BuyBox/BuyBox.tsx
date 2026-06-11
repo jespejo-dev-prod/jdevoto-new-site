@@ -123,35 +123,55 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
 
   return (
     <div className="p-8 rounded-[48px] border border-zinc-100 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] space-y-8">
-      <div className="space-y-2">
-        {/* Precio Neto — visible INMEDIATAMENTE, se actualiza silenciosamente */}
-        <div className="text-[32px] font-black text-zinc-950 transition-all duration-300">
-          $ {displayNetPrice.toLocaleString('es-CL')}
-        </div>
-        <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Precio Neto (sin IVA)</span>
-
-        {/* Descuento — aparece solo si hay precio B2B con descuento */}
-        {priceReady && discountPercent > 0 && (
-          <div className="text-sm font-bold text-green-600 animate-fade-in">
-            {priceSource === 'PROMOTION' ? `${discountPercent}% Promoción aplicada` : `${discountPercent}% descuento B2B aplicado`}
-          </div>
+      <div className="space-y-2.5">
+        {discountPercent > 0 ? (
+          <>
+            <div className="flex items-baseline gap-3 flex-wrap">
+              <span className="text-[36px] font-black text-zinc-950 transition-all duration-300 leading-none">
+                $ {displayNetPrice.toLocaleString('es-CL')}
+              </span>
+              <span className="text-base font-black text-blue-600 whitespace-nowrap bg-blue-50 px-2 py-0.5 rounded-md">
+                Ahorra $ {(Math.round(b2bPrice?.unitNetPrice || baseNetPrice) - displayNetPrice).toLocaleString('es-CL')}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-1.5 text-[17px] text-zinc-400 uppercase tracking-tight">
+              <span className="line-through">
+                $ {Math.round(b2bPrice?.unitNetPrice || baseNetPrice).toLocaleString('es-CL')}
+              </span>
+              <span>•</span>
+              <span>Neto</span>
+              {priceReady && (
+                <>
+                  <span>•</span>
+                  <span className="text-green-600 font-semibold lowercase first-letter:uppercase">
+                    {priceSource === 'PROMOTION' ? `${discountPercent}% promo` : `${discountPercent}% dcto`}
+                  </span>
+                </>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-[36px] font-black text-zinc-950 transition-all duration-300 leading-none">
+              $ {displayNetPrice.toLocaleString('es-CL')}
+            </div>
+            <span className="text-sm sm:text-base text-zinc-500 font-bold uppercase tracking-widest block">Precio Neto (sin IVA)</span>
+          </>
         )}
 
-        <div className="flex items-center gap-2 text-[#00a650] text-[11px] font-black uppercase tracking-widest">
-          <div className="h-2 w-2 rounded-full bg-[#00a650] animate-pulse" /> Listos para despacho
+        <div className="flex items-center gap-2 text-[#00a650] text-[13px] sm:text-[14px] font-black uppercase tracking-widest pt-1">
+          <div className="h-2.5 w-2.5 rounded-full bg-[#00a650] animate-pulse" /> Listos para despacho
         </div>
       </div>
 
-
-
       <div className="space-y-4 pt-4 border-t border-zinc-100">
-        <div className="flex gap-4 text-[11px] font-bold uppercase tracking-tight text-zinc-400">
-          <Truck className="h-4 w-4 text-[#3483fa]" />
-          <span>Entrega este <span className="text-zinc-950">VIERNES</span></span>
-        </div>
-        <div className="flex gap-4 text-[11px] font-bold uppercase tracking-tight text-zinc-400">
-          <ShieldCheck className="h-4 w-4 text-zinc-400" />
-          <span>Garantía <span className="text-zinc-950">3 Años</span></span>
+        <div className="flex gap-4 items-start text-sm sm:text-[15px] font-bold uppercase tracking-tight text-zinc-400">
+          <ShieldCheck className="h-5 w-5 text-zinc-400 shrink-0 mt-0.5" />
+          <div className="flex flex-col leading-tight">
+            <span>Cambio o Devolución</span>
+            <span className="text-zinc-950">hasta 6 Meses</span>
+          </div>
         </div>
       </div>
 
@@ -159,14 +179,14 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
         {product.stockQuantity > 0 ? (
           <div className="flex items-center gap-2 px-4 py-3 bg-[#f3f9f2] rounded-xl w-full border border-[#e3f0e0]">
             <CheckCircle2 className="h-5 w-5 text-[#70b363]" />
-            <span className="text-[#70b363] font-black text-[14px]">
+            <span className="text-[#70b363] font-black text-[15px] sm:text-[16px]">
               {product.stockQuantity} disponibles
             </span>
           </div>
         ) : (
           <div className="flex items-center gap-2 px-4 py-3 bg-red-50 rounded-xl w-full border border-red-100">
             <div className="h-2 w-2 rounded-full bg-red-500" />
-            <span className="text-red-600 font-black text-[14px]">Agotado</span>
+            <span className="text-red-600 font-black text-[15px] sm:text-[16px]">Agotado</span>
           </div>
         )}
 
@@ -188,17 +208,17 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
           <div className="space-y-4 pt-2">
             <div className="flex gap-3">
               <div className="shrink-0 pt-0.5">
-                <RotateCcw className="h-4 w-4 text-zinc-400" />
+                <RotateCcw className="h-5 w-5 text-zinc-400" />
               </div>
-              <p className="text-[12px] text-zinc-500 leading-relaxed">
+              <p className="text-sm sm:text-[15px] text-zinc-500 leading-relaxed">
                 <span className="text-[#3483fa] cursor-pointer hover:underline">Devolución gratis.</span> Tienes 30 días desde que lo recibes.
               </p>
             </div>
             <div className="flex gap-3">
               <div className="shrink-0 pt-0.5">
-                <ShieldCheck className="h-4 w-4 text-zinc-400" />
+                <ShieldCheck className="h-5 w-5 text-zinc-400" />
               </div>
-              <p className="text-[12px] text-zinc-500 leading-relaxed">
+              <p className="text-sm sm:text-[15px] text-zinc-500 leading-relaxed">
                 <span className="text-[#3483fa] cursor-pointer hover:underline">Compra Protegida:</span> Recibe el producto que esperabas o te devolvemos tu dinero.
               </p>
             </div>

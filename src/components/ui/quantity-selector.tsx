@@ -10,6 +10,7 @@ interface QuantitySelectorProps {
   step?: number;
   onChange: (value: number) => void;
   className?: string;
+  size?: 'default' | 'sm';
 }
 
 /**
@@ -25,7 +26,8 @@ export function QuantitySelector({
   max = Infinity, 
   step = 1, 
   onChange,
-  className
+  className,
+  size = 'default'
 }: QuantitySelectorProps) {
   const [localValue, setLocalValue] = useState<string>(value.toString());
 
@@ -80,13 +82,22 @@ export function QuantitySelector({
     }
   };
 
+  const isSm = size === 'sm';
+
   return (
-    <div className={cn("flex items-center border border-zinc-200 rounded-md h-12 bg-white shrink-0 overflow-hidden", className)}>
+    <div className={cn(
+      "flex items-center border border-zinc-200 rounded-md bg-white shrink-0 overflow-hidden",
+      isSm ? "h-9" : "h-12",
+      className
+    )}>
       <button 
         type="button"
         onClick={handleDecrement}
         disabled={value <= min}
-        className="px-3 h-full hover:bg-zinc-50 transition-colors text-zinc-400 text-lg font-medium disabled:opacity-20 disabled:cursor-not-allowed select-none"
+        className={cn(
+          "h-full hover:bg-zinc-50 transition-colors text-zinc-400 text-lg font-medium disabled:opacity-20 disabled:cursor-not-allowed select-none",
+          isSm ? "px-2" : "px-3"
+        )}
       >
         -
       </button>
@@ -97,13 +108,19 @@ export function QuantitySelector({
         onChange={handleInputChange}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        className="w-12 bg-transparent text-center font-bold text-zinc-900 text-sm focus:outline-none focus:ring-0 select-all border-none focus:border-none ring-0 focus:ring-0 p-0"
+        className={cn(
+          "bg-transparent text-center font-bold text-zinc-900 text-sm focus:outline-none focus:ring-0 select-all border-none focus:border-none ring-0 focus:ring-0 p-0",
+          isSm ? "w-6" : "w-12"
+        )}
       />
       <button 
         type="button"
         onClick={handleIncrement}
         disabled={value >= maxMultiple}
-        className="px-3 h-full hover:bg-zinc-50 transition-colors text-zinc-400 text-lg font-medium disabled:opacity-20 disabled:cursor-not-allowed select-none"
+        className={cn(
+          "h-full hover:bg-zinc-50 transition-colors text-zinc-400 text-lg font-medium disabled:opacity-20 disabled:cursor-not-allowed select-none",
+          isSm ? "px-2" : "px-3"
+        )}
       >
         +
       </button>

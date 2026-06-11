@@ -24,7 +24,7 @@ export async function getRelatedProductsUseCase(
   const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
 
   // Busca productos de la misma categoría excluyendo el producto actual
-  const products = await prisma.product.findMany({
+  let products = await prisma.product.findMany({
     where: {
       ...(categoryId ? { categoryId } : {}),
       id: { not: currentProductId },
@@ -55,6 +55,55 @@ export async function getRelatedProductsUseCase(
       },
     },
   });
+
+  // Fallback a la categoría padre si no hay productos en la categoría actual
+  if (products.length === 0 && categoryId) {
+    const currentCategory = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { id: true, parentId: true }
+    });
+
+    if (currentCategory) {
+      const parentId = currentCategory.parentId || currentCategory.id;
+      const subcategories = await prisma.category.findMany({
+        where: { parentId: parentId },
+        select: { id: true }
+      });
+      const categoryIds = [parentId, ...subcategories.map(c => c.id)];
+
+      products = await prisma.product.findMany({
+        where: {
+          categoryId: { in: categoryIds },
+          id: { not: currentProductId },
+          isActive: true,
+          isDeleted: false,
+          ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
+        },
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          sku: true,
+          name: true,
+          slug: true,
+          basePrice: true,
+          stockQuantity: true,
+          minOrderQty: true,
+          unit: true,
+          inner: true,
+          brandId: true,
+          categoryId: true,
+          category: { select: { id: true, name: true, isOutlet: true } },
+          brand: { select: { id: true, name: true } },
+          images: {
+            where: { isPrimary: true },
+            take: 1,
+            select: { url: true, isPrimary: true },
+          },
+        },
+      });
+    }
+  }
 
   if (products.length === 0) return [];
 

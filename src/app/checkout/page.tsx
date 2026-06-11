@@ -5,7 +5,7 @@ import {
   ShieldCheck, ChevronRight, Lock, 
   CreditCard, Building2, CheckCircle2,
   ArrowLeft, Calendar, FileText, Ticket,
-  Truck, Wallet, Edit2
+  Truck, Wallet, Edit2, ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,6 +67,9 @@ export default function CheckoutPage() {
   const [razonSocial, setRazonSocial] = useState('');
   const [rutEmpresa, setRutEmpresa] = useState('');
   
+  const [selectedCourier, setSelectedCourier] = useState('');
+  const [customCourier, setCustomCourier] = useState('');
+  
   const [paymentMethod, setPaymentMethod] = useState<'credit_b2b' | 'webpay' | 'transfer' | 'mercadopago'>('webpay');
   const [coupon, setCoupon] = useState('');
   
@@ -75,6 +78,52 @@ export default function CheckoutPage() {
 
   const [bankConfig, setBankConfig] = useState<any>(null);
   const [mpConfig, setMpConfig] = useState<any>(null);
+
+  const [isVerifyingAddress, setIsVerifyingAddress] = useState(false);
+  const [addressValidationError, setAddressValidationError] = useState<string | null>(null);
+
+  const validateAddress = async (streetVal: string, comunaVal: string, regionVal: string) => {
+    if (!streetVal.trim() || !comunaVal || !regionVal) {
+      setAddressValidationError(null);
+      return;
+    }
+    
+    setIsVerifyingAddress(true);
+    setAddressValidationError(null);
+    
+    try {
+      const query = `${streetVal}, ${comunaVal}, ${regionVal}, Chile`;
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&email=jespejo@jdevoto.cl`;
+      
+      const res = await fetch(url);
+      
+      if (!res.ok) throw new Error('Error al conectar con el servicio de mapas');
+      
+      const data = await res.json();
+      if (data.length === 0) {
+        setAddressValidationError("La calle y número ingresados no parecen existir en esta comuna y región. Por favor, verifícalos.");
+      } else {
+        setAddressValidationError(null);
+      }
+    } catch (err) {
+      console.error("Address validation error:", err);
+      // Do not block the purchase if the OpenStreetMap API fails or times out
+      setAddressValidationError(null);
+    } finally {
+      setIsVerifyingAddress(false);
+    }
+  };
+
+  useEffect(() => {
+    if (shippingStreet && comuna && region) {
+      const delayDebounceFn = setTimeout(() => {
+        validateAddress(shippingStreet, comuna, region);
+      }, 800);
+      return () => clearTimeout(delayDebounceFn);
+    } else {
+      setAddressValidationError(null);
+    }
+  }, [shippingStreet, comuna, region]);
 
   useEffect(() => {
     fetch('/api/settings?key=bank_transfer_config')
@@ -246,13 +295,20 @@ export default function CheckoutPage() {
   // 7. Grand Total
   const grandTotal = Math.round(finalNet + finalIva + shippingCost);
 
-  // Credit Validation
   const creditLimit = user?.company?.creditLimit ? Number(user.company.creditLimit) : 0;
   const creditUsed = user?.company?.creditUsed ? Number(user.company.creditUsed) : 0;
   const availableCredit = creditLimit - creditUsed;
   const hasEnoughCredit = paymentMethod !== 'credit_b2b' || grandTotal <= availableCredit;
 
-  const isFormValid = termsAccepted && region && comuna && (billingType === 'factura' ? (razonSocial && rutEmpresa) : true) && hasEnoughCredit;
+  // Credit Validation
+  const isCourierValid = shippingMethod === 'free' || (
+    selectedCourier && (selectedCourier !== 'otro' || customCourier.trim() !== '')
+  );
+
+  const isFormValid = termsAccepted && region && comuna && shippingStreet.trim() !== '' &&
+    !addressValidationError && !isVerifyingAddress &&
+    (billingType === 'factura' ? (razonSocial && rutEmpresa) : true) && 
+    hasEnoughCredit && isCourierValid;
 
   const handleProcessOrder = async () => {
     const activeCompanyId = user?.companyId || user?.company?.id;
@@ -277,7 +333,9 @@ export default function CheckoutPage() {
           comuna,
           street: shippingStreet,
           shippingMethod,
-          courier: selectedComunaInfo?.transport || null,
+          courier: shippingMethod === 'free' 
+            ? (selectedComunaInfo?.transport || 'FLETE INCLUIDO')
+            : (selectedCourier === 'otro' ? customCourier : selectedCourier) || 'POR PAGAR',
           estimatedDelivery: selectedComunaInfo?.deliveryTime || null,
         },
         billingAddress: {
@@ -388,11 +446,11 @@ export default function CheckoutPage() {
       
       {/* MINIMAL HEADER FOR CHECKOUT */}
       <nav className="bg-zinc-950 text-white p-6 px-12 flex items-center justify-between border-b border-zinc-800 sticky top-0 z-50">
-         <Link href="/cart" className="flex items-center gap-2 text-xs font-black text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">
+         <Link href="/cart" className="flex items-center gap-2 text-xs sm:text-sm font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-wider">
             <ArrowLeft className="h-4 w-4" /> Volver al carrito
          </Link>
-         <span className="text-2xl font-black italic tracking-tighter">antigravity<span className="text-primary">.</span></span>
-         <div className="flex items-center gap-3 text-xs font-black text-green-500 uppercase tracking-widest hidden md:flex">
+         <span className="text-2xl sm:text-3xl font-black italic tracking-normal">antigravity<span className="text-primary">.</span></span>
+         <div className="flex items-center gap-3 text-xs sm:text-sm font-bold text-green-500 uppercase tracking-wider hidden md:flex">
             <Lock className="h-4 w-4" /> Pago Seguro SSL
          </div>
       </nav>
@@ -406,7 +464,7 @@ export default function CheckoutPage() {
               <section className="bg-white p-8 lg:p-10 rounded-[40px] border border-zinc-200 shadow-sm space-y-8 relative overflow-hidden">
                  <div className="absolute top-0 left-0 w-2 h-full bg-blue-500" />
                  <div className="flex items-center gap-4">
-                    <h2 className="text-xl font-black text-zinc-900 uppercase tracking-tight">Documento de Compra</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 uppercase tracking-tight">Documento de Compra</h2>
                  </div>
                  
                  <div className="space-y-6">
@@ -418,7 +476,7 @@ export default function CheckoutPage() {
                                 <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${billingType === 'boleta' ? 'border-primary' : 'border-zinc-300'}`}>
                                    {billingType === 'boleta' && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
                                 </div>
-                                <span className="font-black text-sm uppercase text-zinc-900">Boleta</span>
+                                <span className="font-bold text-sm sm:text-base uppercase text-zinc-900">Boleta</span>
                              </div>
                              <FileText className={`h-5 w-5 ${billingType === 'boleta' ? 'text-primary' : 'text-zinc-400'}`} />
                           </div>
@@ -430,7 +488,7 @@ export default function CheckoutPage() {
                                 <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${billingType === 'factura' ? 'border-primary' : 'border-zinc-300'}`}>
                                    {billingType === 'factura' && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
                                 </div>
-                                <span className="font-black text-sm uppercase text-zinc-900">Factura</span>
+                                <span className="font-bold text-sm sm:text-base uppercase text-zinc-900">Factura</span>
                              </div>
                              <Building2 className={`h-5 w-5 ${billingType === 'factura' ? 'text-primary' : 'text-zinc-400'}`} />
                           </div>
@@ -438,14 +496,14 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="space-y-2">
-                       <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Email de recepción</Label>
+                       <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Email de recepción</Label>
                        <Input 
                          value={billingEmail} 
                          onChange={(e) => setBillingEmail(e.target.value)}
                          readOnly
-                         className="rounded-xl h-12 bg-zinc-100 border-zinc-200 font-medium text-zinc-500 cursor-not-allowed focus:ring-0" 
+                         className="rounded-xl h-12 bg-zinc-100 border-zinc-200 font-medium text-zinc-500 cursor-not-allowed focus:ring-0 text-sm" 
                        />
-                       <p className="text-xs text-zinc-500 font-medium mt-2">
+                       <p className="text-sm text-zinc-500 font-medium mt-2">
                           La {billingType} se enviará al siguiente correo: <span className="font-bold text-zinc-900">{billingEmail || '...'}</span>.
                        </p>
                     </div>
@@ -453,22 +511,22 @@ export default function CheckoutPage() {
                     {billingType === 'factura' && (
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-zinc-100">
                           <div className="space-y-2">
-                             <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Razón Social</Label>
+                             <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Razón Social</Label>
                              <Input 
                                value={razonSocial}
                                onChange={(e) => setRazonSocial(e.target.value)}
                                readOnly
-                               className="rounded-xl h-12 bg-zinc-100 border-zinc-200 text-zinc-500 font-medium cursor-not-allowed focus:ring-0" 
+                               className="rounded-xl h-12 bg-zinc-100 border-zinc-200 text-zinc-500 font-medium cursor-not-allowed focus:ring-0 text-sm" 
                              />
                           </div>
                           <div className="space-y-2">
-                             <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">RUT Empresa</Label>
+                             <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">RUT Empresa</Label>
                              <Input 
                                value={rutEmpresa}
                                onChange={(e) => setRutEmpresa(e.target.value)}
                                placeholder="Ej: 76.123.456-7"
                                readOnly
-                               className="rounded-xl h-12 bg-zinc-100 border-zinc-200 text-zinc-500 font-medium cursor-not-allowed focus:ring-0" 
+                               className="rounded-xl h-12 bg-zinc-100 border-zinc-200 text-zinc-500 font-medium cursor-not-allowed focus:ring-0 text-sm" 
                              />
                           </div>
                        </div>
@@ -480,49 +538,79 @@ export default function CheckoutPage() {
               <section className="bg-white p-8 lg:p-10 rounded-[40px] border border-zinc-200 shadow-sm space-y-8 relative overflow-hidden">
                  <div className="absolute top-0 left-0 w-2 h-full bg-purple-500" />
                  <div className="flex items-center gap-4">
-                    <h2 className="text-xl font-black text-zinc-900 uppercase tracking-tight">Opciones de Despacho</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 uppercase tracking-tight">Opciones de Despacho</h2>
                  </div>
                  
                  <div className="space-y-6">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                           <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Región</Label>
-                           <select 
-                             value={region}
-                             onChange={(e) => {
-                                setRegion(e.target.value);
-                                setComuna('');
-                             }}
-                             className="w-full h-12 rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-900 outline-none focus:border-primary transition-all bg-zinc-50"
-                           >
-                              <option value="" className="text-zinc-500">Selecciona tu región...</option>
-                              {CHILE_REGIONS.map(r => (
-                                 <option key={r.id} value={r.name}>{r.name}</option>
-                              ))}
-                           </select>
-                        </div>
-                        <div className="space-y-2">
-                           <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Comuna / Ciudad</Label>
-                           <select 
-                             value={comuna}
-                             onChange={(e) => setComuna(e.target.value)}
-                             disabled={!region}
-                             className="w-full h-12 rounded-xl border border-zinc-200 px-4 text-sm font-medium text-zinc-900 outline-none focus:border-primary transition-all bg-zinc-50 disabled:opacity-50"
-                           >
-                              <option value="" className="text-zinc-500">Selecciona tu comuna...</option>
-                              {comunas.map(c => (
-                                 <option key={c.id} value={c.name}>{c.name}</option>
-                              ))}
-                           </select>
-                        </div>
+                            <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Región</Label>
+                            <div className="relative">
+                               <select 
+                                 value={region}
+                                 onChange={(e) => {
+                                    setRegion(e.target.value);
+                                    setComuna('');
+                                 }}
+                                 className="w-full h-12 rounded-xl border border-zinc-200 px-4 pr-10 text-sm font-semibold text-zinc-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-zinc-50 cursor-pointer appearance-none"
+                               >
+                                  <option value="" className="text-zinc-500">Selecciona tu región...</option>
+                                  {CHILE_REGIONS.map(r => (
+                                     <option key={r.id} value={r.name}>{r.name}</option>
+                                  ))}
+                               </select>
+                               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
+                            </div>
+                         </div>
+                         <div className="space-y-2">
+                            <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Comuna / Ciudad</Label>
+                            <div className="relative">
+                               <select 
+                                 value={comuna}
+                                 onChange={(e) => setComuna(e.target.value)}
+                                 disabled={!region}
+                                 className="w-full h-12 rounded-xl border border-zinc-200 px-4 pr-10 text-sm font-semibold text-zinc-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-zinc-50 disabled:opacity-50 cursor-pointer appearance-none"
+                               >
+                                  <option value="" className="text-zinc-500">Selecciona tu comuna...</option>
+                                  {comunas.map(c => (
+                                     <option key={c.id} value={c.name}>{c.name}</option>
+                                  ))}
+                               </select>
+                               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
+                            </div>
+                         </div>
                         <div className="md:col-span-2 space-y-2">
-                           <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Calle y Número</Label>
+                           <div className="flex justify-between items-center">
+                              <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Calle y Número</Label>
+                              {region && comuna && (
+                                 <a 
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                       (shippingStreet ? shippingStreet + ', ' : '') + comuna + ', ' + region + ', Chile'
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[10px] font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-wider flex items-center gap-1"
+                                 >
+                                    📍 Verificar en Google Maps
+                                 </a>
+                              )}
+                           </div>
                            <Input 
                              value={shippingStreet}
                              onChange={(e) => setShippingStreet(e.target.value)}
                              placeholder="Ej: Av. Vitacura 1234, Of 502" 
-                             className="rounded-xl h-12 bg-zinc-50 text-zinc-900 font-medium" 
+                             className="rounded-xl h-12 bg-zinc-50 text-zinc-900 font-medium text-sm" 
                            />
+                           {isVerifyingAddress && (
+                               <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider animate-pulse pt-1 px-1">
+                                  🔍 Verificando existencia de la dirección...
+                               </p>
+                            )}
+                            {addressValidationError && (
+                               <p className="text-[10px] text-red-500 font-semibold uppercase tracking-wider pt-1 px-1">
+                                  ❌ {addressValidationError}
+                               </p>
+                            )}
                         </div>
                      </div>
 
@@ -532,7 +620,7 @@ export default function CheckoutPage() {
                            const showClientPaysOption = subtotalAfterCompany < freeShippingMin || isInsularValparaiso;
                            return (
                              <div className="space-y-3">
-                                <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Modalidad de Flete</Label>
+                                <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Modalidad de Flete</Label>
                                 <div className={`grid gap-4 ${showClientPaysOption ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
                                    {showClientPaysOption && (
                                      <label className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${shippingMethod === 'client_pays' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
@@ -542,8 +630,8 @@ export default function CheckoutPage() {
                                               {shippingMethod === 'client_pays' && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
                                            </div>
                                            <div className="flex flex-col text-left">
-                                              <span className="font-black text-xs uppercase text-zinc-900">Flete por Pagar</span>
-                                              <span className="text-[9px] text-zinc-500 font-bold uppercase">A cargo del cliente en destino</span>
+                                              <span className="font-bold text-sm sm:text-base uppercase text-zinc-900">Flete por Pagar</span>
+                                              <span className="text-[11px] text-zinc-500 font-medium uppercase">A cargo del cliente en destino</span>
                                            </div>
                                         </div>
                                      </label>
@@ -557,11 +645,11 @@ export default function CheckoutPage() {
                                                 <div className="h-5 w-5 rounded-full border-2 border-zinc-300 flex items-center justify-center">
                                                 </div>
                                                 <div className="flex flex-col text-left">
-                                                   <span className="font-black text-xs uppercase text-zinc-400">Flete Incluido</span>
-                                                   <span className="text-[9px] text-zinc-400 font-bold uppercase">Despacho Gratis</span>
+                                                   <span className="font-bold text-sm sm:text-base uppercase text-zinc-400">Flete Incluido</span>
+                                                   <span className="text-[11px] text-zinc-450 font-semibold uppercase">Despacho Gratis</span>
                                                 </div>
                                              </div>
-                                             <span className="text-[9px] font-black text-red-500 uppercase tracking-tight text-left">
+                                             <span className="text-[11px] font-bold text-red-500 uppercase tracking-tight text-left">
                                                No disponible para territorio insular (Envío por pagar obligatorio)
                                              </span>
                                           </div>
@@ -595,13 +683,13 @@ export default function CheckoutPage() {
                                                    {shippingMethod === 'free' && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
                                                 </div>
                                                 <div className="flex flex-col text-left">
-                                                   <span className="font-black text-xs uppercase text-zinc-900">Flete Incluido</span>
-                                                   <span className="text-[9px] text-emerald-600 font-bold uppercase">Despacho Gratis</span>
+                                                   <span className="font-bold text-sm sm:text-base uppercase text-zinc-900">Flete Incluido</span>
+                                                   <span className="text-[11px] text-emerald-600 font-semibold uppercase">Despacho Gratis</span>
                                                 </div>
                                              </div>
                                           </div>
                                           {!canFreeShipping && (
-                                            <span className="text-[9px] font-black text-red-500 uppercase tracking-tight text-left">
+                                            <span className="text-[11px] font-bold text-red-500 uppercase tracking-tight text-left">
                                               Falta ${missingForFree.toLocaleString('es-CL')} neto (Mínimo: ${freeShippingMin.toLocaleString('es-CL')} neto)
                                             </span>
                                           )}
@@ -612,44 +700,85 @@ export default function CheckoutPage() {
                              </div>
                            );
                          })()}
+
+                         {shippingMethod === 'client_pays' && (
+                            <div className="space-y-3 pt-3 border-t border-zinc-100/80 animate-in fade-in duration-350 text-left">
+                               <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                                  Selecciona tu Transporte de Preferencia (Por Pagar)
+                               </Label>
+                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div className="relative">
+                                     <select
+                                        value={selectedCourier}
+                                        onChange={(e) => {
+                                           setSelectedCourier(e.target.value);
+                                           if (e.target.value !== 'otro') {
+                                              setCustomCourier('');
+                                           }
+                                        }}
+                                        className="w-full h-12 rounded-xl border border-zinc-200 px-4 pr-10 text-sm font-semibold text-zinc-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-zinc-50 cursor-pointer appearance-none"
+                                     >
+                                        <option value="" className="text-zinc-500">Selecciona un transporte...</option>
+                                        <option value="Starken">Starken</option>
+                                        <option value="Chilexpress">Chilexpress</option>
+                                        <option value="Blue Express">Blue Express</option>
+                                        <option value="Pullman Cargo">Pullman Cargo</option>
+                                        <option value="Varmontt">Varmontt</option>
+                                        <option value="Cruz del Sur">Cruz del Sur</option>
+                                        <option value="otro">Otro (Especificar...)</option>
+                                     </select>
+                                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
+                                  </div>
+
+                                  {selectedCourier === 'otro' && (
+                                     <Input
+                                        value={customCourier}
+                                        onChange={(e) => setCustomCourier(e.target.value)}
+                                        placeholder="Escribe el nombre del transporte"
+                                        className="rounded-xl h-12 bg-zinc-50 text-zinc-900 font-medium text-sm focus:ring-primary focus:border-primary border-zinc-200"
+                                     />
+                                  )}
+                               </div>
+                            </div>
+                         )}
                         
                         {/* Courier y plazos asignados */}
-                        {region && comuna && selectedComunaInfo && (
+                        {shippingMethod === 'free' && region && comuna && selectedComunaInfo && (
                           <div className="flex flex-col gap-5 bg-purple-50/70 p-6 sm:p-7 rounded-[28px] border border-purple-100/80 animate-in fade-in zoom-in duration-300">
                              <div className="flex items-center gap-4 border-b border-purple-100 pb-4">
                                 <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-purple-200/50">
                                    <Truck className="h-6 w-6 text-purple-600" />
                                 </div>
                                 <div className="text-left">
-                                   <p className="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] leading-none mb-1">Detalles del Courier</p>
-                                   <h3 className="text-lg font-black text-zinc-950 uppercase tracking-tight">Información de Despacho</h3>
+                                   <p className="text-[10px] sm:text-xs font-bold text-purple-600 uppercase tracking-wider leading-none mb-1">Detalles del Courier</p>
+                                   <h3 className="text-lg sm:text-xl font-bold text-zinc-900 uppercase tracking-tight">Información de Despacho</h3>
                                 </div>
                              </div>
 
                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-left">
-                                <div className="bg-white p-5 rounded-2xl border border-purple-50 shadow-sm flex flex-col justify-between">
-                                   <span className="text-[10px] font-black text-purple-600 uppercase tracking-widest block mb-1">Transporte Asignado</span>
-                                   <span className="text-xl font-black text-zinc-900 uppercase tracking-tight block">
+                                <div className="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm flex flex-col justify-between">
+                                   <span className="text-[10px] sm:text-xs font-bold text-purple-600 uppercase tracking-wider block mb-1">Transporte Asignado</span>
+                                   <span className="text-lg sm:text-xl font-bold text-zinc-900 uppercase tracking-tight block">
                                       {selectedComunaInfo.transport || 'POR DEFINIR'}
                                    </span>
                                 </div>
-                                <div className="bg-white p-5 rounded-2xl border border-purple-50 shadow-sm flex flex-col justify-between">
-                                   <span className="text-[10px] font-black text-purple-600 uppercase tracking-widest block mb-1">Plazo de entrega / Salidas</span>
-                                   <span className="text-xl font-black text-zinc-900 uppercase tracking-tight block">
+                                <div className="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm flex flex-col justify-between">
+                                   <span className="text-[10px] sm:text-xs font-bold text-purple-600 uppercase tracking-wider block mb-1">Plazo de entrega / Salidas</span>
+                                   <span className="text-lg sm:text-xl font-bold text-zinc-900 uppercase tracking-tight block">
                                       {selectedComunaInfo.deliveryTime || 'POR DEFINIR'}
                                    </span>
                                 </div>
                              </div>
 
-                             <div className="pt-4 border-t border-purple-100/60 space-y-1 text-left">
-                                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-tight">
+                             <div className="pt-4 border-t border-purple-100/60 space-y-2 text-left">
+                                <p className="text-xs sm:text-[13px] text-zinc-500 font-medium tracking-normal">
                                    *¹ Tiempos de entregas declarados por respectivos transportes, solo referencial.
                                 </p>
-                                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-tight">
+                                <p className="text-xs sm:text-[13px] text-zinc-500 font-medium tracking-normal">
                                    *² Tiempos a regiones se inician desde la entrega en Santiago por T. Espinoza, cuando corresponda.
                                 </p>
-                                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-tight pl-3">
-                                   exepto Fedex y GyG.
+                                <p className="text-xs sm:text-[13px] text-zinc-500 font-medium tracking-normal pl-4">
+                                   excepto Fedex y GyG.
                                 </p>
                              </div>
                           </div>
@@ -662,7 +791,7 @@ export default function CheckoutPage() {
               <section className="bg-white p-8 lg:p-10 rounded-[40px] border border-zinc-200 shadow-sm space-y-8 relative overflow-hidden">
                  <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500" />
                  <div className="flex items-center gap-4">
-                    <h2 className="text-xl font-black text-zinc-900 uppercase tracking-tight">Método de Pago</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 uppercase tracking-tight">Método de Pago</h2>
                  </div>
                  
                  <div className="grid grid-cols-1 gap-4">
@@ -672,8 +801,8 @@ export default function CheckoutPage() {
                           <input type="radio" name="payment" checked={paymentMethod === 'credit_b2b'} onChange={() => setPaymentMethod('credit_b2b')} className="hidden" />
                           <Wallet className={`h-6 w-6 ${paymentMethod === 'credit_b2b' ? 'text-primary' : 'text-zinc-400'}`} />
                           <div className="flex flex-col">
-                             <span className="text-sm font-black text-zinc-900">Crédito Directo B2B {creditB2bDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">-{creditB2bDiscountPercent}% OFF</span>}</span>
-                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Condición: Pago a {user?.company?.paymentTerms || 30} días</span>
+                             <span className="text-sm sm:text-base font-bold text-zinc-900">Crédito Directo B2B {creditB2bDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">-{creditB2bDiscountPercent}% OFF</span>}</span>
+                             <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Condición: Pago a {user?.company?.paymentTerms || 30} días</span>
                           </div>
                        </div>
                        {paymentMethod === 'credit_b2b' && <CheckCircle2 className="h-6 w-6 text-primary" />}
@@ -683,11 +812,11 @@ export default function CheckoutPage() {
                        <div className="flex items-center gap-4">
                           <input type="radio" name="payment" checked={paymentMethod === 'webpay'} onChange={() => setPaymentMethod('webpay')} className="hidden" />
                           <div className="relative h-7 w-7 shrink-0 flex items-center justify-center rounded-lg bg-sky-50 border border-sky-200 shadow-sm">
-                             <span className="text-[9px] font-black text-sky-600 italic tracking-tighter">MP</span>
+                             <span className="text-[9px] font-bold text-sky-600 italic tracking-tighter">MP</span>
                           </div>
                           <div className="flex flex-col">
-                             <span className="text-sm font-black text-zinc-900">Mercado Pago {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
-                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Paga seguro con tu cuenta o tarjeta</span>
+                             <span className="text-sm sm:text-base font-bold text-zinc-900">Mercado Pago {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
+                             <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Paga seguro con tu cuenta o tarjeta</span>
                           </div>
                        </div>
                        {paymentMethod === 'webpay' && <CheckCircle2 className="h-6 w-6 text-primary" />}
@@ -698,8 +827,8 @@ export default function CheckoutPage() {
                           <input type="radio" name="payment" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} className="hidden" />
                           <Building2 className={`h-6 w-6 ${paymentMethod === 'transfer' ? 'text-primary' : 'text-zinc-400'}`} />
                           <div className="flex flex-col">
-                             <span className="text-sm font-black text-zinc-900">{bankConfig?.title || 'Transferencia Electrónica'} {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
-                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Venta bajo orden de compra</span>
+                             <span className="text-sm sm:text-base font-bold text-zinc-900">{bankConfig?.title || 'Transferencia Electrónica'} {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
+                             <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Venta bajo orden de compra</span>
                           </div>
                        </div>
                        {paymentMethod === 'transfer' && <CheckCircle2 className="h-6 w-6 text-primary" />}
@@ -709,10 +838,10 @@ export default function CheckoutPage() {
                       <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'mercadopago' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
                          <div className="flex items-center gap-4">
                             <input type="radio" name="payment" checked={paymentMethod === 'mercadopago'} onChange={() => setPaymentMethod('mercadopago')} className="hidden" />
-                            <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center text-[8px] font-black text-white shrink-0">MP</div>
+                            <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">MP</div>
                             <div className="flex flex-col">
-                               <span className="text-sm font-black text-zinc-900">Mercado Pago {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
-                               <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Tarjetas y dinero en cuenta</span>
+                               <span className="text-sm sm:text-base font-bold text-zinc-900">Mercado Pago {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
+                               <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Tarjetas y dinero en cuenta</span>
                             </div>
                          </div>
                          {paymentMethod === 'mercadopago' && <CheckCircle2 className="h-6 w-6 text-primary" />}
@@ -720,16 +849,15 @@ export default function CheckoutPage() {
                     )}
                  </div>
               </section>
-
            </div>
-
+           
            {/* RESUMEN LATERAL */}
            <div className="lg:col-span-4">
               <div className="bg-zinc-950 text-white p-8 lg:p-10 rounded-[50px] shadow-2xl space-y-8 sticky top-24 border border-zinc-800">
                  <div className="flex items-center justify-between">
-                   <h2 className="text-lg font-black uppercase tracking-[0.2em]">Tu Orden</h2>
+                   <h2 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white">Tu Orden</h2>
                    <Link href="/cart">
-                     <Button variant="ghost" className="h-8 px-3 text-zinc-400 hover:text-white hover:bg-zinc-900 text-[10px] font-black uppercase tracking-widest gap-1.5 rounded-full">
+                     <Button variant="ghost" className="h-8 px-3 text-zinc-400 hover:text-white hover:bg-zinc-900 text-[10px] font-bold uppercase tracking-wider gap-1.5 rounded-full">
                        <Edit2 className="h-3 w-3" /> Editar Carrito
                      </Button>
                    </Link>
@@ -751,75 +879,75 @@ export default function CheckoutPage() {
                                  {item.image && <Image src={item.image} alt={item.name} fill className="object-contain p-1" />}
                               </div>
                               <div className="flex-1 flex flex-col justify-center">
-                                 <span className="text-xs font-bold text-zinc-300 line-clamp-1">{item.name}</span>
-                                 <span className="text-[10px] text-zinc-500 font-medium">
+                                 <span className="text-sm font-semibold text-zinc-200 line-clamp-1">{item.name}</span>
+                                 <span className="text-xs text-zinc-400 font-semibold mt-0.5">
                                    Cant: {item.quantity} x ${Math.round(discountedPrice).toLocaleString('es-CL')}
-                                   {companyDiscount > 0 && <span className="text-[9px] text-emerald-400 ml-1.5">(-{companyDiscount}%)</span>}
+                                   {companyDiscount > 0 && <span className="text-[11px] text-emerald-400 ml-1.5">(-{companyDiscount}%)</span>}
                                  </span>
                               </div>
-                              <div className="flex items-center text-xs font-black">
+                              <div className="flex items-center text-sm font-bold text-zinc-100">
                                  ${lineTotal.toLocaleString('es-CL')}
                               </div>
                            </div>
                          );
-                       })
+                      })
                     )}
                  </div>
 
                  {/* CUPONES */}
                  <div className="space-y-3 pb-6 border-b border-zinc-800">
-                    <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                       <Ticket className="h-3 w-3" /> Cupones
+                    <Label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+                       <Ticket className="h-3.5 w-3.5" /> Cupones
                     </Label>
                     <div className="flex gap-2">
                        <Input 
                          placeholder="Agrega cupón de descuento" 
                          value={coupon}
                          onChange={(e) => setCoupon(e.target.value)}
-                         className="h-12 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-600 rounded-xl"
+                         className="h-12 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 rounded-xl text-xs sm:text-sm"
                        />
-                       <Button className="h-12 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl px-6">
+                       <Button className="h-12 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-xl px-6 text-xs sm:text-sm">
                           Aplicar
                        </Button>
                     </div>
                     <p className="text-[10px] text-zinc-500 font-medium italic">El descuento se aplicará luego de seleccionar tu medio de pago.</p>
                     
                     {/* TOTALES */}
-                    <div className="space-y-4 text-sm">
-                       <div className="flex justify-between items-center font-bold text-zinc-500 uppercase tracking-widest gap-2">
+                    <div className="space-y-4 text-xs sm:text-sm">
+                       <div className="flex justify-between items-center font-semibold text-zinc-400 uppercase tracking-wider gap-2">
                           <span>Subtotal Neto</span>
-                          <span className="whitespace-nowrap">$ {subtotalAfterCompany.toLocaleString('es-CL')}</span>
+                          <span className="whitespace-nowrap text-zinc-100 font-bold">$ {subtotalAfterCompany.toLocaleString('es-CL')}</span>
                        </div>
 
                        {paymentDiscountAmount > 0 && (
-                         <div className="flex justify-between items-center font-bold text-emerald-400 uppercase tracking-widest gap-2">
+                         <div className="flex justify-between items-center font-semibold text-emerald-400 uppercase tracking-wider gap-2">
                             <span className="truncate">Dcto. Pago ({activePaymentDiscountPercent}%)</span>
-                            <span className="whitespace-nowrap">- $ {paymentDiscountAmount.toLocaleString('es-CL')}</span>
+                            <span className="whitespace-nowrap font-bold text-emerald-400">- $ {paymentDiscountAmount.toLocaleString('es-CL')}</span>
                          </div>
                        )}
 
-                       <div className="flex justify-between items-center font-bold text-zinc-500 uppercase tracking-widest gap-2">
+                       <div className="flex justify-between items-center font-semibold text-zinc-400 uppercase tracking-wider gap-2">
                           <span>IVA (19%)</span>
-                          <span className="whitespace-nowrap">$ {finalIva.toLocaleString('es-CL')}</span>
+                          <span className="whitespace-nowrap text-zinc-100 font-bold">$ {finalIva.toLocaleString('es-CL')}</span>
                        </div>
 
-                       <div className="flex justify-between items-center font-bold text-purple-400 uppercase tracking-widest gap-2">
+                       <div className="flex justify-between items-center font-semibold text-purple-400 uppercase tracking-wider gap-2">
                           <span>Tipo de Despacho</span>
-                          <span className="whitespace-nowrap">
+                          <span className="whitespace-nowrap font-bold text-purple-400">
                             {shippingMethod === 'free' ? 'Flete Incluido (Gratis)' : 'Flete por Pagar'}
                           </span>
                        </div>
 
                        {shippingCost > 0 && (
-                         <div className="flex justify-between items-center font-bold text-purple-400 uppercase tracking-widest gap-2">
+                         <div className="flex justify-between items-center font-semibold text-purple-400 uppercase tracking-wider gap-2">
                             <span>Despacho Estimado</span>
-                            <span className="whitespace-nowrap">$ {shippingCost.toLocaleString('es-CL')}</span>
+                            <span className="whitespace-nowrap font-bold text-purple-400">$ {shippingCost.toLocaleString('es-CL')}</span>
                          </div>
                        )}
 
                        <div className="pt-4 border-t border-zinc-800 flex justify-between items-end gap-2">
-                          <span className="text-lg font-black uppercase">Total Final</span>
-                          <span className="text-3xl font-black text-primary whitespace-nowrap">$ {grandTotal.toLocaleString('es-CL')}</span>
+                          <span className="text-sm sm:text-base font-bold uppercase text-zinc-300">Total Final</span>
+                          <span className="text-2xl sm:text-3xl font-black text-primary whitespace-nowrap">$ {grandTotal.toLocaleString('es-CL')}</span>
                        </div>
                     </div>
                  </div>
@@ -831,7 +959,7 @@ export default function CheckoutPage() {
                           <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="peer appearance-none h-5 w-5 border-2 border-zinc-600 rounded-md checked:bg-primary checked:border-primary transition-all cursor-pointer" />
                           <CheckCircle2 className="h-3.5 w-3.5 text-zinc-950 absolute opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
                        </div>
-                       <span className="text-xs text-zinc-400 font-medium group-hover:text-zinc-300 transition-colors">
+                       <span className="text-[13px] text-zinc-400 font-medium group-hover:text-zinc-300 transition-colors leading-snug">
                           Acepto los <Link href="#" className="underline hover:text-white">términos y condiciones</Link>.
                        </span>
                     </label>
@@ -841,7 +969,7 @@ export default function CheckoutPage() {
                           <input type="checkbox" checked={pointsAccepted} onChange={(e) => setPointsAccepted(e.target.checked)} className="peer appearance-none h-5 w-5 border-2 border-zinc-600 rounded-md checked:bg-primary checked:border-primary transition-all cursor-pointer" />
                           <CheckCircle2 className="h-3.5 w-3.5 text-zinc-950 absolute opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
                        </div>
-                       <span className="text-xs text-zinc-400 font-medium group-hover:text-zinc-300 transition-colors">
+                       <span className="text-[13px] text-zinc-400 font-medium group-hover:text-zinc-300 transition-colors leading-snug">
                           Quiero ser parte del programa Puntos y aprovechar sus beneficios, recibir ofertas y novedades personalizadas.
                        </span>
                     </label>
@@ -850,20 +978,26 @@ export default function CheckoutPage() {
                  <Button 
                    onClick={handleProcessOrder}
                    disabled={isProcessing || !isFormValid || items.length === 0}
-                   className="w-full h-16 bg-primary hover:bg-primary/90 text-zinc-950 font-black uppercase text-xs rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                   className="w-full h-14 bg-primary hover:bg-primary/90 text-zinc-950 font-bold uppercase text-sm sm:text-base rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                  >
                    {isProcessing ? (
                      "Procesando..."
                    ) : (
-                     <>Finalizar Pedido <ChevronRight className="h-4 w-4" /></>
+                     <>Finalizar Pedido <ChevronRight className="h-5 w-5" /></>
                    )}
                  </Button>
                  
                  {!isFormValid && items.length > 0 && (
-                   <p className="text-[10px] text-red-400 text-center uppercase tracking-widest font-bold">
+                   <p className="text-[10px] sm:text-xs text-red-400 text-center uppercase tracking-wider font-semibold">
                      {!hasEnoughCredit 
                         ? `Límite de crédito insuficiente (Disponible: $${availableCredit.toLocaleString('es-CL')}). Por favor, elige otro medio de pago.` 
-                        : "Completa tu dirección, datos de facturación y acepta los términos para continuar."}
+                        : (isVerifyingAddress
+                           ? "Verificando dirección de despacho..."
+                           : (addressValidationError
+                              ? "La dirección de despacho es inválida. Por favor, corrígela."
+                              : (!isCourierValid
+                                 ? "Por favor, selecciona o escribe el courier para el flete por pagar."
+                                 : "Completa tu dirección, datos de facturación y acepta los términos para continuar.")))}
                    </p>
                  )}
               </div>

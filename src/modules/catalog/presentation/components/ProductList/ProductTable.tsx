@@ -43,13 +43,13 @@ const ProductRow = memo(function ProductRow({
 
   return (
     <tr className={cn(
-      "group transition-colors text-xs border-b last:border-0",
+      "group transition-colors text-sm border-b last:border-0",
       isDashboard ? "hover:bg-zinc-800/20 border-zinc-800/50" : "hover:bg-zinc-50 border-zinc-100"
     )}>
-      <td className="px-6 py-4">
+      <td className="px-1.5 lg:px-2.5 py-3">
         <Link 
           href={linkHref}
-          className="flex items-center gap-3 group/link cursor-pointer"
+          className="flex items-center gap-3 group/link cursor-pointer min-w-0"
         >
           <div className={cn(
             "h-10 w-10 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center relative border",
@@ -73,17 +73,30 @@ const ProductRow = memo(function ProductRow({
             )}
           </div>
           <span className={cn(
-            "font-bold transition-colors max-w-[300px] truncate uppercase tracking-tight flex items-center gap-2",
-            isDashboard ? "text-white group-hover/link:text-primary" : "text-zinc-900 group-hover/link:text-primary"
+            "transition-colors flex flex-col gap-0.5 min-w-0",
+            isDashboard 
+              ? "font-bold text-xs text-white group-hover/link:text-primary max-w-[300px] uppercase tracking-tight" 
+              : "font-extrabold text-sm sm:text-base text-zinc-900 group-hover/link:text-primary max-w-[120px] sm:max-w-[200px] md:max-w-[280px] lg:max-w-[140px] xl:max-w-[220px] 2xl:max-w-[300px] uppercase tracking-tight"
           )}>
-            {product.name}
+            <span className="block w-full whitespace-normal leading-normal">
+              {product.name}
+            </span>
+            {!isDashboard && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[9px] sm:text-[10px] text-zinc-400 font-bold uppercase md:hidden">
+                <span>SKU: {product.sku}</span>
+                <span>•</span>
+                <span className={product.stockQuantity > 0 ? "text-green-600" : "text-red-600"}>
+                  {product.stockQuantity > 0 ? `${product.stockQuantity} Stock` : "Sin Stock"}
+                </span>
+              </div>
+            )}
             {isDashboard && product.isDeleted && (
-              <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-red-500/20 border border-red-500/30 text-red-400">
+              <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-red-500/20 border border-red-500/30 text-red-400 shrink-0 w-fit">
                 Papelera
               </span>
             )}
             {isDashboard && !product.isDeleted && !product.isActive && (
-              <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-amber-500/20 border border-amber-500/30 text-amber-400">
+              <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase bg-amber-500/20 border border-amber-500/30 text-amber-400 shrink-0 w-fit">
                 Borrador
               </span>
             )}
@@ -91,20 +104,24 @@ const ProductRow = memo(function ProductRow({
         </Link>
       </td>
 
-      <td className={cn("px-6 py-4 font-mono", isDashboard ? "text-zinc-400" : "text-zinc-500")}>
+      <td className={cn("px-1.5 lg:px-2.5 py-3 font-mono whitespace-nowrap hidden md:table-cell", isDashboard ? "text-zinc-400" : "text-zinc-500")}>
         {product.sku}
       </td>
 
-      <td className="px-6 py-4">
+      <td className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap hidden xl:table-cell">
         <span className={cn(
           "px-2 py-0.5 rounded-lg font-medium text-[10px] uppercase tracking-wider",
           isDashboard ? "bg-zinc-800 text-zinc-400" : "bg-zinc-100 text-zinc-500"
         )}>
-          {product.category?.name ?? '—'}
+          {product.category?.name 
+            ? (product.category.name.includes(" > ") 
+                ? product.category.name.split(" > ")[1] 
+                : product.category.name) 
+            : '—'}
         </span>
       </td>
 
-      <td className={cn("px-6 py-4 font-bold", isDashboard ? "text-white" : "text-zinc-900")}>
+      <td className={cn("px-1 lg:px-1.5 py-3 font-bold whitespace-nowrap w-[80px]", isDashboard ? "text-white" : "text-zinc-900")}>
         {isDashboard ? (
           `$${price.toLocaleString('es-CL')}`
         ) : isAuthenticated ? (
@@ -114,17 +131,22 @@ const ProductRow = memo(function ProductRow({
         )}
       </td>
 
-      <td className="px-6 py-4">
+      <td className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap hidden sm:table-cell">
         {isDashboard ? (
           <StockBadge stock={product.stockQuantity} stockAlert={product.stockAlert} />
         ) : isAuthenticated ? (
-          <span className="text-[10px] font-black text-green-600 bg-green-50 px-2 py-0.5 rounded uppercase tracking-widest">En Stock</span>
+          <span className={cn(
+            "text-[11px] font-black px-2.5 py-1 rounded uppercase tracking-widest whitespace-nowrap",
+            product.stockQuantity > 0 ? "text-green-600 bg-green-50 border border-green-200/50" : "text-red-600 bg-red-50 border border-red-200/50"
+          )}>
+            {product.stockQuantity > 0 ? `${product.stockQuantity}` : "Sin Stock"}
+          </span>
         ) : (
-          <span className="text-[10px] font-bold text-zinc-400 uppercase">Stock Privado</span>
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Stock Privado</span>
         )}
       </td>
 
-      <td className="px-6 py-4 text-right">
+      <td className="px-1.5 lg:px-2.5 py-3 text-right">
         <div className="flex justify-end items-center gap-2">
           {isDashboard ? (
             <>
@@ -148,14 +170,14 @@ const ProductRow = memo(function ProductRow({
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
               {isAuthenticated && (
-                <div className="w-48">
+                <div className="w-32 sm:w-40 shrink-0 mr-1.5">
                   <AddToCartAction product={product} variant="compact" />
                 </div>
               )}
-              <button className="p-2 rounded-lg bg-white border border-zinc-200 text-zinc-400 hover:text-red-500 hover:border-red-500 transition-all shadow-sm">
-                <Heart className="h-3.5 w-3.5" />
+              <button className="p-2 rounded-xl bg-white border border-zinc-200 text-zinc-400 hover:text-red-500 hover:border-red-500 hover:bg-red-50/20 transition-all shadow-md flex items-center justify-center shrink-0 hidden md:flex">
+                <Heart className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -175,15 +197,15 @@ export function ProductTable({ products, onDelete, isDeleting, variant = 'dashbo
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className={cn(
-            "text-[10px] font-black uppercase tracking-widest",
+            "text-[11px] font-black uppercase tracking-widest",
             isDashboard ? "text-zinc-500 bg-zinc-950/60" : "text-zinc-400 bg-zinc-50"
           )}>
-            <th className="px-6 py-4">Producto</th>
-            <th className="px-6 py-4">SKU</th>
-            <th className="px-6 py-4">Categoría</th>
-            <th className="px-6 py-4">{isDashboard ? 'Precio Neto' : 'Precio B2B'}</th>
-            <th className="px-6 py-4">Stock</th>
-            <th className="px-6 py-4 text-right">Acciones</th>
+            <th className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap">Producto</th>
+            <th className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap hidden md:table-cell">SKU</th>
+            <th className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap hidden xl:table-cell">Categoría</th>
+            <th className="px-1 lg:px-1.5 py-3 whitespace-nowrap w-[80px]">{isDashboard ? 'Precio Neto' : 'Precio'}</th>
+            <th className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap hidden sm:table-cell">Stock</th>
+            <th className="px-1.5 lg:px-2.5 py-3 text-right whitespace-nowrap">Acciones</th>
           </tr>
         </thead>
         <tbody className={cn("divide-y", isDashboard ? "divide-zinc-800/50" : "divide-zinc-100")}>

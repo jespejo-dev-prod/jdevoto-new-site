@@ -335,7 +335,7 @@ export function CatalogView({
   });
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
+    <div className="flex flex-col lg:flex-row gap-4 xl:gap-8">
       {/* SIDEBAR DE CATEGORÍAS & FILTROS AVANZADOS */}
       <aside className="hidden lg:block w-80 shrink-0 space-y-6">
          <div className="bg-white rounded-2xl border border-zinc-100 p-6 shadow-sm space-y-6">
@@ -557,19 +557,11 @@ export function CatalogView({
               </button>
             )}
 
-            {/* Banner Publicitario */}
-            <div className="bg-zinc-950 rounded-2xl p-6 text-white overflow-hidden relative group mt-4">
-              <div className="relative z-10 space-y-3">
-                <Zap className="h-6 w-6 text-primary" />
-                <h4 className="text-[11px] font-black uppercase tracking-tight">Despacho Express</h4>
-                <p className="text-[9px] text-zinc-400 font-bold leading-relaxed uppercase">Entrega en menos de 24 horas.</p>
-              </div>
-              <div className="absolute -right-4 -bottom-4 h-24 w-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all" />
-            </div>
+
          </div>
       </aside>
 
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 min-w-0 space-y-6">
         {/* Filtros Mobile Trigger */}
         <div className="flex items-center gap-3 w-full lg:hidden">
           <button
@@ -625,6 +617,7 @@ export function CatalogView({
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
+                className="w-full min-w-0"
               >
                 <ProductTable products={filteredProducts} variant="catalog" />
               </motion.div>

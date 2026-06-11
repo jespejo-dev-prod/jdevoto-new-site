@@ -39,17 +39,17 @@ export function CartItem({ item }: CartItemProps) {
         <div className="flex justify-between items-start gap-2">
           <div className="space-y-1 min-w-0">
             <Link href={`/products/${item.slug}`} className="hover:text-primary transition-colors block">
-              <h3 className="text-xs sm:text-sm font-black text-zinc-900 leading-tight uppercase truncate sm:whitespace-normal max-w-xs sm:max-w-md">
+              <h3 className="text-sm sm:text-base font-black text-zinc-950 leading-tight uppercase truncate sm:whitespace-normal max-w-xs sm:max-w-md">
                 {item.name}
               </h3>
             </Link>
             {item.discountPercent > 0 && (
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-[8px] sm:text-[9px] font-bold text-emerald-600 uppercase tracking-tight">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] sm:text-xs font-bold text-emerald-600 uppercase tracking-tight">
                 {item.discountPercent}% OFF • {item.priceSource.replace('_', ' ')}
               </div>
             )}
             {companyDiscount > 0 && (
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-[8px] sm:text-[9px] font-bold text-blue-600 uppercase tracking-tight ml-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-100 text-[10px] sm:text-xs font-bold text-blue-600 uppercase tracking-tight ml-2">
                 -{companyDiscount}% DCTO. EMPRESA
               </div>
             )}
@@ -58,12 +58,12 @@ export function CartItem({ item }: CartItemProps) {
             onClick={() => removeItem(item.id)} 
             className="text-zinc-400 hover:text-red-500 transition-colors p-1"
           >
-            <Trash2 className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+            <Trash2 className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
         </div>
         
-        <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-green-600 uppercase tracking-widest">
-          <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" /> En stock despacho inmediato
+        <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-green-600 uppercase tracking-widest">
+          <CheckCircle2 className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" /> En stock despacho inmediato
         </div>
         
         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-3 sm:gap-4 pt-2">
@@ -77,17 +77,17 @@ export function CartItem({ item }: CartItemProps) {
           />
           
           <div className="text-left sm:text-right">
-            <div className="text-base sm:text-lg font-black text-zinc-900">
+            <div className="text-lg sm:text-xl font-black text-zinc-950">
               $ {lineTotal.toLocaleString('es-CL')}{' '}
-              <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase">Neto</span>
+              <span className="text-xs sm:text-sm font-bold text-zinc-400 uppercase">Neto</span>
             </div>
             <div className="flex flex-col items-start sm:items-end">
               {item.discountPercent > 0 && (
-                <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 line-through uppercase tracking-tighter">
+                <span className="text-xs sm:text-[13px] font-bold text-zinc-400 line-through uppercase tracking-wide">
                   $ {Math.round(item.originalPrice).toLocaleString('es-CL')}
                 </span>
               )}
-              <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">
+              <span className="text-xs sm:text-[13px] font-bold text-zinc-400 uppercase tracking-wide">
                 $ {Math.round(item.price).toLocaleString('es-CL')} c/u Neto {companyDiscount > 0 && `(-${companyDiscount}% Dcto. Empresa)`}
               </span>
             </div>

@@ -102,22 +102,22 @@ export function BundleAction({ currentProduct, suggestedProduct }: BundleActionP
 
   return (
     <div className="flex flex-col gap-6 md:min-w-[350px] border-l border-zinc-100 pl-0 lg:pl-12 text-center lg:text-left">
-      <div className="space-y-1">
-        <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Inversión Total (Inner Pack)</div>
-        <div className="text-4xl font-black text-zinc-950 tracking-tighter">
+      <div className="space-y-2">
+        <div className="text-xs sm:text-[13px] font-black text-zinc-400 uppercase tracking-widest">Inversión Total (Inner Pack)</div>
+        <div className="text-5xl font-black text-zinc-950 tracking-tighter">
           $ {Math.round(totalMOQ).toLocaleString('es-CL')}{' '}
-          <span className="text-sm font-bold text-zinc-400 uppercase">Neto</span>
+          <span className="text-base font-bold text-zinc-400 uppercase">Neto</span>
         </div>
-        <div className="text-[10px] text-zinc-400 font-bold uppercase">
+        <div className="text-xs sm:text-[13px] text-zinc-400 font-bold uppercase">
           Incluye {currentProduct.inner || currentProduct.minOrderQty || 1} un. + {suggestedProduct.inner || suggestedProduct.minOrderQty || 1} un.
         </div>
       </div>
       
       <Button 
         onClick={handleBundleAddToCart}
-        className="bg-zinc-950 text-white h-12 px-10 text-[11px] font-black uppercase tracking-widest rounded-xl shadow-xl shadow-zinc-900/20 hover:bg-zinc-800 transition-all hover:translate-y-[-2px] flex items-center justify-center gap-2"
+        className="bg-zinc-950 text-white h-14 px-10 text-[13px] sm:text-[14px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-zinc-900/20 hover:bg-zinc-800 transition-all hover:translate-y-[-2px] flex items-center justify-center gap-2"
       >
-        <Plus className="h-4 w-4" />
+        <Plus className="h-5 w-5" />
         comprar juntos
       </Button>
     </div>

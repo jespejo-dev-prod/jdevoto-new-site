@@ -82,7 +82,7 @@ export const ProductCard = memo(function ProductCard({
         {/* Badges */}
         <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 z-10">
           {!isDashboard && priceSource === 'PROMOTION' && discountPercent > 0 && (
-            <span className="px-2.5 py-1 rounded-full bg-primary text-zinc-950 text-[9px] font-black uppercase tracking-wider shadow-md">
+            <span className="px-2.5 py-1 rounded-full bg-primary text-zinc-950 text-[11px] font-black uppercase tracking-wider shadow-md">
               {discountPercent}% OFF
             </span>
           )}
@@ -169,7 +169,7 @@ export const ProductCard = memo(function ProductCard({
         <div className="flex justify-between items-start gap-2 pointer-events-none">
           <div className="min-w-0">
             <p className={cn(
-              "text-[10px] font-bold uppercase tracking-widest mb-1 font-mono",
+              "text-[15px] font-bold uppercase tracking-widest mb-1 font-mono",
               isDashboard ? "text-zinc-500" : "text-zinc-400"
             )}>
               {product.brand?.name || 'SIN MARCA'}
@@ -178,7 +178,7 @@ export const ProductCard = memo(function ProductCard({
               "transition-colors",
               isDashboard 
                 ? "text-sm font-bold leading-tight truncate text-white group-hover:text-primary" 
-                : "text-base sm:text-lg font-bold leading-snug line-clamp-2 h-11 sm:h-12 overflow-hidden text-zinc-900 group-hover:text-primary"
+                : "text-lg sm:text-[19px] font-bold leading-snug line-clamp-2 h-[50px] sm:h-[54px] overflow-hidden text-zinc-900 group-hover:text-primary"
             )}>
               {product.name}
             </h3>
@@ -188,60 +188,82 @@ export const ProductCard = memo(function ProductCard({
         {/* Rating removed to keep clean Retail aesthetic */}
 
         <div className={cn(
-          "flex items-center justify-between pt-2 border-t mt-auto pointer-events-none",
+          "pt-2 border-t mt-auto pointer-events-none",
           isDashboard ? "border-zinc-800/50" : "border-zinc-100"
         )}>
-          <div>
-            {isDashboard ? (
-              <>
+          {isDashboard ? (
+            <div className="flex items-center justify-between w-full">
+              <div>
                 <p className="text-[10px] font-medium text-zinc-500 mb-0.5 uppercase">Precio Neto</p>
                 <p className="text-lg font-bold text-white tracking-tight">
                   ${Number(product.basePrice).toLocaleString('es-CL')}
                 </p>
-              </>
-            ) : isAuthenticated ? (
-              <div className="flex flex-col">
-                {originalNetPrice && originalNetPrice !== price && (
-                  <span className="text-[10px] text-zinc-400 line-through font-bold tracking-tighter">
-                    $ {originalNetPrice.toLocaleString('es-CL')}
-                  </span>
-                )}
-                <p className="text-lg font-black text-zinc-950 tracking-tight">
-                  $ {price.toLocaleString('es-CL')}
-                </p>
-                <span className="text-[9px] text-zinc-400 font-bold uppercase">Neto</span>
               </div>
-            ) : (
-              <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider">
-                  🔒 Inicia sesión
-                </span>
-                <span className="text-[9px] text-zinc-400 font-bold uppercase">Para ver precios</span>
-              </div>
-            )}
-          </div>
-          <div className="text-right">
-            {isDashboard ? (
-              <>
+              <div className="text-right">
                 <p className="text-[10px] font-medium text-zinc-500 mb-1 uppercase text-right">Stock</p>
                 <StockBadge stock={product.stockQuantity} stockAlert={product.stockAlert} />
-              </>
-            ) : isAuthenticated ? (
-              <div className="flex flex-col items-end gap-1">
-                <span className={cn(
-                  "text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-widest",
-                  product.stockQuantity > 0 ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"
-                )}>
-                  {product.stockQuantity > 0 ? `${product.stockQuantity} En Stock` : "Sin Stock"}
-                </span>
-                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">Entrega mañana</span>
               </div>
-            ) : (
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                Stock Privado
-              </span>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              {/* Row 1: Pricing details */}
+              <div className="w-full">
+                {isAuthenticated ? (
+                  <div className="flex flex-col gap-0.5">
+                    {originalNetPrice && originalNetPrice !== price ? (
+                      <>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-black text-zinc-950 tracking-tight">
+                            $ {price.toLocaleString('es-CL')}
+                          </span>
+                          <span className="text-[14px] font-black text-blue-600 whitespace-nowrap">
+                            Ahorra $ {(originalNetPrice - price).toLocaleString('es-CL')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-[15px] text-zinc-400 uppercase tracking-tight">
+                          <span className="line-through">
+                            $ {originalNetPrice.toLocaleString('es-CL')}
+                          </span>
+                          <span>•</span>
+                          <span>Neto</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-3xl font-black text-zinc-950 tracking-tight">
+                          $ {price.toLocaleString('es-CL')}
+                        </span>
+                        <span className="text-[11px] text-zinc-400 font-bold uppercase tracking-tight">Neto</span>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col">
+                    <span className="text-[11.5px] font-bold text-blue-600 uppercase tracking-wider">
+                      🔒 Inicia sesión
+                    </span>
+                    <span className="text-[9.5px] text-zinc-400 font-bold uppercase">Para ver precios</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Row 2: Stock (Catalog only, below price to avoid superposition) */}
+              <div className="flex justify-end w-full pt-0.5">
+                {isAuthenticated ? (
+                  <span className={cn(
+                    "text-[11px] font-black px-2 py-1 rounded uppercase tracking-widest whitespace-nowrap",
+                    product.stockQuantity > 0 ? "text-green-600 bg-green-50 border border-green-200/50" : "text-red-600 bg-red-50 border border-red-200/50"
+                  )}>
+                    {product.stockQuantity > 0 ? `${product.stockQuantity} En Stock` : "Sin Stock"}
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
+                    Stock Privado
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* BOTÓN AGREGAR AL CARRO (Solo si está autenticado) */}

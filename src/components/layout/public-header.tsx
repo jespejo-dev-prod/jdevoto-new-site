@@ -14,6 +14,7 @@ export function PublicHeader() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const router = useRouter();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -24,6 +25,21 @@ export function PublicHeader() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.user-dropdown-container')) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, []);
+
+  useEffect(() => {
+    setIsUserDropdownOpen(false);
+  }, [router]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,25 +109,59 @@ export function PublicHeader() {
           </Link>
 
           <div className="hidden md:flex flex-col text-right">
-            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Empresa</span>
-            <span className="text-xs font-bold text-white tracking-tighter uppercase">{user?.company?.razonSocial || 'Invitado'}</span>
+            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Empresa</span>
+            <span className="text-sm font-black text-white uppercase tracking-wide">{user?.company?.razonSocial || 'Invitado'}</span>
           </div>
 
-          {/* Íconos siempre visibles o desktop-only */}
-          {user ? (
-            <>
-              <Link href="/dashboard" className="hidden md:block relative group cursor-pointer" title="Ir al Perfil/Dashboard">
-                <User className="h-5 w-5 text-zinc-400 group-hover:text-primary transition-colors" />
-              </Link>
-              <button onClick={logout} className="hidden md:block relative group cursor-pointer" title="Cerrar Sesión">
-                <LogOut className="h-5 w-5 text-zinc-400 group-hover:text-red-500 transition-colors" />
-              </button>
-            </>
-          ) : (
-            <Link href="/login" className="hidden md:block relative group cursor-pointer" title="Iniciar Sesión">
-              <LogIn className="h-6 w-6 text-zinc-400 group-hover:text-primary transition-colors" />
-            </Link>
-          )}
+          {/* Menú de usuario con Dropdown */}
+          <div className="relative user-dropdown-container hidden md:block">
+            <button
+              onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+              className="relative group cursor-pointer flex items-center justify-center focus:outline-none p-1.5 rounded-lg hover:bg-zinc-900 transition-colors"
+              title="Menú de usuario"
+            >
+              <User className="h-6 w-6 text-zinc-400 group-hover:text-white transition-colors" />
+            </button>
+
+            {isUserDropdownOpen && (
+              <div className="absolute right-0 mt-3 w-56 rounded-2xl bg-white border border-zinc-200 shadow-2xl p-4 flex flex-col gap-1.5 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-200">
+                <Link
+                  href="/dashboard"
+                  className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
+                  onClick={() => setIsUserDropdownOpen(false)}
+                >
+                  Mi cuenta
+                </Link>
+                <Link
+                  href="/dashboard/orders"
+                  className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
+                  onClick={() => setIsUserDropdownOpen(false)}
+                >
+                  Mis pedidos
+                </Link>
+                <div className="h-px bg-zinc-100 my-1" />
+                {user ? (
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsUserDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 rounded-xl text-blue-600 hover:bg-blue-50 font-black text-sm transition-all cursor-pointer"
+                  >
+                    Cerrar sesión
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="px-4 py-2.5 rounded-xl text-blue-600 hover:bg-blue-50 font-black text-sm transition-all"
+                    onClick={() => setIsUserDropdownOpen(false)}
+                  >
+                    Iniciar sesión
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Carrito siempre visible */}
           <Link href="/cart" className="relative group cursor-pointer" title="Carrito">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, CreditCard, ShieldCheck, Truck } from 'lucide-react';
+import { ChevronRight, CreditCard, ShieldCheck, Truck, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
@@ -68,12 +68,12 @@ export function OrderSummary() {
 
   return (
     <div className="bg-white p-6 sm:p-8 rounded-[24px] sm:rounded-[40px] border-2 border-zinc-100 shadow-xl space-y-8 sticky top-28">
-      <h2 className="text-lg font-black text-zinc-900 uppercase tracking-widest">Resumen de Orden</h2>
+      <h2 className="text-lg sm:text-xl font-bold text-zinc-900 uppercase tracking-wider">Resumen de Orden</h2>
       
-      <div className="space-y-4 text-sm">
+      <div className="space-y-4 text-sm sm:text-base">
         {/* Selector de Medio de Pago */}
-        <div className="space-y-2 pb-4 border-b border-zinc-100 flex flex-col">
-           <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Medio de Pago (Simulador)</label>
+        <div className="space-y-2.5 pb-4 border-b border-zinc-100 flex flex-col">
+           <label className="text-xs sm:text-[13px] font-black text-zinc-400 uppercase tracking-widest">Medio de Pago (Simulador)</label>
            <div className="relative mt-1">
               <select 
                 value={paymentMethod}
@@ -82,41 +82,41 @@ export function OrderSummary() {
                   setPaymentMethod(val);
                   localStorage.setItem('antigravity_payment_method', val);
                 }}
-                className="w-full h-11 rounded-xl border-2 border-zinc-200 px-3 pr-8 text-xs font-bold text-zinc-900 outline-none focus:border-zinc-900 transition-all bg-zinc-50 cursor-pointer appearance-none"
+                className="w-full h-12 rounded-xl border border-zinc-200 px-4 pr-10 text-sm font-semibold text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition-all bg-zinc-50 cursor-pointer appearance-none"
               >
                 <option value="transfer">Transferencia Bancaria Directa (10% OFF)</option>
                 <option value="webpay">Mercado Pago (10% OFF)</option>
                 <option value="credit_b2b">Crédito Directo B2B ({creditDiscountPercent}% OFF)</option>
               </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 font-bold text-[10px]">▼</div>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
            </div>
         </div>
 
-        <div className="flex justify-between font-bold text-zinc-500 uppercase tracking-tighter">
+        <div className="flex justify-between font-semibold text-zinc-400 uppercase tracking-wide">
           <span>Subtotal Neto</span>
-          <span className="text-zinc-900">$ {finalNet.toLocaleString('es-CL')}</span>
+          <span className="text-zinc-900 font-bold">$ {finalNet.toLocaleString('es-CL')}</span>
         </div>
 
         {paymentDiscountAmount > 0 && (
-          <div className="flex justify-between font-bold text-emerald-600 uppercase tracking-tighter">
+          <div className="flex justify-between font-semibold text-emerald-600 uppercase tracking-wide">
             <span>Dcto. Pago ({activePaymentDiscountPercent}%)</span>
-            <span>- $ {paymentDiscountAmount.toLocaleString('es-CL')}</span>
+            <span className="font-bold">- $ {paymentDiscountAmount.toLocaleString('es-CL')}</span>
           </div>
         )}
 
-        <div className="flex justify-between font-bold text-zinc-500 uppercase tracking-tighter">
+        <div className="flex justify-between font-semibold text-zinc-400 uppercase tracking-wide">
           <span>IVA (19%)</span>
-          <span className="text-zinc-900">$ {finalIva.toLocaleString('es-CL')}</span>
+          <span className="text-zinc-900 font-bold">$ {finalIva.toLocaleString('es-CL')}</span>
         </div>
         
-        <div className="flex justify-between font-bold text-zinc-500 uppercase tracking-tighter">
+        <div className="flex justify-between font-semibold text-zinc-400 uppercase tracking-wide">
           <span>Envío estimado</span>
-          <span className="text-zinc-500 font-black tracking-widest">---</span>
+          <span className="text-zinc-500 font-bold tracking-wider">---</span>
         </div>
         
-        <div className="pt-4 border-t border-zinc-100 flex justify-between">
-          <span className="text-lg font-black text-zinc-900 uppercase">Total Final</span>
-          <span className="text-2xl font-black text-primary">$ {grandTotal.toLocaleString('es-CL')}</span>
+        <div className="pt-4 border-t border-zinc-100 flex justify-between items-baseline">
+          <span className="text-base sm:text-lg font-bold text-zinc-900 uppercase">Total Final</span>
+          <span className="text-2xl sm:text-3xl font-black text-primary">$ {grandTotal.toLocaleString('es-CL')}</span>
         </div>
       </div>
 
@@ -133,13 +133,13 @@ export function OrderSummary() {
         )}
 
         {isEmpty || totalBaseNet < 100000 ? (
-          <Button disabled className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-xs rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
-            Proceder al Checkout <ChevronRight className="h-4 w-4 text-zinc-500" />
+          <Button disabled className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-sm rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
+            Proceder al Checkout <ChevronRight className="h-5 w-5 text-zinc-500" />
           </Button>
         ) : (
           <Link href="/checkout">
-            <Button className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-xs rounded-2xl shadow-xl hover:bg-zinc-800 transition-all flex items-center justify-center gap-3">
-              Proceder al Checkout <ChevronRight className="h-4 w-4 text-primary" />
+            <Button className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-sm rounded-2xl shadow-xl hover:bg-zinc-800 transition-all flex items-center justify-center gap-3">
+              Proceder al Checkout <ChevronRight className="h-5 w-5 text-primary" />
             </Button>
           </Link>
         )}
@@ -151,7 +151,7 @@ export function OrderSummary() {
       </div>
 
       <div className="pt-6 text-center">
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest leading-relaxed">
+        <p className="text-xs sm:text-[13px] font-bold text-zinc-400 uppercase tracking-widest leading-relaxed">
           * Los descuentos corporativos se aplican solo sobre productos sin promoción activa.
         </p>
       </div>

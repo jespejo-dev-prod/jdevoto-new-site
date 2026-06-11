@@ -40,6 +40,30 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
   const { user } = useAuth();
   const isCompanyAdmin = user?.role === 'COMPANY_ADMIN';
 
+  const [creditLimitDisplay, setCreditLimitDisplay] = useState('');
+
+  // Initial load formatting
+  useEffect(() => {
+    if (initialData?.creditLimit !== undefined && initialData?.creditLimit !== null) {
+      setCreditLimitDisplay(Math.round(Number(initialData.creditLimit)).toLocaleString('es-CL'));
+    } else {
+      setCreditLimitDisplay('0');
+    }
+  }, [initialData?.creditLimit]);
+
+  const handleCreditLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value;
+    // Keep only digits
+    const cleanVal = rawVal.replace(/\D/g, '');
+    const parsed = parseInt(cleanVal, 10) || 0;
+    
+    // Update RHF form state
+    setValue('creditLimit', parsed, { shouldValidate: true, shouldDirty: true });
+    
+    // Update local state with formatting
+    setCreditLimitDisplay(parsed.toLocaleString('es-CL'));
+  };
+
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RegisterCompanyDto>({
     resolver: zodResolver(RegisterCompanySchema) as any,
     defaultValues: {
@@ -333,11 +357,13 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                 <div className="relative">
                   <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                   <input 
-                    type="number"
-                    {...register('creditLimit', { valueAsNumber: true })}
+                    type="text"
+                    value={creditLimitDisplay}
+                    onChange={handleCreditLimitChange}
                     disabled={isCompanyAdmin}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-14 pl-12 pr-6 text-xl font-bold text-emerald-500 focus:border-emerald-500 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   />
+                  <input type="hidden" {...register('creditLimit', { valueAsNumber: true })} />
                 </div>
                 {errors.creditLimit && <p className="text-red-400 text-[10px] font-bold px-1">{errors.creditLimit.message}</p>}
                 <p className="text-[9px] text-zinc-500 px-1 italic text-center">
