@@ -37,7 +37,7 @@ export function OrderStatusBadge({ status, className }: { status: OrderStatus; c
 
   return (
     <span className={cn(
-      "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border whitespace-nowrap",
+      "px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border whitespace-nowrap",
       config.className,
       className
     )}>

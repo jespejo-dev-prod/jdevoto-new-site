@@ -65,7 +65,7 @@ export function OrderTable({ orders }: OrderTableProps) {
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-x-auto shadow-xl">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider bg-zinc-950/60">
+          <tr className="text-xs font-bold text-zinc-400 uppercase tracking-wider bg-zinc-950/60">
             <th className="px-6 py-4 pl-8">Pedido</th>
             <th className="px-6 py-4">Fecha</th>
             <th className="px-6 py-4">Estado</th>
@@ -76,24 +76,24 @@ export function OrderTable({ orders }: OrderTableProps) {
         <tbody className="divide-y divide-zinc-800/50">
           {orders.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-6 py-12 text-center text-zinc-500 italic text-xs uppercase tracking-widest">
+              <td colSpan={5} className="px-6 py-12 text-center text-zinc-500 italic text-sm uppercase tracking-widest">
                 No se encontraron pedidos.
               </td>
             </tr>
           ) : (
             orders.map((order) => (
-              <tr key={order.id} className="group hover:bg-zinc-800/20 transition-colors text-xs">
+              <tr key={order.id} className="group hover:bg-zinc-800/20 transition-colors text-sm">
                 <td className="px-6 py-4 pl-8">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center text-primary shadow-inner">
                       <Hash className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="font-bold text-white group-hover:text-primary transition-colors">
+                      <p className="font-bold text-white group-hover:text-primary transition-colors text-[15px]">
                         #{order.orderNumber.split('-').pop()}
                       </p>
-                      <div className="flex items-center gap-2 text-[10px] text-zinc-500">
-                        <Building2 className="h-3 w-3" />
+                      <div className="flex items-center gap-2 text-xs text-sky-400/90 font-medium mt-0.5">
+                        <Building2 className="h-3 w-3 text-sky-400/70" />
                         <span className="truncate max-w-[150px]">{order.companyName}</span>
                       </div>
                     </div>
@@ -102,10 +102,10 @@ export function OrderTable({ orders }: OrderTableProps) {
 
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="text-zinc-400 capitalize">
+                    <span className="text-zinc-300 capitalize font-medium">
                       {format(new Date(order.createdAt), "dd MMM, yyyy", { locale: es })}
                     </span>
-                    <span className="text-[10px] text-zinc-600">
+                    <span className="text-xs text-zinc-500 font-medium">
                       {format(new Date(order.createdAt), "HH:mm 'hrs'")}
                     </span>
                   </div>
@@ -117,10 +117,10 @@ export function OrderTable({ orders }: OrderTableProps) {
 
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="font-bold text-white">
+                    <span className="font-bold text-white text-[15px]">
                       {formatCurrency(order.totalGross)}
                     </span>
-                    <span className="text-[9px] text-zinc-500 uppercase tracking-tighter">
+                    <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-0.5">
                       {order.itemCount} ítems
                     </span>
                   </div>
@@ -136,9 +136,9 @@ export function OrderTable({ orders }: OrderTableProps) {
                       title="Repetir este pedido"
                     >
                       {repeatingId === order.id ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
                       ) : (
-                        <RotateCcw className="h-3.5 w-3.5" />
+                        <RotateCcw className="h-4 w-4" />
                       )}
                     </button>
                     <Link href={`/dashboard/orders/${order.id}`}>
@@ -147,7 +147,7 @@ export function OrderTable({ orders }: OrderTableProps) {
                         className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-primary hover:border-primary/40 transition-all shadow-sm"
                         title="Ver detalle del pedido"
                       >
-                        <Eye className="h-3.5 w-3.5" />
+                        <Eye className="h-4 w-4" />
                       </button>
                     </Link>
                   </div>

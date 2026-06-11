@@ -30,7 +30,7 @@ export default function AnalyticsPage() {
   const { summary, dailySales, statusDistribution, topCustomers } = stats;
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-700">
+    <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in duration-700">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">

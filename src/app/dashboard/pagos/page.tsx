@@ -132,7 +132,7 @@ export default function PagosDashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in zoom-in-95 duration-500">
+    <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in zoom-in-95 duration-500">
       <div>
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Proveedores de pago</h1>
         <p className="text-zinc-500 text-sm mt-1">Configura las opciones de pago que verán tus clientes durante el checkout.</p>

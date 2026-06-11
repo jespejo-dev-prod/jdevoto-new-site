@@ -92,7 +92,28 @@ export default function CheckoutPage() {
     setAddressValidationError(null);
     
     try {
-      const query = `${streetVal}, ${comunaVal}, ${regionVal}, Chile`;
+      // Clean up common Chilean address suffixes (e.g. Of 502, Depto 101, Piso 3, Local 4) that fail geocoding
+      const cleanStreetVal = streetVal
+        .replace(/[,;]\s*(oficina|ofi|of\.?|departamento|depto\.?|dep\.?|piso|block|bl\.?|casa|sitio|local)\b.*/i, '')
+        .replace(/\s+(oficina|ofi|of\.?|departamento|depto\.?|dep\.?|piso|block|bl\.?|casa|sitio|local)\b.*/i, '')
+        .trim();
+
+      // If street becomes empty after cleaning (e.g., user wrote only "Oficina 502"), skip geocoding
+      if (!cleanStreetVal) {
+        setAddressValidationError(null);
+        setIsVerifyingAddress(false);
+        return;
+      }
+
+      // Build query. Omit region for insular areas to prevent geocoder bias to Valparaiso city
+      let query = `${cleanStreetVal}, ${comunaVal}, ${regionVal}, Chile`;
+      const isInsular = comunaVal.toUpperCase() === 'ISLA DE PASCUA' || 
+                        comunaVal.toUpperCase() === 'JUAN FERNÁNDEZ' || 
+                        comunaVal.toUpperCase() === 'JUAN FERNANDEZ';
+      if (isInsular) {
+        query = `${cleanStreetVal}, ${comunaVal}, Chile`;
+      }
+
       const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&email=jespejo@jdevoto.cl`;
       
       const res = await fetch(url);
@@ -585,7 +606,16 @@ export default function CheckoutPage() {
                               {region && comuna && (
                                  <a 
                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                       (shippingStreet ? shippingStreet + ', ' : '') + comuna + ', ' + region + ', Chile'
+                                       (() => {
+                                          const cleanStreetVal = shippingStreet
+                                             .replace(/[,;]\s*(oficina|ofi|of\.?|departamento|depto\.?|dep\.?|piso|block|bl\.?|casa|sitio|local)\b.*/i, '')
+                                             .replace(/\s+(oficina|ofi|of\.?|departamento|depto\.?|dep\.?|piso|block|bl\.?|casa|sitio|local)\b.*/i, '')
+                                             .trim();
+                                          const isInsular = comuna.toUpperCase() === 'ISLA DE PASCUA' || 
+                                                            comuna.toUpperCase() === 'JUAN FERNÁNDEZ' || 
+                                                            comuna.toUpperCase() === 'JUAN FERNANDEZ';
+                                          return (cleanStreetVal ? cleanStreetVal + ', ' : '') + comuna + (isInsular ? '' : ', ' + region) + ', Chile';
+                                       })()
                                     )}`}
                                     target="_blank"
                                     rel="noopener noreferrer"

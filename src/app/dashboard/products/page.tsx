@@ -154,7 +154,7 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
+    <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in duration-500">
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

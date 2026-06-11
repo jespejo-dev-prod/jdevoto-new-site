@@ -125,35 +125,37 @@ export function PublicHeader() {
 
             {isUserDropdownOpen && (
               <div className="absolute right-0 mt-3 w-56 rounded-2xl bg-white border border-zinc-200 shadow-2xl p-4 flex flex-col gap-1.5 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-200">
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
-                  onClick={() => setIsUserDropdownOpen(false)}
-                >
-                  Mi cuenta
-                </Link>
-                <Link
-                  href="/dashboard/orders"
-                  className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
-                  onClick={() => setIsUserDropdownOpen(false)}
-                >
-                  Mis pedidos
-                </Link>
-                <div className="h-px bg-zinc-100 my-1" />
                 {user ? (
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsUserDropdownOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2.5 rounded-xl text-blue-600 hover:bg-blue-50 font-black text-sm transition-all cursor-pointer"
-                  >
-                    Cerrar sesión
-                  </button>
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      Mi cuenta
+                    </Link>
+                    <Link
+                      href="/dashboard/orders"
+                      className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      Mis pedidos
+                    </Link>
+                    <div className="h-px bg-zinc-100 my-1" />
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsUserDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 rounded-xl text-blue-600 hover:bg-blue-50 font-black text-sm transition-all cursor-pointer"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </>
                 ) : (
                   <Link
                     href="/login"
-                    className="px-4 py-2.5 rounded-xl text-blue-600 hover:bg-blue-50 font-black text-sm transition-all"
+                    className="px-4 py-2.5 rounded-xl text-blue-600 hover:bg-blue-50 font-black text-sm transition-all text-center"
                     onClick={() => setIsUserDropdownOpen(false)}
                   >
                     Iniciar sesión

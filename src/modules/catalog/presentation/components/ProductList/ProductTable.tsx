@@ -75,7 +75,7 @@ const ProductRow = memo(function ProductRow({
           <span className={cn(
             "transition-colors flex flex-col gap-0.5 min-w-0",
             isDashboard 
-              ? "font-bold text-xs text-white group-hover/link:text-primary max-w-[300px] uppercase tracking-tight" 
+              ? "font-bold text-sm text-white group-hover/link:text-primary max-w-[300px] uppercase tracking-normal" 
               : "font-extrabold text-sm sm:text-base text-zinc-900 group-hover/link:text-primary max-w-[120px] sm:max-w-[200px] md:max-w-[280px] lg:max-w-[140px] xl:max-w-[220px] 2xl:max-w-[300px] uppercase tracking-tight"
           )}>
             <span className="block w-full whitespace-normal leading-normal">
@@ -110,7 +110,7 @@ const ProductRow = memo(function ProductRow({
 
       <td className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap hidden xl:table-cell">
         <span className={cn(
-          "px-2 py-0.5 rounded-lg font-medium text-[10px] uppercase tracking-wider",
+          "px-2.5 py-1 rounded-lg font-semibold text-xs uppercase tracking-wider",
           isDashboard ? "bg-zinc-800 text-zinc-400" : "bg-zinc-100 text-zinc-500"
         )}>
           {product.category?.name 
@@ -127,7 +127,7 @@ const ProductRow = memo(function ProductRow({
         ) : isAuthenticated ? (
           `$${price.toLocaleString('es-CL')}`
         ) : (
-          <span className="text-blue-600 font-bold text-[11px] uppercase">🔒 Inicia sesión</span>
+          <span className="text-blue-600 font-bold text-xs sm:text-[13px] uppercase whitespace-nowrap">🔒 Inicia sesión</span>
         )}
       </td>
 
@@ -142,7 +142,7 @@ const ProductRow = memo(function ProductRow({
             {product.stockQuantity > 0 ? `${product.stockQuantity}` : "Sin Stock"}
           </span>
         ) : (
-          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Stock Privado</span>
+          <span className="text-xs sm:text-[12.5px] font-bold text-zinc-455 uppercase tracking-wider whitespace-nowrap">Stock Privado</span>
         )}
       </td>
 
@@ -156,7 +156,7 @@ const ProductRow = memo(function ProductRow({
                   className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-primary hover:border-primary/40 transition-all shadow-sm"
                   title="Editar"
                 >
-                  <Pencil className="h-3.5 w-3.5" />
+                  <Pencil className="h-4 w-4" />
                 </button>
               </Link>
               <button
@@ -166,7 +166,7 @@ const ProductRow = memo(function ProductRow({
                 className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-500/40 transition-all disabled:opacity-50 shadow-sm"
                 title="Eliminar"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="h-4 w-4" />
               </button>
             </>
           ) : (
@@ -197,8 +197,8 @@ export function ProductTable({ products, onDelete, isDeleting, variant = 'dashbo
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className={cn(
-            "text-[11px] font-black uppercase tracking-widest",
-            isDashboard ? "text-zinc-500 bg-zinc-950/60" : "text-zinc-400 bg-zinc-50"
+            "text-xs font-bold uppercase tracking-wider",
+            isDashboard ? "text-zinc-400 bg-zinc-950/60" : "text-zinc-400 bg-zinc-50"
           )}>
             <th className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap">Producto</th>
             <th className="px-1.5 lg:px-2.5 py-3 whitespace-nowrap hidden md:table-cell">SKU</th>

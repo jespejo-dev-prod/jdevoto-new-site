@@ -45,7 +45,7 @@ export default function NewProductPage() {
   return (
     <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SALES_REP]}>
       <FormProvider {...form}>
-        <div className="p-8 max-w-[1500px] mx-auto w-full">
+        <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
           <PageHeader
             title="Editor de Producto"
             breadcrumbs={[{ label: 'Productos', href: '/dashboard/products' }]}

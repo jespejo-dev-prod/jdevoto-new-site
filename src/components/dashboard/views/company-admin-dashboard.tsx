@@ -41,39 +41,39 @@ export function CompanyAdminDashboard() {
 
       {/* Quick Actions / Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between h-32">
+        <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between h-36">
           <div className="flex justify-between items-start">
-            <p className="text-zinc-400 font-medium text-sm">Crédito Disponible</p>
+            <p className="text-zinc-400 font-semibold text-base">Crédito Disponible</p>
             <div className="p-2 bg-primary/10 rounded-lg text-primary">
               <Building2 className="w-5 h-5" />
             </div>
           </div>
-          <h3 className="text-2xl font-bold text-white">
+          <h3 className="text-3xl font-black text-white">
             ${(Number(user?.company?.creditLimit || 0) - Number(user?.company?.creditUsed || 0)).toLocaleString('es-CL')}
           </h3>
         </div>
 
         <Link href="/dashboard/orders" className="group">
-          <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between h-32 hover:bg-zinc-800 transition-colors">
+          <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between h-36 hover:bg-zinc-800 transition-colors">
             <div className="flex justify-between items-start">
-              <p className="text-zinc-400 font-medium text-sm group-hover:text-white transition-colors">Ver Mis Compras</p>
+              <p className="text-zinc-400 font-semibold text-base group-hover:text-white transition-colors">Ver Mis Compras</p>
               <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
                 <ShoppingCart className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-xs text-zinc-500 group-hover:text-zinc-400">Revisa el estado de tus pedidos recientes.</p>
+            <p className="text-sm text-zinc-500 group-hover:text-zinc-400">Revisa el estado de tus pedidos recientes.</p>
           </div>
         </Link>
 
         <Link href="/dashboard/users" className="group">
-          <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between h-32 hover:bg-zinc-800 transition-colors">
+          <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between h-36 hover:bg-zinc-800 transition-colors">
             <div className="flex justify-between items-start">
-              <p className="text-zinc-400 font-medium text-sm group-hover:text-white transition-colors">Gestionar Equipo</p>
+              <p className="text-zinc-400 font-semibold text-base group-hover:text-white transition-colors">Gestionar Equipo</p>
               <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
                 <Users className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-xs text-zinc-500 group-hover:text-zinc-400">Agrega o elimina usuarios de tu empresa.</p>
+            <p className="text-sm text-zinc-500 group-hover:text-zinc-400">Agrega o elimina usuarios de tu empresa.</p>
           </div>
         </Link>
       </div>

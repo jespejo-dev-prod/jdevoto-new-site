@@ -20,7 +20,7 @@ export default function MyCompanyPage() {
 
   return (
     <RoleGuard allowedRoles={[UserRole.COMPANY_ADMIN]}>
-      <div className="p-8 max-w-[1200px] mx-auto space-y-8">
+      <div className="p-8 max-w-[1500px] mx-auto space-y-8">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
             <Building2 className="h-5 w-5" />

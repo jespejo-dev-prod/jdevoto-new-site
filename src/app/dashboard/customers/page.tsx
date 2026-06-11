@@ -42,7 +42,7 @@ export default function CustomersPage() {
   });
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -50,16 +50,16 @@ export default function CustomersPage() {
             <Users className="h-8 w-8 text-primary" />
             Clientes B2B
           </h1>
-          <p className="text-zinc-500 mt-1 font-medium">
+          <p className="text-sm text-zinc-500 mt-1 font-medium">
             Gestión de empresas, condiciones comerciales y facturación.
-            {meta && <span className="ml-2 text-primary/50 text-[10px] tracking-widest uppercase">Total DB: {meta.total}</span>}
+            {meta && <span className="ml-2 text-primary/50 text-xs tracking-widest uppercase">Total DB: {meta.total}</span>}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Link href="/dashboard/customers/new">
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-primary text-black rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-              <UserPlus className="h-4 w-4" />
+            <button className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+              <UserPlus className="w-4 h-4" />
               Nuevo Cliente
             </button>
           </Link>
@@ -75,7 +75,7 @@ export default function CustomersPage() {
             placeholder="Buscar por Razón Social, RUT o Nombre de Fantasía..."
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-            className="w-full bg-zinc-900/40 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-sm text-white focus:border-primary/50 outline-none transition-all"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-sm text-white focus:border-primary/50 outline-none transition-all"
           />
         </div>
         <div className="md:col-span-4 flex gap-2">
@@ -124,12 +124,12 @@ export default function CustomersPage() {
           {meta && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
               <div className="flex items-center gap-3">
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
                   Mostrando página {meta.page} de {meta.totalPages} ({meta.total} clientes)
                 </p>
                 <div className="h-4 w-px bg-zinc-800 hidden sm:block" />
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Por página:</span>
+                  <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Por página:</span>
                   <select
                     value={limit === 99999 ? "all" : limit}
                     onChange={(e) => {
@@ -137,7 +137,7 @@ export default function CustomersPage() {
                       setLimit(val === "all" ? 99999 : Number(val));
                       setPage(1);
                     }}
-                    className="bg-zinc-900 border border-zinc-850 rounded-xl text-[10px] font-bold text-zinc-400 px-3 py-1.5 outline-none focus:border-primary/50 cursor-pointer"
+                    className="bg-zinc-900 border border-zinc-850 rounded-xl text-xs font-bold text-zinc-400 px-3.5 py-1.5 outline-none focus:border-primary/50 cursor-pointer"
                   >
                     <option value={10}>10</option>
                     <option value={100}>100</option>

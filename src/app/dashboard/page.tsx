@@ -18,7 +18,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
+    <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in duration-500">
       {user.role === 'ADMIN' || user.role === 'SALES_REP' ? (
         <AdminDashboard />
       ) : user.role === 'COMPANY_ADMIN' ? (

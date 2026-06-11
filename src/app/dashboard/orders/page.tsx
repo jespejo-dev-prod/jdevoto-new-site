@@ -72,7 +72,7 @@ export default function OrdersPage() {
   const meta = data?.meta;
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -105,7 +105,7 @@ export default function OrdersPage() {
             placeholder="Buscar por # de pedido o cliente..."
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-xs text-white focus:border-primary/50 outline-none transition-all"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-sm text-white focus:border-primary/50 outline-none transition-all"
           />
         </div>
         
@@ -116,14 +116,14 @@ export default function OrdersPage() {
               type="date"
               value={fromDate}
               onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
-              className="bg-transparent text-xs text-zinc-400 focus:text-white outline-none w-full"
+              className="bg-transparent text-sm text-zinc-400 focus:text-white outline-none w-full"
             />
             <span className="text-zinc-700 font-bold">—</span>
             <input 
               type="date"
               value={toDate}
               onChange={(e) => { setToDate(e.target.value); setPage(1); }}
-              className="bg-transparent text-xs text-zinc-400 focus:text-white outline-none w-full"
+              className="bg-transparent text-sm text-zinc-400 focus:text-white outline-none w-full"
             />
           </div>
           
@@ -139,34 +139,36 @@ export default function OrdersPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-zinc-900/40 p-1 rounded-2xl border border-zinc-800 w-fit">
-        {TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id as OrderStatus | '');
-                setPage(1);
-              }}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap",
-                isActive 
-                  ? "bg-zinc-800 text-primary shadow-lg shadow-black/20" 
-                  : "text-zinc-500 hover:text-white hover:bg-zinc-800/50"
-              )}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              {tab.label}
-              {isActive && meta && (
-                <span className="ml-1 bg-primary/10 px-1.5 py-0.5 rounded-md text-[10px]">
-                  {meta.total}
-                </span>
-              )}
-            </button>
-          );
-        })}
+      <div className="w-full overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex items-center gap-1 bg-zinc-900/40 p-1.5 rounded-2xl border border-zinc-800 w-fit">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id as OrderStatus | '');
+                  setPage(1);
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
+                  isActive 
+                    ? "bg-zinc-800 text-primary shadow-lg shadow-black/20" 
+                    : "text-zinc-500 hover:text-white hover:bg-zinc-800/50"
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {tab.label}
+                {isActive && meta && (
+                  <span className="ml-1 bg-primary/10 px-1.5 py-0.5 rounded-md text-xs">
+                    {meta.total}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Listado */}

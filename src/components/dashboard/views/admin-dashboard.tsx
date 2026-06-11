@@ -94,7 +94,7 @@ export function AdminDashboard() {
 
       {/* Quick Actions Panel */}
       <div className="bg-zinc-900/40 border border-zinc-800 rounded-[32px] p-6 shadow-2xl">
-        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">Acciones Rápidas</h3>
+        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-4">Acciones Rápidas</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link href="/dashboard/orders/new">
             <div className="bg-zinc-950/50 border border-zinc-850 hover:border-primary/40 rounded-2xl p-4 flex items-center gap-4 transition-all hover:scale-[1.01] cursor-pointer group">
@@ -102,8 +102,8 @@ export function AdminDashboard() {
                 <Plus className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white uppercase tracking-wider">Crear Pedido B2B</p>
-                <p className="text-[10px] text-zinc-500 mt-0.5">Ingresar orden manual</p>
+                <p className="text-sm font-bold text-white uppercase tracking-wider">Crear Pedido B2B</p>
+                <p className="text-xs text-zinc-400 font-semibold mt-0.5">Ingresar orden manual</p>
               </div>
             </div>
           </Link>
@@ -114,8 +114,8 @@ export function AdminDashboard() {
                 <Database className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white uppercase tracking-wider">Importar Stock</p>
-                <p className="text-[10px] text-zinc-500 mt-0.5">Cargar catálogo por Excel</p>
+                <p className="text-sm font-bold text-white uppercase tracking-wider">Importar Stock</p>
+                <p className="text-xs text-zinc-400 font-semibold mt-0.5">Cargar catálogo por Excel</p>
               </div>
             </div>
           </Link>
@@ -126,8 +126,8 @@ export function AdminDashboard() {
                 <Building2 className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white uppercase tracking-wider">Ver Clientes</p>
-                <p className="text-[10px] text-zinc-500 mt-0.5">Cartera de clientes B2B</p>
+                <p className="text-sm font-bold text-white uppercase tracking-wider">Ver Clientes</p>
+                <p className="text-xs text-zinc-400 font-semibold mt-0.5">Cartera de clientes B2B</p>
               </div>
             </div>
           </Link>
@@ -138,8 +138,8 @@ export function AdminDashboard() {
                 <TrendingUp className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white uppercase tracking-wider">Métricas de Negocio</p>
-                <p className="text-[10px] text-zinc-500 mt-0.5">Gráficos de ventas y tendencias</p>
+                <p className="text-sm font-bold text-white uppercase tracking-wider">Métricas de Negocio</p>
+                <p className="text-xs text-zinc-400 font-semibold mt-0.5">Gráficos de ventas y tendencias</p>
               </div>
             </div>
           </Link>
@@ -156,14 +156,14 @@ export function AdminDashboard() {
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 Últimos Pedidos Recibidos
               </h3>
-              <Link href="/dashboard/orders" className="text-[10px] font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5">
+              <Link href="/dashboard/orders" className="text-xs font-bold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5">
                 Ver Todos <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
 
             <div className="overflow-x-auto w-full">
               <table className="w-full text-left">
-                <thead className="bg-zinc-950/40 text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
+                <thead className="bg-zinc-950/40 text-xs font-bold text-zinc-400 uppercase tracking-widest">
                   <tr>
                     <th className="px-4 py-3 rounded-l-xl">Pedido</th>
                     <th className="px-4 py-3">Cliente</th>
@@ -175,20 +175,20 @@ export function AdminDashboard() {
                 <tbody className="divide-y divide-zinc-850">
                   {recentOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-zinc-600 text-xs italic uppercase tracking-wider font-bold">
+                      <td colSpan={5} className="px-4 py-8 text-center text-zinc-600 text-sm italic uppercase tracking-wider font-bold">
                         No se registran pedidos recientes
                       </td>
                     </tr>
                   ) : (
                     recentOrders.map((order: any) => (
-                      <tr key={order.id} className="text-xs group hover:bg-zinc-950/20 transition-colors">
+                      <tr key={order.id} className="text-sm group hover:bg-zinc-950/20 transition-colors">
                         <td className="px-4 py-4 font-mono font-medium text-white truncate max-w-[90px]">
                           #{order.orderNumber.split('-').pop()}
                         </td>
-                        <td className="px-4 py-4 text-zinc-400 font-semibold truncate max-w-[150px]">
+                        <td className="px-4 py-4 text-sky-400 font-bold truncate max-w-[150px]">
                           {order.company.razonSocial}
                         </td>
-                        <td className="px-4 py-4 font-bold text-white">
+                        <td className="px-4 py-4 font-bold text-white text-[15px]">
                           {formatCurrency(Number(order.totalGross))}
                         </td>
                         <td className="px-4 py-4">
@@ -217,7 +217,7 @@ export function AdminDashboard() {
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 Alertas de Stock Crítico
               </h3>
-              <span className="text-[9px] font-black uppercase tracking-widest text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 animate-pulse">
+              <span className="text-xs font-black uppercase tracking-widest text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 animate-pulse">
                 {metrics.lowStockCount} crítico
               </span>
             </div>
@@ -225,19 +225,19 @@ export function AdminDashboard() {
             {/* Scrollable list of critical stock products */}
             <div className="space-y-3 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
               {lowStockProducts.length === 0 ? (
-                <div className="p-8 text-center text-zinc-600 text-xs italic uppercase tracking-wider font-bold">
+                <div className="p-8 text-center text-zinc-600 text-sm italic uppercase tracking-wider font-bold">
                   Excelente: Todo el catálogo con stock óptimo
                 </div>
               ) : (
                 lowStockProducts.map((p: any) => (
                   <div key={p.id} className="flex items-center justify-between p-3.5 bg-zinc-950/50 border border-zinc-850 rounded-2xl group hover:border-amber-500/20 transition-all">
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-white truncate max-w-[180px]">{p.name}</p>
-                      <p className="text-[9px] text-zinc-500 font-mono mt-0.5">SKU: {p.sku}</p>
+                      <p className="text-sm font-bold text-white truncate max-w-[180px]">{p.name}</p>
+                      <p className="text-xs text-sky-400 font-mono mt-0.5">SKU: {p.sku}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-black text-amber-500">{p.stock} unidades</p>
-                      <p className="text-[9px] text-zinc-600 font-medium">Alerta: {p.alert}</p>
+                      <p className="text-sm font-black text-amber-500">{p.stock} unidades</p>
+                      <p className="text-xs text-zinc-500 font-medium">Alerta: {p.alert}</p>
                     </div>
                   </div>
                 ))
@@ -253,21 +253,21 @@ export function AdminDashboard() {
 
 function StatCard({ title, value, description, icon: Icon, color, badge }: any) {
   return (
-    <div className="bg-zinc-900/40 border border-zinc-800 p-6 rounded-[28px] space-y-4 shadow-xl hover:border-zinc-700 transition-all flex flex-col justify-between">
+    <div className="bg-zinc-900/40 border border-zinc-800 p-6 rounded-[28px] space-y-4 shadow-xl hover:border-zinc-700 transition-all flex flex-col justify-between min-h-[160px]">
       <div className="flex items-center justify-between">
         <div className="p-2.5 bg-zinc-950 border border-zinc-800 rounded-2xl">
           <Icon className="h-5 w-5 text-primary" />
         </div>
         {badge && (
-          <span className="text-[8px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
+          <span className="text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
             {badge}
           </span>
         )}
       </div>
       <div>
-        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{title}</p>
-        <p className="text-2xl font-black text-white mt-1 truncate">{value}</p>
-        <p className="text-[10px] text-zinc-600 mt-1 font-medium leading-relaxed">{description}</p>
+        <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{title}</p>
+        <p className="text-3xl font-black text-white mt-1 truncate">{value}</p>
+        <p className="text-[13px] text-zinc-400 mt-1 font-semibold leading-relaxed">{description}</p>
       </div>
     </div>
   );

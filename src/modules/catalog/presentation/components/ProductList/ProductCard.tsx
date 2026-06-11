@@ -239,10 +239,10 @@ export const ProductCard = memo(function ProductCard({
                   </div>
                 ) : (
                   <div className="flex flex-col">
-                    <span className="text-[11.5px] font-bold text-blue-600 uppercase tracking-wider">
+                    <span className="text-xs sm:text-[13.5px] font-bold text-blue-600 uppercase tracking-wider">
                       🔒 Inicia sesión
                     </span>
-                    <span className="text-[9.5px] text-zinc-400 font-bold uppercase">Para ver precios</span>
+                    <span className="text-[10px] sm:text-[11px] text-zinc-400 font-bold uppercase mt-0.5">Para ver precios</span>
                   </div>
                 )}
               </div>
@@ -257,7 +257,7 @@ export const ProductCard = memo(function ProductCard({
                     {product.stockQuantity > 0 ? `${product.stockQuantity} En Stock` : "Sin Stock"}
                   </span>
                 ) : (
-                  <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">
+                  <span className="text-xs sm:text-[12.5px] font-bold text-zinc-450 uppercase tracking-wider">
                     Stock Privado
                   </span>
                 )}
@@ -276,7 +276,7 @@ export const ProductCard = memo(function ProductCard({
           <div className="pt-2 relative z-10 text-center border-t border-zinc-150/60 mt-1">
             <Link 
               href="/login" 
-              className="text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-widest block py-1"
+              className="text-[11px] sm:text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-widest block py-1.5"
             >
               Inicia sesión para precio B2B
             </Link>

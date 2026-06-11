@@ -9,7 +9,7 @@ import { BrandList } from "@/modules/catalog/presentation/components/Taxonomy/Br
 export default function BrandsPage() {
   return (
     <RoleGuard allowedRoles={[UserRole.ADMIN]}>
-      <div className="p-8 max-w-6xl mx-auto space-y-8">
+      <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight">Marcas</h1>
           <p className="text-zinc-500 mt-1">Gestiona las marcas y fabricantes de tus productos.</p>
