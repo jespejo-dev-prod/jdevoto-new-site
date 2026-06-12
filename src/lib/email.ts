@@ -177,8 +177,8 @@ function generateOrderHtml(order: any, customerEmail: string) {
   </body>
   </html>
   `;
-}`;
 }
+
 
 export async function sendOrderMessageEmail(order: any, messageData: any, attachmentPath: string | null, customerEmail: string) {
   try {
