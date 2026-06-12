@@ -294,16 +294,19 @@ export class OrderService {
       return newOrder;
     });
 
-    // Enviar correo asíncronamente si el pedido fue creado con éxito y no es un borrador
+    // Enviar correo si el pedido fue creado con éxito y no es un borrador
     if (order.status !== OrderStatus.DRAFT) {
-      import('@/lib/email').then(async ({ sendOrderEmail }) => {
+      try {
+        const { sendOrderEmail } = await import('@/lib/email');
         let customerEmail = (order.billingAddress as any)?.email;
         if (!customerEmail) {
           const user = await prisma.user.findUnique({ where: { id: createdById }, select: { email: true } });
           customerEmail = user?.email || "ventas@tutiendab2b.cl";
         }
-        sendOrderEmail(order, customerEmail).catch(console.error);
-      });
+        await sendOrderEmail(order, customerEmail);
+      } catch (err) {
+        console.error("Error al enviar correo del pedido:", err);
+      }
     }
 
     return order;
@@ -384,23 +387,29 @@ export class OrderService {
     });
 
     if (newStatus === OrderStatus.SHIPPED) {
-      import('@/lib/email').then(async ({ sendOrderShippedEmail }) => {
+      try {
+        const { sendOrderShippedEmail } = await import('@/lib/email');
         let customerEmail = (updated.billingAddress as any)?.email;
         if (!customerEmail) {
           const user = await prisma.user.findUnique({ where: { id: updated.createdById }, select: { email: true } });
           customerEmail = user?.email || "ventas@tutiendab2b.cl";
         }
-        sendOrderShippedEmail(updated, customerEmail).catch(console.error);
-      });
+        await sendOrderShippedEmail(updated, customerEmail);
+      } catch (err) {
+        console.error("Error al enviar correo de despacho:", err);
+      }
     } else {
-      import('@/lib/email').then(async ({ sendOrderStatusUpdateEmail }) => {
+      try {
+        const { sendOrderStatusUpdateEmail } = await import('@/lib/email');
         let customerEmail = (updated.billingAddress as any)?.email;
         if (!customerEmail) {
           const user = await prisma.user.findUnique({ where: { id: updated.createdById }, select: { email: true } });
           customerEmail = user?.email || "ventas@tutiendab2b.cl";
         }
-        sendOrderStatusUpdateEmail(updated, customerEmail).catch(console.error);
-      });
+        await sendOrderStatusUpdateEmail(updated, customerEmail);
+      } catch (err) {
+        console.error("Error al enviar correo de cambio de estado:", err);
+      }
     }
 
     return updated;

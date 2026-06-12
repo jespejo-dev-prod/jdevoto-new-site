@@ -100,12 +100,15 @@ export const POST = withApiHandler(async (
         }
       });
       // Enviar correo de notificación
-      import('@/lib/email').then(async ({ sendNotificationEmail }) => {
+      try {
+        const { sendNotificationEmail } = await import('@/lib/email');
         const recipient = await prisma.user.findUnique({ where: { id: order.createdById }, select: { email: true } });
         if (recipient?.email) {
-          sendNotificationEmail(recipient.email, notif.title, notif.message, notif.link || undefined).catch(console.error);
+          await sendNotificationEmail(recipient.email, notif.title, notif.message, notif.link || undefined);
         }
-      });
+      } catch (err) {
+        console.error("Error al enviar correo de notificación:", err);
+      }
     }
   } else {
     // Notificar a todos los administradores
@@ -124,7 +127,8 @@ export const POST = withApiHandler(async (
         }))
       });
       // Enviar correos de notificación a los administradores
-      import('@/lib/email').then(async ({ sendNotificationEmail }) => {
+      try {
+        const { sendNotificationEmail } = await import('@/lib/email');
         const adminUsers = await prisma.user.findMany({
           where: { id: { in: admins.map(a => a.id) } },
           select: { email: true }
@@ -134,24 +138,28 @@ export const POST = withApiHandler(async (
         const link = `/dashboard/orders/${order.id}`;
         for (const admin of adminUsers) {
           if (admin.email) {
-            sendNotificationEmail(admin.email, title, msg, link).catch(console.error);
+            await sendNotificationEmail(admin.email, title, msg, link);
           }
         }
-      });
+      } catch (err) {
+        console.error("Error al enviar correos a administradores:", err);
+      }
     }
   }
 
   // 5. Notificar al cliente por correo si se solicitó (sólo si es admin)
   if (notifyCustomer && isAdmin) {
-    // Importamos dinámicamente para no bloquear la respuesta
-    import('@/lib/email').then(async ({ sendOrderMessageEmail }) => {
+    try {
+      const { sendOrderMessageEmail } = await import('@/lib/email');
       let customerEmail = (order.billingAddress as any)?.email;
       if (!customerEmail) {
         customerEmail = order.createdBy?.email || "ventas@tutiendab2b.cl";
       }
 
       await sendOrderMessageEmail(order, newMessage, attachmentPath, customerEmail);
-    }).catch(console.error);
+    } catch (err) {
+      console.error("Error al enviar correo de mensaje del pedido:", err);
+    }
   }
 
   logAuditAction({
