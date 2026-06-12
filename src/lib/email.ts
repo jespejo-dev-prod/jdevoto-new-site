@@ -69,24 +69,25 @@ function generateOrderHtml(order: any, customerEmail: string) {
   const company = order.company || {};
   const createdBy = order.createdBy || {};
   const items = order.items || [];
-  const billing = order.billingAddress || {};
   const shipping = order.shippingAddress || {};
-  const salesRep = order.salesRep || null;
 
   const discountAmount = Number(order.discountAmount) || 0;
   const totalNet = Number(order.subtotalNet) || 0;
   const baseSubtotalNet = totalNet + discountAmount;
   const taxAmount = Number(order.taxAmount) || 0;
   const totalGross = Number(order.totalGross) || 0;
+  const discountPct = baseSubtotalNet > 0 ? Math.round((discountAmount / baseSubtotalNet) * 100) : 0;
 
   const itemsHtml = items.map((item: any) => `
     <tr>
-      <td style="padding: 12px; border: 1px solid #e5e7eb; color: #374151;">${item.productName || item.product?.name || 'Producto'}</td>
-      <td style="padding: 12px; border: 1px solid #e5e7eb; color: #374151; text-align: center;">${item.quantity}</td>
-      <td style="padding: 12px; border: 1px solid #e5e7eb; color: #374151; text-align: right;">${formatMoney(item.unitNetPrice)}</td>
-      <td style="padding: 12px; border: 1px solid #e5e7eb; color: #374151; text-align: center;">${item.productSku || item.product?.sku || '-'}</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151;">${item.productName || item.product?.name || 'Producto'}</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151;">${item.quantity}</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151;">${formatMoney(item.unitNetPrice)}</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151;">${item.productSku || item.product?.sku || '-'}</td>
     </tr>
   `).join('');
+
+  const creatorName = `${createdBy.firstName || ''} ${createdBy.lastName || ''}`.trim().toLowerCase();
 
   return `
   <!DOCTYPE html>
@@ -94,115 +95,89 @@ function generateOrderHtml(order: any, customerEmail: string) {
   <head>
     <meta charset="utf-8">
     <style>
-      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
-      .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-      .header { margin-bottom: 24px; }
-      .header h2 { color: #1e40af; margin: 0 0 8px 0; font-size: 16px; }
-      .header a { color: #2563eb; text-decoration: none; font-size: 16px; font-weight: 500; }
-      .header a:hover { text-decoration: underline; }
-      
-      table { width: 100%; border-collapse: collapse; margin-bottom: 32px; font-size: 14px; }
-      th { background-color: #f9fafb; padding: 12px; border: 1px solid #e5e7eb; text-align: left; color: #4b5563; font-weight: 600; }
-      td { padding: 12px; border: 1px solid #e5e7eb; }
-      .totals-row td { padding: 12px; border: 1px solid #e5e7eb; }
-      .totals-label { font-weight: 600; color: #374151; text-align: left; }
-      .totals-value { text-align: left; color: #374151; }
-      
-      .billing-section { margin-top: 32px; border-top: 1px solid #e5e7eb; pt-4; }
-      .billing-section h3 { color: #1e40af; font-size: 16px; margin-bottom: 16px; }
-      .billing-details { color: #6b7280; font-style: italic; font-size: 14px; line-height: 1.5; }
-      .billing-details strong { font-style: normal; color: #374151; }
-      
-      .footer { margin-top: 40px; text-align: center; color: #6b7280; font-size: 12px; }
+      body { font-family: Arial, sans-serif; line-height: 1.5; color: #333; background-color: #ffffff; padding: 20px; }
+      .container { max-width: 600px; margin: 0 auto; }
+      .link-pedido { font-size: 16px; color: #2563eb; text-decoration: underline; font-weight: bold; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+      th { border: 1px solid #d1d5db; padding: 10px; text-align: left; font-weight: bold; color: #374151; }
+      td { border: 1px solid #d1d5db; padding: 10px; text-align: left; color: #374151; }
+      .totals-label { font-weight: bold; }
     </style>
   </head>
   <body>
     <div class="container">
-      <div style="text-align: left; margin-bottom: 30px;">
-        <img src="${process.env.NEXT_PUBLIC_APP_URL ? process.env.NEXT_PUBLIC_APP_URL + '/logo-svg.png' : 'https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png'}" alt="Logo Jdevoto" style="max-height: 50px;" />
-      </div>
-      <div class="header">
-        <h2 style="margin-bottom: 4px; color: #1e40af; font-size: 16px;">Datos del Cliente</h2>
-        <p style="margin: 0 0 12px 0; font-size: 14px; color: #4b5563; line-height: 1.6;">
-          <strong>RUT:</strong> ${company.rut || '-'}<br>
-          <strong>Razón Social:</strong> ${company.razonSocial || '-'}<br>
-          ${company.giro ? `<strong>Giro:</strong> ${company.giro}<br>` : ''}
-          <strong>Teléfono:</strong> ${company.telefono || createdBy.phone || billing.phone || 'No especificado'}<br>
-          <strong>Correo:</strong> <a href="mailto:${billing.email || customerEmail}">${billing.email || customerEmail}</a>
-        </p>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/orders/${order.id}" style="display: inline-block; margin-bottom: 20px;">Ver Pedido #${order.orderNumber}</a>
-      </div>
+      <p style="font-size: 14px; color: #4b5563; margin-bottom: 15px;">
+        Has recibido el siguiente pedido de ${creatorName}:
+      </p>
+      
+      <p style="font-size: 16px; font-weight: bold; color: #1e40af; margin-top: 15px; margin-bottom: 5px;">
+        RUT del cliente: ${company.rut || '-'}
+      </p>
+      
+      <p style="margin-top: 5px; margin-bottom: 20px;">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/orders/${order.id}" class="link-pedido">Pedido #${order.orderNumber}</a>
+      </p>
 
       <table>
         <thead>
           <tr>
             <th>Producto</th>
-            <th style="text-align: center;">Cantidad</th>
-            <th style="text-align: right;">Precio</th>
-            <th style="text-align: center;">SKU</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>SKU</th>
           </tr>
         </thead>
         <tbody>
           ${itemsHtml}
           
-          <tr class="totals-row">
-            <td colspan="2" class="totals-label">Subtotal Neto:</td>
-            <td colspan="2" class="totals-value">${formatMoney(baseSubtotalNet)}</td>
+          <!-- Subtotal -->
+          <tr>
+            <td colspan="3" class="totals-label">Subtotal:</td>
+            <td>${formatMoney(baseSubtotalNet)}</td>
           </tr>
           
+          <!-- Descuento Especial -->
           ${discountAmount > 0 ? `
-          <tr class="totals-row">
-            <td colspan="2" class="totals-label">Descuento Especial:</td>
-            <td colspan="2" class="totals-value">-${formatMoney(discountAmount)}</td>
+          <tr>
+            <td colspan="3" class="totals-label">Descuento Especial: (${discountPct}%):</td>
+            <td>${formatMoney(discountAmount)}</td>
           </tr>
           ` : ''}
 
-          <tr class="totals-row">
-            <td colspan="2" class="totals-label">Total Neto:</td>
-            <td colspan="2" class="totals-value">${formatMoney(totalNet)}</td>
-          </tr>
-          
-          <tr class="totals-row">
-            <td colspan="2" class="totals-label">IVA (19%):</td>
-            <td colspan="2" class="totals-value">${formatMoney(taxAmount)}</td>
+          <!-- IVA -->
+          <tr>
+            <td colspan="3" class="totals-label">IVA:</td>
+            <td>${formatMoney(taxAmount)}</td>
           </tr>
 
-          <tr class="totals-row">
-            <td colspan="2" class="totals-label">Total:</td>
-            <td colspan="2" class="totals-value">${formatMoney(totalGross)}</td>
+          <!-- Total Neto -->
+          <tr>
+            <td colspan="3" class="totals-label">Total Neto:</td>
+            <td>${formatMoney(totalNet)}</td>
+          </tr>
+
+          <!-- Total -->
+          <tr>
+            <td colspan="3" class="totals-label">Total:</td>
+            <td>${formatMoney(totalGross)}</td>
           </tr>
         </tbody>
       </table>
 
-      <div class="billing-section">
-        <h3>Dirección de Envío</h3>
-        <div class="billing-details">
-          ${shipping.street ? shipping.street + '<br>' : 'Dirección no especificada<br>'}
-          ${shipping.comuna ? shipping.comuna + '<br>' : ''}
-          ${shipping.region ? shipping.region + '<br>' : ''}
-          <br>
-          Felicidades por la venta.
-        </div>
-      </div>
-
-      ${salesRep ? `
-      <div style="margin-top: 32px; border-top: 1px solid #e5e7eb; padding-top: 16px; font-size: 14px; color: #4b5563;">
-        <h3 style="color: #1e40af; font-size: 15px; margin: 0 0 8px 0; font-weight: 600;">Tu Ejecutivo Comercial Asignado</h3>
-        <p style="margin: 0; line-height: 1.5; font-style: italic;">
-          <strong>Nombre:</strong> ${salesRep.firstName} ${salesRep.lastName}<br>
-          <strong>Email:</strong> <a href="mailto:${salesRep.email}" style="color: #2563eb; text-decoration: none;">${salesRep.email}</a>
-          ${salesRep.phone ? `<br><strong>Teléfono:</strong> ${salesRep.phone}` : ''}
+      ${shipping.street ? `
+      <div style="margin-top: 30px; border-top: 1px solid #d1d5db; padding-top: 15px; font-size: 13px; color: #4b5563;">
+        <p style="margin: 0 0 5px 0; font-weight: bold; color: #374151;">Dirección de Despacho:</p>
+        <p style="margin: 0; font-style: italic;">
+          ${shipping.street} ${shipping.number || ''}<br>
+          ${shipping.comuna || ''}, ${shipping.region || ''}
         </p>
       </div>
       ` : ''}
-
-      <div class="footer">
-        Jdevoto.cl
-      </div>
     </div>
   </body>
   </html>
   `;
+}`;
 }
 
 export async function sendOrderMessageEmail(order: any, messageData: any, attachmentPath: string | null, customerEmail: string) {
