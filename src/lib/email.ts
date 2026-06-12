@@ -6,8 +6,8 @@ let transporterInstance: nodemailer.Transporter | null = null;
 async function getTransporter() {
   if (transporterInstance) return transporterInstance;
 
-  // Use real SMTP in production if configured
-  if (process.env.NODE_ENV === 'production' && process.env.SMTP_HOST) {
+  // Use real SMTP if configured
+  if (process.env.SMTP_HOST) {
     transporterInstance = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT) || 587,
@@ -41,7 +41,7 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
     const htmlContent = generateOrderHtml(order, customerEmail);
 
     const info = await transporter.sendMail({
-      from: '"Jdevoto.cl" <ventas@jdevoto.cl>',
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Nuevo pedido (${order.orderNumber})`,
@@ -254,7 +254,7 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
     `;
 
     const info = await transporter.sendMail({
-      from: '"Jdevoto.cl" <ventas@jdevoto.cl>',
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Actualización de pedido #${order.orderNumber}`,
@@ -318,7 +318,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     `;
 
     const info = await transporter.sendMail({
-      from: '"Jdevoto.cl" <soporte@jdevoto.cl>',
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
       to: email,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: 'Restablecer contraseña - Jdevoto.cl',
@@ -381,7 +381,7 @@ export async function sendOrderShippedEmail(order: any, customerEmail: string) {
     `;
 
     const info = await transporter.sendMail({
-      from: '"Jdevoto.cl" <despachos@jdevoto.cl>',
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'despachos@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Tu pedido #${order.orderNumber} ha sido enviado 🚚`,
@@ -428,7 +428,7 @@ export async function sendNotificationEmail(email: string, title: string, messag
     `;
 
     const info = await transporter.sendMail({
-      from: '"Jdevoto.cl" <notificaciones@jdevoto.cl>',
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'notificaciones@jdevoto.cl'}>`,
       to: email,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: title,
@@ -479,7 +479,7 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
     `;
 
     const info = await transporter.sendMail({
-      from: '"Jdevoto.cl" <ventas@jdevoto.cl>',
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: `Actualización de estado pedido #${order.orderNumber} -> ${order.status}`,
