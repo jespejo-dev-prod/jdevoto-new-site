@@ -80,10 +80,10 @@ function generateOrderHtml(order: any, customerEmail: string) {
 
   const itemsHtml = items.map((item: any) => `
     <tr>
-      <td style="padding: 5px 8px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif;">${item.productName || item.product?.name || 'Producto'}</td>
-      <td style="padding: 5px 8px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif;">${item.quantity}</td>
-      <td style="padding: 5px 8px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif;">${formatMoney(item.unitNetPrice)}</td>
-      <td style="padding: 5px 8px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif;">${item.productSku || item.product?.sku || '-'}</td>
+      <td style="padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${item.productName || item.product?.name || 'Producto'}</td>
+      <td style="padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${item.quantity}</td>
+      <td style="padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(item.unitNetPrice)}</td>
+      <td style="padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${item.productSku || item.product?.sku || '-'}</td>
     </tr>
   `).join('');
 
@@ -112,7 +112,7 @@ function generateOrderHtml(order: any, customerEmail: string) {
                 
                 <!-- Logo -->
                 <div style="text-align: left; margin-bottom: 25px;">
-                  <img src="${logoUrl}" alt="Logo Jdevoto" style="max-height: 25px; height: 25px; display: block; border: 0;" />
+                  <img src="${logoUrl}" alt="Logo Jdevoto" height="25" style="display: block; border: 0; height: 25px; max-height: 25px;" />
                 </div>
 
                 <!-- Header info -->
@@ -132,10 +132,10 @@ function generateOrderHtml(order: any, customerEmail: string) {
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; font-family: Arial, sans-serif;">
                   <thead>
                     <tr>
-                      <th style="border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Producto</th>
-                      <th style="border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Cantidad</th>
-                      <th style="border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Precio</th>
-                      <th style="border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">SKU</th>
+                      <th style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 8px; padding-right: 8px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Producto</th>
+                      <th style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 8px; padding-right: 8px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Cantidad</th>
+                      <th style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 8px; padding-right: 8px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Precio</th>
+                      <th style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 8px; padding-right: 8px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">SKU</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -143,34 +143,34 @@ function generateOrderHtml(order: any, customerEmail: string) {
                     
                     <!-- Subtotal -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 5px 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Subtotal:</td>
-                      <td style="border: 1px solid #d1d5db; padding: 5px 8px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(baseSubtotalNet)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Subtotal:</td>
+                      <td style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(baseSubtotalNet)}</td>
                     </tr>
                     
                     <!-- Descuento Especial -->
                     ${discountAmount > 0 ? `
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 5px 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Descuento Especial: (${discountPct}%):</td>
-                      <td style="border: 1px solid #d1d5db; padding: 5px 8px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(discountAmount)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Descuento Especial: (${discountPct}%):</td>
+                      <td style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(discountAmount)}</td>
                     </tr>
                     ` : ''}
 
                     <!-- IVA -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 5px 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">IVA:</td>
-                      <td style="border: 1px solid #d1d5db; padding: 5px 8px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(taxAmount)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">IVA:</td>
+                      <td style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(taxAmount)}</td>
                     </tr>
 
                     <!-- Total Neto -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 5px 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Total Neto:</td>
-                      <td style="border: 1px solid #d1d5db; padding: 5px 8px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(totalNet)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Total Neto:</td>
+                      <td style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(totalNet)}</td>
                     </tr>
 
                     <!-- Total -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 5px 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Total:</td>
-                      <td style="border: 1px solid #d1d5db; padding: 5px 8px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(totalGross)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Total:</td>
+                      <td style="border: 1px solid #d1d5db; padding-top: 5px; padding-bottom: 5px; padding-left: 8px; padding-right: 8px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(totalGross)}</td>
                     </tr>
                   </tbody>
                 </table>
