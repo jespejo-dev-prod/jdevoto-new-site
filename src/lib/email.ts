@@ -80,100 +80,118 @@ function generateOrderHtml(order: any, customerEmail: string) {
 
   const itemsHtml = items.map((item: any) => `
     <tr>
-      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151;">${item.productName || item.product?.name || 'Producto'}</td>
-      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151;">${item.quantity}</td>
-      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151;">${formatMoney(item.unitNetPrice)}</td>
-      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151;">${item.productSku || item.product?.sku || '-'}</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif;">${item.productName || item.product?.name || 'Producto'}</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif;">${item.quantity}</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif;">${formatMoney(item.unitNetPrice)}</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif;">${item.productSku || item.product?.sku || '-'}</td>
     </tr>
   `).join('');
 
   const creatorName = `${createdBy.firstName || ''} ${createdBy.lastName || ''}`.trim().toLowerCase();
+
+  const logoUrl = process.env.NEXT_PUBLIC_APP_URL 
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/logo-svg.png` 
+    : 'https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png';
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   return `
   <!DOCTYPE html>
   <html>
   <head>
     <meta charset="utf-8">
-    <style>
-      body { font-family: Arial, sans-serif; line-height: 1.5; color: #333; background-color: #ffffff; padding: 20px; }
-      .container { max-width: 600px; margin: 0 auto; }
-      .link-pedido { font-size: 16px; color: #2563eb; text-decoration: underline; font-weight: bold; }
-      table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
-      th { border: 1px solid #d1d5db; padding: 10px; text-align: left; font-weight: bold; color: #374151; }
-      td { border: 1px solid #d1d5db; padding: 10px; text-align: left; color: #374151; }
-      .totals-label { font-weight: bold; }
-    </style>
   </head>
-  <body>
-    <div class="container">
-      <p style="font-size: 14px; color: #4b5563; margin-bottom: 15px;">
-        Has recibido el siguiente pedido de ${creatorName}:
-      </p>
-      
-      <p style="font-size: 16px; font-weight: bold; color: #1e40af; margin-top: 15px; margin-bottom: 5px;">
-        RUT del cliente: ${company.rut || '-'}
-      </p>
-      
-      <p style="margin-top: 5px; margin-bottom: 20px;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/orders/${order.id}" class="link-pedido">Pedido #${order.orderNumber}</a>
-      </p>
+  <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; background-color: #ffffff; margin: 0; padding: 20px;">
+    <!-- Wrapper Table for Outlook compatibility -->
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #ffffff;">
+      <tr>
+        <td align="center" style="padding: 0;">
+          <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; width: 100%; text-align: left;">
+            <tr>
+              <td style="padding: 0;">
+                
+                <!-- Logo -->
+                <div style="text-align: left; margin-bottom: 25px;">
+                  <img src="${logoUrl}" alt="Logo Jdevoto" style="max-height: 45px; display: block; border: 0;" />
+                </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>SKU</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHtml}
-          
-          <!-- Subtotal -->
-          <tr>
-            <td colspan="3" class="totals-label">Subtotal:</td>
-            <td>${formatMoney(baseSubtotalNet)}</td>
-          </tr>
-          
-          <!-- Descuento Especial -->
-          ${discountAmount > 0 ? `
-          <tr>
-            <td colspan="3" class="totals-label">Descuento Especial: (${discountPct}%):</td>
-            <td>${formatMoney(discountAmount)}</td>
-          </tr>
-          ` : ''}
+                <!-- Header info -->
+                <p style="font-size: 14px; color: #4b5563; margin: 0 0 15px 0; font-family: Arial, sans-serif;">
+                  Has recibido el siguiente pedido de ${creatorName}:
+                </p>
+                
+                <p style="font-size: 16px; font-weight: bold; color: #1e40af; margin: 15px 0 5px 0; font-family: Arial, sans-serif;">
+                  RUT del cliente: ${company.rut || '-'}
+                </p>
+                
+                <p style="margin: 5px 0 20px 0; font-family: Arial, sans-serif;">
+                  <a href="${appUrl}/dashboard/orders/${order.id}" style="font-size: 16px; color: #2563eb; text-decoration: underline; font-weight: bold; font-family: Arial, sans-serif;">Pedido #${order.orderNumber}</a>
+                </p>
 
-          <!-- IVA -->
-          <tr>
-            <td colspan="3" class="totals-label">IVA:</td>
-            <td>${formatMoney(taxAmount)}</td>
-          </tr>
+                <!-- Products Table -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; font-family: Arial, sans-serif;">
+                  <thead>
+                    <tr>
+                      <th style="border: 1px solid #d1d5db; padding: 10px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Producto</th>
+                      <th style="border: 1px solid #d1d5db; padding: 10px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Cantidad</th>
+                      <th style="border: 1px solid #d1d5db; padding: 10px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Precio</th>
+                      <th style="border: 1px solid #d1d5db; padding: 10px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">SKU</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${itemsHtml}
+                    
+                    <!-- Subtotal -->
+                    <tr>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Subtotal:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 10px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(baseSubtotalNet)}</td>
+                    </tr>
+                    
+                    <!-- Descuento Especial -->
+                    ${discountAmount > 0 ? `
+                    <tr>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Descuento Especial: (${discountPct}%):</td>
+                      <td style="border: 1px solid #d1d5db; padding: 10px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(discountAmount)}</td>
+                    </tr>
+                    ` : ''}
 
-          <!-- Total Neto -->
-          <tr>
-            <td colspan="3" class="totals-label">Total Neto:</td>
-            <td>${formatMoney(totalNet)}</td>
-          </tr>
+                    <!-- IVA -->
+                    <tr>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">IVA:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 10px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(taxAmount)}</td>
+                    </tr>
 
-          <!-- Total -->
-          <tr>
-            <td colspan="3" class="totals-label">Total:</td>
-            <td>${formatMoney(totalGross)}</td>
-          </tr>
-        </tbody>
-      </table>
+                    <!-- Total Neto -->
+                    <tr>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Total Neto:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 10px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(totalNet)}</td>
+                    </tr>
 
-      ${shipping.street ? `
-      <div style="margin-top: 30px; border-top: 1px solid #d1d5db; padding-top: 15px; font-size: 13px; color: #4b5563;">
-        <p style="margin: 0 0 5px 0; font-weight: bold; color: #374151;">Dirección de Despacho:</p>
-        <p style="margin: 0; font-style: italic;">
-          ${shipping.street} ${shipping.number || ''}<br>
-          ${shipping.comuna || ''}, ${shipping.region || ''}
-        </p>
-      </div>
-      ` : ''}
-    </div>
+                    <!-- Total -->
+                    <tr>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Total:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 10px; color: #374151; font-family: Arial, sans-serif;">${formatMoney(totalGross)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- Shipping Address -->
+                ${shipping.street ? `
+                <div style="margin-top: 30px; border-top: 1px solid #d1d5db; padding-top: 15px; font-size: 13px; color: #4b5563; font-family: Arial, sans-serif;">
+                  <p style="margin: 0 0 5px 0; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Dirección de Despacho:</p>
+                  <p style="margin: 0; font-style: italic; font-family: Arial, sans-serif;">
+                    ${shipping.street} ${shipping.number || ''}<br>
+                    ${shipping.comuna || ''}, ${shipping.region || ''}
+                  </p>
+                </div>
+                ` : ''}
+
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
   </html>
   `;
