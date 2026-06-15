@@ -219,6 +219,8 @@ export class PaymentService {
       const status = paymentData.status;
       const orderId = paymentData.external_reference;
 
+      let wasAlreadyPaid = false;
+
       if (status === "approved" && orderId) {
         await prisma.$transaction(async (tx) => {
           const order = await tx.order.findUnique({
@@ -230,6 +232,7 @@ export class PaymentService {
           }
 
           if (order.paymentStatus === PaymentStatus.PAID) {
+            wasAlreadyPaid = true;
             return;
           }
 
@@ -256,44 +259,46 @@ export class PaymentService {
         });
 
         // Enviar correo de confirmación de pago
-        try {
-          const populatedOrder = await prisma.order.findUnique({
-            where: { id: orderId },
-            include: {
-              items: {
-                include: {
-                  product: {
-                    select: {
-                      id: true,
-                      sku: true,
-                      name: true,
-                      images: { where: { isPrimary: true }, take: 1 }
+        if (!wasAlreadyPaid) {
+          try {
+            const populatedOrder = await prisma.order.findUnique({
+              where: { id: orderId },
+              include: {
+                items: {
+                  include: {
+                    product: {
+                      select: {
+                        id: true,
+                        sku: true,
+                        name: true,
+                        images: { where: { isPrimary: true }, take: 1 }
+                      }
                     }
                   }
-                }
-              },
-              company: true,
-              createdBy: {
-                select: {
-                  id: true,
-                  firstName: true,
-                  lastName: true,
-                  email: true
+                },
+                company: true,
+                createdBy: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true
+                  }
                 }
               }
-            }
-          });
+            });
 
-          if (populatedOrder) {
-            const { sendOrderEmail } = await import('@/lib/email');
-            let customerEmail = (populatedOrder.billingAddress as any)?.email;
-            if (!customerEmail) {
-              customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
+            if (populatedOrder) {
+              const { sendOrderEmail } = await import('@/lib/email');
+              let customerEmail = (populatedOrder.billingAddress as any)?.email;
+              if (!customerEmail) {
+                customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
+              }
+              await sendOrderEmail(populatedOrder, customerEmail);
             }
-            await sendOrderEmail(populatedOrder, customerEmail);
+          } catch (emailErr) {
+            console.error("Error al enviar correo tras pago webhook:", emailErr);
           }
-        } catch (emailErr) {
-          console.error("Error al enviar correo tras pago webhook:", emailErr);
         }
 
         console.log(`[Webhook MercadoPago] Pago ${paymentId} procesado con éxito para Pedido ${orderId}`);

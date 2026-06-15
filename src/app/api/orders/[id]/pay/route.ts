@@ -6,6 +6,8 @@ import { OrderStatus, PaymentStatus } from "@prisma/client";
 export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) => {
   const { id } = await ctx.params;
 
+  let wasAlreadyPaid = false;
+
   const updatedOrder = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
       where: { id },
@@ -16,6 +18,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     }
 
     if (order.paymentStatus === PaymentStatus.PAID) {
+      wasAlreadyPaid = true;
       return order;
     }
 
@@ -42,44 +45,46 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
   });
 
   // Enviar correo de confirmación de pago
-  try {
-    const populatedOrder = await prisma.order.findUnique({
-      where: { id },
-      include: {
-        items: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                sku: true,
-                name: true,
-                images: { where: { isPrimary: true }, take: 1 }
+  if (!wasAlreadyPaid) {
+    try {
+      const populatedOrder = await prisma.order.findUnique({
+        where: { id },
+        include: {
+          items: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  sku: true,
+                  name: true,
+                  images: { where: { isPrimary: true }, take: 1 }
+                }
               }
             }
-          }
-        },
-        company: true,
-        createdBy: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true
+          },
+          company: true,
+          createdBy: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true
+            }
           }
         }
-      }
-    });
+      });
 
-    if (populatedOrder) {
-      const { sendOrderEmail } = await import("@/lib/email");
-      let customerEmail = (populatedOrder.billingAddress as any)?.email;
-      if (!customerEmail) {
-        customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
+      if (populatedOrder) {
+        const { sendOrderEmail } = await import("@/lib/email");
+        let customerEmail = (populatedOrder.billingAddress as any)?.email;
+        if (!customerEmail) {
+          customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
+        }
+        await sendOrderEmail(populatedOrder, customerEmail);
       }
-      await sendOrderEmail(populatedOrder, customerEmail);
+    } catch (emailErr) {
+      console.error("Error al enviar correo tras pago simulado:", emailErr);
     }
-  } catch (emailErr) {
-    console.error("Error al enviar correo tras pago simulado:", emailErr);
   }
 
   return ok(updatedOrder);
