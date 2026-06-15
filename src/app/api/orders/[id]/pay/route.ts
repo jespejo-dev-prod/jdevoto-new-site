@@ -41,5 +41,46 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     return updated;
   });
 
+  // Enviar correo de confirmación de pago
+  try {
+    const populatedOrder = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                sku: true,
+                name: true,
+                images: { where: { isPrimary: true }, take: 1 }
+              }
+            }
+          }
+        },
+        company: true,
+        createdBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    if (populatedOrder) {
+      const { sendOrderEmail } = await import("@/lib/email");
+      let customerEmail = (populatedOrder.billingAddress as any)?.email;
+      if (!customerEmail) {
+        customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
+      }
+      await sendOrderEmail(populatedOrder, customerEmail);
+    }
+  } catch (emailErr) {
+    console.error("Error al enviar correo tras pago simulado:", emailErr);
+  }
+
   return ok(updatedOrder);
 });

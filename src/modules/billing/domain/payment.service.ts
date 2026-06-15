@@ -106,7 +106,7 @@ export class PaymentService {
    * @param orderId - ID del pedido en la DB
    * @returns { preferenceId: string, initPoint: string }
    */
-  async createPreference(orderId: string): Promise<{ preferenceId: string; initPoint: string }> {
+  async createPreference(orderId: string, context: 'checkout' | 'invoice' = 'checkout'): Promise<{ preferenceId: string; initPoint: string }> {
     const config = await prisma.storeSettings.findUnique({
       where: { key: 'mercadopago_config' }
     });
@@ -114,9 +114,10 @@ export class PaymentService {
 
     // Si no está habilitado o no tiene Access Token, fallback al simulador local
     if (!mpConfig || !mpConfig.enabled || !mpConfig.accessToken) {
+      const simulationParams = context === 'invoice' ? '&payInvoice=true' : '';
       return {
         preferenceId: "SIMULATION",
-        initPoint: `/checkout/mercadopago-simulation?orderId=${orderId}&payInvoice=true`
+        initPoint: `/checkout/mercadopago-simulation?orderId=${orderId}${simulationParams}`
       };
     }
 
@@ -140,6 +141,8 @@ export class PaymentService {
     }
     const webhookUrl = process.env.MP_WEBHOOK_URL || baseUrl;
 
+    const redirectPath = context === 'invoice' ? '/dashboard/cuenta-corriente' : '/dashboard/orders';
+
     try {
       const response = await preference.create({
         body: {
@@ -154,9 +157,9 @@ export class PaymentService {
           ],
           external_reference: order.id,
           back_urls: {
-            success: `${baseUrl}/dashboard/cuenta-corriente?payStatus=success&orderId=${order.id}`,
-            failure: `${baseUrl}/dashboard/cuenta-corriente?payStatus=failure`,
-            pending: `${baseUrl}/dashboard/cuenta-corriente?payStatus=pending`
+            success: `${baseUrl}${redirectPath}?payStatus=success&orderId=${order.id}`,
+            failure: `${baseUrl}${redirectPath}?payStatus=failure`,
+            pending: `${baseUrl}${redirectPath}?payStatus=pending`
           },
           auto_return: 'approved',
           notification_url: `${webhookUrl}/api/webhooks/mercadopago`
@@ -251,6 +254,47 @@ export class PaymentService {
             });
           }
         });
+
+        // Enviar correo de confirmación de pago
+        try {
+          const populatedOrder = await prisma.order.findUnique({
+            where: { id: orderId },
+            include: {
+              items: {
+                include: {
+                  product: {
+                    select: {
+                      id: true,
+                      sku: true,
+                      name: true,
+                      images: { where: { isPrimary: true }, take: 1 }
+                    }
+                  }
+                }
+              },
+              company: true,
+              createdBy: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  email: true
+                }
+              }
+            }
+          });
+
+          if (populatedOrder) {
+            const { sendOrderEmail } = await import('@/lib/email');
+            let customerEmail = (populatedOrder.billingAddress as any)?.email;
+            if (!customerEmail) {
+              customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
+            }
+            await sendOrderEmail(populatedOrder, customerEmail);
+          }
+        } catch (emailErr) {
+          console.error("Error al enviar correo tras pago webhook:", emailErr);
+        }
 
         console.log(`[Webhook MercadoPago] Pago ${paymentId} procesado con éxito para Pedido ${orderId}`);
         return true;

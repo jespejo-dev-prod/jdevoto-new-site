@@ -398,7 +398,7 @@ export default function CheckoutPage() {
 
       if (paymentMethod === 'mercadopago') {
         try {
-          const prefRes = await fetch(`/api/orders/${createdOrder.data.id}/checkout-preference`, {
+          const prefRes = await fetch(`/api/orders/${createdOrder.data.id}/checkout-preference?context=checkout`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

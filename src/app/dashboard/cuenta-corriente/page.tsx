@@ -157,7 +157,7 @@ export default function CuentaCorrientePage() {
   const handleOnlinePayment = async (orderId: string) => {
     setPayingOrderId(orderId);
     try {
-      const res = await fetch(`/api/orders/${orderId}/checkout-preference`, {
+      const res = await fetch(`/api/orders/${orderId}/checkout-preference?context=invoice`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

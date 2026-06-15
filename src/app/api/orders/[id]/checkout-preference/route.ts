@@ -4,6 +4,8 @@ import { paymentService } from "@/modules/billing/domain/payment.service";
 
 export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext) => {
   const { id } = await ctx.params;
-  const result = await paymentService.createPreference(id);
+  const url = new URL(req.url);
+  const context = url.searchParams.get('context') || 'checkout';
+  const result = await paymentService.createPreference(id, context as 'checkout' | 'invoice');
   return ok(result);
 });
