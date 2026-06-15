@@ -33,7 +33,7 @@ export async function getServerUser(): Promise<AuthenticatedUser | null> {
       },
     });
 
-    if (!user || !user.companyId) return null;
+    if (!user || (!user.companyId && user.role !== 'ADMIN' && user.role !== 'SALES_REP')) return null;
 
     return user as AuthenticatedUser;
   } catch (error) {

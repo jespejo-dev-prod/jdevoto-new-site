@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Plus, Trash2, Building2, CreditCard, Wallet, AlertCircle, Edit2, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 
 type BankAccount = {
   accountName: string;
@@ -132,7 +134,8 @@ export default function PagosDashboard() {
   }
 
   return (
-    <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in zoom-in-95 duration-500">
+    <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+      <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in zoom-in-95 duration-500">
       <div>
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Proveedores de pago</h1>
         <p className="text-zinc-500 text-sm mt-1">Configura las opciones de pago que verán tus clientes durante el checkout.</p>
@@ -334,6 +337,7 @@ export default function PagosDashboard() {
         </form>
       )}
 
-    </div>
+      </div>
+    </RoleGuard>
   );
 }
