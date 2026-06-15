@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
-  FileText, Wrench, PenTool, Sparkles, Search, MessageCircle, Phone, Mail, 
-  ArrowRight, ChevronRight, X, Send, Smartphone, ChevronDown, Check, MapPin, CheckCircle
+  FileText, Wrench, PenTool, Sparkles, Search, Phone, Mail, 
+  ArrowRight, ChevronRight, X, Smartphone, ChevronDown, Check, MapPin, CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PublicHeader } from '@/components/layout/public-header';
@@ -21,27 +21,25 @@ export default function SupportPage() {
   // --- STATE ---
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const [chatOpen, setChatOpen] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
   // Captcha & Honeypot State
-  const [mathNums, setMathNums] = useState(() => {
-    const n1 = Math.floor(Math.random() * 9) + 1;
-    const n2 = Math.floor(Math.random() * 9) + 1;
-    return { n1, n2 };
-  });
+  const [mathNums, setMathNums] = useState({ n1: 0, n2: 0 });
+  const [mounted, setMounted] = useState(false);
   const [userMathAnswer, setUserMathAnswer] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [captchaError, setCaptchaError] = useState(false);
 
+  useEffect(() => {
+    const n1 = Math.floor(Math.random() * 9) + 1;
+    const n2 = Math.floor(Math.random() * 9) + 1;
+    setMathNums({ n1, n2 });
+    setMounted(true);
+  }, []);
+
   // Email Ticket State
   const [emailForm, setEmailForm] = useState({ name: '', email: '', subject: '', message: '' });
-
-  // Live Chat Simulator State
-  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'bot' | 'user'; text: string }>>([
-    { sender: 'bot', text: '¡Hola! Gracias por contactar al Centro de Soporte de jdevoto.cl. ¿En qué podemos ayudarte hoy?' }
-  ]);
-  const [chatInput, setChatInput] = useState('');
+  const [errors, setErrors] = useState({ name: '', email: '', subject: '', message: '' });
 
   // --- DATA ---
   const faqs: FAQ[] = [
@@ -102,12 +100,56 @@ export default function SupportPage() {
       console.log('Bot submission detected via Honeypot');
       return;
     }
+
+    // Custom Validation
+    const newErrors = { name: '', email: '', subject: '', message: '' };
+    let hasError = false;
+
+    if (!emailForm.name.trim()) {
+      newErrors.name = 'El nombre completo es requerido.';
+      hasError = true;
+    } else if (emailForm.name.trim().length < 3) {
+      newErrors.name = 'El nombre debe tener al menos 3 caracteres.';
+      hasError = true;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailForm.email.trim()) {
+      newErrors.email = 'El correo electrónico es requerido.';
+      hasError = true;
+    } else if (!emailRegex.test(emailForm.email.trim())) {
+      newErrors.email = 'El formato del correo electrónico no es válido.';
+      hasError = true;
+    }
+
+    if (!emailForm.subject.trim()) {
+      newErrors.subject = 'El asunto o número de pedido es requerido.';
+      hasError = true;
+    } else if (emailForm.subject.trim().length < 4) {
+      newErrors.subject = 'El asunto debe tener al menos 4 caracteres.';
+      hasError = true;
+    }
+
+    if (!emailForm.message.trim()) {
+      newErrors.message = 'El detalle de la solicitud es requerido.';
+      hasError = true;
+    } else if (emailForm.message.trim().length < 10) {
+      newErrors.message = 'El mensaje debe tener al menos 10 caracteres.';
+      hasError = true;
+    }
+
+    setErrors(newErrors);
+
+    if (hasError) {
+      return;
+    }
+
     if (parseInt(userMathAnswer) !== mathNums.n1 + mathNums.n2) {
       setCaptchaError(true);
       return;
     }
     setCaptchaError(false);
-    if (!emailForm.name || !emailForm.email || !emailForm.message) return;
+
     setEmailSent(true);
     setTimeout(() => {
       setEmailSent(false);
@@ -120,36 +162,7 @@ export default function SupportPage() {
     }, 3000);
   };
 
-  const handleSendChatMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
 
-    const userMsg = chatInput.trim();
-    setChatMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
-    setChatInput('');
-
-    // Simulate response based on user input
-    setTimeout(() => {
-      let response = '';
-      const query = userMsg.toLowerCase();
-      
-      if (query.includes('pedido') || query.includes('rastrear') || query.includes('seguimiento') || query.includes('despacho')) {
-        response = 'Para consultar el estado de tu pedido, puedes escribirnos con tu RUT o número de compra a soporte@jdevoto.cl o iniciar un ticket en el formulario de contacto.';
-      } else if (query.includes('factura') || query.includes('xml')) {
-        response = 'Las facturas electrónicas se envían automáticamente al correo de facturación tras el despacho. También puedes revisarlas en tu perfil, en la pestaña "Mis Pedidos".';
-      } else if (query.includes('garantia') || query.includes('fallo') || query.includes('devolver') || query.includes('cambiar')) {
-        response = 'Nuestros productos de ferretería y herramientas cuentan con garantía de 6 meses. Escríbenos directamente o abre un caso de soporte para gestionar el cambio.';
-      } else if (query.includes('volumen') || query.includes('cotizar') || query.includes('mayorista')) {
-        response = 'Ofrecemos precios preferenciales por volumen en papelería, aseo y ferretería. Solicita tu cotización formal al momento de procesar tu carro.';
-      } else if (query.includes('humano') || query.includes('hablar') || query.includes('persona')) {
-        response = 'Te estamos transfiriendo con un ejecutivo de servicio al cliente. Te responderemos aquí en breves instantes.';
-      } else {
-        response = 'He recibido tu mensaje. Para asistirte de forma óptima, ¿podrías indicarnos el SKU del producto o el número de tu pedido?';
-      }
-      
-      setChatMessages(prev => [...prev, { sender: 'bot', text: response }]);
-    }, 800);
-  };
 
   // Pre-fill search from tags
   const handleTagClick = (tag: string) => {
@@ -284,13 +297,6 @@ export default function SupportPage() {
                 >
                   Limpiar Filtros
                 </Button>
-                <Button 
-                  size="sm"
-                  onClick={() => setChatOpen(true)}
-                  className="text-xs rounded-full bg-zinc-950 text-white cursor-pointer"
-                >
-                  Chatear con Soporte
-                </Button>
               </div>
             </div>
           )}
@@ -305,7 +311,7 @@ export default function SupportPage() {
             <p className="text-sm text-zinc-500 max-w-xl mx-auto">Nuestro equipo de atención al cliente está listo para ayudarte con tu compra.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
             {/* Channel 1: WhatsApp */}
             <div className="p-8 rounded-[36px] bg-white border border-zinc-200/80 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
               <div className="space-y-6">
@@ -327,30 +333,7 @@ export default function SupportPage() {
               </a>
             </div>
 
-            {/* Channel 2: Live Chat */}
-            <div className="p-8 rounded-[36px] bg-white border border-zinc-200/80 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
-              <div className="space-y-6">
-                <div className="h-12 w-12 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center relative">
-                  <MessageCircle className="h-6 w-6" />
-                  <span className="absolute top-0.5 right-0.5 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full" />
-                </div>
-                <h3 className="text-lg font-bold text-zinc-950">Chat en Vivo</h3>
-                <p className="text-xs text-zinc-500 leading-relaxed">Chatea directamente con un ejecutivo de servicio al cliente de JDevoto en Valparaíso.</p>
-                <div className="text-xs text-emerald-600 font-bold flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Disponible Online</span>
-                </div>
-              </div>
-              <button 
-                onClick={() => setChatOpen(true)}
-                className="mt-6 w-full rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold h-11 text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <span>Iniciar Chat</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Channel 3: Email Support */}
+            {/* Channel 2: Email Support */}
             <div className="p-8 rounded-[36px] bg-white border border-zinc-200/80 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
               <div className="space-y-6">
                 <div className="h-12 w-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center">
@@ -369,7 +352,7 @@ export default function SupportPage() {
               </a>
             </div>
 
-            {/* Channel 4: Phone Support */}
+            {/* Channel 3: Phone Support */}
             <div className="p-8 rounded-[36px] bg-white border border-zinc-200/80 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
               <div className="space-y-6">
                 <div className="h-12 w-12 bg-zinc-100 text-zinc-700 rounded-2xl flex items-center justify-center">
@@ -434,10 +417,20 @@ export default function SupportPage() {
                         type="text" 
                         required
                         value={emailForm.name}
-                        onChange={(e) => setEmailForm({...emailForm, name: e.target.value})}
-                        className="w-full bg-white border border-zinc-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20"
+                        onChange={(e) => {
+                          setEmailForm({...emailForm, name: e.target.value});
+                          if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                        }}
+                        className={`w-full bg-white border rounded-xl px-4 py-2.5 outline-none focus:ring-1 transition-all ${
+                          errors.name 
+                            ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 text-rose-600' 
+                            : 'border-zinc-200/80 focus:border-sky-500 focus:ring-sky-500/20 text-zinc-950'
+                        }`}
                         placeholder="Ej. Juan Pérez"
                       />
+                      {errors.name && (
+                        <p className="text-[11px] font-semibold text-rose-500 mt-1">{errors.name}</p>
+                      )}
                     </div>
                     <div className="space-y-1.5">
                       <label className="font-semibold text-zinc-700">Correo Electrónico</label>
@@ -445,10 +438,20 @@ export default function SupportPage() {
                         type="email" 
                         required
                         value={emailForm.email}
-                        onChange={(e) => setEmailForm({...emailForm, email: e.target.value})}
-                        className="w-full bg-white border border-zinc-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20"
+                        onChange={(e) => {
+                          setEmailForm({...emailForm, email: e.target.value});
+                          if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+                        }}
+                        className={`w-full bg-white border rounded-xl px-4 py-2.5 outline-none focus:ring-1 transition-all ${
+                          errors.email 
+                            ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 text-rose-600' 
+                            : 'border-zinc-200/80 focus:border-sky-500 focus:ring-sky-500/20 text-zinc-950'
+                        }`}
                         placeholder="ejemplo@empresa.cl"
                       />
+                      {errors.email && (
+                        <p className="text-[11px] font-semibold text-rose-500 mt-1">{errors.email}</p>
+                      )}
                     </div>
                   </div>
 
@@ -458,10 +461,20 @@ export default function SupportPage() {
                       type="text" 
                       required
                       value={emailForm.subject}
-                      onChange={(e) => setEmailForm({...emailForm, subject: e.target.value})}
-                      className="w-full bg-white border border-zinc-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20"
+                      onChange={(e) => {
+                        setEmailForm({...emailForm, subject: e.target.value});
+                        if (errors.subject) setErrors(prev => ({ ...prev, subject: '' }));
+                      }}
+                      className={`w-full bg-white border rounded-xl px-4 py-2.5 outline-none focus:ring-1 transition-all ${
+                        errors.subject 
+                          ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 text-rose-600' 
+                          : 'border-zinc-200/80 focus:border-sky-500 focus:ring-sky-500/20 text-zinc-950'
+                      }`}
                       placeholder="Ej. Problema con despacho - Pedido JD-3420"
                     />
+                    {errors.subject && (
+                      <p className="text-[11px] font-semibold text-rose-500 mt-1">{errors.subject}</p>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -470,10 +483,20 @@ export default function SupportPage() {
                       rows={4}
                       required
                       value={emailForm.message}
-                      onChange={(e) => setEmailForm({...emailForm, message: e.target.value})}
-                      className="w-full bg-white border border-zinc-200/80 rounded-xl px-4 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 resize-none"
+                      onChange={(e) => {
+                        setEmailForm({...emailForm, message: e.target.value});
+                        if (errors.message) setErrors(prev => ({ ...prev, message: '' }));
+                      }}
+                      className={`w-full bg-white border rounded-xl px-4 py-2.5 outline-none focus:ring-1 transition-all resize-none ${
+                        errors.message 
+                          ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 text-rose-600' 
+                          : 'border-zinc-200/80 focus:border-sky-500 focus:ring-sky-500/20 text-zinc-950'
+                      }`}
                       placeholder="Describe los detalles de tu consulta o el inconveniente con tu pedido..."
                     />
+                    {errors.message && (
+                      <p className="text-[11px] font-semibold text-rose-500 mt-1">{errors.message}</p>
+                    )}
                   </div>
 
                   {/* Honeypot field (hidden from users, filled by bots) */}
@@ -496,7 +519,7 @@ export default function SupportPage() {
                     </label>
                     <div className="flex items-center gap-3">
                       <div className="bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-2.5 font-bold text-zinc-800 select-none tracking-wide text-sm shrink-0">
-                        {mathNums.n1} + {mathNums.n2} =
+                        {mounted ? `${mathNums.n1} + ${mathNums.n2} =` : '... + ... ='}
                       </div>
                       <input 
                         type="text" 
@@ -530,85 +553,7 @@ export default function SupportPage() {
         </div>
       </section>
 
-      {/* --- FLOATING CHAT WIDGET (LIVE CHAT SIMULATOR) --- */}
-      {chatOpen && (
-        <div className="fixed bottom-6 right-6 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-3xl border border-zinc-200 shadow-2xl z-50 overflow-hidden flex flex-col h-[480px]">
-          {/* Chat Header */}
-          <div className="bg-[#0c0d12] text-white p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-sky-500 flex items-center justify-center text-white relative">
-                <MessageCircle className="h-5 w-5" />
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 border-2 border-[#0c0d12] rounded-full" />
-              </div>
-              <div>
-                <h4 className="text-xs md:text-sm font-bold leading-tight">Chat de Atención JDevoto</h4>
-                <span className="text-[10px] text-zinc-400">Respuesta típica: menos de 5 min</span>
-              </div>
-            </div>
-            <button 
-              onClick={() => setChatOpen(false)}
-              className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
 
-          {/* Chat Messages */}
-          <div className="flex-grow p-4 overflow-y-auto bg-zinc-50 space-y-3 flex flex-col justify-end">
-            <div className="space-y-3 max-h-[320px] overflow-y-auto flex flex-col pb-2">
-              {chatMessages.map((msg, i) => (
-                <div 
-                  key={i} 
-                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-xs ${
-                    msg.sender === 'user' 
-                      ? 'bg-zinc-950 text-white self-end rounded-tr-none' 
-                      : 'bg-white border border-zinc-200 text-zinc-800 self-start rounded-tl-none'
-                  }`}
-                >
-                  {msg.text}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Predefined Quick Questions */}
-          <div className="p-2 border-t border-zinc-100 flex gap-1.5 overflow-x-auto whitespace-nowrap bg-white text-[10px] scrollbar-none">
-            {[
-              '¿Estado de mi pedido?',
-              'Compras de papelería por volumen',
-              'Medidas de papel térmico',
-              'Hablar con ejecutivo'
-            ].map(q => (
-              <button
-                key={q}
-                onClick={() => {
-                  setChatInput(q);
-                }}
-                className="bg-zinc-100 hover:bg-zinc-200/80 text-zinc-700 px-3 py-1.5 rounded-full font-semibold transition-colors cursor-pointer shrink-0"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-
-          {/* Chat Input */}
-          <form onSubmit={handleSendChatMessage} className="p-3 border-t border-zinc-100 bg-white flex gap-2">
-            <input 
-              type="text" 
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Escribe tu mensaje..."
-              className="w-full bg-zinc-50 rounded-xl px-4 py-2 outline-none text-xs border border-zinc-200 focus:border-sky-500"
-            />
-            <button 
-              type="submit"
-              className="p-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl flex items-center justify-center cursor-pointer transition-colors"
-            >
-              <Send className="h-4 w-4" />
-            </button>
-          </form>
-        </div>
-      )}
 
       <PublicFooter />
     </div>

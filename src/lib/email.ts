@@ -80,14 +80,25 @@ function generateOrderHtml(order: any, customerEmail: string) {
 
   const itemsHtml = items.map((item: any) => `
     <tr>
-      <td style="padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${item.productName || item.product?.name || 'Producto'}</td>
-      <td style="padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${item.quantity}</td>
-      <td style="padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(item.unitNetPrice)}</td>
-      <td style="padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; border: 1px solid #d1d5db; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${item.productSku || item.product?.sku || '-'}</td>
+      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2;">
+        ${item.productName || item.product?.name || 'Producto'}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2; font-weight: 500;">
+        ${item.quantity}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2; font-weight: 500;">
+        ${formatMoney(item.unitNetPrice)}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2;">
+        ${item.productSku || item.product?.sku || '-'}
+      </td>
     </tr>
   `).join('');
 
-  const creatorName = `${createdBy.firstName || ''} ${createdBy.lastName || ''}`.trim().toLowerCase();
+  const creatorName = `${createdBy.firstName || ''} ${createdBy.lastName || ''}`.trim();
+  const creatorFormatted = creatorName 
+    ? creatorName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') 
+    : 'un cliente';
 
   const logoUrl = process.env.NEXT_PUBLIC_APP_URL 
     ? `${process.env.NEXT_PUBLIC_APP_URL}/logo-svg.png` 
@@ -100,43 +111,62 @@ function generateOrderHtml(order: any, customerEmail: string) {
   <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Pedido ${order.orderNumber}</title>
   </head>
-  <body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; background-color: #f6f8fa; margin: 0; padding: 20px;">
-    <!-- Wrapper Table for Outlook compatibility -->
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f6f8fa; width: 100%;">
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased;">
+    <!-- Wrapper Table -->
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; width: 100%; padding: 20px 0;">
       <tr>
         <td align="center" style="padding: 0;">
-          <!-- White Card Container -->
-          <table cellpadding="0" cellspacing="0" border="0" width="600" style="width: 600px; background-color: #ffffff; border: 1px solid #d1d5db; text-align: left;">
+          <!-- Card Container -->
+          <table cellpadding="0" cellspacing="0" border="0" width="600" style="width: 600px; max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); overflow: hidden;">
+            
+            <!-- Header (Logo) -->
             <tr>
-              <td style="padding: 30px;">
+              <td style="padding: 35px 40px 20px 40px; border-bottom: 1px solid #f1f5f9;">
+                <img src="${logoUrl}" alt="Jdevoto.cl" height="60" style="display: block; border: 0; height: 60px; max-height: 60px; width: auto;" />
+              </td>
+            </tr>
+
+            <!-- Content Body -->
+            <tr>
+              <td style="padding: 30px 40px 40px 40px;">
                 
-                <!-- Logo -->
-                <div style="text-align: left; margin-bottom: 25px;">
-                  <img src="${logoUrl}" alt="Logo Jdevoto" height="42" style="display: block; border: 0; height: 42px; max-height: 42px; width: auto;" />
+                <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  ¡Nuevo Pedido Confirmado!
+                </h1>
+                
+                <p style="font-size: 14px; color: #475569; margin: 0 0 24px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  Has recibido el siguiente pedido del cliente corporativo:
+                </p>
+
+                <!-- Customer Details Card -->
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 25px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                      <td style="padding-bottom: 8px; width: 35%; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">RUT Cliente:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 700; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${company.rut || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Razón Social:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${company.razonSocial || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Creado por:</td>
+                      <td style="font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${creatorFormatted}</td>
+                    </tr>
+                  </table>
                 </div>
 
-                <!-- Header info -->
-                <p style="font-size: 14px; color: #4b5563; margin: 0 0 15px 0; font-family: Arial, sans-serif;">
-                  Has recibido el siguiente pedido de ${creatorName}:
-                </p>
-                
-                <p style="font-size: 16px; font-weight: bold; color: #1e40af; margin: 15px 0 5px 0; font-family: Arial, sans-serif;">
-                  RUT del cliente: ${company.rut || '-'}
-                </p>
-                
-                <p style="margin: 5px 0 20px 0; font-family: Arial, sans-serif;">
-                  <a href="${appUrl}/dashboard/orders/${order.id}" style="font-size: 16px; color: #2563eb; text-decoration: underline; font-weight: bold; font-family: Arial, sans-serif;">Pedido #${order.orderNumber}</a>
-                </p>
-
                 <!-- Products Table -->
-                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; font-family: Arial, sans-serif;">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.2;">
                   <thead>
-                    <tr>
-                      <th width="50%" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Producto</th>
-                      <th width="12%" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Cantidad</th>
-                      <th width="20%" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Precio</th>
-                      <th width="18%" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; text-align: left; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">SKU</th>
+                    <tr style="background-color: #f8fafc;">
+                      <th width="50%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Producto</th>
+                      <th width="12%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Cantidad</th>
+                      <th width="20%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Precio</th>
+                      <th width="18%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">SKU</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -144,43 +174,50 @@ function generateOrderHtml(order: any, customerEmail: string) {
                     
                     <!-- Subtotal -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Subtotal:</td>
-                      <td style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(baseSubtotalNet)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Subtotal:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2;">${formatMoney(baseSubtotalNet)}</td>
                     </tr>
                     
                     <!-- Descuento Especial -->
                     ${discountAmount > 0 ? `
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Descuento Especial: (${discountPct}%):</td>
-                      <td style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(discountAmount)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #16a34a; font-size: 12px; line-height: 1.2;">Descuento Especial (${discountPct}%):</td>
+                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #16a34a; font-weight: 600; font-size: 12px; line-height: 1.2;">-${formatMoney(discountAmount)}</td>
                     </tr>
                     ` : ''}
 
                     <!-- IVA -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">IVA:</td>
-                      <td style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(taxAmount)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">IVA:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2;">${formatMoney(taxAmount)}</td>
                     </tr>
 
                     <!-- Total Neto -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Total Neto:</td>
-                      <td style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(totalNet)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Total Neto:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2;">${formatMoney(totalNet)}</td>
                     </tr>
 
                     <!-- Total -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; font-weight: bold; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">Total:</td>
-                      <td style="border: 1px solid #d1d5db; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 10px; color: #374151; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2;">${formatMoney(totalGross)}</td>
+                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #0f172a; font-size: 13px; background-color: #f8fafc; line-height: 1.2;">Total:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #1e3a8a; font-size: 14px; font-weight: 800; background-color: #f8fafc; line-height: 1.2;">${formatMoney(totalGross)}</td>
                     </tr>
                   </tbody>
                 </table>
 
-                <!-- Shipping Address -->
+                <!-- Action Button -->
+                <div style="text-align: center; margin: 35px 0;">
+                  <a href="${appUrl}/dashboard/orders/${order.id}" style="display: inline-block; background-color: #1e3a8a; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 30px; border-radius: 6px; box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    Ver Pedido #${order.orderNumber}
+                  </a>
+                </div>
+
+                <!-- Shipping Address Card -->
                 ${shipping.street ? `
-                <div style="margin-top: 30px; border-top: 1px solid #d1d5db; padding-top: 15px; font-size: 13px; color: #4b5563; font-family: Arial, sans-serif;">
-                  <p style="margin: 0 0 5px 0; font-weight: bold; color: #374151; font-family: Arial, sans-serif;">Dirección de Despacho:</p>
-                  <p style="margin: 0; font-style: italic; font-family: Arial, sans-serif;">
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  <p style="margin: 0 0 6px 0; font-weight: 700; color: #334155; font-size: 14px;">📍 Dirección de Despacho</p>
+                  <p style="margin: 0; color: #475569; line-height: 1.4;">
                     ${shipping.street} ${shipping.number || ''}<br>
                     ${shipping.comuna || ''}, ${shipping.region || ''}
                   </p>
@@ -189,6 +226,15 @@ function generateOrderHtml(order: any, customerEmail: string) {
 
               </td>
             </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td align="center" style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 25px 40px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: #475569;">Jdevoto.cl - B2B eCommerce</p>
+                <p style="margin: 0; font-size: 11px; color: #94a3b8;">Este es un correo automático, por favor no respondas a este mensaje.</p>
+              </td>
+            </tr>
+
           </table>
         </td>
       </tr>

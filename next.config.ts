@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@prisma/client"],
 
@@ -26,17 +28,25 @@ const nextConfig: NextConfig = {
 
   // ── Cabeceras de caché globales ──────────────────────────────────────────
   async headers() {
+    const securityHeaders = [
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+    ];
+
+    if (isProd) {
+      securityHeaders.push({
+        key: "Content-Security-Policy",
+        value: "default-src 'self'; connect-src 'self' https://nominatim.openstreetmap.org; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com https://www.jdevoto.cl; font-src 'self' data:;"
+      });
+    }
+
     return [
       {
         source: "/(.*)",
-        headers: [
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-          { key: "Content-Security-Policy", value: "default-src 'self'; connect-src 'self' https://nominatim.openstreetmap.org; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com https://www.jdevoto.cl; font-src 'self' data:;" }
-        ],
+        headers: securityHeaders,
       },
       {
         source: "/api/:path*",

@@ -164,6 +164,7 @@ export const BaseCompanySchema = z.object({
   paymentTermDiscount: z.number().min(0).max(100).optional(),
   defaultDiscount: z.number().min(0).max(100).optional(),
   creditLimit: z.number().min(0).optional(),
+  creditUsed: z.number().optional(),
   isActive: z.boolean().optional(),
 });
 

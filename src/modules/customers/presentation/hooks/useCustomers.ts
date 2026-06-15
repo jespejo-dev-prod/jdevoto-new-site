@@ -8,6 +8,7 @@ export function useCustomers(filters: string | {
   page?: number;
   limit?: number;
   search?: string;
+  enabled?: boolean;
 } = {}) {
   const { fetcher } = useApi();
   const queryClient = useQueryClient();
@@ -16,6 +17,7 @@ export function useCustomers(filters: string | {
   let page = 1;
   let limit = 10;
   let search = "";
+  let enabled = true;
   if (typeof filters === "string") {
     search = filters;
     // Si es búsqueda clásica, podemos usar un límite mayor para autocompletado (por ejemplo, 50)
@@ -24,6 +26,7 @@ export function useCustomers(filters: string | {
     page = filters.page ?? 1;
     limit = filters.limit ?? 10;
     search = filters.search ?? "";
+    enabled = filters.enabled ?? true;
   }
 
   const queryParams = new URLSearchParams();
@@ -34,6 +37,7 @@ export function useCustomers(filters: string | {
   const query = useQuery<any>({
     queryKey: ["customers", { page, limit, search }],
     queryFn: () => fetcher(`/api/customers?${queryParams.toString()}`),
+    enabled,
   });
 
   const createMutation = useMutation({

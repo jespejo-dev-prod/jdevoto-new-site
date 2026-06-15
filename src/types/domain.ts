@@ -125,8 +125,10 @@ export interface OrderSummary {
   orderNumber: string;
   companyId: string;
   companyName: string;
+  companyRut?: string;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
+  paymentMethod?: string;
   subtotalNet: number;
   taxAmount: number;
   totalGross: number;

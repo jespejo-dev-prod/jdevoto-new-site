@@ -25,14 +25,15 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
 
   // Fetch dynamic categories from the database API
   useEffect(() => {
-    fetch('/api/categories')
+    fetch('/api/categories', { cache: 'no-store' })
       .then((res) => {
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();
       })
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          const mapped = data.map((c: any) => ({
+      .then((json) => {
+        const dataList = json.data;
+        if (Array.isArray(dataList) && dataList.length > 0) {
+          const mapped = dataList.map((c: any) => ({
             id: c.id,
             name: c.name,
             slug: c.slug,

@@ -1,8 +1,3 @@
-// ============================================================
-// schema.prisma — B2B eCommerce Backend
-// ORM: Prisma  |  DB: PostgreSQL
-// ============================================================
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
@@ -13,96 +8,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================================
-// ENUMS
-// ============================================================
-
-enum UserRole {
-  ADMIN // Administrador del sistema
-  COMPANY_ADMIN // Administrador de una empresa cliente
-  SALES_REP // Vendedor / agente comercial
-  BUYER // Comprador vinculado a una Company
-}
-
-enum OrderStatus {
-  DRAFT // Borrador, aún no confirmado
-  CONFIRMED // Confirmado
-  SHIPPED // Enviado / Despachado
-  CANCELLED // Cancelado
-  REJECTED // Rechazado
-  DELIVERED // Entregado
-  PENDING // Pendiente
-}
-
-enum PaymentStatus {
-  PENDING
-  PARTIALLY_PAID
-  PAID
-  OVERDUE
-  REFUNDED
-}
-
-enum PriceListType {
-  GENERAL // Lista de precios base (pública)
-  COMPANY // Lista asignada directamente a una empresa
-}
-
-// ============================================================
-// EMPRESAS (B2B — Clientes corporativos)
-// ============================================================
-
 model Company {
-  id             String  @id @default(cuid())
-  // RUT almacenado sin puntos y con guión: 12345678-9
-  // Formato validado en la capa de servicio y en los Zod schemas.
-  rut            String  @unique // RUT chileno — formato: XXXXXXXX-D (sin puntos, con guión)
-  razonSocial    String
-  nombreFantasia String?
-  giro           String? // Actividad económica
-  direccion      String?
-  comuna         String?
-  ciudad         String?
-  region         String?
-  pais           String  @default("CL")
-  telefono       String?
-  email          String?
-  website        String?
-
-  // Crédito B2B
-  creditLimit         Decimal @default(0) @db.Decimal(15, 2)
-  creditUsed          Decimal @default(0) @db.Decimal(15, 2)
-  paymentTerms        Int     @default(30) // Días de plazo de pago (0, 30, 60, 90)
-  paymentTermDiscount Decimal @default(0) @db.Decimal(5, 2) // Descuento por condición de pago
-  defaultDiscount     Decimal @default(0) @db.Decimal(5, 2) // Porcentaje de descuento base asignado a la empresa
-
-  // Direcciones adicionales
-  shippingStreet    String?
-  shippingNumber    String?
-  shippingApartment String?
-  shippingCommune   String?
-  shippingCity      String?
-  shippingRegion    String?
-
-  billingStreet    String?
-  billingNumber    String?
-  billingApartment String?
-  billingCommune   String?
-  billingCity      String?
-  billingRegion    String?
-  billingEmail     String?
-
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Vendedor asignado (Sales Rep)
-  salesRepId String?
-  salesRep   User?   @relation("CompanySalesRep", fields: [salesRepId], references: [id], onDelete: SetNull)
-
-  // Relaciones
-  users      User[]
-  orders     Order[]
-  priceLists CompanyPriceList[]
+  id                  String             @id @default(cuid())
+  rut                 String             @unique
+  razonSocial         String
+  nombreFantasia      String?
+  giro                String?
+  direccion           String?
+  comuna              String?
+  ciudad              String?
+  region              String?
+  pais                String             @default("CL")
+  telefono            String?
+  email               String?
+  website             String?
+  creditLimit         Decimal            @default(0) @db.Decimal(15, 2)
+  creditUsed          Decimal            @default(0) @db.Decimal(15, 2)
+  paymentTerms        Int                @default(30)
+  defaultDiscount     Decimal            @default(0) @db.Decimal(5, 2)
+  isActive            Boolean            @default(true)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  billingApartment    String?
+  billingCity         String?
+  billingCommune      String?
+  billingEmail        String?
+  billingNumber       String?
+  billingRegion       String?
+  billingStreet       String?
+  shippingApartment   String?
+  shippingCity        String?
+  shippingCommune     String?
+  shippingNumber      String?
+  shippingRegion      String?
+  shippingStreet      String?
+  paymentTermDiscount Decimal            @default(0) @db.Decimal(5, 2)
+  salesRepId          String?
+  salesRep            User?              @relation("CompanySalesRep", fields: [salesRepId], references: [id])
+  priceLists          CompanyPriceList[]
+  orders              Order[]
+  users               User[]
 
   @@index([rut])
   @@index([isActive])
@@ -110,35 +55,26 @@ model Company {
   @@map("companies")
 }
 
-// ============================================================
-// USUARIOS
-// ============================================================
-
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  firstName    String
-  lastName     String
-  phone        String?
-  role         UserRole @default(BUYER)
-  isActive     Boolean  @default(true)
-
-  // Todo usuario está obligatoriamente vinculado a una Company
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relaciones
-  orders            Order[]        @relation("CreatedByUser")
-  refreshTokens     RefreshToken[]
-  notifications     Notification[]
-  sentMessages      OrderMessage[] @relation("OrderMessagesSent")
+  id                String         @id @default(cuid())
+  email             String         @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  phone             String?
+  role              UserRole       @default(BUYER)
+  isActive          Boolean        @default(true)
+  companyId         String
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
   auditLogs         AuditLog[]
   assignedCompanies Company[]      @relation("CompanySalesRep")
+  notifications     Notification[]
+  sentMessages      OrderMessage[] @relation("OrderMessagesSent")
+  orders            Order[]        @relation("CreatedByUser")
   attributedOrders  Order[]        @relation("OrderSalesRep")
+  refreshTokens     RefreshToken[]
+  company           Company        @relation(fields: [companyId], references: [id])
 
   @@index([email])
   @@index([companyId])
@@ -150,35 +86,29 @@ model RefreshToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   revoked   Boolean  @default(false)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([token])
   @@index([userId])
   @@map("refresh_tokens")
 }
 
-// ============================================================
-// CATÁLOGO DE PRODUCTOS
-// ============================================================
-
 model Category {
-  id          String     @id @default(cuid())
-  name        String     @unique
-  slug        String     @unique
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
   description String?
   parentId    String?
-  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryTree")
+  isOutlet    Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  parent      Category?   @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[]  @relation("CategoryTree")
   products    Product[]
-
-  isOutlet   Boolean     @default(false)
-  promotions Promotion[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  promotions  Promotion[]
 
   @@index([slug])
   @@index([parentId])
@@ -186,194 +116,138 @@ model Category {
 }
 
 model Product {
-  id          String  @id @default(cuid())
-  sku         String  @unique
-  name        String
-  slug        String  @unique
-  description String?
-  brandId     String?
-  brand       Brand?  @relation(fields: [brandId], references: [id])
-  unit        String  @default("UN") // UN, KG, LT, MT, etc.
-  inner       Int     @default(1) // Unidades por empaque (ej: 12 unidades por caja)
-
-  // Precio base (neto) sin IVA — usado como fallback
-  basePrice Decimal @db.Decimal(15, 2)
-
-  // Imágenes en relación 1:N
-  images ProductImage[]
-
-  // Stock
-  stockQuantity BigInt @default(0)
-  minOrderQty   Int    @default(1) // Cantidad mínima de pedido
-  stockAlert    Int    @default(5) // Alerta de stock bajo
-
-  // Logística
-  weight Decimal? @db.Decimal(15, 2)
-  length Decimal? @db.Decimal(15, 2)
-  width  Decimal? @db.Decimal(15, 2)
-  height Decimal? @db.Decimal(15, 2)
-
-  isActive   Boolean   @default(true)
-  isDeleted  Boolean   @default(false)
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
-
-  // SEO Avanzado
+  id             String          @id @default(cuid())
+  sku            String          @unique
+  name           String
+  slug           String          @unique
+  description    String?
+  brandId        String?
+  unit           String          @default("UN")
+  inner          Int             @default(1)
+  basePrice      Decimal         @db.Decimal(15, 2)
+  stockQuantity  BigInt          @default(0)
+  minOrderQty    Int             @default(1)
+  stockAlert     Int             @default(5)
+  isActive       Boolean         @default(true)
+  categoryId     String?
   seoTitle       String?
   seoDescription String?
-
-  // Ficha Técnica / Atributos
-  specifications Json? @default("[]")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relaciones
-  priceListItems PriceListItem[]
+  specifications Json?           @default("[]")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  height         Decimal?        @db.Decimal(15, 2)
+  length         Decimal?        @db.Decimal(15, 2)
+  weight         Decimal?        @db.Decimal(15, 2)
+  width          Decimal?        @db.Decimal(15, 2)
+  isDeleted      Boolean         @default(false)
   orderItems     OrderItem[]
+  priceListItems PriceListItem[]
+  images         ProductImage[]
+  brand          Brand?          @relation(fields: [brandId], references: [id])
+  category       Category?       @relation(fields: [categoryId], references: [id])
 
   @@index([sku])
   @@index([slug])
   @@index([categoryId])
   @@index([isActive])
   @@index([brandId])
-  // Índices compuestos para los patrones de query más comunes del dashboard
-  @@index([isActive, categoryId]) // filtro de categoría + estado
-  @@index([isActive, createdAt(sort: Desc)]) // orden por fecha (modo dashboard)
-  @@index([isActive, name]) // búsqueda por nombre + estado
+  @@index([isActive, categoryId])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@index([isActive, name])
   @@map("products")
 }
 
 model ProductImage {
   id        String   @id @default(cuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   url       String
   position  Int      @default(0)
   altText   String?
   isPrimary Boolean  @default(false)
   createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@map("product_images")
 }
 
-// ============================================================
-// LISTAS DE PRECIOS
-// ============================================================
-
 model PriceList {
-  id          String        @id @default(cuid())
-  name        String
-  description String?
-  type        PriceListType @default(GENERAL)
-
-  // Descuento global de la lista (%)
-  globalDiscount Decimal @default(0) @db.Decimal(5, 2)
-
-  isActive  Boolean   @default(true)
-  validFrom DateTime?
-  validTo   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relaciones
-  items     PriceListItem[]
-  companies CompanyPriceList[]
+  id             String             @id @default(cuid())
+  name           String
+  description    String?
+  type           PriceListType      @default(GENERAL)
+  globalDiscount Decimal            @default(0) @db.Decimal(5, 2)
+  isActive       Boolean            @default(true)
+  validFrom      DateTime?
+  validTo        DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  companies      CompanyPriceList[]
+  items          PriceListItem[]
 
   @@index([type])
   @@index([isActive])
   @@map("price_lists")
 }
 
-// Precios específicos por producto dentro de una lista
 model PriceListItem {
   id          String    @id @default(cuid())
   priceListId String
-  priceList   PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
   productId   String
+  netPrice    Decimal   @db.Decimal(15, 2)
+  discount    Decimal   @default(0) @db.Decimal(5, 2)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  priceList   PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
   product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  // Precio neto (sin IVA) para este producto en esta lista
-  netPrice Decimal @db.Decimal(15, 2)
-
-  // Descuento adicional sobre el precio neto (%)
-  discount Decimal @default(0) @db.Decimal(5, 2)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@unique([priceListId, productId])
   @@index([productId])
   @@map("price_list_items")
 }
 
-// Tabla de unión: qué lista de precios aplica a qué empresa
 model CompanyPriceList {
   id          String    @id @default(cuid())
   companyId   String
-  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   priceListId String
-  priceList   PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
-  priority    Int       @default(0) // Mayor número = mayor prioridad
+  priority    Int       @default(0)
   createdAt   DateTime  @default(now())
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  priceList   PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, priceListId])
   @@index([companyId])
   @@map("company_price_lists")
 }
 
-// ============================================================
-// PEDIDOS
-// ============================================================
-
 model Order {
-  id          String @id @default(cuid())
-  orderNumber String @unique // e.g. "ORD-2024-0001"
-
-  // Empresa compradora
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-
-  // Usuario que creó el pedido
-  createdById String
-  createdBy   User   @relation("CreatedByUser", fields: [createdById], references: [id])
-
-  status        OrderStatus   @default(DRAFT)
-  paymentStatus PaymentStatus @default(PENDING)
-  paymentMethod String?
-
-  // Totales (en pesos chilenos)
-  subtotalNet    Decimal @db.Decimal(15, 2) // Suma neta sin IVA
-  taxAmount      Decimal @db.Decimal(15, 2) // IVA (19%)
-  totalGross     Decimal @db.Decimal(15, 2) // Total con IVA
-  discountAmount Decimal @default(0) @db.Decimal(15, 2)
-
-  // Dirección de despacho (snapshot al momento del pedido)
+  id              String         @id @default(cuid())
+  orderNumber     String         @unique
+  companyId       String
+  createdById     String
+  status          OrderStatus    @default(DRAFT)
+  paymentStatus   PaymentStatus  @default(PENDING)
+  subtotalNet     Decimal        @db.Decimal(15, 2)
+  taxAmount       Decimal        @db.Decimal(15, 2)
+  totalGross      Decimal        @db.Decimal(15, 2)
+  discountAmount  Decimal        @default(0) @db.Decimal(15, 2)
   shippingAddress Json?
+  notes           String?
+  internalNotes   String?
+  confirmedAt     DateTime?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
   billingAddress  Json?
-
-  // Notas
-  notes         String?
-  internalNotes String?
-
-  // Fechas relevantes
-  confirmedAt DateTime?
-  shippedAt   DateTime?
-  deliveredAt DateTime?
-  cancelledAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Atribución de vendedor (Sales Rep)
-  salesRepId String?
-  salesRep   User?   @relation("OrderSalesRep", fields: [salesRepId], references: [id], onDelete: SetNull)
-
-  // Relaciones
-  items    OrderItem[]
-  messages OrderMessage[]
+  paymentMethod   String?
+  salesRepId      String?
+  items           OrderItem[]
+  messages        OrderMessage[]
+  company         Company        @relation(fields: [companyId], references: [id])
+  createdBy       User           @relation("CreatedByUser", fields: [createdById], references: [id])
+  salesRep        User?          @relation("OrderSalesRep", fields: [salesRepId], references: [id])
 
   @@index([orderNumber])
   @@index([companyId])
@@ -385,82 +259,59 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  // Snapshot del producto al momento del pedido
-  productSku  String
-  productName String
-
+  id           String   @id @default(cuid())
+  orderId      String
+  productId    String
+  productSku   String
+  productName  String
   quantity     Int
-  unitNetPrice Decimal @db.Decimal(15, 2) // Precio neto unitario (sin IVA)
-  discount     Decimal @default(0) @db.Decimal(5, 2)
-  lineNetTotal Decimal @db.Decimal(15, 2) // unitNetPrice * qty * (1 - discount/100)
-  lineTax      Decimal @db.Decimal(15, 2) // lineNetTotal * 0.19
-  lineTotal    Decimal @db.Decimal(15, 2) // lineNetTotal + lineTax
-
-  createdAt DateTime @default(now())
+  unitNetPrice Decimal  @db.Decimal(15, 2)
+  discount     Decimal  @default(0) @db.Decimal(5, 2)
+  lineNetTotal Decimal  @db.Decimal(15, 2)
+  lineTax      Decimal  @db.Decimal(15, 2)
+  lineTotal    Decimal  @db.Decimal(15, 2)
+  createdAt    DateTime @default(now())
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product  @relation(fields: [productId], references: [id])
 
   @@index([orderId])
   @@index([productId])
   @@map("order_items")
 }
 
-// ============================================================
-// MARCAS
-// ============================================================
-
 model Brand {
-  id          String  @id @default(cuid())
-  name        String  @unique
-  slug        String  @unique
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
   description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   imageUrl    String?
-
-  products   Product[]
-  promotions Promotion[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  products    Product[]
+  promotions  Promotion[]
 
   @@map("brands")
 }
 
-// ============================================================
-// PROMOCIONES / OFERTAS (Reglas masivas)
-// ============================================================
-
 model Promotion {
-  id       String  @id @default(cuid())
-  name     String // Ej: "Especial Hand Septiembre"
-  discount Decimal @db.Decimal(5, 2) // Porcentaje de descuento
-
-  // Filtros opcionales
-  brandId String?
-  brand   Brand?  @relation(fields: [brandId], references: [id])
-
+  id         String    @id @default(cuid())
+  name       String
+  discount   Decimal   @db.Decimal(5, 2)
+  brandId    String?
   categoryId String?
+  isActive   Boolean   @default(true)
+  validFrom  DateTime?
+  validTo    DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  brand      Brand?    @relation(fields: [brandId], references: [id])
   category   Category? @relation(fields: [categoryId], references: [id])
-
-  isActive  Boolean   @default(true)
-  validFrom DateTime?
-  validTo   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@index([brandId])
   @@index([categoryId])
   @@index([isActive])
   @@map("promotions")
 }
-
-// ============================================================
-// CONFIGURACIÓN GLOBAL (PAGOS, ETC)
-// ============================================================
 
 model StoreSettings {
   id        String   @id @default(cuid())
@@ -471,47 +322,35 @@ model StoreSettings {
   @@map("store_settings")
 }
 
-// ============================================================
-// HISTORIAL DE MENSAJES Y FACTURAS (SAP)
-// ============================================================
-
 model OrderMessage {
   id                String   @id @default(cuid())
   orderId           String
-  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  senderId          String // ID del usuario que envía el mensaje
-  sender            User     @relation("OrderMessagesSent", fields: [senderId], references: [id])
-  message           String?  @db.Text
-  attachmentUrl     String? // Ruta al archivo PDF de la factura SAP
-  attachmentName    String? // Ej: "Factura_12345.pdf"
-  isCustomerVisible Boolean  @default(true) // Si es false, es solo nota interna
+  senderId          String
+  message           String?
+  attachmentUrl     String?
+  attachmentName    String?
+  isCustomerVisible Boolean  @default(true)
   createdAt         DateTime @default(now())
+  order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sender            User     @relation("OrderMessagesSent", fields: [senderId], references: [id])
 
   @@index([orderId])
   @@map("order_messages")
 }
 
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-
 model Notification {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   message   String
   link      String?
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("notifications")
 }
-
-// ============================================================
-// PASSWORD RESET
-// ============================================================
 
 model PasswordResetToken {
   id        String   @id @default(cuid())
@@ -524,20 +363,16 @@ model PasswordResetToken {
   @@map("password_reset_tokens")
 }
 
-// ============================================================
-// AUDITORIA Y TRAZABILIDAD
-// ============================================================
-
 model AuditLog {
   id        String   @id @default(cuid())
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
   action    String
   entity    String?
   entityId  String?
-  details   String?  @db.Text
+  details   String?
   ipAddress String?
   createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([action])
@@ -550,12 +385,42 @@ model SystemErrorLog {
   path      String
   method    String
   errorName String
-  message   String   @db.Text
-  stack     String?  @db.Text
+  message   String
+  stack     String?
   userId    String?
   ipAddress String?
   createdAt DateTime @default(now())
 
   @@index([createdAt])
   @@map("system_error_logs")
+}
+
+enum UserRole {
+  ADMIN
+  SALES_REP
+  BUYER
+  COMPANY_ADMIN
+}
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  SHIPPED
+  CANCELLED
+  REJECTED
+  PENDING
+  DELIVERED
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  REFUNDED
+}
+
+enum PriceListType {
+  GENERAL
+  COMPANY
 }

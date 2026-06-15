@@ -5,7 +5,7 @@
  */
 
 import { z } from "zod";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 export const CreateOrderItemSchema = z.object({
   productId: z.string().cuid("productId debe ser un CUID válido"),
@@ -52,6 +52,8 @@ export const GetOrdersQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   status: z.nativeEnum(OrderStatus).optional(),
+  paymentStatus: z.nativeEnum(PaymentStatus).optional(),
+  paymentMethod: z.string().optional(),
   companyId: z.string().cuid().optional(),
   from: z.coerce.date().optional(),
   to: z.coerce.date().optional(),

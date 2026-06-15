@@ -73,7 +73,9 @@ export function useApi() {
         if (data.success && data.meta) {
           return {
             data: data.data,
-            meta: data.meta.pagination || data.meta
+            meta: data.meta.pagination
+              ? { ...data.meta.pagination, ...data.meta }
+              : data.meta
           };
         }
 

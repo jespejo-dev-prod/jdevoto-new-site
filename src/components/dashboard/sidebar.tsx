@@ -50,6 +50,7 @@ const mainItems = [
   { icon: Building2, label: 'My Company', href: '/dashboard/my-company' },
   { icon: Users, label: 'Team', href: '/dashboard/users' },
   { icon: CreditCard, label: 'Pagos', href: '/dashboard/pagos' },
+  { icon: CreditCard, label: 'Cuenta Corriente', href: '/dashboard/cuenta-corriente' },
 ];
 
 export function Sidebar() {
@@ -71,10 +72,14 @@ export function Sidebar() {
 
   const filteredMainItems = mainItems.filter(item => {
     if (user?.role === "BUYER") {
-      return item.label === "Orders";
+      return item.label === "Orders" || item.label === "Cuenta Corriente";
     }
     if (user?.role === "COMPANY_ADMIN") {
-      return item.label === "Orders" || item.label === "Team" || item.label === "My Company";
+      return item.label === "Orders" || item.label === "Team" || item.label === "My Company" || item.label === "Cuenta Corriente";
+    }
+    // Cuenta Corriente visible para ADMIN y SALES_REP también
+    if (item.label === "Cuenta Corriente") {
+      return user?.role === "ADMIN" || user?.role === "SALES_REP";
     }
     // Descuentos solo para ADMIN
     if (item.label === "Descuentos" && user?.role !== "ADMIN") return false;

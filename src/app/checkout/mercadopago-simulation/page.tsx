@@ -18,6 +18,7 @@ export default function MercadoPagoSimulationPage() {
   const { accessToken } = useAuth();
   
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [payInvoice, setPayInvoice] = useState<boolean>(false);
 
   // Page states
   const [order, setOrder] = useState<any>(null);
@@ -35,6 +36,7 @@ export default function MercadoPagoSimulationPage() {
         return;
       }
       setOrderId(id);
+      setPayInvoice(params.get('payInvoice') === 'true');
     }
   }, [router]);
   
@@ -219,8 +221,13 @@ export default function MercadoPagoSimulationPage() {
       setViewState('success');
       await new Promise(r => setTimeout(r, 1500));
       
-      // Redirect back to checkout success
-      router.push(`/checkout?success=true&orderId=${orderId}`);
+      if (payInvoice) {
+        toast.success('Pago procesado con éxito. Su cupo ha sido liberado.');
+        router.push('/dashboard/cuenta-corriente');
+      } else {
+        // Redirect back to checkout success
+        router.push(`/checkout?success=true&orderId=${orderId}`);
+      }
     } catch (err) {
       console.error(err);
       toast.error('Ocurrió un error al registrar tu pago.');

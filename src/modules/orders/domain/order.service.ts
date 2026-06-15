@@ -632,12 +632,14 @@ export class OrderService {
     query: GetOrdersQuery,
     companyId?: string // Si viene del context del BUYER, filtra por su empresa
   ): Promise<PaginatedResult<OrderSummary>> {
-    const { page, limit, status, from, to, search } = query;
+    const { page, limit, status, paymentStatus, paymentMethod, from, to, search } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.OrderWhereInput = {
       ...(companyId ? { companyId } : query.companyId ? { companyId: query.companyId } : {}),
       ...(status ? { status } : {}),
+      ...(paymentStatus ? { paymentStatus } : {}),
+      ...(paymentMethod ? { paymentMethod } : {}),
       ...(from || to
         ? {
             createdAt: {
@@ -661,7 +663,7 @@ export class OrderService {
         take: limit,
         orderBy: { createdAt: "desc" },
         include: {
-          company: { select: { razonSocial: true } },
+          company: { select: { razonSocial: true, rut: true } },
           _count: { select: { items: true } },
         },
       }),
@@ -673,8 +675,10 @@ export class OrderService {
       orderNumber: o.orderNumber,
       companyId: o.companyId,
       companyName: o.company.razonSocial,
+      companyRut: o.company.rut,
       status: o.status,
       paymentStatus: o.paymentStatus,
+      paymentMethod: o.paymentMethod || undefined,
       subtotalNet: Number(o.subtotalNet),
       taxAmount: Number(o.taxAmount),
       totalGross: Number(o.totalGross),

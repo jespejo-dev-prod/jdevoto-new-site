@@ -17,21 +17,33 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const skip = (page - 1) * limit;
 
   const whereClause = {
-    OR: [
-      { razonSocial: { contains: search, mode: "insensitive" as const } },
-      { rut: { contains: search, mode: "insensitive" as const } },
-      { nombreFantasia: { contains: search, mode: "insensitive" as const } },
+    AND: [
+      { razonSocial: { not: "" } },
+      {
+        OR: [
+          { razonSocial: { contains: search, mode: "insensitive" as const } },
+          { rut: { contains: search, mode: "insensitive" as const } },
+          { nombreFantasia: { contains: search, mode: "insensitive" as const } },
+        ]
+      }
     ]
   };
 
-  const [customers, total] = await Promise.all([
+  const [customers, total, totals] = await Promise.all([
     prisma.company.findMany({
       where: whereClause,
       skip,
       take: limit,
       orderBy: { razonSocial: "asc" },
     }),
-    prisma.company.count({ where: whereClause })
+    prisma.company.count({ where: whereClause }),
+    prisma.company.aggregate({
+      where: { razonSocial: { not: "" } },
+      _sum: {
+        creditLimit: true,
+        creditUsed: true
+      }
+    })
   ]);
 
   return ok(customers, 200, {
@@ -40,6 +52,10 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       page,
       limit,
       totalPages: Math.ceil(total / limit)
+    },
+    totals: {
+      creditLimit: totals._sum.creditLimit ? Number(totals._sum.creditLimit) : 0,
+      creditUsed: totals._sum.creditUsed ? Number(totals._sum.creditUsed) : 0
     }
   });
 });

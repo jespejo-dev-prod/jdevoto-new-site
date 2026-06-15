@@ -49,7 +49,7 @@ export function CompanyAdminDashboard() {
             </div>
           </div>
           <h3 className="text-3xl font-black text-white">
-            ${(Number(user?.company?.creditLimit || 0) - Number(user?.company?.creditUsed || 0)).toLocaleString('es-CL')}
+            ${Math.round(Number(user?.company?.creditLimit || 0) - Number(user?.company?.creditUsed || 0)).toLocaleString('es-CL')}
           </h3>
         </div>
 

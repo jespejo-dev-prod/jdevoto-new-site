@@ -8,6 +8,8 @@ export function useOrders(filters: {
   page?: number; 
   limit?: number; 
   status?: OrderStatus | ''; 
+  paymentStatus?: string;
+  paymentMethod?: string;
   companyId?: string;
   from?: Date;
   to?: Date;
@@ -19,6 +21,8 @@ export function useOrders(filters: {
   if (filters.page) queryParams.set("page", filters.page.toString());
   if (filters.limit) queryParams.set("limit", filters.limit.toString());
   if (filters.status) queryParams.set("status", filters.status);
+  if (filters.paymentStatus) queryParams.set("paymentStatus", filters.paymentStatus);
+  if (filters.paymentMethod) queryParams.set("paymentMethod", filters.paymentMethod);
   if (filters.companyId) queryParams.set("companyId", filters.companyId);
   if (filters.from) queryParams.set("from", filters.from.toISOString());
   if (filters.to) queryParams.set("to", filters.to.toISOString());

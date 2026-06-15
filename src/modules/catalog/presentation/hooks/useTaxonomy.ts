@@ -27,7 +27,7 @@ export function useCategories() {
   const { fetcher } = useApi();
   const queryClient = useQueryClient();
 
-  const query = useQuery<Category[]>({
+  const query = useQuery<(Category & { parent?: { name: string } | null })[]>({
     queryKey: ["categories"],
     queryFn: () => fetcher("/api/categories"),
   });

@@ -67,75 +67,237 @@
  * ============================================================
  */
 
-// TODO: Descomentar cuando se instale el SDK de Mercado Pago
-// import MercadoPago, { Preference, Payment } from "mercadopago";
-// import { prisma } from "@/lib/client";
-// import { BusinessRuleError } from "@/lib/errors";
+import { MercadoPagoConfig, Preference, Payment, PaymentRefund } from "mercadopago";
+import { prisma } from "@/lib/client";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 export class PaymentService {
-  // TODO: Inicializar el cliente de Mercado Pago con el Access Token
-  // private readonly mp: MercadoPago;
-  //
-  // constructor() {
-  //   this.mp = new MercadoPago({ accessToken: process.env.MP_ACCESS_TOKEN! });
-  // }
-
   /**
-   * TODO: Crear preferencia de pago para un pedido B2B.
-   *
-   * @param orderId - ID del pedido en la DB
-   * @returns { preferenceId, initPoint, sandboxInitPoint }
+   * Helper para manejar los errores arrojados por el SDK de Mercado Pago
+   * y convertirlos en excepciones estándar con mensajes descriptivos.
    */
-  async createPreference(_orderId: string): Promise<never> {
-    throw new Error(
-      "[PaymentService] createPreference() no implementado. " +
-        "Instala el SDK: npm install mercadopago"
-    );
+  private handleMpError(error: any, context: string): never {
+    console.error(`[MercadoPago Error in ${context}]`, error);
+    
+    let errMsg = "Error en la pasarela de pagos Mercado Pago";
+    if (error && typeof error === 'object') {
+      const code = error.code || error.message;
+      const details = error.message;
+      const status = error.status;
+
+      if (code === 'PA_UNAUTHORIZED_RESULT_FROM_POLICIES' || status === 403) {
+        errMsg = `Error de autenticación/política en Mercado Pago: La API retornó 403 (${code}). Asegúrate de usar credenciales válidas. Si usas credenciales de producción (APP_USR-), debes completar la homologación de la cuenta en el panel de Mercado Pago. Si estás probando, usa credenciales de Sandbox (TEST-).`;
+      } else if (details) {
+        errMsg = `Mercado Pago API Error: ${details} (${code || 'Unknown Code'})`;
+      } else {
+        errMsg = `Mercado Pago Error: ${JSON.stringify(error)}`;
+      }
+    } else if (error) {
+      errMsg = String(error);
+    }
+    
+    throw new Error(errMsg);
   }
 
   /**
-   * TODO: Consultar el estado de un pago en Mercado Pago.
+   * Crear preferencia de pago para un pedido B2B.
+   * Si Mercado Pago no está configurado o está deshabilitado en panel, retorna el enlace al simulador local.
+   *
+   * @param orderId - ID del pedido en la DB
+   * @returns { preferenceId: string, initPoint: string }
+   */
+  async createPreference(orderId: string): Promise<{ preferenceId: string; initPoint: string }> {
+    const config = await prisma.storeSettings.findUnique({
+      where: { key: 'mercadopago_config' }
+    });
+    const mpConfig = config?.value as any;
+
+    // Si no está habilitado o no tiene Access Token, fallback al simulador local
+    if (!mpConfig || !mpConfig.enabled || !mpConfig.accessToken) {
+      return {
+        preferenceId: "SIMULATION",
+        initPoint: `/checkout/mercadopago-simulation?orderId=${orderId}&payInvoice=true`
+      };
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { company: true }
+    });
+
+    if (!order) {
+      throw new Error(`Pedido con ID ${orderId} no encontrado`);
+    }
+
+    const client = new MercadoPagoConfig({ accessToken: mpConfig.accessToken });
+    const preference = new Preference(client);
+
+    let baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    // Para entornos locales de prueba, forzar el uso del túnel HTTPS (MP_WEBHOOK_URL) para evitar que Mercado Pago
+    // descarte los back_urls basados en http://localhost
+    if ((baseUrl.includes("localhost") || baseUrl.includes("127.0.0.1")) && process.env.MP_WEBHOOK_URL) {
+      baseUrl = process.env.MP_WEBHOOK_URL;
+    }
+    const webhookUrl = process.env.MP_WEBHOOK_URL || baseUrl;
+
+    try {
+      const response = await preference.create({
+        body: {
+          items: [
+            {
+              id: order.orderNumber,
+              title: `Pago Pedido ${order.orderNumber}`,
+              quantity: 1,
+              unit_price: Math.round(Number(order.totalGross)),
+              currency_id: 'CLP'
+            }
+          ],
+          external_reference: order.id,
+          back_urls: {
+            success: `${baseUrl}/dashboard/cuenta-corriente?payStatus=success&orderId=${order.id}`,
+            failure: `${baseUrl}/dashboard/cuenta-corriente?payStatus=failure`,
+            pending: `${baseUrl}/dashboard/cuenta-corriente?payStatus=pending`
+          },
+          auto_return: 'approved',
+          notification_url: `${webhookUrl}/api/webhooks/mercadopago`
+        }
+      });
+
+      return {
+        preferenceId: response.id || '',
+        initPoint: response.init_point || response.sandbox_init_point || ''
+      };
+    } catch (error) {
+      this.handleMpError(error, "createPreference");
+    }
+  }
+
+  /**
+   * Consultar el estado de un pago en Mercado Pago.
    *
    * @param paymentId - ID del pago retornado por MP
    */
-  async getPaymentStatus(_paymentId: string): Promise<never> {
-    throw new Error(
-      "[PaymentService] getPaymentStatus() no implementado."
-    );
+  async getPaymentStatus(paymentId: string): Promise<any> {
+    const config = await prisma.storeSettings.findUnique({
+      where: { key: 'mercadopago_config' }
+    });
+    const mpConfig = config?.value as any;
+
+    if (!mpConfig || !mpConfig.accessToken) {
+      throw new Error("Mercado Pago no está configurado.");
+    }
+
+    const client = new MercadoPagoConfig({ accessToken: mpConfig.accessToken });
+    const payment = new Payment(client);
+    try {
+      return await payment.get({ id: paymentId });
+    } catch (error) {
+      this.handleMpError(error, "getPaymentStatus");
+    }
   }
 
   /**
-   * TODO: Procesar webhook de Mercado Pago.
-   * Registrar este endpoint en el panel de MP:
-   *  https://www.mercadopago.cl/developers/panel/notifications/webhooks
+   * Procesar webhook de Mercado Pago.
    *
-   * @param payload  - Body de la notificación
-   * @param signature - Header x-signature de Mercado Pago (para validar HMAC)
+   * @param payload - Body de la notificación
    */
-  async processWebhook(
-    _payload: unknown,
-    _signature: string
-  ): Promise<never> {
-    throw new Error(
-      "[PaymentService] processWebhook() no implementado."
-    );
+  async processWebhook(payload: any): Promise<boolean> {
+    // Mercado Pago envía notificaciones con la estructura { action: "payment.created", data: { id: "123" } }
+    // o de IPN tradicional { type: "payment", data: { id: "123" } }
+    const type = payload.type || payload.topic;
+    const paymentId = payload.data?.id || payload.id;
+
+    if (type !== "payment" || !paymentId) {
+      return false;
+    }
+
+    try {
+      const paymentData = await this.getPaymentStatus(String(paymentId));
+      const status = paymentData.status;
+      const orderId = paymentData.external_reference;
+
+      if (status === "approved" && orderId) {
+        await prisma.$transaction(async (tx) => {
+          const order = await tx.order.findUnique({
+            where: { id: orderId }
+          });
+
+          if (!order) {
+            throw new Error(`Pedido ${orderId} no encontrado en webhook.`);
+          }
+
+          if (order.paymentStatus === PaymentStatus.PAID) {
+            return;
+          }
+
+          // Marcar el pedido como pagado y confirmado
+          await tx.order.update({
+            where: { id: orderId },
+            data: {
+              paymentStatus: PaymentStatus.PAID,
+              status: OrderStatus.CONFIRMED
+            }
+          });
+
+          // Si el método de pago original era crédito B2B, liberar cupo decrementando el crédito utilizado
+          if (order.paymentMethod === 'credit_b2b') {
+            await tx.company.update({
+              where: { id: order.companyId },
+              data: {
+                creditUsed: {
+                  decrement: Number(order.totalGross)
+                }
+              }
+            });
+          }
+        });
+
+        console.log(`[Webhook MercadoPago] Pago ${paymentId} procesado con éxito para Pedido ${orderId}`);
+        return true;
+      }
+    } catch (error) {
+      console.error("[Webhook MercadoPago Error]", error);
+      throw error;
+    }
+
+    return false;
   }
 
   /**
-   * TODO: Emitir reembolso total o parcial.
+   * Emitir reembolso total o parcial.
    *
    * @param paymentId - ID del pago en MP
-   * @param amount    - Monto a reembolsar (opcional, si es undefined = reembolso total)
+   * @param amount    - Monto a reembolsar (opcional)
    */
-  async refundPayment(
-    _paymentId: string,
-    _amount?: number
-  ): Promise<never> {
-    throw new Error(
-      "[PaymentService] refundPayment() no implementado."
-    );
+  async refundPayment(paymentId: string, amount?: number): Promise<any> {
+    const config = await prisma.storeSettings.findUnique({
+      where: { key: 'mercadopago_config' }
+    });
+    const mpConfig = config?.value as any;
+
+    if (!mpConfig || !mpConfig.accessToken) {
+      throw new Error("Mercado Pago no está configurado.");
+    }
+
+    const client = new MercadoPagoConfig({ accessToken: mpConfig.accessToken });
+    const refund = new PaymentRefund(client);
+    
+    try {
+      if (amount) {
+        return await refund.create({
+          payment_id: paymentId,
+          body: { amount }
+        });
+      } else {
+        return await refund.total({
+          payment_id: paymentId
+        });
+      }
+    } catch (error) {
+      this.handleMpError(error, "refundPayment");
+    }
   }
 }
 
-// Singleton exportado — listo para inyectar cuando se implemente
+// Singleton exportado
 export const paymentService = new PaymentService();

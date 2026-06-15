@@ -14,10 +14,15 @@ import {
   Link as LinkIcon, 
   Pencil, 
   X, 
-  Check 
+  Check,
+  CornerDownRight,
+  ChevronRight,
+  ChevronDown
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import { Category } from '@prisma/client';
+
+type CategoryWithParent = Category & { parent?: { name: string } | null };
 
 export function CategoryList() {
   const { data: categories = [], isLoading, createCategory, deleteCategory, updateCategory } = useCategories();
@@ -27,12 +32,17 @@ export function CategoryList() {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
+  const [parentId, setParentId] = useState<string | null>(null);
+
+  // Estado para colapsar/expandir categorías
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
 
   const resetForm = () => {
     setEditingId(null);
     setName('');
     setSlug('');
     setDescription('');
+    setParentId(null);
   };
 
   const handleNameChange = (newName: string) => {
@@ -43,11 +53,12 @@ export function CategoryList() {
     }
   };
 
-  const handleEdit = (category: Category) => {
+  const handleEdit = (category: CategoryWithParent) => {
     setEditingId(category.id);
     setName(category.name);
     setSlug(category.slug);
     setDescription(category.description || '');
+    setParentId(category.parentId || null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -63,6 +74,7 @@ export function CategoryList() {
             name,
             slug: slug.toLowerCase().replace(/ /g, '-'),
             description: description || null,
+            parentId: parentId || null,
           },
         });
       } else {
@@ -70,10 +82,22 @@ export function CategoryList() {
           name,
           slug: slug.toLowerCase().replace(/ /g, '-'),
           description: description || null,
+          parentId: parentId || null,
         });
       }
       resetForm();
     } catch (e) {}
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const hasChildren = (catId: string) => {
+    return categories.some(child => child.parentId === catId);
   };
 
   if (isLoading) {
@@ -84,6 +108,54 @@ export function CategoryList() {
       </div>
     );
   }
+
+  // Algoritmo de aplanamiento recursivo para ordenar categorías en cascada (árbol)
+  const orderedCategories: { category: CategoryWithParent; depth: number }[] = [];
+  const visited = new Set<string>();
+
+  const addCategoryAndChildren = (cat: CategoryWithParent, depth: number) => {
+    if (visited.has(cat.id)) return;
+    visited.add(cat.id);
+    
+    orderedCategories.push({ category: cat, depth });
+    
+    // Buscar hijos de esta categoría y ordenarlos alfabéticamente
+    const children = categories
+      .filter((child) => child.parentId === cat.id)
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    children.forEach((child) => addCategoryAndChildren(child, depth + 1));
+  };
+
+  // Encontrar todas las categorías raíz (no tienen padre, o su padre no existe en la lista de categorías) y ordenarlas alfabéticamente
+  const roots = categories
+    .filter((cat) => !cat.parentId || !categories.some((p) => p.id === cat.parentId))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  roots.forEach((root) => addCategoryAndChildren(root, 0));
+
+  // Agregar categorías huérfanas o cíclicas que queden sin visitar por seguridad
+  categories.forEach((cat) => {
+    if (!visited.has(cat.id)) {
+      addCategoryAndChildren(cat, 0);
+    }
+  });
+
+  // Filtrar categorías visibles según su estado de expansión
+  const isVisible = (cat: CategoryWithParent) => {
+    let currentParentId = cat.parentId;
+    while (currentParentId) {
+      // Si el padre no existe en el listado o no está expandido, ocultamos el hijo
+      if (!expandedIds[currentParentId]) {
+        return false;
+      }
+      const parent = categories.find(c => c.id === currentParentId);
+      currentParentId = parent ? parent.parentId : null;
+    }
+    return true;
+  };
+
+  const visibleCategories = orderedCategories.filter(({ category }) => isVisible(category));
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -134,6 +206,24 @@ export function CategoryList() {
             </div>
 
             <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Categoría Padre (Opcional)</label>
+              <select
+                value={parentId || ''}
+                onChange={(e) => setParentId(e.target.value || null)}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-sm text-white focus:border-primary/50 outline-none transition-all font-sans"
+              >
+                <option value="">Ninguna (Categoría Raíz)</option>
+                {orderedCategories
+                  .filter(({ category: cat }) => cat.id !== editingId) // Evitar seleccionarse a sí misma como padre
+                  .map(({ category: cat, depth }) => (
+                    <option key={cat.id} value={cat.id}>
+                      {'\u00A0'.repeat(depth * 3)}{depth > 0 ? '└─ ' : ''}{cat.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
               <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Descripción</label>
               <textarea
                 value={description}
@@ -173,49 +263,85 @@ export function CategoryList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/50">
-              {categories.map((cat) => (
-                <tr key={cat.id} className="group hover:bg-zinc-800/20 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-500">
-                        <Tag className="h-5 w-5" />
+              {visibleCategories.map(({ category: cat, depth }) => {
+                const isChild = depth > 0;
+                return (
+                  <tr 
+                    key={cat.id} 
+                    className={`group transition-colors ${
+                      isChild 
+                        ? 'bg-zinc-900/10 hover:bg-zinc-800/10 border-l-2 border-primary/20' 
+                        : 'hover:bg-zinc-800/20'
+                    }`}
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2" style={{ paddingLeft: `${depth * 20}px` }}>
+                        {/* Botón de expandir/colapsar si tiene hijos */}
+                        {hasChildren(cat.id) ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleExpand(cat.id)}
+                            className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+                            title={expandedIds[cat.id] ? 'Contraer subcategorías' : 'Expandir subcategorías'}
+                          >
+                            {expandedIds[cat.id] ? (
+                              <ChevronDown className="h-4 w-4 shrink-0" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4 shrink-0" />
+                            )}
+                          </button>
+                        ) : (
+                          // Espaciador para alinear si no tiene hijos
+                          <div className="w-6 h-6 shrink-0" />
+                        )}
+
+                        {isChild && (
+                          <CornerDownRight className="h-4 w-4 text-primary shrink-0 -ml-2" />
+                        )}
+                        <div className="h-9 w-9 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-500 shrink-0">
+                          <Tag className="h-4.5 w-4.5" />
+                        </div>
+                        <div>
+                          <p className={`text-sm leading-tight ${isChild ? 'font-medium text-zinc-300' : 'font-bold text-white'}`}>
+                            {cat.name}
+                          </p>
+                          <p className="text-[10px] text-zinc-500 line-clamp-1 mt-1">
+                            {cat.description || 'Sin descripción'}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-white leading-tight">{cat.name}</p>
-                        <p className="text-[10px] text-zinc-500 line-clamp-1">{cat.description || 'Sin descripción'}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-zinc-500 font-mono text-[10px]">
+                        <LinkIcon className="h-3 w-3" />
+                        {cat.slug}
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-zinc-500 font-mono text-[10px]">
-                      <LinkIcon className="h-3 w-3" />
-                      {cat.slug}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEdit(cat)}
-                        className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-primary hover:border-primary/40 transition-all"
-                        title="Editar"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm('¿Estás seguro de eliminar esta categoría?')) {
-                            deleteCategory.mutate(cat.id);
-                          }
-                        }}
-                        className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-red-400 hover:border-red-500/40 transition-all"
-                        title="Eliminar"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEdit(cat)}
+                          className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-primary hover:border-primary/40 transition-all"
+                          title="Editar"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm('¿Estás seguro de eliminar esta categoría?')) {
+                              deleteCategory.mutate(cat.id);
+                            }
+                          }}
+                          className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-red-400 hover:border-red-500/40 transition-all"
+                          title="Eliminar"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
               {categories.length === 0 && (
                 <tr>
                   <td colSpan={3} className="px-6 py-12 text-center text-zinc-500 italic">
