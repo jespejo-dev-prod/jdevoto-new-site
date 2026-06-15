@@ -157,7 +157,10 @@ export default function CheckoutPage() {
     fetch('/api/settings?key=mercadopago_config')
       .then(res => res.json())
       .then(data => {
-        if (data.value && data.value.enabled) setMpConfig(data.value);
+        if (data.value && data.value.enabled) {
+          setMpConfig(data.value);
+          setPaymentMethod(prev => prev === 'webpay' ? 'mercadopago' : prev);
+        }
       })
       .catch(() => {});
 
@@ -391,6 +394,34 @@ export default function CheckoutPage() {
         // Redirect to Mercado Pago simulation
         router.push(`/checkout/mercadopago-simulation?orderId=${createdOrder.data.id}`);
         return;
+      }
+
+      if (paymentMethod === 'mercadopago') {
+        try {
+          const prefRes = await fetch(`/api/orders/${createdOrder.data.id}/checkout-preference`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            }
+          });
+          if (!prefRes.ok) throw new Error('Error al generar la preferencia de pago.');
+          const prefData = await prefRes.json();
+          if (prefData.success && prefData.data?.initPoint) {
+            clearCart();
+            window.location.href = prefData.data.initPoint;
+            return;
+          } else {
+            throw new Error('No se recibió la URL de pago.');
+          }
+        } catch (prefErr: any) {
+          console.error(prefErr);
+          toast.error(prefErr.message || 'Error al iniciar la pasarela de pagos.');
+          // Si falla la redirección, al menos mostramos la pantalla de éxito local
+          setIsSuccess(true);
+          clearCart();
+          return;
+        }
       }
 
       setIsSuccess(true);
@@ -838,19 +869,33 @@ export default function CheckoutPage() {
                        {paymentMethod === 'credit_b2b' && <CheckCircle2 className="h-6 w-6 text-primary" />}
                     </label>
 
-                    <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'webpay' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
-                       <div className="flex items-center gap-4">
-                          <input type="radio" name="payment" checked={paymentMethod === 'webpay'} onChange={() => setPaymentMethod('webpay')} className="hidden" />
-                          <div className="relative h-7 w-7 shrink-0 flex items-center justify-center rounded-lg bg-sky-50 border border-sky-200 shadow-sm">
-                             <span className="text-[9px] font-bold text-sky-600 italic tracking-tighter">MP</span>
+                    {mpConfig ? (
+                       <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'mercadopago' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
+                          <div className="flex items-center gap-4">
+                             <input type="radio" name="payment" checked={paymentMethod === 'mercadopago'} onChange={() => setPaymentMethod('mercadopago')} className="hidden" />
+                             <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">MP</div>
+                             <div className="flex flex-col">
+                                <span className="text-sm sm:text-base font-bold text-zinc-900">Mercado Pago {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
+                                <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Paga seguro con tu cuenta o tarjeta</span>
+                             </div>
                           </div>
-                          <div className="flex flex-col">
-                             <span className="text-sm sm:text-base font-bold text-zinc-900">Mercado Pago {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
-                             <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Paga seguro con tu cuenta o tarjeta</span>
+                          {paymentMethod === 'mercadopago' && <CheckCircle2 className="h-6 w-6 text-primary" />}
+                       </label>
+                     ) : (
+                       <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'webpay' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
+                          <div className="flex items-center gap-4">
+                             <input type="radio" name="payment" checked={paymentMethod === 'webpay'} onChange={() => setPaymentMethod('webpay')} className="hidden" />
+                             <div className="relative h-7 w-7 shrink-0 flex items-center justify-center rounded-lg bg-sky-50 border border-sky-200 shadow-sm">
+                                <span className="text-[9px] font-bold text-sky-600 italic tracking-tighter">MP</span>
+                             </div>
+                             <div className="flex flex-col">
+                                <span className="text-sm sm:text-base font-bold text-zinc-900">Mercado Pago (Simulado) {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
+                                <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Paga seguro con tu cuenta o tarjeta (Prueba)</span>
+                             </div>
                           </div>
-                       </div>
-                       {paymentMethod === 'webpay' && <CheckCircle2 className="h-6 w-6 text-primary" />}
-                    </label>
+                          {paymentMethod === 'webpay' && <CheckCircle2 className="h-6 w-6 text-primary" />}
+                       </label>
+                     )}
 
                     <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'transfer' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
                        <div className="flex items-center gap-4">
@@ -863,20 +908,6 @@ export default function CheckoutPage() {
                        </div>
                        {paymentMethod === 'transfer' && <CheckCircle2 className="h-6 w-6 text-primary" />}
                     </label>
-
-                    {mpConfig && (
-                      <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'mercadopago' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
-                         <div className="flex items-center gap-4">
-                            <input type="radio" name="payment" checked={paymentMethod === 'mercadopago'} onChange={() => setPaymentMethod('mercadopago')} className="hidden" />
-                            <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">MP</div>
-                            <div className="flex flex-col">
-                               <span className="text-sm sm:text-base font-bold text-zinc-900">Mercado Pago {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
-                               <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Tarjetas y dinero en cuenta</span>
-                            </div>
-                         </div>
-                         {paymentMethod === 'mercadopago' && <CheckCircle2 className="h-6 w-6 text-primary" />}
-                      </label>
-                    )}
                  </div>
               </section>
            </div>
