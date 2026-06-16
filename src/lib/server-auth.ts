@@ -30,6 +30,7 @@ export async function getServerUser(): Promise<AuthenticatedUser | null> {
         companyId: true,
         firstName: true,
         lastName: true,
+        phone: true,
       },
     });
 

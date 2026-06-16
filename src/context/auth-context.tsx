@@ -27,7 +27,8 @@ import { AuthenticatedUser } from '@/types/domain';
 interface AuthContextType {
   user: AuthenticatedUser | null;   // Datos del usuario logueado
   accessToken: string | null;       // JWT de corta duración (solo en memoria)
-  login: (email: string, password: string, callbackUrl?: string) => Promise<void>;
+  login: (email: string, password: string, callbackUrl?: string) => Promise<any>;
+  verify2fa: (userId: string, code: string, callbackUrl?: string) => Promise<any>;
   registerUser: (formData: any) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -118,10 +119,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(data.error?.message || data.message || 'Error al iniciar sesión');
     }
 
+    if (data.data.requires_2fa) {
+      return data.data; // { requires_2fa: true, userId: ..., email: ... }
+    }
+
     setAccessToken(data.data.access_token); // JWT en memoria
     setUser(data.data.user);               // Datos del usuario autenticado
 
     router.push(callbackUrl || '/dashboard'); // Redirige tras login exitoso
+    return data.data;
+  };
+
+  /**
+   * verify2fa
+   *
+   * Verifica el código 2FA de inicio de sesión.
+   * Llama a: POST /api/auth/verify-2fa
+   * En éxito: guarda accessToken y user en memoria, redirige a /dashboard.
+   * En fallo: lanza Error con el mensaje del backend.
+   */
+  const verify2fa = async (userId: string, code: string, callbackUrl?: string) => {
+    const res = await fetch('/api/auth/verify-2fa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, code }),
+      credentials: 'include',
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error?.message || data.message || 'Código incorrecto o expirado');
+    }
+
+    setAccessToken(data.data.access_token); // JWT en memoria
+    setUser(data.data.user);               // Datos del usuario autenticado
+
+    router.push(callbackUrl || '/dashboard'); // Redirige tras login exitoso
+    return data.data;
   };
 
   /**
@@ -183,6 +218,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         accessToken,
         login,
+        verify2fa,
         registerUser,
         logout,
         refresh,

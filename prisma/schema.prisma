@@ -64,6 +64,7 @@ model User {
   phone             String?
   role              UserRole       @default(BUYER)
   isActive          Boolean        @default(true)
+  twoFactorSecret   String?
   companyId         String
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt

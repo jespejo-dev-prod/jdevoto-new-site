@@ -220,7 +220,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   /** clearCart — Vacía el carrito por completo. Llamado tras checkout exitoso. */
-  const clearCart = () => setItems([]);
+  const clearCart = () => {
+    setItems([]);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('antigravity_cart');
+    }
+  };
 
   // Valores derivados: se recalculan en cada render, no se almacenan en estado
   const itemCount = items.reduce((acc, item) => acc + (item.quantity || 0), 0);

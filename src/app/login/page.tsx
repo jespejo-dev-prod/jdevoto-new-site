@@ -14,10 +14,16 @@ import { LoginSchema, LoginDto } from '@/validations/auth.schemas';
 import { useState, useEffect } from 'react';
 
 export default function LoginPage() {
-  const { login, user, logout } = useAuth();
+  const { login, verify2fa, user, logout } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [callbackUrl, setCallbackUrl] = useState('/dashboard');
+
+  // 2FA Flow state
+  const [show2faInput, setShow2faInput] = useState(false);
+  const [mfaUserId, setMfaUserId] = useState('');
+  const [mfaEmail, setMfaEmail] = useState('');
+  const [mfaCode, setMfaCode] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -28,8 +34,6 @@ export default function LoginPage() {
       }
     }
   }, []);
-
-
 
   const {
     register,
@@ -46,12 +50,39 @@ export default function LoginPage() {
   const onSubmit = async (formData: LoginDto) => {
     setIsSubmitting(true);
     try {
-      await login(formData.email, formData.password, callbackUrl);
-      
-      toast.success('¡Bienvenido de nuevo!');
+      const result = await login(formData.email, formData.password, callbackUrl);
+      if (result && result.requires_2fa) {
+        setMfaUserId(result.userId);
+        setMfaEmail(result.email);
+        setShow2faInput(true);
+        setMfaCode('');
+        toast.info('Se requiere autenticación de doble factor.');
+      } else {
+        toast.success('¡Bienvenido de nuevo!');
+      }
     } catch (err: any) {
       toast.error('Error de autenticación', {
         description: err.message,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onVerify2fa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (mfaCode.trim().length !== 6) {
+      toast.error('El código debe ser de 6 dígitos.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await verify2fa(mfaUserId, mfaCode, callbackUrl);
+      toast.success('¡Sesión iniciada con éxito!');
+    } catch (err: any) {
+      toast.error('Código incorrecto', {
+        description: err.message || 'El código ingresado no es válido.',
       });
     } finally {
       setIsSubmitting(false);
@@ -67,6 +98,81 @@ export default function LoginPage() {
       });
     }
   };
+
+  if (show2faInput) {
+    return (
+      <div className="container relative min-h-screen flex items-center justify-center bg-zinc-950 p-4">
+        <div 
+          className="absolute inset-0 opacity-10" 
+          style={{ 
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)`,
+            backgroundSize: '48px 48px' 
+          }} 
+        />
+        <div className="w-full max-w-md space-y-8 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-500">
+          <div className="text-center space-y-2">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight text-white uppercase tracking-tighter">Verificación 2FA</h2>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Ingresa el código dinámico de 6 dígitos para <span className="text-zinc-200 font-bold">{mfaEmail}</span>.
+            </p>
+          </div>
+
+          <form onSubmit={onVerify2fa} className="space-y-6">
+            <div className="space-y-2 text-center">
+              <Label htmlFor="mfaCode" className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Código de Seguridad</Label>
+              <Input
+                id="mfaCode"
+                type="text"
+                maxLength={6}
+                placeholder="123456"
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                disabled={isSubmitting}
+                required
+                className="text-center font-mono text-xl tracking-[0.3em] bg-zinc-950/50 border-zinc-800 text-white rounded-xl h-12 focus:border-primary/50 focus:ring-0 outline-none"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Button type="submit" disabled={isSubmitting} className="w-full h-11 bg-white text-black hover:bg-zinc-200 transition-all font-semibold">
+                {isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {isSubmitting ? "Verificando..." : "Confirmar Código"}
+              </Button>
+              
+              <Button 
+                type="button" 
+                variant="outline" 
+                disabled={isSubmitting}
+                onClick={() => {
+                  setShow2faInput(false);
+                  setMfaCode('');
+                }} 
+                className="w-full border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 h-11"
+              >
+                Volver al Login
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   if (user) {
     return (

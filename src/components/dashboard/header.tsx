@@ -6,11 +6,13 @@ import {
   Search, 
   ChevronRight,
   LayoutDashboard,
-  Menu
+  Menu,
+  ChevronDown
 } from 'lucide-react';
 import Link from 'next/link';
 import { NotificationBell } from '@/components/dashboard/NotificationBell';
 import { useDashboard } from '@/app/dashboard/layout';
+import { useAuth } from '@/context/auth-context';
 
 const segmentMap: Record<string, string> = {
   dashboard: 'Panel',
@@ -34,6 +36,19 @@ export function DashboardHeader() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
+  const { user, logout } = useAuth();
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.dashboard-user-dropdown-container')) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   // Sync search input with URL search param changes
   useEffect(() => {
@@ -135,6 +150,66 @@ export function DashboardHeader() {
 
         <div className="flex items-center gap-2">
           <NotificationBell />
+          
+          <div className="h-px w-4 bg-zinc-800 rotate-90" />
+
+          {/* Menú de usuario con Dropdown */}
+          <div className="relative dashboard-user-dropdown-container flex items-center">
+            <button
+              onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+              className="relative group cursor-pointer flex items-center gap-2 focus:outline-none p-1.5 rounded-lg hover:bg-zinc-900 transition-colors"
+              title="Menú de usuario"
+            >
+              <div className="h-7 w-7 rounded-full bg-zinc-800 border border-zinc-700 overflow-hidden flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary font-bold text-[10px]">
+                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                </div>
+              </div>
+              <span className="text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors hidden md:inline-block">
+                {user?.firstName}
+              </span>
+              <ChevronDown className="h-3 w-3 text-zinc-500 group-hover:text-zinc-300 transition-colors hidden md:inline-block" />
+            </button>
+
+            {isUserDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-zinc-950 border border-zinc-800 shadow-2xl p-4 flex flex-col gap-1.5 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-4 py-2 border-b border-zinc-900 mb-1">
+                  <p className="text-xs font-semibold text-white truncate">
+                    {user?.firstName} {user?.lastName}
+                  </p>
+                  <p className="text-[10px] text-zinc-500 truncate">{user?.email}</p>
+                </div>
+                
+                <Link
+                  href="/profile"
+                  className="px-4 py-2 rounded-xl text-zinc-400 hover:bg-zinc-900/50 hover:text-white font-semibold text-xs transition-all"
+                  onClick={() => setIsUserDropdownOpen(false)}
+                >
+                  Mi Perfil
+                </Link>
+                
+                <Link
+                  href="/"
+                  className="px-4 py-2 rounded-xl text-zinc-400 hover:bg-zinc-900/50 hover:text-white font-semibold text-xs transition-all"
+                  onClick={() => setIsUserDropdownOpen(false)}
+                >
+                  Ir a la Tienda
+                </Link>
+
+                <div className="h-px bg-zinc-900 my-1" />
+
+                <button
+                  onClick={async () => {
+                    setIsUserDropdownOpen(false);
+                    await logout();
+                  }}
+                  className="w-full text-left px-4 py-2 rounded-xl text-red-400 hover:bg-red-950/20 font-bold text-xs transition-all cursor-pointer"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

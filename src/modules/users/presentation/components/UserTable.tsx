@@ -1,14 +1,15 @@
-import React from "react";
-import { Mail, CheckCircle2, Trash2, Loader2 } from "lucide-react";
+import { Mail, CheckCircle2, Trash2, Loader2, Pencil, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface UserTableProps {
   users: any[];
   isLoading: boolean;
   onDelete: (id: string) => void;
+  onResetPassword: (id: string) => void;
 }
 
-export function UserTable({ users, isLoading, onDelete }: UserTableProps) {
+export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserTableProps) {
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-x-auto shadow-2xl">
       <table className="w-full text-left border-collapse">
@@ -72,12 +73,30 @@ export function UserTable({ users, isLoading, onDelete }: UserTableProps) {
                   </div>
                 </td>
                 <td className="p-4 pr-8">
-                  <button 
-                    onClick={() => onDelete(u.id)}
-                    className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={() => onResetPassword(u.id)}
+                      className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-yellow-500 transition-colors opacity-50 group-hover:opacity-100"
+                      title="Restablecer contraseña"
+                    >
+                      <Key className="w-4 h-4" />
+                    </button>
+                    <Link href={`/dashboard/users/${u.id}`}>
+                      <button 
+                        className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors opacity-50 group-hover:opacity-100"
+                        title="Editar miembro"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    </Link>
+                    <button 
+                      onClick={() => onDelete(u.id)}
+                      className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100"
+                      title="Eliminar miembro"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))

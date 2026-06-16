@@ -147,16 +147,25 @@ export interface AuthenticatedUser {
   companyId: string;
   firstName: string;
   lastName: string;
+  phone?: string | null;
   company?: {
     id: string;
     razonSocial: string;
     rut?: string;
     telefono?: string;
+    email?: string | null;
+    giro?: string | null;
     creditLimit?: any; // Prisma Decimal is usually sent as string or number in JSON
     creditUsed?: any;
     defaultDiscount?: any;
     paymentTerms?: number;
     paymentTermDiscount?: any;
+    shippingStreet?: string | null;
+    shippingNumber?: string | null;
+    shippingApartment?: string | null;
+    shippingCommune?: string | null;
+    shippingCity?: string | null;
+    shippingRegion?: string | null;
   };
 }
 

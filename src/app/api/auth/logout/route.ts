@@ -14,8 +14,14 @@ export const POST = withApiHandler(async () => {
     });
   }
 
-  // Borrar la cookie
-  cookieStore.delete("refresh_token");
+  // Borrar la cookie de forma segura especificando el path
+  cookieStore.set("refresh_token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
 
   return ok({ message: "Logged out successfully" });
 });

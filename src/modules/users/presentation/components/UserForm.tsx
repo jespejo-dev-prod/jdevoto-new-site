@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth-context";
@@ -8,9 +8,10 @@ interface UserFormProps {
   onSubmit: (data: any) => Promise<void>;
   isSubmitting: boolean;
   onSuccess: () => void;
+  initialData?: any;
 }
 
-export function UserForm({ onSubmit, isSubmitting, onSuccess }: UserFormProps) {
+export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData }: UserFormProps) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,11 +22,16 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess }: UserFormProps) {
   const { user } = useAuth();
   const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await onSubmit(formData);
-      toast.success("Usuario creado correctamente");
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        email: initialData.email || "",
+        password: "",
+        firstName: initialData.firstName || "",
+        lastName: initialData.lastName || "",
+        role: initialData.role || "BUYER"
+      });
+    } else {
       setFormData({
         email: "",
         password: "",
@@ -33,6 +39,23 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess }: UserFormProps) {
         lastName: "",
         role: "BUYER"
       });
+    }
+  }, [initialData]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await onSubmit(formData);
+      if (!initialData) {
+        toast.success("Usuario creado correctamente");
+        setFormData({
+          email: "",
+          password: "",
+          firstName: "",
+          lastName: "",
+          role: "BUYER"
+        });
+      }
       onSuccess();
     } catch (error: any) {
       // Manejado en el hook o componente superior si falla
@@ -76,12 +99,12 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess }: UserFormProps) {
         <div className="space-y-2">
           <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Password</label>
           <input 
-            required
+            required={!initialData}
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({...formData, password: e.target.value})}
             className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            placeholder="********"
+            placeholder={initialData ? "Dejar en blanco para no cambiar" : "********"}
           />
         </div>
         <div className="space-y-2">
@@ -103,13 +126,13 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess }: UserFormProps) {
         </div>
       </div>
       <div className="flex justify-end pt-2">
-        <button 
-          disabled={isSubmitting}
-          className="px-8 py-2.5 bg-white text-black rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center gap-2"
-        >
-          {isSubmitting && <Loader2 className="w-3 h-3 animate-spin" />}
-          Guardar Usuario
-        </button>
+         <button 
+           disabled={isSubmitting}
+           className="px-8 py-2.5 bg-white text-black rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+         >
+           {isSubmitting && <Loader2 className="w-3 h-3 animate-spin" />}
+           {initialData ? "Actualizar Usuario" : "Guardar Usuario"}
+         </button>
       </div>
     </form>
   );

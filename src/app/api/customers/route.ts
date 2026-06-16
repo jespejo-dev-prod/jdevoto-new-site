@@ -24,6 +24,15 @@ export const GET = withApiHandler(async (req: NextRequest) => {
           { razonSocial: { contains: search, mode: "insensitive" as const } },
           { rut: { contains: search, mode: "insensitive" as const } },
           { nombreFantasia: { contains: search, mode: "insensitive" as const } },
+          { email: { contains: search, mode: "insensitive" as const } },
+          { billingEmail: { contains: search, mode: "insensitive" as const } },
+          {
+            users: {
+              some: {
+                email: { contains: search, mode: "insensitive" as const }
+              }
+            }
+          }
         ]
       }
     ]

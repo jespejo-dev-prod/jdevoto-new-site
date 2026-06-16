@@ -298,12 +298,12 @@ export default function CheckoutPage() {
 
   // Validate shipping method compatibility and automatically select the correct flete option
   useEffect(() => {
-    if (region && comuna && subtotalAfterCompany >= freeShippingMin && !isInsularValparaiso) {
+    if (region && comuna && baseNet >= freeShippingMin && !isInsularValparaiso) {
       setShippingMethod('free');
     } else {
       setShippingMethod('client_pays');
     }
-  }, [region, comuna, subtotalAfterCompany, freeShippingMin, isInsularValparaiso]);
+  }, [region, comuna, baseNet, freeShippingMin, isInsularValparaiso]);
 
   const shippingCost = 0; // Both shipping options are $0 in invoice (freight to be paid by client or free shipping)
   
@@ -345,7 +345,7 @@ export default function CheckoutPage() {
     try {
       const orderPayload = {
         companyId: activeCompanyId,
-        status: "PENDING",
+        status: paymentMethod === 'credit_b2b' ? 'CONFIRMED' : 'PENDING',
         paymentMethod,
         items: items.map(item => ({
           productId: item.id,
@@ -501,7 +501,11 @@ export default function CheckoutPage() {
          <Link href="/cart" className="flex items-center gap-2 text-xs sm:text-sm font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-wider">
             <ArrowLeft className="h-4 w-4" /> Volver al carrito
          </Link>
-         <span className="text-2xl sm:text-3xl font-black italic tracking-normal">antigravity<span className="text-primary">.</span></span>
+         <img 
+            src="/home/devoto.png" 
+            alt="JDevoto Logo" 
+            className="h-10 sm:h-12 w-auto"
+         />
          <div className="flex items-center gap-3 text-xs sm:text-sm font-bold text-green-500 uppercase tracking-wider hidden md:flex">
             <Lock className="h-4 w-4" /> Pago Seguro SSL
          </div>
@@ -678,7 +682,7 @@ export default function CheckoutPage() {
                      <div className="pt-6 border-t border-zinc-100 grid grid-cols-1 gap-6">
                         {/* Selector de tipo de flete */}
                         {region && comuna && (() => {
-                           const showClientPaysOption = subtotalAfterCompany < freeShippingMin || isInsularValparaiso;
+                           const showClientPaysOption = baseNet < freeShippingMin || isInsularValparaiso;
                            return (
                              <div className="space-y-3">
                                 <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Modalidad de Flete</Label>
@@ -717,8 +721,8 @@ export default function CheckoutPage() {
                                         );
                                       }
 
-                                      const canFreeShipping = subtotalAfterCompany >= freeShippingMin;
-                                      const missingForFree = freeShippingMin - subtotalAfterCompany;
+                                      const canFreeShipping = baseNet >= freeShippingMin;
+                                      const missingForFree = freeShippingMin - baseNet;
 
                                       return (
                                        <label className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col gap-2 ${

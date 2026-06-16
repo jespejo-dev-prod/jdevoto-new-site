@@ -128,10 +128,14 @@ export class OrderService {
       orderItemsData.reduce((acc, i) => acc + i.lineNetTotal, 0)
     );
 
+    const subtotalBeforeCompanyDiscount = round2(
+      orderItemsData.reduce((acc, i) => acc + (i.unitNetPrice * i.quantity), 0)
+    );
+
     // Validar mínimo de compra de 100.000 CLP netos (sobre el subtotal neto base)
-    if (baseSubtotalNet < 100000) {
+    if (subtotalBeforeCompanyDiscount < 100000) {
       throw new BusinessRuleError(
-        `El subtotal neto del pedido ($${baseSubtotalNet.toLocaleString("es-CL")}) ` +
+        `El subtotal neto del pedido ($${subtotalBeforeCompanyDiscount.toLocaleString("es-CL")}) ` +
           `debe ser de al menos $100.000 pesos netos.`,
         "MINIMUM_PURCHASE_NOT_MET"
       );
@@ -184,9 +188,9 @@ export class OrderService {
         freeShippingMin = 100000;
       }
 
-      if (baseSubtotalNet < freeShippingMin) {
+      if (subtotalBeforeCompanyDiscount < freeShippingMin) {
         throw new BusinessRuleError(
-          `El subtotal neto del pedido ($${baseSubtotalNet.toLocaleString("es-CL")}) ` +
+          `El subtotal neto del pedido ($${subtotalBeforeCompanyDiscount.toLocaleString("es-CL")}) ` +
             `es inferior al mínimo requerido para flete incluido en su zona ($${freeShippingMin.toLocaleString("es-CL")} netos).`,
           "FREE_SHIPPING_MINIMUM_NOT_MET"
         );

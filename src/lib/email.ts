@@ -34,17 +34,82 @@ async function getTransporter() {
   return transporterInstance;
 }
 
+const STATUS_CONFIGS: Record<string, { label: string; title: string; subject: string; description: string; color: string }> = {
+  PENDING: {
+    label: "Pendiente",
+    title: "¡Pedido Pendiente de Confirmación!",
+    subject: "Pedido pendiente",
+    description: "Tu pedido ha sido recibido y se encuentra en estado pendiente de aprobación o pago.",
+    color: "#d97706", // amber-600
+  },
+  CONFIRMED: {
+    label: "Confirmado",
+    title: "¡Pedido Confirmado!",
+    subject: "Pedido confirmado",
+    description: "Tu pedido ha sido confirmado y está siendo preparado para su despacho.",
+    color: "#1e3a8a", // blue-900 / primary
+  },
+  SHIPPED: {
+    label: "Enviado",
+    title: "¡Pedido Enviado! 🚚",
+    subject: "Pedido enviado",
+    description: "¡Buenas noticias! Tu pedido ha sido despachado y está en camino.",
+    color: "#0d9488", // teal-600
+  },
+  DELIVERED: {
+    label: "Entregado",
+    title: "¡Pedido Entregado! ✅",
+    subject: "Pedido entregado",
+    description: "Tu pedido ha sido entregado exitosamente. ¡Gracias por tu compra!",
+    color: "#16a34a", // green-600
+  },
+  CANCELLED: {
+    label: "Cancelado",
+    title: "¡Pedido Cancelado!",
+    subject: "Pedido cancelado",
+    description: "Tu pedido ha sido cancelado.",
+    color: "#dc2626", // red-600
+  },
+  REJECTED: {
+    label: "Rechazado",
+    title: "¡Pedido Rechazado!",
+    subject: "Pedido rechazado",
+    description: "Tu pedido ha sido rechazado.",
+    color: "#7f1d1d", // red-900
+  },
+  DRAFT: {
+    label: "Borrador",
+    title: "¡Borrador de Pedido!",
+    subject: "Borrador de pedido",
+    description: "Este es un borrador de tu pedido.",
+    color: "#4b5563", // gray-600
+  },
+};
+
+function getStatusConfig(status: string) {
+  const normalized = (status || '').toUpperCase();
+  return STATUS_CONFIGS[normalized] || {
+    label: status || "Confirmado",
+    title: "¡Pedido Confirmado!",
+    subject: "Pedido",
+    description: "Tu pedido ha sido procesado.",
+    color: "#1e3a8a",
+  };
+}
+
 export async function sendOrderEmail(order: any, customerEmail: string) {
   try {
     const transporter = await getTransporter();
 
     const htmlContent = generateOrderHtml(order, customerEmail);
+    const statusConfig = getStatusConfig(order.status);
+    const subject = `${statusConfig.subject} (${order.orderNumber})`;
 
     const info = await transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
-      subject: `Nuevo pedido (${order.orderNumber})`,
+      subject,
       html: htmlContent,
     });
 
@@ -106,13 +171,15 @@ function generateOrderHtml(order: any, customerEmail: string) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
+  const statusConfig = getStatusConfig(order.status);
+
   return `
   <!DOCTYPE html>
   <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuevo Pedido ${order.orderNumber}</title>
+    <title>${statusConfig.title} ${order.orderNumber}</title>
   </head>
   <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased;">
     <!-- Wrapper Table -->
@@ -134,11 +201,11 @@ function generateOrderHtml(order: any, customerEmail: string) {
               <td style="padding: 30px 40px 40px 40px;">
                 
                 <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                  ¡Nuevo Pedido Confirmado!
+                  ${statusConfig.title}
                 </h1>
                 
                 <p style="font-size: 14px; color: #475569; margin: 0 0 24px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                  Has recibido el siguiente pedido del cliente corporativo:
+                  ${statusConfig.description}
                 </p>
 
                 <!-- Customer Details Card -->
@@ -153,8 +220,16 @@ function generateOrderHtml(order: any, customerEmail: string) {
                       <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${company.razonSocial || '-'}</td>
                     </tr>
                     <tr>
-                      <td style="font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Creado por:</td>
-                      <td style="font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${creatorFormatted}</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Creado por:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${creatorFormatted}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Estado:</td>
+                      <td style="font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                        <span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; color: ${statusConfig.color}; background-color: ${statusConfig.color}15; border: 1px solid ${statusConfig.color}30;">
+                          ${statusConfig.label.toUpperCase()}
+                        </span>
+                      </td>
                     </tr>
                   </table>
                 </div>
@@ -383,48 +458,15 @@ export async function sendOrderShippedEmail(order: any, customerEmail: string) {
   try {
     const transporter = await getTransporter();
 
-    const shipping = order.shippingAddress || {};
-
-    const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; }
-        .btn { display: inline-block; background-color: #16a34a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
-      </style>
-    </head>
-    <body style="background-color: #f9fafb; padding: 40px 0;">
-      <div class="container">
-        <h2 style="color: #16a34a; margin-top: 0;">¡Tu pedido ha sido enviado! 🚚</h2>
-        <p>Hola,</p>
-        <p>Nos complace informarte que tu pedido <strong>#${order.orderNumber}</strong> ha sido despachado y está en camino a la dirección de envío registrada.</p>
-        
-        <div style="margin: 20px 0; padding: 15px; background-color: #f3f4f6; border-radius: 6px; font-size: 14px; color: #374151;">
-          <strong>Dirección de Despacho:</strong><br>
-          ${shipping.street || ''} ${shipping.number || ''}<br>
-          ${shipping.comuna || ''}, ${shipping.region || ''}
-        </div>
-        
-        <div style="text-align: center;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/orders/${order.id}" class="btn">Ver Estado del Pedido</a>
-        </div>
-        
-        <p style="font-size: 12px; color: #9ca3af; margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-          Si tienes alguna consulta, por favor contáctanos respondiendo a este correo.
-        </p>
-      </div>
-    </body>
-    </html>
-    `;
+    const htmlContent = generateOrderHtml(order, customerEmail);
+    const statusConfig = getStatusConfig(order.status);
+    const subject = `Tu pedido #${order.orderNumber} ha sido enviado 🚚`;
 
     const info = await transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'despachos@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
-      subject: `Tu pedido #${order.orderNumber} ha sido enviado 🚚`,
+      subject,
       html: htmlContent,
     });
 
@@ -493,36 +535,15 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
   try {
     const transporter = await getTransporter();
 
-    const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; }
-        .btn { display: inline-block; background-color: #1e40af; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
-      </style>
-    </head>
-    <body style="background-color: #f9fafb; padding: 40px 0;">
-      <div class="container">
-        <h2 style="color: #1e40af; margin-top: 0;">Actualización de Estado de Pedido 📋</h2>
-        <p>Hola,</p>
-        <p>El estado de tu pedido <strong>#${order.orderNumber}</strong> ha sido actualizado a: <strong>${order.status}</strong>.</p>
-        
-        <div style="text-align: center; margin-top: 30px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/orders/${order.id}" class="btn">Ver Pedido en la Tienda</a>
-        </div>
-      </div>
-    </body>
-    </html>
-    `;
+    const htmlContent = generateOrderHtml(order, customerEmail);
+    const statusConfig = getStatusConfig(order.status);
+    const subject = `Actualización de estado pedido #${order.orderNumber} -> ${statusConfig.label}`;
 
     const info = await transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
-      subject: `Actualización de estado pedido #${order.orderNumber} -> ${order.status}`,
+      subject,
       html: htmlContent,
     });
 

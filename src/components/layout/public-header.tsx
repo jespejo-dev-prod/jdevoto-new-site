@@ -132,14 +132,14 @@ export function PublicHeader() {
                       className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
                       onClick={() => setIsUserDropdownOpen(false)}
                     >
-                      Mi cuenta
+                      Dashboard B2B
                     </Link>
                     <Link
-                      href="/dashboard/orders"
+                      href="/profile"
                       className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
                       onClick={() => setIsUserDropdownOpen(false)}
                     >
-                      Mis pedidos
+                      Mi Perfil / Cuenta
                     </Link>
                     <div className="h-px bg-zinc-100 my-1" />
                     <button
@@ -279,6 +279,14 @@ export function PublicHeader() {
                 >
                   <User className="h-5 w-5 text-primary" />
                   Ir a mi Dashboard
+                </Link>
+                <Link 
+                  href="/profile" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-zinc-900 text-zinc-400 hover:text-white transition-all text-sm font-bold uppercase tracking-wider"
+                >
+                  <User className="h-5 w-5 text-primary" />
+                  Mi Perfil / Cuenta
                 </Link>
                 <button 
                   onClick={() => {

@@ -16,7 +16,9 @@ export type AuditAction =
   | "USER_UPDATED"
   | "PRODUCT_CREATED"
   | "PRODUCT_UPDATED"
-  | "PRODUCT_DELETED";
+  | "PRODUCT_DELETED"
+  | "2FA_FAILED"
+  | "LOGIN_SUCCESS_2FA";
 
 interface AuditLogOptions {
   userId?: string;

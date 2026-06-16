@@ -255,28 +255,37 @@ export default function OrderDetailPage() {
               Acciones del Pedido
             </h4>
             
-            <div className="space-y-3">
-              <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest px-1">Cambiar Estado</p>
-              <select 
-                value={order.status}
-                onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
-              >
-                {/* Estados principales */}
-                <option value={OrderStatus.PENDING}>{STATUS_CONFIG[OrderStatus.PENDING]?.label || "Pendiente"}</option>
-                <option value={OrderStatus.CONFIRMED}>{STATUS_CONFIG[OrderStatus.CONFIRMED]?.label || "Confirmado"}</option>
-                <option value={OrderStatus.SHIPPED}>{STATUS_CONFIG[OrderStatus.SHIPPED]?.label || "Enviado"}</option>
-                <option value={OrderStatus.DELIVERED}>{STATUS_CONFIG[OrderStatus.DELIVERED]?.label || "Entregado"}</option>
+            {isAdmin ? (
+              <div className="space-y-3">
+                <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest px-1">Cambiar Estado</p>
+                <select 
+                  value={order.status}
+                  onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
+                >
+                  {/* Estados principales */}
+                  <option value={OrderStatus.PENDING}>{STATUS_CONFIG[OrderStatus.PENDING]?.label || "Pendiente"}</option>
+                  <option value={OrderStatus.CONFIRMED}>{STATUS_CONFIG[OrderStatus.CONFIRMED]?.label || "Confirmado"}</option>
+                  <option value={OrderStatus.SHIPPED}>{STATUS_CONFIG[OrderStatus.SHIPPED]?.label || "Enviado"}</option>
+                  <option value={OrderStatus.DELIVERED}>{STATUS_CONFIG[OrderStatus.DELIVERED]?.label || "Entregado"}</option>
 
-                {/* Separador */}
-                <option disabled>────────────────────</option>
+                  {/* Separador */}
+                  <option disabled>────────────────────</option>
 
-                {/* Estados secundarios */}
-                <option value={OrderStatus.DRAFT}>{STATUS_CONFIG[OrderStatus.DRAFT]?.label || "Borrador"}</option>
-                <option value={OrderStatus.REJECTED}>{STATUS_CONFIG[OrderStatus.REJECTED]?.label || "Rechazado"}</option>
-                <option value={OrderStatus.CANCELLED}>{STATUS_CONFIG[OrderStatus.CANCELLED]?.label || "Cancelado"}</option>
-              </select>
-            </div>
+                  {/* Estados secundarios */}
+                  <option value={OrderStatus.DRAFT}>{STATUS_CONFIG[OrderStatus.DRAFT]?.label || "Borrador"}</option>
+                  <option value={OrderStatus.REJECTED}>{STATUS_CONFIG[OrderStatus.REJECTED]?.label || "Rechazado"}</option>
+                  <option value={OrderStatus.CANCELLED}>{STATUS_CONFIG[OrderStatus.CANCELLED]?.label || "Cancelado"}</option>
+                </select>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest px-1">Estado del Pedido</p>
+                <div className="w-full bg-zinc-950/40 border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-center">
+                  <OrderStatusBadge status={order.status} className="text-xs px-3 py-1" />
+                </div>
+              </div>
+            )}
 
             <div className="space-y-3 pt-4">
                <button 

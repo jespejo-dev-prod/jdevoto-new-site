@@ -27,7 +27,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       user: { 
         include: { 
           company: { 
-            select: { id: true, rut: true, razonSocial: true, creditLimit: true, creditUsed: true, defaultDiscount: true, paymentTerms: true, paymentTermDiscount: true } 
+            select: { id: true, rut: true, razonSocial: true, email: true, billingEmail: true, telefono: true, giro: true, creditLimit: true, creditUsed: true, defaultDiscount: true, paymentTerms: true, paymentTermDiscount: true, shippingStreet: true, shippingNumber: true, shippingApartment: true, shippingCommune: true, shippingCity: true, shippingRegion: true } 
           } 
         } 
       } 
@@ -53,6 +53,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       email: storedToken.user.email,
       firstName: storedToken.user.firstName,
       lastName: storedToken.user.lastName,
+      phone: storedToken.user.phone,
       role: storedToken.user.role,
       companyId: storedToken.user.companyId,
       company: storedToken.user.company,

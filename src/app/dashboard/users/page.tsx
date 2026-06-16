@@ -24,7 +24,7 @@ export default function UsersPage() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const { users, meta, isLoading, create, isCreating, deleteUser } = useUsers({
+  const { users, meta, isLoading, create, isCreating, deleteUser, resetPassword } = useUsers({
     page,
     limit,
     search: debouncedSearch,
@@ -74,6 +74,7 @@ export default function UsersPage() {
           users={users} 
           isLoading={isLoading} 
           onDelete={deleteUser} 
+          onResetPassword={resetPassword}
         />
 
         {/* Pagination */}

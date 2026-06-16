@@ -27,6 +27,14 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     throw err;
   }
 
+  if (result.requires2fa) {
+    return ok({
+      requires_2fa: true,
+      userId: result.userId,
+      email: result.email,
+    });
+  }
+
   // Establecer cookie httpOnly con expiración de 1 día (24 horas)
   const { cookies } = await import("next/headers");
   (await cookies()).set("refresh_token", result.refreshToken, {

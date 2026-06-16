@@ -15,7 +15,7 @@ export async function loginUseCase({ email, password }: LoginInput) {
   // 1. Buscar usuario activo
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase(), isActive: true },
-    include: { company: { select: { id: true, rut: true, razonSocial: true, creditLimit: true, creditUsed: true, defaultDiscount: true, paymentTerms: true, paymentTermDiscount: true } } },
+    include: { company: { select: { id: true, rut: true, razonSocial: true, email: true, billingEmail: true, telefono: true, giro: true, creditLimit: true, creditUsed: true, defaultDiscount: true, paymentTerms: true, paymentTermDiscount: true, shippingStreet: true, shippingNumber: true, shippingApartment: true, shippingCommune: true, shippingCity: true, shippingRegion: true } } },
   });
 
   if (!user) {
@@ -27,6 +27,15 @@ export async function loginUseCase({ email, password }: LoginInput) {
   const isValidPassword = await bcrypt.compare(password, user.passwordHash);
   if (!isValidPassword) {
     throw new UnauthorizedError("Credenciales inválidas");
+  }
+
+  // 3. Si requiere 2FA, detener login y pedir código
+  if ((user as any).twoFactorSecret) {
+    return {
+      requires2fa: true,
+      userId: user.id,
+      email: user.email,
+    } as any;
   }
 
   // 3. Generar tokens
@@ -56,6 +65,7 @@ export async function loginUseCase({ email, password }: LoginInput) {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      phone: user.phone,
       role: user.role,
       companyId: user.companyId,
       company: user.company,
