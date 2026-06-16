@@ -47,11 +47,16 @@ interface ProductPageProps {
  * En dev no tiene efecto, pero en producción sirve HTML pre-generado → velocidad máxima.
  */
 export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    where: { isActive: true },
-    select: { slug: true },
-  });
-  return products.map((p) => ({ slug: p.slug }));
+  try {
+    const products = await prisma.product.findMany({
+      where: { isActive: true },
+      select: { slug: true },
+    });
+    return products.map((p) => ({ slug: p.slug }));
+  } catch (err) {
+    console.warn("⚠️ Advertencia: No se pudo conectar a la base de datos en generateStaticParams. Omitiendo pre-generación estática de productos.");
+    return [];
+  }
 }
 
 // ─── SEO Metadata ─────────────────────────────────────────────────────────────
