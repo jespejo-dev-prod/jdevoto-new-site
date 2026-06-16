@@ -1,4 +1,6 @@
 import React from 'react';
+
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import { prisma } from '@/lib/client';

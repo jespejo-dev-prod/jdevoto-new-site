@@ -1,4 +1,6 @@
 import React from 'react';
+
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/client';
 import { priceService } from '@/modules/pricing/domain/price.service';
 import { getServerUser } from '@/lib/server-auth';
