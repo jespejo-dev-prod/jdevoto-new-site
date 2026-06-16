@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  web:
+    image: mi-app-nextjs:latest
+    build: .
+    expose:
+      - "3000"
+    environment:
+      - DATABASE_URL=postgresql://usuario:contraseña@servidor_db:5432/nombre_db
+      - JWT_SECRET=tu_jwt_secret_seguro
+      - NODE_ENV=production
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
+    restart: always
