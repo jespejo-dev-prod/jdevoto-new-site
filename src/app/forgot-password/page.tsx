@@ -24,8 +24,10 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({ email }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error('Ocurrió un error al procesar tu solicitud.');
+        throw new Error(data.message || data.error?.message || 'Ocurrió un error al procesar tu solicitud.');
       }
 
       setStatus('success');

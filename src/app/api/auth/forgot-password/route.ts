@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { withApiHandler, ok } from "@/lib/api-handler";
 import { prisma } from "@/lib/client";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { AppError } from "@/lib/errors";
 import crypto from "crypto";
 
 export const POST = withApiHandler(async (req: NextRequest) => {
@@ -16,9 +17,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     where: { email }
   });
 
-  // Always return success to prevent email enumeration attacks
   if (!user) {
-    return ok({ message: "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación." });
+    throw new AppError("El correo electrónico ingresado no está registrado en nuestro sistema.", "NOT_FOUND", 404);
   }
 
   // Delete any existing tokens for this email
