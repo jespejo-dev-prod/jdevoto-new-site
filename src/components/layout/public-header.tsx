@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { CategoriesMenu } from './categories-menu';
 
 export function PublicHeader() {
-  const { itemCount, subtotal = 0 } = useCart();
+  const { items = [], itemCount, subtotal = 0 } = useCart();
   const { itemCount: wishlistCount } = useWishlist();
   const { user, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,7 +58,21 @@ export function PublicHeader() {
     ? (isMobile ? '119px' : '123px')
     : (isMobile ? '73px' : '77px');
 
-  const roundedSubtotal = Math.round(subtotal);
+  const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
+  const excludedSubtotal = items
+    .filter(item => item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET')
+    .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
+
+  const nonExcludedSubtotal = items
+    .filter(item => item.priceSource !== 'PROMOTION' && item.priceSource !== 'OUTLET')
+    .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
+
+  const excludedBaseNet = Math.round(excludedSubtotal);
+  const nonExcludedBaseNet = Math.round(nonExcludedSubtotal);
+  const companyDiscountAmount = Math.round(nonExcludedBaseNet * (companyDiscountPercent / 100));
+  const subtotalAfterCompany = excludedBaseNet + (nonExcludedBaseNet - companyDiscountAmount);
+
+  const roundedSubtotal = Math.round(subtotalAfterCompany);
   const formattedSubtotal = roundedSubtotal.toLocaleString('es-CL');
   const missingAmount = Math.max(0, 100000 - roundedSubtotal);
   const formattedMissing = missingAmount.toLocaleString('es-CL');

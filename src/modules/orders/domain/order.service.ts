@@ -132,10 +132,10 @@ export class OrderService {
       orderItemsData.reduce((acc, i) => acc + (i.unitNetPrice * i.quantity), 0)
     );
 
-    // Validar mínimo de compra de 100.000 CLP netos (sobre el subtotal neto base)
-    if (subtotalBeforeCompanyDiscount < 100000) {
+    // Validar mínimo de compra de 100.000 CLP netos (sobre el subtotal neto con descuento corporativo aplicado)
+    if (baseSubtotalNet < 100000) {
       throw new BusinessRuleError(
-        `El subtotal neto del pedido ($${subtotalBeforeCompanyDiscount.toLocaleString("es-CL")}) ` +
+        `El subtotal neto del pedido ($${baseSubtotalNet.toLocaleString("es-CL")}) ` +
           `debe ser de al menos $100.000 pesos netos.`,
         "MINIMUM_PURCHASE_NOT_MET"
       );

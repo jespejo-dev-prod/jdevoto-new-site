@@ -49,6 +49,50 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
 
   const existing = await prisma.category.findUnique({ where: { id } });
   if (existing) {
+    // 1. Obtener o crear la categoría por defecto "Sin categoría"
+    let defaultCategory = await prisma.category.findUnique({
+      where: { slug: "sin-categoria" }
+    });
+
+    if (!defaultCategory) {
+      defaultCategory = await prisma.category.findFirst({
+        where: { name: { equals: "Sin categoría", mode: "insensitive" } }
+      });
+
+      if (!defaultCategory) {
+        defaultCategory = await prisma.category.create({
+          data: {
+            name: "Sin categoría",
+            slug: "sin-categoria",
+            description: "Productos sin categoría asignada",
+          }
+        });
+      }
+    }
+
+    // Bloquear eliminación de la categoría por defecto
+    if (existing.id === defaultCategory.id) {
+      throw new Error("No se puede eliminar la categoría por defecto 'Sin categoría'");
+    }
+
+    // 2. Eliminar promociones asociadas a esta categoría
+    await prisma.promotion.deleteMany({
+      where: { categoryId: existing.id }
+    });
+
+    // 3. Promover subcategorías reasignando su parentId al parentId de la categoría que se elimina
+    await prisma.category.updateMany({
+      where: { parentId: existing.id },
+      data: { parentId: existing.parentId }
+    });
+
+    // 4. Reasignar productos a "Sin categoría"
+    await prisma.product.updateMany({
+      where: { categoryId: existing.id },
+      data: { categoryId: defaultCategory.id }
+    });
+
+    // 5. Eliminar físicamente la categoría
     await prisma.category.delete({ where: { id } });
   }
 

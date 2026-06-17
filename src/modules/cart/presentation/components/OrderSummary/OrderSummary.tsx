@@ -121,18 +121,18 @@ export function OrderSummary() {
       </div>
 
       <div className="space-y-4">
-        {!isEmpty && totalBaseNet < 100000 && (
+        {!isEmpty && finalNet < 100000 && (
           <div className="p-4 rounded-2xl bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-bold uppercase tracking-wider space-y-1.5 animate-in fade-in zoom-in">
             <div className="flex items-center gap-2">
               <span className="text-sm">⚠️</span> Mínimo de compra no alcanzado
             </div>
             <p className="font-semibold text-rose-700 tracking-normal leading-relaxed normal-case">
-              Tu subtotal neto actual es de <strong>${totalBaseNet.toLocaleString('es-CL')}</strong>. Se requiere un mínimo de <strong>$100.000</strong> netos para proceder al checkout. Te faltan <strong>${(100000 - totalBaseNet).toLocaleString('es-CL')}</strong> netos.
+              Tu subtotal neto actual es de <strong>${finalNet.toLocaleString('es-CL')}</strong>. Se requiere un mínimo de <strong>$100.000</strong> netos para proceder al checkout. Te faltan <strong>${(100000 - finalNet).toLocaleString('es-CL')}</strong> netos.
             </p>
           </div>
         )}
 
-        {isEmpty || totalBaseNet < 100000 ? (
+        {isEmpty || finalNet < 100000 ? (
           <Button disabled className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-sm rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
             Proceder al Checkout <ChevronRight className="h-5 w-5 text-zinc-500" />
           </Button>

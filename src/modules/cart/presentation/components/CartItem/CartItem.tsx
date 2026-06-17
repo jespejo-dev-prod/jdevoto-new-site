@@ -61,11 +61,6 @@ export function CartItem({ item }: CartItemProps) {
                 {item.discountPercent}% OFF • {item.priceSource.replace('_', ' ')}
               </div>
             )}
-            {companyDiscount > 0 && (
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-100 text-[10px] sm:text-xs font-bold text-blue-600 uppercase tracking-tight ml-2">
-                -{companyDiscount}% DCTO. EMPRESA
-              </div>
-            )}
           </div>
           <button 
             onClick={() => removeItem(item.id)} 
@@ -106,9 +101,15 @@ export function CartItem({ item }: CartItemProps) {
                   $ {Math.round(item.originalPrice).toLocaleString('es-CL')}
                 </span>
               )}
-              <span className="text-xs sm:text-[13px] font-bold text-zinc-400 uppercase tracking-wide">
-                $ {Math.round(item.price).toLocaleString('es-CL')} c/u Neto {companyDiscount > 0 && `(-${companyDiscount}% Dcto. Empresa)`}
-              </span>
+              {companyDiscount > 0 ? (
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[10px] sm:text-xs font-bold text-blue-600 uppercase tracking-tight mt-1">
+                  $ {Math.round(item.price).toLocaleString('es-CL')} c/u Neto (-{companyDiscount}% Dcto. Empresa)
+                </span>
+              ) : (
+                <span className="text-xs sm:text-[13px] font-bold text-zinc-400 uppercase tracking-wide">
+                  $ {Math.round(item.price).toLocaleString('es-CL')} c/u Neto
+                </span>
+              )}
             </div>
           </div>
         </div>

@@ -23,6 +23,29 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
   const { user, accessToken, refresh } = useAuth();
+
+  const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
+  const paymentTermsDays = user?.company?.paymentTerms ?? 30;
+
+  const excludedSubtotal = items
+    .filter(item => item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET')
+    .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
+
+  const nonExcludedSubtotal = items
+    .filter(item => item.priceSource !== 'PROMOTION' && item.priceSource !== 'OUTLET')
+    .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
+
+  // 1. Subtotales Netos
+  const excludedBaseNet = Math.round(excludedSubtotal);
+  const nonExcludedBaseNet = Math.round(nonExcludedSubtotal);
+  const baseNet = excludedBaseNet + nonExcludedBaseNet;
+
+  // 2. Company discount amount — ONLY on non-excluded items
+  const companyDiscountAmount = Math.round(nonExcludedBaseNet * (companyDiscountPercent / 100));
+
+  // 3. Net after company discount
+  const netAfterCompanyDiscount = nonExcludedBaseNet - companyDiscountAmount;
+  const subtotalAfterCompany = excludedBaseNet + netAfterCompanyDiscount;
   
   // States
   const [step, setStep] = useState(1);
@@ -42,19 +65,19 @@ export default function CheckoutPage() {
     }
   }, [clearCart]);
 
-  // Redirect if cart is empty or subtotal is below minimum
+  // Redirect if cart is empty or subtotal after company discount is below minimum
   useEffect(() => {
     if (!isSuccess && !successParam) {
       if (items.length === 0) {
         router.push('/cart');
         return;
       }
-      if (subtotal < 100000) {
+      if (subtotalAfterCompany < 100000) {
         toast.error('Compra mínima no alcanzada. Se requiere al menos $100.000 neto.');
         router.push('/cart');
       }
     }
-  }, [items.length, subtotal, isSuccess, successParam, router]);
+  }, [items.length, subtotalAfterCompany, isSuccess, successParam, router]);
   
   // Form States
   const [region, setRegion] = useState('');
@@ -246,8 +269,7 @@ export default function CheckoutPage() {
 
 
 
-  const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
-  const paymentTermsDays = user?.company?.paymentTerms ?? 30;
+
 
   const activePaymentDiscountPercent = useMemo(() => {
     if (paymentMethod === 'credit_b2b') {
@@ -273,28 +295,7 @@ export default function CheckoutPage() {
 
   const cardTransferDiscountPercent = 10;
 
-  // Sequential B2B Checkout Calculations — with Exclusions
-  // Items with priceSource 'PROMOTION' or 'OUTLET' bypass company default discount.
 
-  const excludedSubtotal = items
-    .filter(item => item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET')
-    .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
-
-  const nonExcludedSubtotal = items
-    .filter(item => item.priceSource !== 'PROMOTION' && item.priceSource !== 'OUTLET')
-    .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
-  
-  // 1. Subtotales Netos
-  const excludedBaseNet = Math.round(excludedSubtotal);
-  const nonExcludedBaseNet = Math.round(nonExcludedSubtotal);
-  const baseNet = excludedBaseNet + nonExcludedBaseNet;
-  
-  // 2. Company discount amount — ONLY on non-excluded items
-  const companyDiscountAmount = Math.round(nonExcludedBaseNet * (companyDiscountPercent / 100));
-  
-  // 3. Net after company discount
-  const netAfterCompanyDiscount = nonExcludedBaseNet - companyDiscountAmount;
-  const subtotalAfterCompany = excludedBaseNet + netAfterCompanyDiscount;
 
   // Validate shipping method compatibility and automatically select the correct flete option
   useEffect(() => {
