@@ -230,8 +230,8 @@ export default async function DynamicProductPage(props: ProductPageProps) {
             <div className="pt-8 lg:pt-12 border-t border-zinc-100">
               <section className="max-w-4xl">
                 <h2 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-4 lg:mb-6">Descripción del producto</h2>
-                <div className="text-lg sm:text-xl text-zinc-700 leading-relaxed">
-                  {product.description || 'No hay descripción disponible.'}
+                <div className="text-lg sm:text-xl text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                  {(product.description || 'No hay descripción disponible.').replace(/\\n/g, '\n')}
                 </div>
               </section>
             </div>

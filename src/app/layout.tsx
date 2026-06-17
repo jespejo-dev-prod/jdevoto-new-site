@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/auth-context';
 import { QueryProvider } from '@/providers/query-provider';
 import { Metadata } from 'next';
 import { CartProvider } from '@/context/CartContext';
+import { WishlistProvider } from '@/context/WishlistContext';
 import { WhatsAppButton } from '@/components/ui/whatsapp-button';
 import { CookieBanner } from '@/components/layout/cookie-banner';
 import { Roboto } from 'next/font/google';
@@ -47,10 +48,12 @@ export default function RootLayout({
           <QueryProvider>
             <AuthProvider>
               <CartProvider>
-                {children}
-                <Toaster position="bottom-right" richColors closeButton />
-                <WhatsAppButton />
-                <CookieBanner />
+                <WishlistProvider>
+                  {children}
+                  <Toaster position="bottom-right" richColors closeButton />
+                  <WhatsAppButton />
+                  <CookieBanner />
+                </WishlistProvider>
               </CartProvider>
             </AuthProvider>
           </QueryProvider>
@@ -59,3 +62,4 @@ export default function RootLayout({
     </html>
   );
 }
+

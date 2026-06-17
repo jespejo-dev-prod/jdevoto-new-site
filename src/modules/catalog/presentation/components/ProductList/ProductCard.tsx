@@ -7,7 +7,9 @@ import { Pencil, Trash2, Package, ShoppingCart, Heart, Zap, Star } from 'lucide-
 import { StockBadge } from './StockBadge';
 import { AddToCartAction } from '../AddToCartAction/AddToCartAction';
 import { useAuth } from '@/context/auth-context';
+import { useWishlist } from '@/context/WishlistContext';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   product: any;
@@ -26,9 +28,11 @@ export const ProductCard = memo(function ProductCard({
   priority = false,
 }: ProductCardProps) {
   const { accessToken, user } = useAuth();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const isAuthenticated = !!accessToken;
   const isAdmin = user?.role === 'ADMIN';
   const isDashboard = variant === 'dashboard';
+  const isSaved = isInWishlist(product.id);
   const primaryImage = product.images?.[0] ?? null;
   const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500&auto=format&fit=crop&q=60';
   
@@ -157,9 +161,35 @@ export const ProductCard = memo(function ProductCard({
                 </button>
               </Link>
             )}
-            <button className="p-2.5 rounded-2xl bg-white/95 text-zinc-800 hover:bg-red-500 hover:text-white shadow-md transition-all border border-zinc-200/50 flex items-center justify-center">
-              <Heart className="h-3.5 w-3.5" />
-            </button>
+            {isAuthenticated && (
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleWishlist(product);
+                  toast.success(
+                    isSaved 
+                      ? 'Eliminado de tu lista de deseos' 
+                      : 'Añadido a tu lista de deseos',
+                    {
+                      description: product.name,
+                      icon: <Heart className="h-4 w-4 fill-red-500 text-red-500" />,
+                      duration: 1500,
+                    }
+                  );
+                }}
+                className={cn(
+                  "p-2.5 rounded-2xl shadow-md transition-all border flex items-center justify-center",
+                  isSaved 
+                    ? "bg-red-50 text-red-500 border-red-200 hover:bg-red-100/70"
+                    : "bg-white/95 text-zinc-800 hover:bg-red-500 hover:text-white border-zinc-200/50"
+                )}
+                title={isSaved ? "Quitar de favoritos" : "Añadir a favoritos"}
+              >
+                <Heart className={cn("h-3.5 w-3.5", isSaved && "fill-current")} />
+              </button>
+            )}
           </>
         )}
       </div>

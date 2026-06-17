@@ -103,7 +103,8 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
 
     const htmlContent = generateOrderHtml(order, customerEmail);
     const statusConfig = getStatusConfig(order.status);
-    const subject = `${statusConfig.subject} (${order.orderNumber})`;
+    const shortOrderNumber = order.orderNumber.split('-').pop();
+    const subject = `${statusConfig.subject}: #${shortOrderNumber}`;
 
     const info = await transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
@@ -172,6 +173,14 @@ function generateOrderHtml(order: any, customerEmail: string) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   const statusConfig = getStatusConfig(order.status);
+  const shortOrderNumber = order.orderNumber.split('-').pop();
+
+  const rawDate = order.createdAt ? new Date(order.createdAt) : new Date();
+  const day = rawDate.getDate();
+  const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const month = months[rawDate.getMonth()];
+  const year = rawDate.getFullYear();
+  const formattedDate = `${day} de ${month} de ${year}`;
 
   return `
   <!DOCTYPE html>
@@ -179,7 +188,7 @@ function generateOrderHtml(order: any, customerEmail: string) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${statusConfig.title} ${order.orderNumber}</title>
+    <title>${statusConfig.title} #${shortOrderNumber}</title>
   </head>
   <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased;">
     <!-- Wrapper Table -->
@@ -208,6 +217,14 @@ function generateOrderHtml(order: any, customerEmail: string) {
                   ${statusConfig.description}
                 </p>
 
+                <!-- Resumen de pedido (WooCommerce style) -->
+                <h2 style="font-size: 15px; font-weight: 700; color: #475569; margin: 30px 0 5px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-transform: uppercase; letter-spacing: 0.05em;">
+                  Resumen del pedido
+                </h2>
+                <p style="font-size: 14px; font-weight: 600; color: #0f172a; margin: 0 0 15px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  Pedido #${shortOrderNumber} (${formattedDate})
+                </p>
+
                 <!-- Customer Details Card -->
                 <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 25px;">
                   <table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -222,6 +239,14 @@ function generateOrderHtml(order: any, customerEmail: string) {
                     <tr>
                       <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Creado por:</td>
                       <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${creatorFormatted}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Email Creador:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${createdBy.email || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Teléfono:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${createdBy.phone || company.telefono || '-'}</td>
                     </tr>
                     <tr>
                       <td style="font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Estado:</td>
@@ -284,7 +309,7 @@ function generateOrderHtml(order: any, customerEmail: string) {
                 <!-- Action Button -->
                 <div style="text-align: center; margin: 35px 0;">
                   <a href="${appUrl}/dashboard/orders/${order.id}" style="display: inline-block; background-color: #1e3a8a; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 30px; border-radius: 6px; box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                    Ver Pedido #${order.orderNumber}
+                    Ver Pedido #${shortOrderNumber}
                   </a>
                 </div>
 
@@ -345,7 +370,7 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
     </head>
     <body>
       <div class="container">
-        <h2 style="color: #1e40af;">Actualización en tu pedido #${order.orderNumber}</h2>
+        <h2 style="color: #1e40af;">Actualización en tu pedido #${order.orderNumber.split('-').pop()}</h2>
         <p>Hola,</p>
         <p>Tienes una nueva actualización o documento adjunto para tu pedido.</p>
         
@@ -372,7 +397,7 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
-      subject: `Actualización de pedido #${order.orderNumber}`,
+      subject: `Actualización de pedido #${order.orderNumber.split('-').pop()}`,
       html: htmlContent,
       attachments
     });
@@ -405,7 +430,6 @@ export async function sendPasswordResetEmail(email: string, token: string) {
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; }
-        .btn { display: inline-block; background-color: #1e40af; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; margin-bottom: 20px; }
       </style>
     </head>
     <body style="background-color: #f9fafb; padding: 40px 0;">
@@ -416,7 +440,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
         <p>Si fuiste tú, haz clic en el siguiente botón para elegir una nueva contraseña:</p>
         
         <div style="text-align: center;">
-          <a href="${resetUrl}" class="btn">Restablecer mi contraseña</a>
+          <a href="${resetUrl}" style="display: inline-block; background-color: #1e40af; color: #ffffff !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; margin-bottom: 20px;">Restablecer mi contraseña</a>
         </div>
         
         <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
@@ -435,7 +459,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     const info = await transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
       to: email,
-      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
+      // Se elimina el BCC al administrador por seguridad, para que no pueda interceptar tokens de recuperación de contraseñas de usuarios.
       subject: 'Restablecer contraseña - Jdevoto.cl',
       html: htmlContent,
     });
@@ -460,7 +484,7 @@ export async function sendOrderShippedEmail(order: any, customerEmail: string) {
 
     const htmlContent = generateOrderHtml(order, customerEmail);
     const statusConfig = getStatusConfig(order.status);
-    const subject = `Tu pedido #${order.orderNumber} ha sido enviado 🚚`;
+    const subject = `Tu pedido #${order.orderNumber.split('-').pop()} ha sido enviado 🚚`;
 
     const info = await transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'despachos@jdevoto.cl'}>`,
@@ -496,14 +520,13 @@ export async function sendNotificationEmail(email: string, title: string, messag
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff; }
-        .btn { display: inline-block; background-color: #1e40af; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
       </style>
     </head>
     <body style="background-color: #f9fafb; padding: 20px;">
       <div class="container">
         <h2 style="color: #1e40af; margin-top: 0;">${title}</h2>
         <p>${message}</p>
-        ${link ? `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${link}" class="btn">Ver en la plataforma</a>` : ''}
+        ${link ? `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${link}" style="display: inline-block; background-color: #1e40af; color: #ffffff !important; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px;">Ver en la plataforma</a>` : ''}
       </div>
     </body>
     </html>
@@ -537,7 +560,7 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
 
     const htmlContent = generateOrderHtml(order, customerEmail);
     const statusConfig = getStatusConfig(order.status);
-    const subject = `Actualización de estado pedido #${order.orderNumber} -> ${statusConfig.label}`;
+    const subject = `Actualización de estado pedido #${order.orderNumber.split('-').pop()} -> ${statusConfig.label}`;
 
     const info = await transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
@@ -560,3 +583,320 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
     return { success: false, error };
   }
 }
+
+export async function sendSupportTicketEmails(name: string, senderEmail: string, subject: string, message: string) {
+  try {
+    const transporter = await getTransporter();
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'soporte@jdevoto.cl';
+    
+    // 1. Correo para el Administrador
+    const adminHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff; }
+        .header { font-size: 18px; font-weight: bold; color: #1e40af; margin-bottom: 20px; border-bottom: 2px solid #1e40af; padding-bottom: 10px; }
+        .field { margin-bottom: 15px; }
+        .label { font-weight: bold; color: #4b5563; }
+        .value { margin-top: 5px; color: #1f2937; }
+        .message-box { background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 6px; margin-top: 5px; white-space: pre-wrap; }
+      </style>
+    </head>
+    <body style="background-color: #f9fafb; padding: 20px;">
+      <div class="container">
+        <div class="header">Nuevo Ticket de Soporte - Jdevoto.cl</div>
+        <div class="field">
+          <div class="label">Nombre del Cliente:</div>
+          <div class="value">${name}</div>
+        </div>
+        <div class="field">
+          <div class="label">Email de Contacto:</div>
+          <div class="value"><a href="mailto:${senderEmail}">${senderEmail}</a></div>
+        </div>
+        <div class="field">
+          <div class="label">Asunto:</div>
+          <div class="value">${subject}</div>
+        </div>
+        <div class="field">
+          <div class="label">Detalle de la Solicitud:</div>
+          <div class="message-box">${message}</div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+
+    const adminInfo = await transporter.sendMail({
+      from: `"Soporte Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
+      to: adminEmail,
+      replyTo: senderEmail,
+      subject: `[Soporte B2B] ${subject} - de ${name}`,
+      html: adminHtml,
+    });
+
+    console.log(`📧 Ticket de soporte enviado al Administrador (${adminEmail})`);
+
+    // 2. Correo de Confirmación para el Cliente
+    const customerHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .header { font-size: 20px; font-weight: bold; color: #1e40af; margin-bottom: 20px; }
+      </style>
+    </head>
+    <body style="background-color: #f9fafb; padding: 40px 0;">
+      <div class="container">
+        <h2 style="color: #1e40af; margin-top: 0;">Hemos recibido tu solicitud de soporte</h2>
+        <p>Hola ${name},</p>
+        <p>Confirmamos que hemos recibido tu ticket de soporte sobre el asunto: <strong>"${subject}"</strong>.</p>
+        <p>Nuestro equipo de soporte revisará tu solicitud y se pondrá en contacto contigo a la brevedad a través de este correo electrónico.</p>
+        <p>Detalle de tu mensaje:</p>
+        <blockquote style="background-color: #f9fafb; border-left: 4px solid #1e40af; padding: 10px 15px; margin: 20px 0; color: #4b5563; white-space: pre-wrap;">${message}</blockquote>
+        <p style="font-size: 12px; color: #9ca3af; margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          Este es un correo automático de Jdevoto.cl. Por favor, no respondas directamente a este mensaje.
+        </p>
+      </div>
+    </body>
+    </html>
+    `;
+
+    const customerInfo = await transporter.sendMail({
+      from: `"Soporte Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
+      to: senderEmail,
+      subject: `Hemos recibido tu solicitud: ${subject} - Jdevoto.cl`,
+      html: customerHtml,
+    });
+
+    console.log(`📧 Confirmación de ticket enviada al Cliente (${senderEmail})`);
+
+    return { success: true, adminMessageId: adminInfo.messageId, customerMessageId: customerInfo.messageId };
+  } catch (error) {
+    console.error("Error enviando correos de soporte:", error);
+    return { success: false, error };
+  }
+}
+
+export async function sendWishlistEmail(items: any[], recipientEmails: string, userDetails: any) {
+  try {
+    const transporter = await getTransporter();
+
+    const htmlContent = generateWishlistHtml(items, userDetails);
+    
+    const name = `${userDetails.firstName || ''} ${userDetails.lastName || ''}`.trim();
+    const companyName = userDetails.company?.razonSocial || 'Invitado';
+    const subject = `Lista de Deseos J. Devoto - de ${name} (${companyName})`;
+
+    const info = await transporter.sendMail({
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
+      to: recipientEmails,
+      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
+      subject,
+      html: htmlContent,
+    });
+
+    console.log("==========================================");
+    console.log(`📧 Lista de deseos enviada exitosamente a ${recipientEmails}`);
+    if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_HOST) {
+      console.log("👀 Preview URL:", nodemailer.getTestMessageUrl(info));
+    }
+    console.log("==========================================");
+
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error enviando correo de lista de deseos:", error);
+    return { success: false, error };
+  }
+}
+
+function generateWishlistHtml(items: any[], userDetails: any) {
+  const formatMoney = (val: number) => 
+    `$${Math.round(Number(val)).toLocaleString('es-CL')}`;
+
+  const company = userDetails.company || {};
+  const creatorName = `${userDetails.firstName || ''} ${userDetails.lastName || ''}`.trim();
+  const creatorFormatted = creatorName 
+    ? creatorName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') 
+    : 'un cliente';
+
+  const logoUrl = process.env.NEXT_PUBLIC_APP_URL 
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/logo-svg.png` 
+    : 'https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png';
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+  const subtotalNeto = Math.round(items.reduce((acc: number, item: any) => {
+    const qty = item.quantity || 1;
+    return acc + (item.price * qty);
+  }, 0));
+  const iva = Math.round(subtotalNeto * 0.19);
+  const total = Math.round(subtotalNeto + iva);
+
+  const itemsHtml = items.map((item: any) => {
+    const qty = item.quantity || 1;
+    const lineTotal = Math.round(item.price * qty);
+
+    return `
+    <tr>
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2;">
+        ${item.image ? `<img src="${item.image.startsWith('http') ? item.image : `${appUrl}${item.image}`}" alt="${item.name}" height="40" style="height: 40px; width: auto; max-width: 40px; display: block; margin: 0 auto; object-fit: contain;" />` : '-'}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2;">
+        <strong>${item.brandName || item.brand?.name || ''}</strong><br/>
+        ${item.name}
+        ${item.discountPercent > 0 ? `
+          <div style="margin-top: 4px;">
+            <span style="display: inline-block; padding: 1px 4px; font-size: 9px; font-weight: bold; color: #16a34a; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; margin-right: 4px;">${item.discountPercent}% OFF</span>
+          </div>
+        ` : ''}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2; font-weight: 600; text-align: center;">
+        ${qty}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2;">
+        ${item.sku}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2; font-weight: 600; text-align: right;">
+        <span style="font-size: 13px; font-weight: 700; color: #0f172a;">${formatMoney(lineTotal)} Neto</span>
+        ${(qty > 1 || item.discountPercent > 0) ? `<br/><span style="font-size: 10px; color: #64748b;">${formatMoney(item.price)} c/u Neto</span>` : ''}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2;">
+        <a href="${appUrl}/products/${item.slug}" style="display: inline-block; background-color: #1e3a8a; color: #ffffff !important; font-size: 10px; font-weight: 700; text-decoration: none; padding: 4px 8px; border-radius: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          Ver
+        </a>
+      </td>
+    </tr>
+    `;
+  }).join('');
+
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Deseos - J. Devoto</title>
+  </head>
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased;">
+    <!-- Wrapper Table -->
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; width: 100%; padding: 20px 0;">
+      <tr>
+        <td align="center" style="padding: 0;">
+          <!-- Card Container -->
+          <table cellpadding="0" cellspacing="0" border="0" width="650" style="width: 650px; max-width: 650px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); overflow: hidden;">
+            
+            <!-- Header (Logo) -->
+            <tr>
+              <td style="padding: 35px 40px 20px 40px; border-bottom: 1px solid #f1f5f9;">
+                <img src="${logoUrl}" alt="Jdevoto.cl" height="60" style="display: block; border: 0; height: 60px; max-height: 60px; width: auto;" />
+              </td>
+            </tr>
+
+            <!-- Content Body -->
+            <tr>
+              <td style="padding: 30px 40px 40px 40px;">
+                
+                <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  Lista de Deseos / Cotización Guardada
+                </h1>
+                
+                <p style="font-size: 14px; color: #475569; margin: 0 0 24px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  Has recibido una selección de productos recomendados de la plataforma mayorista B2B <strong>J. Devoto</strong>.
+                </p>
+
+                <!-- Customer Details Card -->
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 25px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                      <td style="padding-bottom: 8px; width: 35%; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Razón Social:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 700; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${company.razonSocial || 'Invitado'}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">RUT:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${company.rut || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Enviado por:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${creatorFormatted} (${userDetails.email})</td>
+                    </tr>
+                    ${userDetails.phone ? `
+                    <tr>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Teléfono:</td>
+                      <td style="padding-bottom: 8px; font-size: 13px; font-weight: 600; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${userDetails.phone}</td>
+                    </tr>
+                    ` : ''}
+                  </table>
+                </div>
+
+                <!-- Products Table -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.2;">
+                  <thead>
+                    <tr style="background-color: #f8fafc;">
+                      <th width="10%" style="border: 1px solid #d1d5db; padding: 8px; text-align: center; font-weight: 700; color: #374151; font-size: 12px;">Imagen</th>
+                      <th width="38%" style="border: 1px solid #d1d5db; padding: 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px;">Producto</th>
+                      <th width="10%" style="border: 1px solid #d1d5db; padding: 8px; text-align: center; font-weight: 700; color: #374151; font-size: 12px;">Cant.</th>
+                      <th width="15%" style="border: 1px solid #d1d5db; padding: 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px;">SKU</th>
+                      <th width="17%" style="border: 1px solid #d1d5db; padding: 8px; text-align: right; font-weight: 700; color: #374151; font-size: 12px;">Precio Neto</th>
+                      <th width="10%" style="border: 1px solid #d1d5db; padding: 8px; text-align: center; font-weight: 700; color: #374151; font-size: 12px;">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${itemsHtml}
+                    <!-- Subtotal Neto -->
+                    <tr style="background-color: #f8fafc; font-weight: bold; border-top: 1px solid #d1d5db;">
+                      <td colSpan="4" style="border: 1px solid #d1d5db; padding: 8px; text-align: right; font-weight: 700; color: #374151; font-size: 12px;">Subtotal Neto:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 8px; color: #374151; font-weight: 600; font-size: 12px; text-align: right; white-space: nowrap;">${formatMoney(subtotalNeto)}</td>
+                      <td style="border: 1px solid #d1d5db; padding: 8px;"></td>
+                    </tr>
+                    <!-- IVA -->
+                    <tr style="background-color: #f8fafc; font-weight: bold;">
+                      <td colSpan="4" style="border: 1px solid #d1d5db; padding: 8px; text-align: right; font-weight: 700; color: #374151; font-size: 12px;">IVA (19%):</td>
+                      <td style="border: 1px solid #d1d5db; padding: 8px; color: #374151; font-weight: 600; font-size: 12px; text-align: right; white-space: nowrap;">${formatMoney(iva)}</td>
+                      <td style="border: 1px solid #d1d5db; padding: 8px;"></td>
+                    </tr>
+                    <!-- Total -->
+                    <tr style="background-color: #f1f5f9; font-weight: bold; border-top: 2px solid #cbd5e1;">
+                      <td colSpan="4" style="border: 1px solid #d1d5db; padding: 8px; text-align: right; font-weight: 800; color: #0f172a; font-size: 13px;">Total Final:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 8px; color: #1e3a8a; font-size: 14px; font-weight: 800; text-align: right; white-space: nowrap;">${formatMoney(total)}</td>
+                      <td style="border: 1px solid #d1d5db; padding: 8px;"></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="margin-top: 30px; font-size: 13px; color: #475569; line-height: 1.5;">
+                  <p><em>Nota: Los precios indicados son netos y están sujetos a variaciones de stock. Puedes ingresar a la plataforma con tu cuenta corporativa para realizar la compra o cotizar formalmente.</em></p>
+                </div>
+
+                <!-- Action Button -->
+                <div style="text-align: center; margin: 35px 0;">
+                  <a href="${appUrl}/products" style="display: inline-block; background-color: #1e3a8a; color: #ffffff !important; font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 30px; border-radius: 6px; box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    Ir a la Tienda Mayorista
+                  </a>
+                </div>
+
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td align="center" style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 25px 40px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: #475569;">Jdevoto.cl - B2B eCommerce</p>
+                <p style="margin: 0; font-size: 11px; color: #94a3b8;">Este es un correo enviado desde la lista de deseos de un usuario registrado en J. Devoto.</p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `;
+}
+

@@ -62,7 +62,8 @@ export async function proxy(request: NextRequest) {
   const isProtectedRoute = pathname.startsWith('/dashboard')
     || pathname.startsWith('/orders')
     || pathname.startsWith('/checkout')
-    || pathname.startsWith('/cart');
+    || pathname.startsWith('/cart')
+    || pathname.startsWith('/wishlist');
 
   const isGuestRoute = pathname === '/login'
     || pathname === '/register';
@@ -71,7 +72,18 @@ export async function proxy(request: NextRequest) {
   if (isProtectedRoute && !isAuthenticated) {
     const url = new URL('/login', request.url);
     url.searchParams.set('callbackUrl', pathname);
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(url);
+    if (refreshToken) {
+      response.cookies.set('refresh_token', '', { path: '/', maxAge: 0 });
+    }
+    return response;
+  }
+
+  // Si no es ruta protegida, pero el token no es válido y existe la cookie, la limpiamos
+  if (refreshToken && !isAuthenticated) {
+    const response = NextResponse.next();
+    response.cookies.set('refresh_token', '', { path: '/', maxAge: 0 });
+    return response;
   }
 
   // Redirigir a dashboard si ya está autenticado e intenta ir a login

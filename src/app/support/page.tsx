@@ -22,6 +22,8 @@ export default function SupportPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Captcha & Honeypot State
   const [mathNums, setMathNums] = useState({ n1: 0, n2: 0 });
@@ -94,7 +96,7 @@ export default function SupportPage() {
   ];
 
   // --- HANDLERS ---
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (honeypot) {
       console.log('Bot submission detected via Honeypot');
@@ -149,17 +151,40 @@ export default function SupportPage() {
       return;
     }
     setCaptchaError(false);
+    setSubmitError('');
+    setSubmitting(true);
 
-    setEmailSent(true);
-    setTimeout(() => {
-      setEmailSent(false);
+    try {
+      const response = await fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailForm),
+      });
+
+      const resData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(resData.error?.message || 'Error al enviar el ticket de soporte');
+      }
+
+      setEmailSent(true);
       setEmailForm({ name: '', email: '', subject: '', message: '' });
       setUserMathAnswer('');
-      // Regenerate Captcha
+      
+      // Regenerar Captcha
       const n1 = Math.floor(Math.random() * 9) + 1;
       const n2 = Math.floor(Math.random() * 9) + 1;
       setMathNums({ n1, n2 });
-    }, 3000);
+
+      setTimeout(() => {
+        setEmailSent(false);
+      }, 5000);
+    } catch (err: any) {
+      console.error("Support submission error:", err);
+      setSubmitError(err.message || 'No se pudo enviar tu mensaje. Intenta nuevamente.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
 
@@ -542,10 +567,15 @@ export default function SupportPage() {
 
                   <Button 
                     type="submit"
-                    className="w-full bg-zinc-950 hover:bg-zinc-800 text-white font-bold h-11 rounded-xl cursor-pointer"
+                    disabled={submitting}
+                    className="w-full bg-zinc-950 hover:bg-zinc-800 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-bold h-11 rounded-xl cursor-pointer"
                   >
-                    Enviar Solicitud de Ayuda
+                    {submitting ? 'Enviando...' : 'Enviar Solicitud de Ayuda'}
                   </Button>
+
+                  {submitError && (
+                    <p className="text-xs font-semibold text-rose-500 text-center mt-2">{submitError}</p>
+                  )}
                 </form>
               )}
             </div>

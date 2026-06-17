@@ -14,7 +14,7 @@ import {
   CreateOrderSchema,
   GetOrdersQuerySchema,
 } from "@/validations/order.schemas";
-import { ForbiddenError } from "@/lib/errors";
+import { ForbiddenError, ValidationError } from "@/lib/errors";
 import { UserRole, OrderStatus } from "@prisma/client";
 
 // ============================================================
@@ -48,6 +48,23 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   // pero BUYER solo puede crear para su propia empresa.
   const body = await req.json();
   const data = CreateOrderSchema.parse(body);
+
+  // Validar consistencia de Región y Comuna de Chile para despacho
+  if (data.shippingAddress?.region && data.shippingAddress?.comuna) {
+    const { CHILE_REGIONS } = await import("@/lib/chile-data");
+    const regName = data.shippingAddress.region.trim().toUpperCase();
+    const comName = data.shippingAddress.comuna.trim().toUpperCase();
+
+    const matchedRegion = CHILE_REGIONS.find(r => r.name.trim().toUpperCase() === regName);
+    if (!matchedRegion) {
+      throw new ValidationError(`La región de despacho '${data.shippingAddress.region}' no es válida en Chile.`);
+    }
+
+    const matchedCommune = matchedRegion.comunas.find(c => c.name.trim().toUpperCase() === comName);
+    if (!matchedCommune) {
+      throw new ValidationError(`La comuna de despacho '${data.shippingAddress.comuna}' no pertenece a la región '${data.shippingAddress.region}'.`);
+    }
+  }
 
   // Aplicar restricción de empresa para BUYER y COMPANY_ADMIN
   if (user.role === UserRole.BUYER || user.role === UserRole.COMPANY_ADMIN) {

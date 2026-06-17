@@ -8,11 +8,11 @@ import { NotFoundError, ForbiddenError, BusinessRuleError } from "@/lib/errors";
 
 export const GET = withApiHandler(async (req: NextRequest, { params }: RouteContext<{ id: string }>) => {
   const user = extractUserFromRequest(req);
-  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP, UserRole.COMPANY_ADMIN]);
+  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP, UserRole.COMPANY_ADMIN, UserRole.BUYER]);
 
   const { id } = await params;
 
-  if (user.role === UserRole.COMPANY_ADMIN && user.companyId !== id) {
+  if ((user.role === UserRole.COMPANY_ADMIN || user.role === UserRole.BUYER) && user.companyId !== id) {
     throw new ForbiddenError("No puedes ver los datos de otra empresa");
   }
 

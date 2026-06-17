@@ -68,7 +68,8 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
               id: true,
               firstName: true,
               lastName: true,
-              email: true
+              email: true,
+              phone: true
             }
           }
         }

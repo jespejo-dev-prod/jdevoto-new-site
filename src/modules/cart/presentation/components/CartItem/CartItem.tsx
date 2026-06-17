@@ -43,6 +43,19 @@ export function CartItem({ item }: CartItemProps) {
                 {item.name}
               </h3>
             </Link>
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+              <span className="text-xs sm:text-[13px] text-indigo-600 font-bold tracking-wider uppercase font-mono">
+                SKU: {item.sku || '-'}
+              </span>
+              {item.brandName && (
+                <>
+                  <span className="text-zinc-300 text-xs font-normal">•</span>
+                  <span className="text-xs sm:text-[13px] text-zinc-500 font-bold tracking-wider uppercase">
+                    {item.brandName}
+                  </span>
+                </>
+              )}
+            </div>
             {item.discountPercent > 0 && (
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] sm:text-xs font-bold text-emerald-600 uppercase tracking-tight">
                 {item.discountPercent}% OFF • {item.priceSource.replace('_', ' ')}
@@ -62,9 +75,15 @@ export function CartItem({ item }: CartItemProps) {
           </button>
         </div>
         
-        <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-green-600 uppercase tracking-widest">
-          <CheckCircle2 className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" /> En stock despacho inmediato
-        </div>
+        {item.stockQuantity > 0 ? (
+          <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-green-600 uppercase tracking-widest">
+            <CheckCircle2 className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" /> {item.stockQuantity} en stock
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-red-600 uppercase tracking-widest">
+            <div className="h-1.5 w-1.5 rounded-full bg-red-500 shrink-0" /> Agotado
+          </div>
+        )}
         
         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-3 sm:gap-4 pt-2">
           <QuantitySelector 

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { 
   CheckCircle2, AlertCircle, XCircle, UploadCloud, 
-  Download, Search, Trash2, Loader2, Check, 
+  Download, Trash2, Loader2, Check, 
   Plus, Minus, FolderOpen, ArrowRight, ShoppingCart
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
@@ -57,7 +57,7 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
   const router = useRouter();
   const { addItem } = useCart();
   const { accessToken, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<'manual' | 'file' | 'search' | 'category'>('manual');
+  const [activeTab, setActiveTab] = useState<'manual' | 'file' | 'category'>('manual');
 
   // --- Tab 1: Manual Input ---
   const [manualText, setManualText] = useState('');
@@ -67,24 +67,6 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
   // --- Tab 2: CSV Upload ---
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // --- Tab 3: Autocomplete Search ---
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchSelectedList, setSearchSelectedList] = useState<any[]>([]);
-  const searchDropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchDropdownRef.current && !searchDropdownRef.current.contains(event.target as Node)) {
-        setSearchResults([]);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   // --- API Validation Handler for Tab 1 and Tab 2 ---
   const validateItems = async (itemsList: { sku: string; quantity: number }[]) => {
@@ -250,94 +232,7 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
     }
   };
 
-  // --- Autocomplete search for Tab 3 ---
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (searchQuery.trim().length >= 2) {
-        triggerSearch(searchQuery.trim());
-      } else {
-        setSearchResults([]);
-      }
-    }, 300);
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
-
-  const triggerSearch = async (query: string) => {
-    setIsSearching(true);
-    try {
-      const res = await fetch(`/api/products?search=${encodeURIComponent(query)}&limit=8`, {
-        headers: {
-          ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
-        }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        // Accept array directly or nested data array
-        const products = Array.isArray(data) ? data : data.data || [];
-        setSearchResults(products);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const addSearchProductToList = (product: any) => {
-    // Check if already in our selectedList
-    if (searchSelectedList.some(item => item.id === product.id)) {
-      toast.info('El producto ya está en tu lista de compra rápida.');
-      setSearchQuery('');
-      setSearchResults([]);
-      return;
-    }
-
-    const item = {
-      ...product,
-      requestedQty: product.inner || 1
-    };
-
-    setSearchSelectedList(prev => [...prev, item]);
-    setSearchQuery('');
-    setSearchResults([]);
-  };
-
-  const updateSearchSelectedQty = (productId: string, qty: number) => {
-    setSearchSelectedList(prev => prev.map(item => {
-      if (item.id !== productId) return item;
-      const minQty = Number(item.inner || 1);
-      let cleanQty = Math.max(minQty, qty);
-      
-      // Enforce B2B multiples of inner
-      if (cleanQty % minQty !== 0) {
-        cleanQty = Math.round(cleanQty / minQty) * minQty;
-      }
-
-      return {
-        ...item,
-        requestedQty: Math.max(minQty, cleanQty)
-      };
-    }));
-  };
-
-  const removeSearchProductFromList = (productId: string) => {
-    setSearchSelectedList(prev => prev.filter(item => item.id !== productId));
-  };
-
-  const addSearchSelectedToCart = () => {
-    if (searchSelectedList.length === 0) {
-      toast.error('No hay productos en la lista para agregar.');
-      return;
-    }
-
-    searchSelectedList.forEach(item => {
-      addItem(item, item.requestedQty);
-    });
-
-    toast.success(`Se agregaron ${searchSelectedList.length} productos al carro.`);
-    setSearchSelectedList([]);
-  };
 
   if (loading || !accessToken) {
     return (
@@ -357,8 +252,7 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
         {[
           { id: 'manual', label: '1. Copia y pega SKUs' },
           { id: 'file', label: '2. Carga planilla Excel/CSV' },
-          { id: 'search', label: '3. Buscador rápido B2B' },
-          { id: 'category', label: '4. Compra por Categorías' }
+          { id: 'category', label: '3. Compra por Categorías' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -455,7 +349,7 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
                   Arrastra tu archivo aquí o haz clic para buscar
                 </p>
                 <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">
-                  Soporta formato .CSV delimitado por comas
+                  Soporta formato .CSV delimitado por comas o punto y coma
                 </p>
               </div>
             </div>
@@ -634,194 +528,7 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
           </div>
         )}
 
-        {/* TAB 3: Autocomplete Search */}
-        {activeTab === 'search' && (
-          <div className="space-y-8 animate-in fade-in duration-300">
-            <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-100 flex flex-col gap-2">
-              <h2 className="text-base font-black text-zinc-950 uppercase tracking-tight">
-                Busca productos en el buscador y agrega cantidades
-              </h2>
-              <p className="text-xs text-zinc-500 font-medium leading-relaxed">
-                Escribe el SKU o nombre del producto en la barra de búsqueda. Al seleccionarlo de la lista emergente, se agregará a tu lista de preparación de pedidos rápida, donde podrás regular sus cantidades con total comodidad.
-              </p>
-            </div>
 
-            {/* Live Search Input */}
-            <div className="relative max-w-2xl" ref={searchDropdownRef}>
-              <div className="relative">
-                <input 
-                  type="text" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Escribe el nombre o SKU del producto..."
-                  className="w-full h-13 rounded-2xl bg-zinc-50 border border-zinc-250 px-12 text-sm focus:ring-2 focus:ring-zinc-950 outline-none transition-all placeholder:text-zinc-400"
-                />
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
-                {isSearching && (
-                  <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-600 animate-spin" />
-                )}
-              </div>
-
-              {/* Suggestions Dropdown */}
-              {searchResults.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-zinc-150 shadow-2xl z-40 max-h-[350px] overflow-y-auto divide-y divide-zinc-50 animate-in slide-in-from-top-3 duration-200">
-                  {searchResults.map((product) => (
-                    <div 
-                      key={product.id}
-                      onClick={() => addSearchProductToList(product)}
-                      className="p-4 flex items-center justify-between hover:bg-zinc-50 cursor-pointer transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 relative rounded-lg bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 flex items-center justify-center p-1">
-                          <img src={product.images?.[0]?.url || '/placeholder-product.png'} className="object-contain max-h-full max-w-full" alt="" />
-                        </div>
-                        <div className="space-y-0.5">
-                          <span className="text-[9px] font-black uppercase text-zinc-400 tracking-wider">{(product.brand as any)?.name || 'Antigravity'}</span>
-                          <p className="text-xs font-bold text-zinc-900 uppercase line-clamp-1">{product.name}</p>
-                          <span className="font-mono text-[10px] text-zinc-500 font-bold bg-zinc-100 px-1.5 py-0.5 rounded">SKU: {product.sku}</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs font-black text-zinc-950">${Math.round((product.price?.discountedNetPrice || product.price?.unitNetPrice || product.basePrice)).toLocaleString('es-CL')} c/u Neto</p>
-                        <span className="text-[9px] font-bold text-zinc-400">Stock: {Number(product.stockQuantity)} {product.unit}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Preparation table list */}
-            {searchSelectedList.length > 0 ? (
-              <div className="space-y-6 pt-6 border-t border-zinc-100 animate-in fade-in duration-500">
-                <h3 className="text-sm font-black text-zinc-950 uppercase tracking-widest">
-                  Lista de Preparación de Pedido
-                </h3>
-
-                <div className="overflow-x-auto rounded-2xl border border-zinc-150">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-zinc-50 text-[10px] font-black uppercase text-zinc-400 tracking-wider border-b border-zinc-150">
-                        <th className="py-4 px-6">Producto</th>
-                        <th className="py-4 px-6 w-[120px]">SKU</th>
-                        <th className="py-4 px-6 w-[140px] text-right">Precio B2B (Neto)</th>
-                        <th className="py-4 px-6 w-[150px] text-center">Cantidad</th>
-                        <th className="py-4 px-6 w-[140px] text-right">Subtotal Neto</th>
-                        <th className="py-4 px-6 w-[80px]"></th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-100 text-sm font-medium text-zinc-900">
-                      {searchSelectedList.map((item, idx) => {
-                        const unitNet = item.price?.discountedNetPrice || item.price?.unitNetPrice || item.basePrice;
-                        const qtyError = item.requestedQty < (item.minOrderQty || 1);
-                        const stockError = item.requestedQty > Number(item.stockQuantity);
-                        
-                        return (
-                          <tr key={item.id} className={`${qtyError || stockError ? 'bg-amber-50/10' : ''}`}>
-                            {/* Product Info */}
-                            <td className="py-4 px-6">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 relative rounded-lg bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 flex items-center justify-center p-1">
-                                  <img src={item.images?.[0]?.url} className="object-contain max-h-full max-w-full" alt="" />
-                                </div>
-                                <div className="space-y-0.5">
-                                  <span className="text-[10px] font-black uppercase text-zinc-400 tracking-wider">{(item.brand as any)?.name || 'Antigravity'}</span>
-                                  <p className="font-bold text-zinc-950 uppercase text-xs line-clamp-1">{item.name}</p>
-                                  {qtyError && (
-                                    <span className="text-[9px] font-bold text-amber-600 block">⚠️ Mínimo de compra es {item.minOrderQty} unidades.</span>
-                                  )}
-                                  {stockError && (
-                                    <span className="text-[9px] font-bold text-red-500 block">⚠️ Supera stock disponible ({Number(item.stockQuantity)} unidades).</span>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* SKU */}
-                            <td className="py-4 px-6 font-mono text-xs font-bold text-zinc-500">
-                              {item.sku}
-                            </td>
-
-                            {/* Price */}
-                            <td className="py-4 px-6 text-right font-mono text-xs font-bold text-zinc-950">
-                              ${Math.round(unitNet).toLocaleString('es-CL')}
-                            </td>
-
-                            {/* Stepper */}
-                            <td className="py-4 px-6">
-                              <div className="flex items-center justify-center">
-                                <div className="flex items-center border border-zinc-200 rounded-xl bg-zinc-50 p-1">
-                                  <button 
-                                    type="button"
-                                    onClick={() => updateSearchSelectedQty(item.id, item.requestedQty - (item.inner || 1))}
-                                    disabled={item.requestedQty <= (item.inner || 1)}
-                                    className="p-1.5 hover:bg-white rounded-lg text-zinc-500 transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                                  >
-                                    <Minus className="h-3.5 w-3.5" />
-                                  </button>
-                                  <div className="w-12 text-center text-xs font-black select-none">
-                                    {item.requestedQty}
-                                  </div>
-                                  <button 
-                                    type="button"
-                                    onClick={() => updateSearchSelectedQty(item.id, item.requestedQty + (item.inner || 1))}
-                                    disabled={item.requestedQty >= Number(item.stockQuantity)}
-                                    className="p-1.5 hover:bg-white rounded-lg text-zinc-500 transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                                  >
-                                    <Plus className="h-3.5 w-3.5" />
-                                  </button>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* Total Neto */}
-                            <td className="py-4 px-6 text-right font-mono text-xs font-black text-zinc-950">
-                              ${Math.round(unitNet * item.requestedQty).toLocaleString('es-CL')}
-                            </td>
-
-                            {/* Remove button */}
-                            <td className="py-4 px-6 text-center">
-                              <button 
-                                onClick={() => removeSearchProductFromList(item.id)}
-                                className="p-2 hover:bg-red-50 hover:text-red-500 rounded-xl text-zinc-400 transition-all cursor-pointer"
-                              >
-                                <Trash2 className="h-4.5 w-4.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="flex justify-end gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setSearchSelectedList([])}
-                    className="h-12 px-6 rounded-xl text-xs font-black uppercase tracking-widest border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 transition-all duration-200 cursor-pointer flex items-center justify-center shadow-sm"
-                  >
-                    Limpiar lista
-                  </button>
-                  <Button
-                    onClick={addSearchSelectedToCart}
-                    className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-lg shadow-blue-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                    Agregar al Carro
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="py-16 text-center border-2 border-dashed border-zinc-100 rounded-3xl space-y-2">
-                <Search className="h-8 w-8 text-zinc-300 mx-auto" />
-                <p className="text-xs font-black text-zinc-400 uppercase tracking-widest">
-                  La lista de preparación está vacía. Comienza a buscar productos arriba.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
 
 
       </div>

@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Minus, Plus, Truck, ShieldCheck, CheckCircle2, RotateCcw, Lock, ShoppingCart as ShoppingCartIcon, Pencil } from 'lucide-react';
+import { Minus, Plus, Truck, ShieldCheck, CheckCircle2, RotateCcw, Lock, ShoppingCart as ShoppingCartIcon, Pencil, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AddToCartAction } from '../AddToCartAction/AddToCartAction';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { TAX_RATE } from '@/types/domain';
+import { cn } from '@/lib/utils';
 
 interface BuyBoxProps {
   product: any;
@@ -32,9 +34,11 @@ interface BuyBoxProps {
  */
 export function BuyBox({ product, slug }: BuyBoxProps) {
   const { accessToken, user } = useAuth();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const isAuthenticated = !!accessToken;
   const isPrivileged = user?.role === 'ADMIN' || user?.role === 'SALES_REP';
   const { addItem } = useCart();
+  const isSaved = isInWishlist(product.id);
   const minQty = product.inner || 1;
   const [quantity, setQuantity] = useState(minQty);
 
@@ -176,17 +180,29 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
       </div>
 
       <div className="space-y-4">
-        {product.stockQuantity > 0 ? (
+        {product.stockQuantity <= 0 ? (
+          <div className="flex items-center gap-2 px-4 py-3 bg-red-50 rounded-xl w-full border border-red-100">
+            <div className="h-2 w-2 rounded-full bg-red-500" />
+            <span className="text-red-600 font-black text-[15px] sm:text-[16px]">Agotado</span>
+          </div>
+        ) : product.stockQuantity < minQty ? (
+          <div className="flex flex-col gap-1 px-4 py-3 bg-amber-50 rounded-xl w-full border border-amber-200">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-amber-500" />
+              <span className="text-amber-700 font-black text-[14px] sm:text-[15px] uppercase tracking-wide">
+                Stock Insuficiente
+              </span>
+            </div>
+            <p className="text-xs text-amber-600 font-medium leading-tight">
+              Hay {product.stockQuantity} unidades en stock, pero el empaque mínimo (Inner) para este producto es de {minQty} unidades.
+            </p>
+          </div>
+        ) : (
           <div className="flex items-center gap-2 px-4 py-3 bg-[#f3f9f2] rounded-xl w-full border border-[#e3f0e0]">
             <CheckCircle2 className="h-5 w-5 text-[#70b363]" />
             <span className="text-[#70b363] font-black text-[15px] sm:text-[16px]">
               {product.stockQuantity} disponibles
             </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 px-4 py-3 bg-red-50 rounded-xl w-full border border-red-100">
-            <div className="h-2 w-2 rounded-full bg-red-500" />
-            <span className="text-red-600 font-black text-[15px] sm:text-[16px]">Agotado</span>
           </div>
         )}
 
@@ -204,6 +220,31 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
             quantity={quantity}
             onQuantityChange={setQuantity}
           />
+
+          <button
+            onClick={() => {
+              toggleWishlist(product);
+              toast.success(
+                isSaved 
+                  ? 'Eliminado de tu lista de deseos' 
+                  : 'Añadido a tu lista de deseos',
+                {
+                  description: product.name,
+                  icon: <Heart className="h-4 w-4 fill-red-500 text-red-500" />,
+                  duration: 1500,
+                }
+              );
+            }}
+            className={cn(
+              "w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border font-bold text-sm transition-all select-none active:scale-[0.98] cursor-pointer mt-1",
+              isSaved
+                ? "bg-red-50 border-red-200 text-red-600 hover:bg-red-100/50"
+                : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300"
+            )}
+          >
+            <Heart className={cn("h-4.5 w-4.5 transition-colors", isSaved ? "fill-red-600 text-red-600" : "text-zinc-500")} />
+            <span>{isSaved ? 'Quitar de favoritos' : 'Añadir a favoritos'}</span>
+          </button>
 
           <div className="space-y-4 pt-2">
             <div className="flex gap-3">

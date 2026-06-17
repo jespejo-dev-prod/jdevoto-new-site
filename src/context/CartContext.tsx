@@ -32,6 +32,7 @@ export interface CartItem {
   minOrderQty: number;    // Cantidad mínima de pedido del producto
   inner: number;          // Unidades por empaque (Inner)
   stockQuantity: number;  // Stock disponible (para validar máximo)
+  brandName?: string;     // Marca del producto
 }
 
 /** Contrato del contexto — lo que expone a los componentes hijos */
@@ -100,6 +101,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                   const minOrderQty = fresh.minOrderQty || 1;
                   const inner = fresh.inner || 1;
                   const priceSource = fresh.price?.priceSource || 'BASE_PRICE';
+                  const brandName = fresh.brand?.name || '';
 
                   if (
                     item.price !== finalPrice ||
@@ -108,7 +110,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     item.stockQuantity !== stockQuantity ||
                     item.minOrderQty !== minOrderQty ||
                     item.inner !== inner ||
-                    item.priceSource !== priceSource
+                    item.priceSource !== priceSource ||
+                    item.brandName !== brandName
                   ) {
                     changed = true;
                     return {
@@ -121,6 +124,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                       stockQuantity: stockQuantity,
                       minOrderQty: minOrderQty,
                       inner: inner,
+                      brandName: brandName,
                     };
                   }
                 }
@@ -154,9 +158,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
    * @param quantity - Cantidad a agregar
    */
   const addItem = (product: any, quantity: number) => {
-    const finalPrice = product.price?.discountedNetPrice || product.price?.unitNetPrice || product.basePrice || 0;
-    const discountPct = product.price?.discountPercent || 0;
-    const originalPrice = product.price?.unitNetPrice || product.basePrice || 0;
+    const isFlatPrice = typeof product.price === 'number';
+
+    const finalPrice = isFlatPrice 
+      ? product.price 
+      : (product.price?.discountedNetPrice || product.price?.unitNetPrice || product.basePrice || 0);
+
+    const discountPct = isFlatPrice
+      ? (product.discountPercent ?? 0)
+      : (product.price?.discountPercent || 0);
+
+    const originalPrice = isFlatPrice
+      ? (product.originalPrice ?? product.price)
+      : (product.price?.unitNetPrice || product.basePrice || 0);
+
+    const priceSource = isFlatPrice
+      ? (product.priceSource || 'BASE_PRICE')
+      : (product.price?.priceSource || 'BASE_PRICE');
+
+    const brandName = product.brand?.name || product.brandName || '';
+    const image = product.images?.[0]?.url || product.image || '';
 
     setItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
@@ -173,7 +194,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               originalPrice: originalPrice,
               discountAmount: originalPrice - finalPrice,
               discountPercent: discountPct,
-              priceSource: product.price?.priceSource || item.priceSource || 'BASE_PRICE'
+              priceSource: priceSource || item.priceSource || 'BASE_PRICE',
+              brandName: brandName || item.brandName || '',
             }
             : item
         );
@@ -189,12 +211,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         originalPrice: originalPrice,
         discountAmount: originalPrice - finalPrice,
         discountPercent: discountPct,
-        priceSource: product.price?.priceSource || 'BASE_PRICE',
+        priceSource: priceSource,
         quantity: quantity,
-        image: product.images?.[0]?.url || '',
+        image: image,
         minOrderQty: product.minOrderQty || 1,
         inner: product.inner || 1,
-        stockQuantity: product.stockQuantity || 0
+        stockQuantity: product.stockQuantity || 0,
+        brandName: brandName,
       };
 
       return [...prevItems, newItem];

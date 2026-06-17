@@ -272,7 +272,7 @@ export class OrderService {
             include: { product: { select: { sku: true, name: true } } },
           },
           company: { select: { razonSocial: true, rut: true, telefono: true, giro: true } },
-          createdBy: { select: { phone: true, firstName: true, lastName: true } },
+          createdBy: { select: { phone: true, firstName: true, lastName: true, email: true } },
           salesRep: { select: { email: true, firstName: true, lastName: true, phone: true } },
         },
       });
@@ -613,7 +613,8 @@ export class OrderService {
             id: true,
             firstName: true,
             lastName: true,
-            email: true
+            email: true,
+            phone: true
           }
         }
       }
