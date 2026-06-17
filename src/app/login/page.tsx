@@ -242,15 +242,22 @@ export default function LoginPage() {
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-        <div className="absolute inset-0 bg-zinc-950" />
+        {/* Imagen de fondo vertical */}
         <div 
-          className="absolute inset-0 opacity-20" 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: "url('/login-bg.jpeg')" }}
+        />
+        {/* Opacidad negra del 70% */}
+        <div className="absolute inset-0 bg-black/70 z-10" />
+        
+        <div 
+          className="absolute inset-0 opacity-20 z-10" 
           style={{ 
             backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)`,
             backgroundSize: '24px 24px' 
           }} 
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/50" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/50 z-10" />
         
         <div className="relative z-20 flex items-center">
           <img 
@@ -258,23 +265,6 @@ export default function LoginPage() {
             alt="JDevoto Logo" 
             className="h-14 w-auto"
           />
-        </div>
-        
-        <div className="relative z-20 mt-auto">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-            <blockquote className="space-y-2">
-              <p className="text-lg font-medium leading-relaxed">
-                &ldquo;Esta plataforma ha simplificado drásticamente nuestra gestión de pedidos B2B y la relación con nuestros distribuidores.&rdquo;
-              </p>
-              <footer className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-zinc-800 border border-white/10" />
-                <div className="text-sm">
-                  <div className="font-semibold text-white">Sofia Davis</div>
-                  <div className="text-zinc-400">Gerente de Operaciones</div>
-                </div>
-              </footer>
-            </blockquote>
-          </div>
         </div>
       </div>
       
