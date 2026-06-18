@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function NewOrderPage() {
   return (
-    <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="p-8 max-w-[2000px] mx-auto space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col gap-4">
         <Link 

@@ -24,7 +24,7 @@ export default function EditOrderPage() {
   }
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="p-8 max-w-[2000px] mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col gap-4">
         <Link 
           href={`/dashboard/orders/${id}`}

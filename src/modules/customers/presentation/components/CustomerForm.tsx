@@ -94,7 +94,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
   const defaultBillingRegion = findMatchingRegionName(initialData?.billingRegion);
   const defaultBillingCommune = findMatchingCommunaName(defaultBillingRegion, initialData?.billingCommune);
 
-  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<RegisterCompanyDto>({
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors, dirtyFields } } = useForm<RegisterCompanyDto>({
     resolver: zodResolver(RegisterCompanySchema) as any,
     defaultValues: {
       rut: initialData?.rut || '',
@@ -111,7 +111,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       salesRepEmail: initialData?.salesRepEmail || '',
       defaultDiscount: Number(initialData?.defaultDiscount) || 0,
       creditLimit: Number(initialData?.creditLimit) || 0,
-      paymentTerms: initialData?.paymentTerms || 30,
+      paymentTerms: initialData?.paymentTerms ?? 30,
       paymentTermDiscount: Number(initialData?.paymentTermDiscount) || 0,
       
       shippingStreet: initialData?.shippingStreet || 'Av. Providencia',
@@ -157,7 +157,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
         salesRepEmail: initialData.salesRepEmail || '',
         defaultDiscount: Number(initialData.defaultDiscount) || 0,
         creditLimit: Number(initialData.creditLimit) || 0,
-        paymentTerms: initialData.paymentTerms || 30,
+        paymentTerms: initialData.paymentTerms ?? 30,
         paymentTermDiscount: Number(initialData.paymentTermDiscount) || 0,
         
         shippingStreet: initialData.shippingStreet || 'Av. Providencia',
@@ -183,7 +183,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
   // Lógica Automática: Descuento por condición de pago
   useEffect(() => {
     const termToDiscount: Record<number, number> = {
-      0: 10,
+      0: 0,
       30: 7,
       60: 4,
       90: 0
@@ -193,6 +193,21 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       setValue('paymentTermDiscount', termToDiscount[watchedPaymentTerms as keyof typeof termToDiscount]);
     }
   }, [watchedPaymentTerms, setValue]);
+
+  // Autofill billingEmail from email
+  const watchedEmail = watch('email');
+  const isBillingEmailDirty = !!dirtyFields.billingEmail;
+
+  useEffect(() => {
+    if (!isBillingEmailDirty && watchedEmail) {
+      setValue('billingEmail', watchedEmail, { shouldValidate: true, shouldDirty: false });
+    }
+  }, [watchedEmail, isBillingEmailDirty, setValue]);
+
+  const defaultDiscountVal = Number(watch('defaultDiscount') || 0);
+  const paymentTermDiscountVal = Number(watch('paymentTermDiscount') || 0);
+  const totalDiscountVal = 100 - (1 - defaultDiscountVal / 100) * (1 - paymentTermDiscountVal / 100) * 100;
+  const formattedTotalDiscount = totalDiscountVal.toLocaleString('es-CL', { maximumFractionDigits: 2 });
 
   return (
     <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-8 animate-in fade-in duration-700">
@@ -345,14 +360,21 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                 )}
               </div>
 
-              <div className="bg-zinc-950/60 rounded-2xl p-4 border border-primary/20 flex items-center justify-between">
-                <div className="flex flex-col">
-                   <span className="text-[10px] font-bold text-zinc-500 uppercase">Dcto. por Pago</span>
-                   <span className="text-xs text-zinc-400 italic">Automático según plazo</span>
+              <div className="bg-zinc-950/60 rounded-2xl p-4 border border-primary/20 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                     <span className="text-[10px] font-bold text-zinc-500 uppercase">Dcto. por Pago</span>
+                     <span className="text-xs text-zinc-400 italic">Automático según plazo</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                     <span className="text-2xl font-black text-primary">-{watch('paymentTermDiscount') || 0}%</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                   <span className="text-2xl font-black text-primary">-{watch('paymentTermDiscount')}%</span>
-                </div>
+                {watch('paymentTerms') === 0 && (
+                  <div className="border-t border-zinc-800/50 pt-2 text-[10px] text-zinc-400 leading-relaxed">
+                    <span className="text-emerald-400 font-bold">Modo informativo:</span> 10% de descuento aplica al pagar con Transferencia o Mercado Pago.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -362,6 +384,16 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
               <Percent className="h-5 w-5 text-primary" />
               Descuento Comercial
             </h3>
+
+            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 text-xs text-zinc-350 leading-relaxed space-y-1">
+              <span className="font-bold text-primary block">💡 ¿Cómo se aplican los descuentos?</span>
+              <p>
+                Los descuentos se aplican de manera sucesiva (descuento sobre descuento) y no se suman directamente.
+              </p>
+              <p className="text-zinc-500 italic">
+                Ejemplo: Si tienes 25% y 10%, primero se resta el 25% del total neto y luego un 10% sobre ese saldo, resultando en un 32,5% de descuento total (pagas el 67,5% del valor original).
+              </p>
+            </div>
 
             <div className="space-y-6">
               <div className="space-y-2">
@@ -404,12 +436,12 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
               <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 space-y-2">
                  <div className="flex justify-between text-[10px] font-bold text-zinc-500 uppercase">
                     <span>Total Descuentos</span>
-                    <span className="text-primary">{Number(watch('defaultDiscount') || 0) + Number(watch('paymentTermDiscount') || 0)}%</span>
+                    <span className="text-primary">{formattedTotalDiscount}%</span>
                  </div>
                  <div className="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
                     <div 
                       className="bg-primary h-full transition-all duration-500" 
-                      style={{ width: `${Math.min((Number(watch('defaultDiscount') || 0) + Number(watch('paymentTermDiscount') || 0)), 100)}%` }}
+                      style={{ width: `${Math.min(totalDiscountVal, 100)}%` }}
                     />
                  </div>
               </div>

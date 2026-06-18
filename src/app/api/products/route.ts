@@ -106,6 +106,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
           stockQuantity: true,
           stockAlert: true,
           minOrderQty: true,
+          inner: true,
           isActive: true,
           createdAt: true,
           category: { select: { id: true, name: true, slug: true } },

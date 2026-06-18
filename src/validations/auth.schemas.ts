@@ -46,7 +46,11 @@ export const FullRegisterSchema = z.object({
   
   // Usuario Administrador
   email: z.string().email("Email inválido"),
-  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+  password: z
+    .string()
+    .min(7, "La contraseña debe tener al menos 7 caracteres")
+    .regex(/[A-Z]/, "La contraseña debe contener al menos una letra mayúscula")
+    .regex(/[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/, "La contraseña debe contener al menos un número o símbolo especial"),
 });
 
 export type FullRegisterDto = z.infer<typeof FullRegisterSchema>;

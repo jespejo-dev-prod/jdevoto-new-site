@@ -6,15 +6,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/auth-context';
 import { FullRegisterSchema, FullRegisterDto } from '@/validations/auth.schemas';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function RegisterPage() {
   const { registerUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Captcha State
+  const [mathNums, setMathNums] = useState({ n1: 0, n2: 0 });
+  const [mounted, setMounted] = useState(false);
+  const [userMathAnswer, setUserMathAnswer] = useState('');
+  const [captchaError, setCaptchaError] = useState(false);
+
+  const generateCaptcha = () => {
+    const n1 = Math.floor(Math.random() * 9) + 1;
+    const n2 = Math.floor(Math.random() * 9) + 1;
+    setMathNums({ n1, n2 });
+  };
+
+  useEffect(() => {
+    generateCaptcha();
+    setMounted(true);
+  }, []);
 
   const {
     register,
@@ -33,6 +51,15 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (formData: FullRegisterDto) => {
+    if (parseInt(userMathAnswer) !== mathNums.n1 + mathNums.n2) {
+      setCaptchaError(true);
+      toast.error('Error de verificación', {
+        description: 'El resultado del captcha es incorrecto.',
+      });
+      return;
+    }
+    setCaptchaError(false);
+
     setIsSubmitting(true);
     try {
       await registerUser(formData);
@@ -44,6 +71,9 @@ export default function RegisterPage() {
       toast.error('Error al registrar empresa', {
         description: err.message,
       });
+      // Regenerar captcha al fallar
+      generateCaptcha();
+      setUserMathAnswer('');
     } finally {
       setIsSubmitting(false);
     }
@@ -170,13 +200,61 @@ export default function RegisterPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-zinc-300">Contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  disabled={isSubmitting}
-                  {...register('password')}
-                  className={`bg-zinc-900/50 border-zinc-800 text-white focus:ring-primary ${errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    disabled={isSubmitting}
+                    {...register('password')}
+                    className={`bg-zinc-900/50 border-zinc-800 text-white focus:ring-primary pr-10 ${errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Requisitos de Contraseña */}
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 space-y-2 text-left">
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Requisitos de la contraseña:</p>
+                <ul className="text-xs text-zinc-500 space-y-1 list-disc list-inside">
+                  <li>Mínimo 7 caracteres de longitud.</li>
+                  <li>Al menos una letra mayúscula.</li>
+                  <li>Al menos un número o símbolo especial.</li>
+                </ul>
+              </div>
+
+              {/* Verificación de Seguridad (Captcha Matemático) */}
+              <div className="space-y-2">
+                <Label className="text-zinc-300 flex items-center gap-2">
+                  <span>Verificación de Seguridad</span>
+                  <span className="text-xs text-zinc-500 font-normal">(Resuelve la suma)</span>
+                </Label>
+                <div className="flex items-center gap-3">
+                  <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 font-bold text-white select-none tracking-wide text-sm shrink-0">
+                    {mounted ? `${mathNums.n1} + ${mathNums.n2} =` : '... + ... ='}
+                  </div>
+                  <Input 
+                    type="text" 
+                    required
+                    value={userMathAnswer}
+                    onChange={(e) => {
+                      setUserMathAnswer(e.target.value);
+                      if (captchaError) setCaptchaError(false);
+                    }}
+                    className={`w-24 bg-zinc-900/50 border text-center font-bold text-sm text-white placeholder:text-zinc-600 focus:ring-primary ${
+                      captchaError ? 'border-red-500 focus-visible:ring-red-500' : 'border-zinc-800'
+                    }`}
+                    placeholder="?"
+                  />
+                </div>
+                {captchaError && (
+                  <p className="text-xs font-semibold text-red-500 mt-1 text-left">El resultado es incorrecto. Por favor vuelve a intentarlo.</p>
+                )}
               </div>
               
               <Button disabled={isSubmitting} className="w-full h-11 bg-white text-black hover:bg-zinc-200 transition-all font-semibold">

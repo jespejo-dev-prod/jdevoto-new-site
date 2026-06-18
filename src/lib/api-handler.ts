@@ -38,10 +38,25 @@ export function withApiHandler<T = Record<string, string>>(handler: Handler<T>):
   };
 }
 
+function safeJson<T>(body: T, status = 200): NextResponse<T> {
+  const jsonString = JSON.stringify(body, (key, value) => {
+    if (typeof value === "bigint") {
+      return Number(value);
+    }
+    return value;
+  });
+  return new NextResponse(jsonString, {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }) as NextResponse<T>;
+}
+
 async function handleError(error: unknown, req?: NextRequest): Promise<NextResponse<ApiError>> {
   // Error de validación Zod
   if (error instanceof ZodError) {
-    return NextResponse.json<ApiError>(
+    return safeJson<ApiError>(
       {
         success: false,
         error: {
@@ -50,7 +65,7 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
           details: error.flatten().fieldErrors,
         },
       },
-      { status: 400 }
+      400
     );
   }
 
@@ -66,7 +81,7 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
         details: appError.code === "VALIDATION_ERROR" ? appError.details : undefined,
       },
     };
-    return NextResponse.json<ApiError>(body, { status: appError.statusCode });
+    return safeJson<ApiError>(body, appError.statusCode);
   }
 
   // Errores de Prisma (ej: duplicados)
@@ -82,7 +97,7 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
           message: `Ya existe un registro con ese ${field}`,
         },
       };
-      return NextResponse.json<ApiError>(body, { status: 409 });
+      return safeJson<ApiError>(body, 409);
     }
   }
 
@@ -121,7 +136,7 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
     }
   }
 
-  return NextResponse.json<ApiError>(
+  return safeJson<ApiError>(
     {
       success: false,
       error: {
@@ -129,7 +144,7 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
         message: "Error interno del servidor",
       },
     },
-    { status: 500 }
+    500
   );
 }
 
@@ -142,9 +157,9 @@ export function ok<T>(
   status = 200,
   meta?: Record<string, unknown>
 ): NextResponse<ApiSuccess<T>> {
-  return NextResponse.json<ApiSuccess<T>>(
+  return safeJson<ApiSuccess<T>>(
     { success: true, data, ...(meta ? { meta } : {}) },
-    { status }
+    status
   );
 }
 

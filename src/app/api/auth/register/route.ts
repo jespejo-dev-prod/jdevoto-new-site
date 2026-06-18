@@ -63,7 +63,12 @@ const RegisterSchema = z.object({
 
   password: z
     .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
+    .min(7, "La contraseña debe tener al menos 7 caracteres")
+    .regex(/[A-Z]/, "La contraseña debe contener al menos una letra mayúscula")
+    .regex(
+      /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/,
+      "La contraseña debe contener al menos un número o símbolo especial"
+    )
     .max(100),
 });
 
@@ -97,7 +102,37 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     );
   }
 
-  // 3. Encriptar contraseña
+  // 3. Verificar que el teléfono no esté ya registrado (tanto en usuario como en empresa)
+  const cleanPhone = data.telefono.replace(/^\+/, "");
+  const phoneVariants = [data.telefono, `+${cleanPhone}`, cleanPhone];
+
+  const existingUserPhone = await prisma.user.findFirst({
+    where: {
+      phone: {
+        in: phoneVariants,
+      },
+    },
+  });
+  if (existingUserPhone) {
+    throw new ConflictError(
+      `Ya existe un usuario registrado con el teléfono ${data.telefono}`
+    );
+  }
+
+  const existingCompanyPhone = await prisma.company.findFirst({
+    where: {
+      telefono: {
+        in: phoneVariants,
+      },
+    },
+  });
+  if (existingCompanyPhone) {
+    throw new ConflictError(
+      `Ya existe una empresa registrada con el teléfono ${data.telefono}`
+    );
+  }
+
+  // 4. Encriptar contraseña
   const passwordHash = await bcrypt.hash(data.password, 10);
 
   // 4. Crear Empresa + Usuario en una sola transacción atómica
@@ -110,6 +145,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
         telefono: data.telefono,
         email: data.email.toLowerCase(),
         defaultDiscount: data.defaultDiscount,
+        paymentTerms: 0,
+        paymentTermDiscount: 0,
       },
     });
 

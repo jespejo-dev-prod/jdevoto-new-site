@@ -201,10 +201,14 @@ export class OrderService {
     const paymentTermsDays = company.paymentTerms;
     let paymentDiscountPercent = 0;
     if (paymentMethod === 'credit_b2b') {
-      if (paymentTermsDays === 90) paymentDiscountPercent = 0;
-      else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
-      else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
-      else if (paymentTermsDays === 0) paymentDiscountPercent = 10;
+      if (company.paymentTermDiscount !== null && company.paymentTermDiscount !== undefined) {
+        paymentDiscountPercent = Number(company.paymentTermDiscount);
+      } else {
+        if (paymentTermsDays === 90) paymentDiscountPercent = 0;
+        else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
+        else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
+        else if (paymentTermsDays === 0) paymentDiscountPercent = 0;
+      }
     } else if (paymentMethod === 'webpay' || paymentMethod === 'transfer' || paymentMethod === 'mercadopago') {
       paymentDiscountPercent = 10;
     }
@@ -511,10 +515,14 @@ export class OrderService {
         const paymentTermsDays = company.paymentTerms;
         let paymentDiscountPercent = 0;
         if (currentPaymentMethod === 'credit_b2b') {
-          if (paymentTermsDays === 90) paymentDiscountPercent = 0;
-          else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
-          else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
-          else if (paymentTermsDays === 0) paymentDiscountPercent = 10;
+          if (company.paymentTermDiscount !== null && company.paymentTermDiscount !== undefined) {
+            paymentDiscountPercent = Number(company.paymentTermDiscount);
+          } else {
+            if (paymentTermsDays === 90) paymentDiscountPercent = 0;
+            else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
+            else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
+            else if (paymentTermsDays === 0) paymentDiscountPercent = 0;
+          }
         } else if (currentPaymentMethod === 'webpay' || currentPaymentMethod === 'transfer' || currentPaymentMethod === 'mercadopago') {
           paymentDiscountPercent = 10;
         }
@@ -602,6 +610,9 @@ export class OrderService {
                 id: true,
                 sku: true,
                 name: true,
+                minOrderQty: true,
+                inner: true,
+                stockQuantity: true,
                 images: { where: { isPrimary: true }, take: 1 }
               }
             }

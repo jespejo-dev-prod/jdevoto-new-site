@@ -19,6 +19,7 @@ export interface DashboardProduct {
   basePrice: number;
   stockQuantity: number;
   stockAlert: number;
+  inner?: number;
   isActive: boolean;
   category: { id: string; name: string; slug: string } | null;
   images: { url: string; isPrimary: boolean; altText?: string | null }[];

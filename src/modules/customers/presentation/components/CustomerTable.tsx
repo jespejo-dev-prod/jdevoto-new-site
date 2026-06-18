@@ -28,6 +28,11 @@ const CustomerRow = memo(function CustomerRow({
   isDeleting?: boolean;
   isReactivating?: boolean;
 }) {
+  const d1 = Number(customer.defaultDiscount || 0);
+  const d2 = Number(customer.paymentTermDiscount || 0);
+  const totalDiscount = 100 - (1 - d1 / 100) * (1 - d2 / 100) * 100;
+  const formattedTotalDiscount = totalDiscount.toLocaleString('es-CL', { maximumFractionDigits: 2 });
+
   return (
     <tr className="hover:bg-zinc-900/20 transition-colors group text-sm">
       <td className="p-4 pl-8">
@@ -59,10 +64,10 @@ const CustomerRow = memo(function CustomerRow({
       <td className="p-4">
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
-            <span className="font-semibold text-white">-{Number(customer.defaultDiscount) + Number(customer.paymentTermDiscount)}%</span>
+            <span className="font-semibold text-white">-{formattedTotalDiscount}%</span>
           </div>
           <span className="text-xs text-zinc-500 mt-0.5">
-            Base: {Number(customer.defaultDiscount)}% + Pago: {Number(customer.paymentTermDiscount)}%
+            Base: {d1}% y Pago: {d2}%
           </span>
         </div>
       </td>

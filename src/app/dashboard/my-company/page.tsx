@@ -33,6 +33,16 @@ export default function MyCompanyPage() {
           </div>
         </div>
 
+        <div className="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-4 flex items-start gap-3 text-sm text-zinc-400">
+          <span className="text-base leading-none">🏢</span>
+          <div>
+            <span className="font-bold text-zinc-200 block mb-0.5">Información de la Organización</span>
+            <p>
+              Estás visualizando los datos comerciales y de facturación oficiales de tu empresa. Estos datos son compartidos por todos los administradores de tu organización y son independientes de los datos de tu cuenta personal en el <a href="/profile" className="text-primary hover:underline">Perfil de Usuario</a>.
+            </p>
+          </div>
+        </div>
+
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <Loader2 className="h-10 w-10 text-primary animate-spin" />

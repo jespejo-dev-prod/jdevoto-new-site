@@ -352,6 +352,26 @@ export default function ProfilePage() {
                <div className="space-y-8">
                   <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Mi Cuenta</h1>
                   
+                  <div className="bg-zinc-900/30 border border-zinc-800 rounded-2xl p-4 flex items-start gap-3 text-sm text-zinc-400">
+                    <span className="text-base leading-none">👤</span>
+                    <div>
+                      <span className="font-bold text-zinc-200 block mb-0.5">Información de Cuenta Personal</span>
+                      <p>
+                        Estás editando tus datos de contacto personales. Estos datos son únicos de tu cuenta de usuario y no afectan la información legal de facturación de la organización
+                        {user?.role === 'COMPANY_ADMIN' ? (
+                          <>
+                            , la cual puedes gestionar en{' '}
+                            <a href="/dashboard/my-company" className="text-primary hover:underline">
+                              Mi Empresa
+                            </a>.
+                          </>
+                        ) : (
+                          '.'
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
                   <form onSubmit={handleUpdateProfile} className="bg-zinc-900/40 p-8 sm:p-10 rounded-[40px] border border-zinc-800 space-y-6">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
