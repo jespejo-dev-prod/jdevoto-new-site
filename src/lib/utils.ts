@@ -33,6 +33,11 @@ export function serializeDecimal<T>(obj: T): T {
     return obj.map(item => serializeDecimal(item)) as unknown as T;
   }
 
+  // Si es un bigint
+  if (typeof obj === 'bigint') {
+    return Number(obj) as unknown as T;
+  }
+
   // Si no es un objeto o es un tipo primitivo, retornar tal cual
   if (typeof obj !== 'object' || obj instanceof Date) {
     return obj;

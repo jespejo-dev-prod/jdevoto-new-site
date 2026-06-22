@@ -12,43 +12,45 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   
-  const summaryOrders = await prisma.order.findMany({
-    where: {
-      createdAt: { gte: thirtyDaysAgo },
-      status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] }
-    },
-    select: { totalGross: true }
-  });
+  const [
+    orderStats,
+    totalCompanies,
+    lowStockResult,
+    recentOrders,
+    lowStockProducts
+  ] = await Promise.all([
+    prisma.order.aggregate({
+      where: {
+        createdAt: { gte: thirtyDaysAgo },
+        status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] }
+      },
+      _sum: { totalGross: true },
+      _count: { _all: true }
+    }),
+    prisma.company.count({ where: { isActive: true } }),
+    prisma.$queryRaw<Array<{ count: number }>>`
+      SELECT COUNT(*)::int as count FROM products 
+      WHERE "isActive" = true AND "isDeleted" = false AND "stockQuantity" <= "stockAlert"
+    `,
+    prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      include: {
+        company: { select: { razonSocial: true } }
+      }
+    }),
+    prisma.$queryRaw`
+      SELECT id, name, sku, "stockQuantity"::int as stock, "stockAlert"::int as alert
+      FROM products
+      WHERE "isActive" = true AND "isDeleted" = false AND "stockQuantity" <= "stockAlert"
+      ORDER BY "stockQuantity" ASC
+      LIMIT 50
+    `
+  ]);
   
-  const totalRevenue = summaryOrders.reduce((sum, o) => sum + Number(o.totalGross), 0);
-  const totalOrders = summaryOrders.length;
-
-  // 2. Count of active companies
-  const totalCompanies = await prisma.company.count({ where: { isActive: true } });
-
-  // 3. Low stock count (total in system)
-  const lowStockResult: any[] = await prisma.$queryRaw`
-    SELECT COUNT(*)::int as count FROM products 
-    WHERE "isActive" = true AND "isDeleted" = false AND "stockQuantity" <= "stockAlert"
-  `;
+  const totalRevenue = Number(orderStats._sum.totalGross || 0);
+  const totalOrders = Number(orderStats._count._all || 0);
   const lowStockCount = lowStockResult[0]?.count || 0;
-
-  // 4. Recent orders (latest 5)
-  const recentOrders = await prisma.order.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-    include: {
-      company: { select: { razonSocial: true } }
-    }
-  });
-
-  // 5. Low stock products (all below threshold)
-  const lowStockProducts = await prisma.$queryRaw`
-    SELECT id, name, sku, "stockQuantity"::int as stock, "stockAlert"::int as alert
-    FROM products
-    WHERE "isActive" = true AND "isDeleted" = false AND "stockQuantity" <= "stockAlert"
-    ORDER BY "stockQuantity" ASC
-  `;
 
   return ok({
     metrics: {

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { withApiHandler, ok } from "@/lib/api-handler";
 import { extractUserFromRequest } from "@/lib/auth";
 import { prisma } from "@/lib/client";
+import { ForbiddenError } from "@/lib/errors";
 import { z } from "zod";
 
 const UpdateProfileSchema = z.object({
@@ -25,6 +26,21 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
 
   const body = await req.json();
   const data = UpdateProfileSchema.parse(body);
+
+  // Check if company fields are present and restrict updates
+  const hasCompanyUpdates =
+    data.companyEmail !== undefined ||
+    data.companyPhone !== undefined ||
+    data.shippingStreet !== undefined ||
+    data.shippingNumber !== undefined ||
+    data.shippingApartment !== undefined ||
+    data.shippingCommune !== undefined ||
+    data.shippingCity !== undefined ||
+    data.shippingRegion !== undefined;
+
+  if (hasCompanyUpdates && user.role !== "ADMIN" && user.role !== "COMPANY_ADMIN") {
+    throw new ForbiddenError("No tiene permisos para modificar los datos de la empresa");
+  }
 
   // Update user details
   const userUpdateData: any = {};

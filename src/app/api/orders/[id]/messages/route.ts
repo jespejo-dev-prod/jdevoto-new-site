@@ -3,7 +3,7 @@ import { withApiHandler, ok, created } from "@/lib/api-handler";
 import { extractUserFromRequest } from "@/lib/auth";
 import { prisma } from "@/lib/client";
 import { logAuditAction } from "@/lib/audit";
-import { NotFoundError, BusinessRuleError } from "@/lib/errors";
+import { NotFoundError, BusinessRuleError, ForbiddenError } from "@/lib/errors";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 
@@ -28,6 +28,12 @@ export const POST = withApiHandler(async (
   });
 
   if (!order) throw new NotFoundError("Pedido", orderId);
+
+  // 1.1 Verificar permisos / Alcance de la empresa
+  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP';
+  if (!isAdmin && order.companyId !== user.companyId) {
+    throw new ForbiddenError("No tiene permisos para enviar mensajes en este pedido");
+  }
 
   // 2. Parsear el FormData
   const formData = await req.formData();
@@ -86,8 +92,6 @@ export const POST = withApiHandler(async (
   });
 
   // 4.1 Crear Notificaciones Globales
-  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP';
-  
   if (isAdmin) {
     // Notificar al comprador
     if (order.createdById !== user.id) {
@@ -102,19 +106,18 @@ export const POST = withApiHandler(async (
       // Enviar correo de notificación
       try {
         const { sendNotificationEmail } = await import('@/lib/email');
-        const recipient = await prisma.user.findUnique({ where: { id: order.createdById }, select: { email: true } });
-        if (recipient?.email) {
-          await sendNotificationEmail(recipient.email, notif.title, notif.message, notif.link || undefined);
+        if (order.createdBy?.email) {
+          await sendNotificationEmail(order.createdBy.email, notif.title, notif.message, notif.link || undefined);
         }
       } catch (err) {
         console.error("Error al enviar correo de notificación:", err);
       }
     }
   } else {
-    // Notificar a todos los administradores
+    // Notificar a todos los administradores (Unificando consultas de IDs y emails)
     const admins = await prisma.user.findMany({
       where: { role: 'ADMIN' },
-      select: { id: true }
+      select: { id: true, email: true }
     });
     
     if (admins.length > 0) {
@@ -126,21 +129,18 @@ export const POST = withApiHandler(async (
           link: `/dashboard/orders/${order.id}`
         }))
       });
-      // Enviar correos de notificación a los administradores
+      // Enviar correos de notificación a los administradores en paralelo
       try {
         const { sendNotificationEmail } = await import('@/lib/email');
-        const adminUsers = await prisma.user.findMany({
-          where: { id: { in: admins.map(a => a.id) } },
-          select: { email: true }
-        });
         const title = `Nuevo mensaje de Cliente`;
         const msg = `${user.firstName} ${user.lastName} (Pedido #${order.orderNumber}) ha enviado un mensaje.`;
         const link = `/dashboard/orders/${order.id}`;
-        for (const admin of adminUsers) {
-          if (admin.email) {
-            await sendNotificationEmail(admin.email, title, msg, link);
-          }
-        }
+        
+        await Promise.all(
+          admins
+            .filter(admin => admin.email)
+            .map(admin => sendNotificationEmail(admin.email!, title, msg, link))
+        );
       } catch (err) {
         console.error("Error al enviar correos a administradores:", err);
       }
@@ -184,6 +184,19 @@ export const GET = withApiHandler(async (
 ) => {
   const user = extractUserFromRequest(req);
   const { id: orderId } = await params;
+
+  // Enforce company scoping
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { companyId: true }
+  });
+
+  if (!order) throw new NotFoundError("Pedido", orderId);
+
+  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP';
+  if (!isAdmin && order.companyId !== user.companyId) {
+    throw new ForbiddenError("No tiene acceso a los mensajes de este pedido");
+  }
 
   const messages = await prisma.orderMessage.findMany({
     where: { orderId },

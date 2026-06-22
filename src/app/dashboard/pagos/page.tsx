@@ -10,6 +10,7 @@ import { Loader2, Plus, Trash2, Building2, CreditCard, Wallet, AlertCircle, Edit
 import { toast } from 'sonner';
 import { RoleGuard } from '@/components/auth/role-guard';
 import { UserRole } from '@prisma/client';
+import { useAuth } from '@/context/auth-context';
 
 type BankAccount = {
   accountName: string;
@@ -32,6 +33,7 @@ type MercadoPagoConfig = {
 };
 
 export default function PagosDashboard() {
+  const { accessToken } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
@@ -64,11 +66,17 @@ export default function PagosDashboard() {
   });
 
   useEffect(() => {
+    if (!accessToken) return;
+
     const fetchSettings = async () => {
       try {
         const [bankRes, mpRes] = await Promise.all([
-          fetch('/api/settings?key=bank_transfer_config'),
-          fetch('/api/settings?key=mercadopago_config')
+          fetch('/api/settings?key=bank_transfer_config', {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+          }),
+          fetch('/api/settings?key=mercadopago_config', {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+          })
         ]);
         
         const bankData = await bankRes.json();
@@ -83,15 +91,13 @@ export default function PagosDashboard() {
       }
     };
     fetchSettings();
-  }, [bankForm, mpForm]);
+  }, [bankForm, mpForm, accessToken]);
 
   const onSaveBank = async (data: BankTransferConfig) => {
     // Limpiar cuentas vacías antes de guardar
     const cleanedData = {
       ...data,
       accounts: data.accounts.filter(acc => 
-        (acc.bankName && acc.bankName.trim() !== '') || 
-        (acc.accountDetails && acc.accountDetails.trim() !== '') || 
         (acc.accountName && acc.accountName.trim() !== '')
       )
     };
@@ -100,7 +106,10 @@ export default function PagosDashboard() {
     try {
       const res = await fetch('/api/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
         body: JSON.stringify({ key: 'bank_transfer_config', value: cleanedData })
       });
       if (res.ok) toast.success('Configuración de transferencia guardada');
@@ -117,7 +126,10 @@ export default function PagosDashboard() {
     try {
       const res = await fetch('/api/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
         body: JSON.stringify({ key: 'mercadopago_config', value: data })
       });
       if (res.ok) toast.success('Configuración de MercadoPago guardada');

@@ -18,7 +18,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   });
 
   if (!user) {
-    throw new AppError("El correo electrónico ingresado no está registrado en nuestro sistema.", "NOT_FOUND", 404);
+    return ok({ message: "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación." });
   }
 
   // Delete any existing tokens for this email

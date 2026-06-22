@@ -155,6 +155,7 @@ model Product {
   @@index([isActive, categoryId])
   @@index([isActive, createdAt(sort: Desc)])
   @@index([isActive, name])
+  @@index([isActive, isDeleted])
   @@map("products")
 }
 
@@ -256,6 +257,7 @@ model Order {
   @@index([createdById])
   @@index([salesRepId])
   @@index([createdAt])
+  @@index([companyId, createdAt(sort: Desc)])
   @@map("orders")
 }
 
@@ -350,6 +352,7 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, isRead])
   @@map("notifications")
 }
 

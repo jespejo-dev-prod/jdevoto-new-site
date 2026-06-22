@@ -178,6 +178,13 @@ export interface TokenPayload {
   exp?: number;
 }
 
+export interface RefreshTokenPayload {
+  sub: string;
+  type: string;
+  iat?: number;
+  exp?: number;
+}
+
 // ============================================================
 // API RESPONSES
 // ============================================================

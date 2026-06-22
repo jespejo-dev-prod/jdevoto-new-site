@@ -3,6 +3,7 @@ import { withApiHandler, ok } from "@/lib/api-handler";
 import { extractUserFromRequest } from "@/lib/auth";
 import { prisma } from "@/lib/client";
 import { priceService } from "@/modules/pricing/domain/price.service";
+import { serializeDecimal } from "@/lib/utils";
 
 export const GET = withApiHandler(async (req: NextRequest) => {
   let user: any = null;
@@ -63,13 +64,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       companyId
     );
 
-    const serialized = productsWithPrices.map((p) => ({
-      ...p,
-      basePrice: Number(p.basePrice),
-      stockQuantity: Number(p.stockQuantity),
-    }));
-
-    return ok(serialized);
+    return ok(serializeDecimal(productsWithPrices));
   }
 
   // 2. Fetch specific products by slugs
@@ -95,15 +90,11 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     companyId
   );
 
-  const serialized = productsWithPrices.map((p) => ({
-    ...p,
-    basePrice: Number(p.basePrice),
-    stockQuantity: Number(p.stockQuantity),
-  }));
+  const serialized = serializeDecimal(productsWithPrices);
 
   // Sort products to match the exact order of requested slugs (most recent first)
   const slugIndexMap = new Map(slugs.map((slug, index) => [slug, index]));
-  serialized.sort((a, b) => {
+  serialized.sort((a: any, b: any) => {
     const indexA = slugIndexMap.get(a.slug) ?? 999;
     const indexB = slugIndexMap.get(b.slug) ?? 999;
     return indexA - indexB;

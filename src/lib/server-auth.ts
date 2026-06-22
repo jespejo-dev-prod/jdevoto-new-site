@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { verifyToken } from "./auth";
+import { verifyRefreshToken } from "./auth";
 import { prisma } from "./client";
 import { AuthenticatedUser } from "@/types/domain";
 
@@ -16,8 +16,8 @@ export async function getServerUser(): Promise<AuthenticatedUser | null> {
 
     if (!refreshToken) return null;
 
-    // El refresh_token en este sistema contiene { sub: userId }
-    const payload = verifyToken(refreshToken);
+    // El refresh_token en este sistema contiene { sub: userId, type: 'refresh' }
+    const payload = verifyRefreshToken(refreshToken);
     
     if (!payload.sub) return null;
 

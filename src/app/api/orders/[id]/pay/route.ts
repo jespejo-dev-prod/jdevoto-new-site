@@ -1,9 +1,13 @@
 import { NextRequest } from "next/server";
 import { withApiHandler, ok, RouteContext } from "@/lib/api-handler";
 import { prisma } from "@/lib/client";
-import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { OrderStatus, PaymentStatus, UserRole } from "@prisma/client";
+import { extractUserFromRequest, requireRole } from "@/lib/auth";
 
 export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) => {
+  const user = extractUserFromRequest(req);
+  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP]);
+
   const { id } = await ctx.params;
 
   let wasAlreadyPaid = false;

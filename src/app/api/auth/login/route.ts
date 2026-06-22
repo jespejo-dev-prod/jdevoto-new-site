@@ -32,15 +32,20 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const now = Date.now();
   const attempt = loginAttempts.get(ip);
 
-  if (attempt && attempt.blockedUntil > now) {
-    const remainingMinutes = Math.ceil((attempt.blockedUntil - now) / 60000);
-    return NextResponse.json({
-      success: false,
-      error: {
-        code: "TOO_MANY_REQUESTS",
-        message: `Demasiados intentos fallidos. Tu dirección IP ha sido bloqueada. Por favor, intenta de nuevo en ${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'}.`
-      }
-    }, { status: 429 });
+  if (attempt) {
+    if (attempt.blockedUntil > now) {
+      const remainingMinutes = Math.ceil((attempt.blockedUntil - now) / 60000);
+      return NextResponse.json({
+        success: false,
+        error: {
+          code: "TOO_MANY_REQUESTS",
+          message: `Demasiados intentos fallidos. Tu dirección IP ha sido bloqueada. Por favor, intenta de nuevo en ${remainingMinutes} ${remainingMinutes === 1 ? 'minuto' : 'minutos'}.`
+        }
+      }, { status: 429 });
+    } else if (attempt.blockedUntil > 0) {
+      // El bloqueo ya expiró. Reseteamos el contador de intentos.
+      loginAttempts.delete(ip);
+    }
   }
 
   const body = await req.json();

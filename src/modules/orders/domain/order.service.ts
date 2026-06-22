@@ -69,9 +69,11 @@ export class OrderService {
       throw new NotFoundError(`Productos no encontrados: ${missing.join(", ")}`);
     }
 
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
     // 4. Validar cantidad mínima de pedido y stock disponible
     for (const item of items) {
-      const product = products.find((p) => p.id === item.productId)!;
+      const product = productMap.get(item.productId)!;
 
       if (item.quantity < product.minOrderQty) {
         throw new BusinessRuleError(
@@ -97,7 +99,7 @@ export class OrderService {
     const defaultDiscountPercent = Number(company.defaultDiscount) || 0;
 
     const orderItemsData = items.map((item) => {
-      const product = products.find((p) => p.id === item.productId)!;
+      const product = productMap.get(item.productId)!;
       const price = priceMap.get(item.productId)!;
 
       const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET';
@@ -468,9 +470,11 @@ export class OrderService {
           where: { id: { in: productIds } },
         });
 
+        const productMap = new Map(products.map((p) => [p.id, p]));
+
         // Validar stock (ahora que hemos devuelto el del pedido anterior)
         for (const item of input.items) {
-          const product = products.find((p) => p.id === item.productId)!;
+          const product = productMap.get(item.productId)!;
           if (product.stockQuantity < item.quantity) {
              throw new BusinessRuleError(`Stock insuficiente para ${product.name}`, "INSUFFICIENT_STOCK");
           }
@@ -481,7 +485,7 @@ export class OrderService {
         const defaultDiscountPercent = Number(company.defaultDiscount) || 0;
 
         orderItemsData = input.items.map((item) => {
-          const product = products.find((p) => p.id === item.productId)!;
+          const product = productMap.get(item.productId)!;
           const price = priceMap.get(item.productId)!;
 
           const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET';

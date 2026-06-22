@@ -87,6 +87,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {
     console.error("[Webhook MercadoPago Handler Error]", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 200 });
+    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 200 });
   }
 }

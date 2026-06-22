@@ -82,6 +82,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
 
   const existingSkuSet = new Set(existingProducts.map((p) => p.sku));
   const updatePromises: any[] = [];
+  const resolvedSkuToUpdateMap = new Map<string, typeof validatedUpdates[number]>();
 
   // 6. Separar registros existentes de los que no existen
   for (const item of validatedUpdates) {
@@ -104,6 +105,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       });
       continue;
     }
+
+    resolvedSkuToUpdateMap.set(resolvedSku, item);
 
     const data: any = {};
     if (item.stock !== undefined && item.stock !== null) {
@@ -141,12 +144,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
 
   // 7. Formatear la lista de actualizaciones exitosas
   for (const p of updatedProducts) {
-    // Buscar la actualización original por SKU exacto o SKU resuelto
-    const originalUpdate = validatedUpdates.find((u) => {
-      if (u.sku === p.sku) return true;
-      if (/^\d+$/.test(u.sku) && u.sku.length < 7 && u.sku.padStart(7, "0") === p.sku) return true;
-      return false;
-    });
+    const originalUpdate = resolvedSkuToUpdateMap.get(p.sku);
 
     successList.push({
       sku: p.sku, // Retornamos el SKU final de la BD

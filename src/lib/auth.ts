@@ -7,10 +7,11 @@
 import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
 import { UnauthorizedError, ForbiddenError } from "@/lib/errors";
-import type { AuthenticatedUser, TokenPayload } from "@/types/domain";
+import type { AuthenticatedUser, TokenPayload, RefreshTokenPayload } from "@/types/domain";
 import { UserRole } from "@prisma/client";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "1h";
 
 if (!JWT_SECRET) {
@@ -26,7 +27,7 @@ export function signAccessToken(payload: Omit<TokenPayload, "iat" | "exp">): str
 }
 
 export function signRefreshToken(userId: string): string {
-  return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: "1d" } as jwt.SignOptions);
+  return jwt.sign({ sub: userId, type: "refresh" }, JWT_REFRESH_SECRET, { expiresIn: "1d" } as jwt.SignOptions);
 }
 
 // ============================================================
@@ -38,6 +39,18 @@ export function verifyToken(token: string): TokenPayload {
     return jwt.verify(token, JWT_SECRET) as TokenPayload;
   } catch {
     throw new UnauthorizedError("Token inválido o expirado");
+  }
+}
+
+export function verifyRefreshToken(token: string): RefreshTokenPayload {
+  try {
+    const payload = jwt.verify(token, JWT_REFRESH_SECRET) as RefreshTokenPayload;
+    if (payload.type !== "refresh") {
+      throw new Error("Tipo de token inválido");
+    }
+    return payload;
+  } catch {
+    throw new UnauthorizedError("Token de refresco inválido o expirado");
   }
 }
 

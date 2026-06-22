@@ -14,6 +14,7 @@ import { withApiHandler, ok, created } from "@/lib/api-handler";
 import { extractUserFromRequest, requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/client";
 import { priceService } from "@/modules/pricing/domain/price.service";
+import { serializeDecimal } from "@/lib/utils";
 import {
   GetProductsQuerySchema,
   CreateProductSchema,
@@ -122,12 +123,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     ]);
 
     return ok(
-      products.map((p) => ({
-        ...p,
-        basePrice: Number(p.basePrice),
-        stockQuantity: Number(p.stockQuantity),
-        minOrderQty: Number(p.minOrderQty || 1),
-      })),
+      serializeDecimal(products),
       200,
       {
         pagination: {
@@ -143,10 +139,21 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   // ── Modo Público / B2B (con motor de precios) ────────────────────────────
   let products: any[];
   let total: number;
+  const hasPriceFilter = query.minPrice !== undefined || query.maxPrice !== undefined;
 
-  if (query.search) {
+  const targetCompanyId = user
+    ? user.role === UserRole.BUYER
+      ? user.companyId
+      : (req.nextUrl.searchParams.get("companyId") ?? user.companyId)
+    : null;
+
+  let productsWithPrices: any[];
+
+  if (query.search || hasPriceFilter) {
+    // Si hay búsqueda o filtro de precio, traemos un set acotado para procesar en memoria y evitar OOM
     const allProducts = await prisma.product.findMany({
       where,
+      take: 500,
       include: {
         category: { select: { id: true, name: true, slug: true } },
         images: {
@@ -156,38 +163,59 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       },
     });
 
-    total = allProducts.length;
+    // Enriquecer primero para poder filtrar por precio
+    const enriched = await priceService.enrichProductsWithPrices(
+      allProducts as any,
+      targetCompanyId
+    );
 
-    const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const searchLower = query.search.toLowerCase();
-    const regexWord = new RegExp(`\\b${escapeRegExp(searchLower)}\\b`, 'i');
+    // Filtrar por precio
+    let filtered = enriched.filter((p) => {
+      if (query.minPrice !== undefined && p.price.unitGrossPrice < query.minPrice) return false;
+      if (query.maxPrice !== undefined && p.price.unitGrossPrice > query.maxPrice) return false;
+      return true;
+    });
 
-    const getRelevanceScore = (name: string, sku: string) => {
-      const nameLower = name.toLowerCase();
-      const skuLower = sku.toLowerCase();
+    // Si además hay búsqueda, ordenar por relevancia
+    if (query.search) {
+      const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchLower = query.search.toLowerCase();
+      const regexWord = new RegExp(`\\b${escapeRegExp(searchLower)}\\b`, 'i');
 
-      if (nameLower === searchLower) return 100;
-      if (nameLower.startsWith(searchLower + " ")) return 90;
-      if (regexWord.test(nameLower)) return 80;
-      if (nameLower.startsWith(searchLower)) return 70;
-      if (skuLower === searchLower) return 60;
-      if (skuLower.includes(searchLower)) return 50;
-      if (nameLower.includes(searchLower)) return 40;
-      return 0;
-    };
+      const getRelevanceScore = (name: string, sku: string) => {
+        const nameLower = name.toLowerCase();
+        const skuLower = sku.toLowerCase();
 
-    const rankedProducts = allProducts.map(p => ({
-      product: p,
-      score: getRelevanceScore(p.name, p.sku)
-    })).sort((a, b) => {
-      if (b.score !== a.score) {
-        return b.score - a.score;
-      }
-      return a.product.name.localeCompare(b.product.name, 'es');
-    }).map(x => x.product);
+        if (nameLower === searchLower) return 100;
+        if (nameLower.startsWith(searchLower + " ")) return 90;
+        if (regexWord.test(nameLower)) return 80;
+        if (nameLower.startsWith(searchLower)) return 70;
+        if (skuLower === searchLower) return 60;
+        if (skuLower.includes(searchLower)) return 50;
+        if (nameLower.includes(searchLower)) return 40;
+        return 0;
+      };
 
-    products = rankedProducts.slice(skip, skip + query.limit);
+      const ranked = filtered.map(p => ({
+        product: p,
+        score: getRelevanceScore(p.name, p.sku)
+      })).sort((a, b) => {
+        if (b.score !== a.score) {
+          return b.score - a.score;
+        }
+        return a.product.name.localeCompare(b.product.name, 'es');
+      }).map(x => x.product);
+
+      filtered = ranked;
+    } else {
+      // Si no hay búsqueda pero sí filtro de precio, ordenar por nombre por defecto
+      filtered.sort((a: any, b: any) => a.name.localeCompare(b.name, 'es'));
+    }
+
+    total = filtered.length;
+    productsWithPrices = filtered.slice(skip, skip + query.limit);
   } else {
+    // Si no hay búsqueda ni filtro de precio, paginar directamente en base de datos (Óptimo)
     const [pList, count] = await Promise.all([
       prisma.product.findMany({
         where,
@@ -206,30 +234,14 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     ]);
     products = pList;
     total = count;
+
+    productsWithPrices = await priceService.enrichProductsWithPrices(
+      products as any,
+      targetCompanyId
+    );
   }
 
-  const targetCompanyId = user
-    ? user.role === UserRole.BUYER
-      ? user.companyId
-      : (req.nextUrl.searchParams.get("companyId") ?? user.companyId)
-    : null;
-
-  const productsWithPrices = await priceService.enrichProductsWithPrices(
-    products as any,
-    targetCompanyId
-  );
-
-  const filtered = productsWithPrices.filter((p) => {
-    if (query.minPrice !== undefined && p.price.unitGrossPrice < query.minPrice) return false;
-    if (query.maxPrice !== undefined && p.price.unitGrossPrice > query.maxPrice) return false;
-    return true;
-  });
-
-  const serialized = filtered.map((p) => ({
-    ...p,
-    basePrice: Number(p.basePrice),
-    stockQuantity: Number(p.stockQuantity),
-  }));
+  const serialized = serializeDecimal(productsWithPrices);
 
   return ok(serialized, 200, {
     pagination: {

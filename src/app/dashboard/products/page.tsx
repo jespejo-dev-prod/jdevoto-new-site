@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { useProducts } from '@/modules/catalog/presentation/hooks/useProducts';
 import { useDeleteProduct } from '@/modules/catalog/presentation/hooks/useDeleteProduct';
 import { useCategories } from '@/modules/catalog/application/hooks/useCatalogData';
+import { useAuth } from '@/context/auth-context';
 
 // Components
 import { ProductCard } from '@/modules/catalog/presentation/components/ProductList/ProductCard';
@@ -64,6 +65,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 export default function ProductsPage() {
+  const { accessToken } = useAuth();
   const searchParams = useSearchParams();
   const urlSearch = searchParams.get('search') || '';
 
@@ -84,7 +86,11 @@ export default function ProductsPage() {
 
   // Load initial setting on component mount
   useEffect(() => {
-    fetch('/api/settings?key=hideOutOfStock')
+    if (!accessToken) return;
+
+    fetch('/api/settings?key=hideOutOfStock', {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data && data.value !== null) {
@@ -92,15 +98,19 @@ export default function ProductsPage() {
         }
       })
       .catch((err) => console.error('Error fetching setting:', err));
-  }, []);
+  }, [accessToken]);
 
   const handleToggleHideOutOfStock = async () => {
+    if (!accessToken) return;
     setIsUpdatingSetting(true);
     const newValue = !hideOutOfStock;
     try {
       const res = await fetch('/api/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
         body: JSON.stringify({ key: 'hideOutOfStock', value: newValue }),
       });
       if (res.ok) {

@@ -1,8 +1,10 @@
 import { NextRequest } from "next/server";
 import { withApiHandler, ok, RouteContext } from "@/lib/api-handler";
 import { paymentService } from "@/modules/billing/domain/payment.service";
+import { extractUserFromRequest } from "@/lib/auth";
 
 export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext) => {
+  const user = extractUserFromRequest(req);
   const { id } = await ctx.params;
   const url = new URL(req.url);
   const context = url.searchParams.get('context') || 'checkout';

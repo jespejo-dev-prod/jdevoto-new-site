@@ -15,6 +15,7 @@ import { priceService } from "@/modules/pricing/domain/price.service";
 import { UpdateProductSchema } from "@/validations/product.schemas";
 import { NotFoundError } from "@/lib/errors";
 import { UserRole } from "@prisma/client";
+import { serializeDecimal } from "@/lib/utils";
 
 // ============================================================
 // GET /api/products/:id
@@ -39,16 +40,10 @@ export const GET = withApiHandler(async (req: NextRequest, ctx: RouteContext) =>
   const price = await priceService.getPriceForProduct(product.id, targetCompanyId);
 
   // Serializar campos Decimal y BigInt para evitar errores de hidratación/paso a Client Components
-  const serialized = {
+  const serialized = serializeDecimal({
     ...product,
-    basePrice: Number(product.basePrice),
-    stockQuantity: Number(product.stockQuantity),
-    weight: product.weight ? Number(product.weight) : null,
-    length: product.length ? Number(product.length) : null,
-    width: product.width ? Number(product.width) : null,
-    height: product.height ? Number(product.height) : null,
     price,
-  };
+  });
 
   return ok(serialized);
 });
@@ -123,15 +118,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     },
   });
 
-  return ok({
-    ...updated,
-    basePrice: Number(updated.basePrice),
-    stockQuantity: Number(updated.stockQuantity),
-    weight: updated.weight ? Number(updated.weight) : null,
-    length: updated.length ? Number(updated.length) : null,
-    width: updated.width ? Number(updated.width) : null,
-    height: updated.height ? Number(updated.height) : null,
-  });
+  return ok(serializeDecimal(updated));
 });
 
 

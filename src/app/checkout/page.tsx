@@ -170,14 +170,20 @@ export default function CheckoutPage() {
   }, [shippingStreet, comuna, region]);
 
   useEffect(() => {
-    fetch('/api/settings?key=bank_transfer_config')
+    if (!accessToken) return;
+
+    fetch('/api/settings?key=bank_transfer_config', {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    })
       .then(res => res.json())
       .then(data => {
         if (data.value) setBankConfig(data.value);
       })
       .catch(() => {});
       
-    fetch('/api/settings?key=mercadopago_config')
+    fetch('/api/settings?key=mercadopago_config', {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    })
       .then(res => res.json())
       .then(data => {
         if (data.value && data.value.enabled) {
@@ -191,7 +197,7 @@ export default function CheckoutPage() {
     if (saved && ['credit_b2b', 'webpay', 'transfer', 'mercadopago'].includes(saved)) {
       setPaymentMethod(saved as any);
     }
-  }, []);
+  }, [accessToken]);
 
   // Auto-fill user data if available
   useEffect(() => {

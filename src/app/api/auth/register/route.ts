@@ -82,50 +82,51 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const body = await req.json();
   const data = RegisterSchema.parse(body);
 
-  // 1. Verificar que el RUT no esté ya registrado
-  const existingCompany = await prisma.company.findUnique({
-    where: { rut: data.rut },
-  });
+  // 1. Verificar unicidad de RUT, Email y Teléfono en paralelo
+  const cleanPhone = data.telefono.replace(/^\+/, "");
+  const phoneVariants = [data.telefono, `+${cleanPhone}`, cleanPhone];
+
+  const [existingCompany, existingUser, existingUserPhone, existingCompanyPhone] = await Promise.all([
+    prisma.company.findUnique({
+      where: { rut: data.rut },
+    }),
+    prisma.user.findUnique({
+      where: { email: data.email.toLowerCase() },
+    }),
+    prisma.user.findFirst({
+      where: {
+        phone: {
+          in: phoneVariants,
+        },
+      },
+    }),
+    prisma.company.findFirst({
+      where: {
+        telefono: {
+          in: phoneVariants,
+        },
+      },
+    })
+  ]);
+
   if (existingCompany) {
     throw new ConflictError(
       `Ya existe una empresa registrada con el RUT ${data.rut}`
     );
   }
 
-  // 2. Verificar que el email no esté ya registrado
-  const existingUser = await prisma.user.findUnique({
-    where: { email: data.email.toLowerCase() },
-  });
   if (existingUser) {
     throw new ConflictError(
       `Ya existe un usuario registrado con el email ${data.email}`
     );
   }
 
-  // 3. Verificar que el teléfono no esté ya registrado (tanto en usuario como en empresa)
-  const cleanPhone = data.telefono.replace(/^\+/, "");
-  const phoneVariants = [data.telefono, `+${cleanPhone}`, cleanPhone];
-
-  const existingUserPhone = await prisma.user.findFirst({
-    where: {
-      phone: {
-        in: phoneVariants,
-      },
-    },
-  });
   if (existingUserPhone) {
     throw new ConflictError(
       `Ya existe un usuario registrado con el teléfono ${data.telefono}`
     );
   }
 
-  const existingCompanyPhone = await prisma.company.findFirst({
-    where: {
-      telefono: {
-        in: phoneVariants,
-      },
-    },
-  });
   if (existingCompanyPhone) {
     throw new ConflictError(
       `Ya existe una empresa registrada con el teléfono ${data.telefono}`

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { verifyToken, signAccessToken, signRefreshToken } from "@/lib/auth";
+import { verifyRefreshToken, signAccessToken, signRefreshToken } from "@/lib/auth";
 import { prisma } from "@/lib/client";
 import { UnauthorizedError } from "@/lib/errors";
 import { ok, withApiHandler } from "@/lib/api-handler";
@@ -16,7 +16,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   // Verificar el token (lanza error si el JWT es inválido o expiró a nivel de firma)
   let payload;
   try {
-    payload = verifyToken(refreshToken);
+    payload = verifyRefreshToken(refreshToken);
   } catch (err) {
     cookieStore.set("refresh_token", "", {
       httpOnly: true,
