@@ -47,9 +47,12 @@ export async function proxy(request: NextRequest) {
 
   if (refreshToken) {
     try {
-      const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-      await jwtVerify(refreshToken, secret);
-      isAuthenticated = true; // Firma criptográfica válida
+      const jwtSecretStr = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
+      const secret = new TextEncoder().encode(jwtSecretStr);
+      const { payload } = await jwtVerify(refreshToken, secret);
+      if (payload.type === "refresh") {
+        isAuthenticated = true; // Firma criptográfica válida y tipo correcto
+      }
     } catch (error) {
       // Si el token es falso o expiró, isAuthenticated queda en false
       isAuthenticated = false;
