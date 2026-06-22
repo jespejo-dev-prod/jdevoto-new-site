@@ -56,8 +56,8 @@ export async function getRelatedProductsUseCase(
     },
   });
 
-  // Fallback a la categoría padre si no hay productos en la categoría actual
-  if (products.length === 0 && categoryId) {
+  // Fallback a la categoría padre si hay menos de 4 productos en la categoría actual
+  if (products.length < 4 && categoryId) {
     const currentCategory = await prisma.category.findUnique({
       where: { id: categoryId },
       select: { id: true, parentId: true }
@@ -71,15 +71,18 @@ export async function getRelatedProductsUseCase(
       });
       const categoryIds = [parentId, ...subcategories.map(c => c.id)];
 
-      products = await prisma.product.findMany({
+      const existingIds = [currentProductId, ...products.map(p => p.id)];
+      const additionalLimit = limit - products.length;
+
+      const additionalProducts = await prisma.product.findMany({
         where: {
           categoryId: { in: categoryIds },
-          id: { not: currentProductId },
+          id: { notIn: existingIds },
           isActive: true,
           isDeleted: false,
           ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
         },
-        take: limit,
+        take: additionalLimit,
         orderBy: { createdAt: "desc" },
         select: {
           id: true,
@@ -102,6 +105,8 @@ export async function getRelatedProductsUseCase(
           },
         },
       });
+
+      products = [...products, ...additionalProducts];
     }
   }
 

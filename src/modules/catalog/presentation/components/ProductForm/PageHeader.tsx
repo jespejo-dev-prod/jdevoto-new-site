@@ -11,7 +11,7 @@ interface PageHeaderProps {
 export function PageHeader({ title, breadcrumbs, productSlug }: PageHeaderProps) {
   return (
     <header className="flex items-center justify-between mb-8">
-      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
+      <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500">
         {breadcrumbs.map((crumb, i) => (
           <span key={crumb.href} className="flex items-center gap-2">
             <Link href={crumb.href} className="hover:text-primary transition-colors">

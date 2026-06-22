@@ -196,18 +196,25 @@ export const ProductCard = memo(function ProductCard({
 
       {/* Body */}
       <div className="p-5 space-y-4 flex flex-col flex-1 relative">
-        <div className="flex justify-between items-start gap-2 pointer-events-none">
-          <div className="min-w-0">
-            <p className={cn(
-              "text-[15px] font-bold uppercase tracking-widest mb-1 font-mono",
-              isDashboard ? "text-zinc-500" : "text-zinc-400"
-            )}>
-              {product.brand?.name || 'SIN MARCA'}
-            </p>
+        <div className="flex justify-between items-start gap-2 pointer-events-none w-full">
+          <div className="min-w-0 w-full">
+            <div className="flex items-center justify-between gap-2 mb-1.5 w-full">
+              <p className={cn(
+                "text-[16px] font-black uppercase tracking-widest font-mono",
+                isDashboard ? "text-zinc-400" : "text-zinc-400"
+              )}>
+                {product.brand?.name || 'SIN MARCA'}
+              </p>
+              {isDashboard && product.sku && (
+                <span className="text-xs font-mono font-black px-2.5 py-0.5 rounded border bg-primary/10 border-primary/20 text-primary shrink-0">
+                  SKU: {product.sku}
+                </span>
+              )}
+            </div>
             <h3 className={cn(
               "transition-colors",
               isDashboard 
-                ? "text-sm font-bold leading-tight truncate text-white group-hover:text-primary" 
+                ? "text-base font-bold leading-snug line-clamp-2 h-[48px] overflow-hidden text-white group-hover:text-primary" 
                 : "text-lg sm:text-[19px] font-bold leading-snug line-clamp-2 h-[50px] sm:h-[54px] overflow-hidden text-zinc-900 group-hover:text-primary"
             )}>
               {product.name}
@@ -224,13 +231,13 @@ export const ProductCard = memo(function ProductCard({
           {isDashboard ? (
             <div className="flex items-center justify-between w-full">
               <div>
-                <p className="text-[10px] font-medium text-zinc-500 mb-0.5 uppercase">Precio Neto</p>
-                <p className="text-lg font-bold text-white tracking-tight">
+                <p className="text-xs font-bold text-zinc-400 mb-1 uppercase">Precio Neto</p>
+                <p className="text-xl font-black text-white tracking-tight">
                   ${Number(product.basePrice).toLocaleString('es-CL')}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] font-medium text-zinc-500 mb-1 uppercase text-right">Stock</p>
+                <p className="text-xs font-bold text-zinc-400 mb-1 uppercase text-right">Stock</p>
                 <StockBadge stock={product.stockQuantity} stockAlert={product.stockAlert} />
               </div>
             </div>

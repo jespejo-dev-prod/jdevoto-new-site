@@ -25,30 +25,30 @@ import { useAuth } from '@/context/auth-context';
 import { useDashboard } from '@/app/dashboard/layout';
 
 const menuItems = [
-  { icon: Home, label: 'Home', href: '/dashboard' },
-  { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
+  { icon: Home, label: 'Inicio', href: '/dashboard' },
+  { icon: BarChart3, label: 'Estadísticas', href: '/dashboard/analytics' },
 ];
 
 const mainItems = [
-  { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
+  { icon: BarChart3, label: 'Estadísticas', href: '/dashboard/analytics' },
   { 
     icon: Package, 
-    label: 'Products', 
+    label: 'Productos', 
     href: '/dashboard/products',
     subItems: [
-      { label: 'Product List', href: '/dashboard/products' },
+      { label: 'Lista de Productos', href: '/dashboard/products' },
       { label: 'Actualizar Catálogo (CSV/Excel)', href: '/dashboard/products/import-stock' },
-      { label: 'Product', href: '/dashboard/products/new' },
-      { label: 'Category', href: '/dashboard/categories' },
+      { label: 'Nuevo Producto', href: '/dashboard/products/new' },
+      { label: 'Categorías', href: '/dashboard/categories' },
     ]
   },
   { icon: Tag, label: 'Categorías', href: '/dashboard/categories' },
   { icon: Shield, label: 'Marcas', href: '/dashboard/marcas' },
   { icon: Ticket, label: 'Descuentos', href: '/dashboard/descuentos' },
-  { icon: ShoppingCart, label: 'Orders', href: '/dashboard/orders' },
-  { icon: Building2, label: 'Customers', href: '/dashboard/customers' },
-  { icon: Building2, label: 'My Company', href: '/dashboard/my-company' },
-  { icon: Users, label: 'Team', href: '/dashboard/users' },
+  { icon: ShoppingCart, label: 'Pedidos', href: '/dashboard/orders' },
+  { icon: Building2, label: 'Clientes', href: '/dashboard/customers' },
+  { icon: Building2, label: 'Mi Empresa', href: '/dashboard/my-company' },
+  { icon: Users, label: 'Equipo', href: '/dashboard/users' },
   { icon: CreditCard, label: 'Pagos', href: '/dashboard/pagos' },
   { icon: CreditCard, label: 'Cuenta Corriente', href: '/dashboard/cuenta-corriente' },
 ];
@@ -65,17 +65,17 @@ export function Sidebar() {
 
   const filteredMenuItems = menuItems.filter(item => {
     if (user?.role === "BUYER" || user?.role === "COMPANY_ADMIN") {
-      return item.label === "Home";
+      return item.label === "Inicio";
     }
     return true;
   });
 
   const filteredMainItems = mainItems.filter(item => {
     if (user?.role === "BUYER") {
-      return item.label === "Orders" || item.label === "Cuenta Corriente";
+      return item.label === "Pedidos" || item.label === "Cuenta Corriente";
     }
     if (user?.role === "COMPANY_ADMIN") {
-      return item.label === "Orders" || item.label === "Team" || item.label === "My Company" || item.label === "Cuenta Corriente";
+      return item.label === "Pedidos" || item.label === "Equipo" || item.label === "Mi Empresa" || item.label === "Cuenta Corriente";
     }
     // Cuenta Corriente visible para ADMIN y SALES_REP también
     if (item.label === "Cuenta Corriente") {
@@ -86,9 +86,9 @@ export function Sidebar() {
     // Pagos solo para ADMIN
     if (item.label === "Pagos" && user?.role !== "ADMIN") return false;
     // My Company no es para ADMIN (ya está cubierto COMPANY_ADMIN arriba)
-    if (item.label === "My Company") return false;
+    if (item.label === "Mi Empresa") return false;
     // Team solo para ADMIN o COMPANY_ADMIN
-    if (item.label === "Team" && user?.role !== "ADMIN") return false;
+    if (item.label === "Equipo" && user?.role !== "ADMIN") return false;
     return true;
   });
 
@@ -106,7 +106,7 @@ export function Sidebar() {
         <nav className="space-y-6">
           <div>
             <div className="px-3 mb-2 flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600">Main Menu</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600">Menú Principal</span>
             </div>
             <ul className="space-y-1">
               {filteredMenuItems.map((item) => {
@@ -133,7 +133,7 @@ export function Sidebar() {
 
           <div>
             <div className="px-3 mb-2 flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600">Management</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600">Gestión</span>
             </div>
             <ul className="space-y-1">
               {filteredMainItems.map((item) => (

@@ -121,30 +121,30 @@ export default function CustomerDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {customer.users.map((u) => (
               <div key={u.id} className="p-6 bg-zinc-950 border border-zinc-800 rounded-3xl flex flex-col gap-4 shadow-xl hover:border-zinc-700 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-2xl bg-zinc-900 flex items-center justify-center text-xs font-bold text-primary border border-zinc-800">
+                <div className="flex items-center gap-4">
+                  <div className="h-14 w-14 rounded-2xl bg-zinc-900 flex items-center justify-center text-sm font-bold text-primary border border-zinc-800 shrink-0">
                     {u.firstName?.[0]}{u.lastName?.[0]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white truncate">{u.firstName} {u.lastName}</p>
-                    <p className="text-[10px] text-zinc-500 truncate">{u.email}</p>
-                    <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[8px] font-bold uppercase tracking-tighter">
+                    <p className="text-base font-bold text-white truncate">{u.firstName} {u.lastName}</p>
+                    <p className="text-xs text-zinc-400 truncate mt-0.5">{u.email}</p>
+                    <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
                       {u.role}
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-900">
+                <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-zinc-900">
                   <button 
                     onClick={() => handleResetPassword(u.id, u.email)}
-                    className="flex items-center justify-center gap-2 py-2 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all border border-zinc-800"
+                    className="flex items-center justify-center gap-2 py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all border border-zinc-800"
                   >
                     <Key className="h-3 w-3" />
                     Reset Pass
                   </button>
                   <button 
                     onClick={() => handleForceLogout(u.id, u.firstName)}
-                    className="flex items-center justify-center gap-2 py-2 px-3 bg-red-500/5 hover:bg-red-500/10 text-red-500/60 hover:text-red-500 rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all border border-red-500/10"
+                    className="flex items-center justify-center gap-2 py-2.5 px-3 bg-red-500/5 hover:bg-red-500/10 text-red-500/60 hover:text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all border border-red-500/10"
                   >
                     <LogOut className="h-3 w-3" />
                     Cerrar Sesión

@@ -354,7 +354,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
                 </div>
                 {isCustomerUser && (
-                  <p className="text-[9px] text-zinc-500 px-1 italic text-center mt-1">
+                  <p className="text-xs text-zinc-400 px-1 italic text-center mt-1">
                     Solo el administrador del sitio puede cambiar tu condición de pago.
                   </p>
                 )}
@@ -385,13 +385,13 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
               Descuento Comercial
             </h3>
 
-            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 text-xs text-zinc-350 leading-relaxed space-y-1">
-              <span className="font-bold text-primary block">💡 ¿Cómo se aplican los descuentos?</span>
+            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 text-sm text-zinc-300 leading-relaxed space-y-1.5">
+              <span className="font-bold text-primary block text-[15px]">💡 ¿Cómo se aplican los descuentos?</span>
               <p>
-                Los descuentos se aplican de manera sucesiva (descuento sobre descuento) y no se suman directamente.
+                Los descuentos no se suman, se aplican de forma sucesiva.
               </p>
-              <p className="text-zinc-500 italic">
-                Ejemplo: Si tienes 25% y 10%, primero se resta el 25% del total neto y luego un 10% sobre ese saldo, resultando en un 32,5% de descuento total (pagas el 67,5% del valor original).
+              <p className="text-xs text-zinc-400 italic mt-1">
+                Ejemplo: 25% + 10% resulta en un 32,5% de descuento final.
               </p>
             </div>
 
@@ -410,7 +410,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   <input type="hidden" {...register('creditLimit', { valueAsNumber: true })} />
                 </div>
                 {errors.creditLimit && <p className="text-red-400 text-[10px] font-bold px-1">{errors.creditLimit.message}</p>}
-                <p className="text-[9px] text-zinc-500 px-1 italic text-center">
+                <p className="text-xs text-zinc-400 px-1 italic text-center mt-1">
                   {isCustomerUser ? "Solo el administrador del sitio puede cambiar tu crédito." : "Crédito máximo autorizado para compras B2B."}
                 </p>
               </div>
@@ -428,7 +428,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   <div className="absolute right-6 top-1/2 -translate-y-1/2 text-primary font-bold text-xl">%</div>
                 </div>
                 {errors.defaultDiscount && <p className="text-red-400 text-[10px] font-bold px-1">{errors.defaultDiscount.message}</p>}
-                <p className="text-[9px] text-zinc-500 px-1 italic text-center">
+                <p className="text-xs text-zinc-400 px-1 italic text-center mt-1">
                   {isCustomerUser ? "Solo el administrador del sitio puede cambiar tu descuento." : "Descuento adicional fijo por cliente."}
                 </p>
               </div>
@@ -470,7 +470,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     />
                   </div>
                   {errors.salesRepEmail && <p className="text-red-400 text-[10px] font-bold px-1">{errors.salesRepEmail.message}</p>}
-                  <p className="text-[9px] text-zinc-500 px-1 italic">
+                  <p className="text-xs text-zinc-400 px-1 italic mt-1">
                     {isCustomerUser ? "Solo un administrador interno puede cambiar tu ejecutivo." : "Email del vendedor (SALES_REP) activo."}
                   </p>
                </div>

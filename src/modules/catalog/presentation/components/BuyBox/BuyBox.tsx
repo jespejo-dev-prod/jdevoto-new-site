@@ -170,11 +170,11 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
       </div>
 
       <div className="space-y-4 pt-4 border-t border-zinc-100">
-        <div className="flex gap-4 items-start text-sm sm:text-[15px] font-bold uppercase tracking-tight text-zinc-400">
+        <div className="flex gap-4 items-start text-xs sm:text-[13px] font-normal uppercase tracking-tight text-zinc-400">
           <ShieldCheck className="h-5 w-5 text-zinc-400 shrink-0 mt-0.5" />
           <div className="flex flex-col leading-tight">
             <span>Cambio o Devolución</span>
-            <span className="text-zinc-950">hasta 6 Meses</span>
+            <span className="text-zinc-950 font-normal">hasta 6 Meses</span>
           </div>
         </div>
       </div>

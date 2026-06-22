@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { CreateProductInput } from "@/validations/product.schemas";
 import { Category, Brand } from "@/modules/catalog/application/hooks/useCatalogData";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ClassificationCardProps {
   categories: Category[];
@@ -10,9 +12,13 @@ interface ClassificationCardProps {
 }
 
 export function ClassificationCard({ categories, brands, isLoading }: ClassificationCardProps) {
-  const { register, setValue, watch } = useFormContext<CreateProductInput>();
+  const { setValue, watch } = useFormContext<CreateProductInput>();
   const categoryId = watch("categoryId");
   const brandId = watch("brandId");
+
+  const [categorySearch, setCategorySearch] = useState("");
+  const [brandSearch, setBrandSearch] = useState("");
+  const [isOpenBrand, setIsOpenBrand] = useState(false);
 
   console.log("DEBUG ClassificationCard - categoryId:", categoryId);
   console.log("DEBUG ClassificationCard - brandId:", brandId);
@@ -38,6 +44,23 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
     }
   };
 
+  // Filtrar categorías padres según la búsqueda
+  const filteredParents = parentCategories.filter(parent => {
+    const parentMatches = parent.name.toLowerCase().includes(categorySearch.toLowerCase());
+    const children = getChildren(parent.id);
+    const anyChildMatches = children.some(child => 
+      child.name.toLowerCase().includes(categorySearch.toLowerCase())
+    );
+    return parentMatches || anyChildMatches;
+  });
+
+  // Filtrar marcas según la búsqueda
+  const filteredBrands = brands.filter(b => 
+    b.name.toLowerCase().includes(brandSearch.toLowerCase())
+  );
+
+  const selectedBrand = brands.find(b => b.id === brandId);
+
   return (
     <div className="space-y-6">
       {/* ─── CARD DE CATEGORÍAS (Estilo WordPress) ───────────────────────────── */}
@@ -46,6 +69,20 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
           Categorías del producto
           {isLoading && <Loader2 className="h-3 w-3 animate-spin text-primary" />}
         </h3>
+
+        {/* Buscador de Categorías */}
+        {!isLoading && categories.length > 0 && (
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-550" />
+            <input
+              type="text"
+              placeholder="Buscar categoría..."
+              value={categorySearch}
+              onChange={(e) => setCategorySearch(e.target.value)}
+              className="w-full h-9 pl-10 pr-4 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-white focus:outline-none focus:border-primary/50 placeholder-zinc-550 transition-colors"
+            />
+          </div>
+        )}
         
         {/* Contenedor con barra de desplazamiento personalizada */}
         <div className="border border-zinc-800/80 rounded-xl bg-zinc-950/60 p-4 space-y-3.5 max-h-[280px] overflow-y-auto custom-scrollbar text-[11px] shadow-inner">
@@ -54,13 +91,21 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
               <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
               Cargando categorías...
             </div>
-          ) : parentCategories.length === 0 ? (
-            <div className="text-zinc-500 text-center py-6">No hay categorías registradas</div>
+          ) : filteredParents.length === 0 ? (
+            <div className="text-zinc-500 text-center py-6">
+              {categorySearch ? "No se encontraron categorías" : "No hay categorías registradas"}
+            </div>
           ) : (
-            parentCategories
+            filteredParents
               .sort((a, b) => a.name.localeCompare(b.name, "es"))
               .map((parent) => {
                 const children = getChildren(parent.id);
+                // Filtrar hijos también por búsqueda
+                const filteredChildren = children.filter(child => 
+                  child.name.toLowerCase().includes(categorySearch.toLowerCase()) ||
+                  parent.name.toLowerCase().includes(categorySearch.toLowerCase())
+                );
+                
                 const isParentChecked = categoryId === parent.id;
                 
                 return (
@@ -77,9 +122,9 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
                     </label>
 
                     {/* Fila Categorías Hijas (Desplazadas) */}
-                    {children.length > 0 && (
+                    {filteredChildren.length > 0 && (
                       <div className="pl-6 space-y-2 border-l border-zinc-800/60 ml-1.5 py-0.5">
-                        {children
+                        {filteredChildren
                           .sort((a, b) => a.name.localeCompare(b.name, "es"))
                           .map((child) => {
                             const isChildChecked = categoryId === child.id;
@@ -117,21 +162,72 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
         </h3>
         
         <div className="relative">
-          <select
-            className="w-full h-10 px-3 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-white focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50 cursor-pointer"
-            {...register("brandId")}
-            value={brandId || ""}
+          <button
+            type="button"
+            onClick={() => setIsOpenBrand(!isOpenBrand)}
             disabled={isLoading}
+            className="w-full h-10 px-4 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-white text-left focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50 flex items-center justify-between cursor-pointer"
           >
-            <option value="">{isLoading ? "Cargando marcas..." : "Seleccionar Marca..."}</option>
-            {brands
-              .sort((a, b) => a.name.localeCompare(b.name, "es"))
-              .map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-          </select>
+            <span className={selectedBrand ? "text-white" : "text-zinc-500"}>
+              {selectedBrand ? selectedBrand.name : "Seleccionar Marca..."}
+            </span>
+            <ChevronDown className={cn("h-4 w-4 text-zinc-500 transition-transform", isOpenBrand && "rotate-180")} />
+          </button>
+
+          {isOpenBrand && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => { setIsOpenBrand(false); setBrandSearch(""); }} />
+              <div className="absolute z-20 mt-2 w-full bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl p-2.5 space-y-2 max-h-[220px] flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-550" />
+                  <input
+                    type="text"
+                    placeholder="Buscar marca..."
+                    value={brandSearch}
+                    onChange={(e) => setBrandSearch(e.target.value)}
+                    className="w-full h-8 pl-8 pr-3 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] text-white focus:outline-none focus:border-primary/50 placeholder-zinc-550"
+                  />
+                </div>
+                <div className="overflow-y-auto flex-1 custom-scrollbar space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setValue("brandId", "", { shouldDirty: true, shouldValidate: true });
+                      setIsOpenBrand(false);
+                      setBrandSearch("");
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] text-zinc-500 hover:bg-zinc-900 hover:text-white transition-colors"
+                  >
+                    Ninguna marca
+                  </button>
+                  {filteredBrands
+                    .sort((a, b) => a.name.localeCompare(b.name, "es"))
+                    .map((b) => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => {
+                          setValue("brandId", b.id, { shouldDirty: true, shouldValidate: true });
+                          setIsOpenBrand(false);
+                          setBrandSearch("");
+                        }}
+                        className={cn(
+                          "w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] transition-colors",
+                          brandId === b.id 
+                            ? "bg-primary text-black font-bold" 
+                            : "text-zinc-300 hover:bg-zinc-900 hover:text-white"
+                        )}
+                      >
+                        {b.name}
+                      </button>
+                    ))}
+                  {filteredBrands.length === 0 && (
+                    <div className="text-zinc-500 text-center py-2 text-[10px]">No se encontraron marcas</div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
