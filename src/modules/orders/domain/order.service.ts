@@ -82,6 +82,13 @@ export class OrderService {
         );
       }
 
+      if (product.inner && product.inner > 1 && item.quantity % product.inner !== 0) {
+        throw new BusinessRuleError(
+          `La cantidad del producto '${product.name}' (${item.quantity} unidades) debe ser múltiplo de su empaque mínimo de ${product.inner} unidades.`,
+          "INVALID_PACK_MULTIPLES"
+        );
+      }
+
       if (product.stockQuantity < item.quantity) {
         throw new BusinessRuleError(
           `Stock insuficiente para '${product.name}'. ` +

@@ -19,11 +19,11 @@ Para ejecutar el conjunto de pruebas en tu entorno local, utiliza los siguientes
 
 ---
 
-## 📊 Resumen de Cobertura de Pruebas (34 Tests Aprobados)
+## 📊 Resumen de Cobertura de Pruebas (54 Tests Aprobados)
 
 Todas las pruebas se ejecutan utilizando **Vitest** con el entorno de simulación **jsdom** para el frontend, y mocks atómicos y aislados de la base de datos (Prisma) para el backend.
 
-### I. Pruebas de Backend y Reglas de Negocio (26 Tests)
+### I. Pruebas de Backend y Reglas de Negocio (46 Tests)
 
 #### 1. Importación Masiva de Stock y Precios (`test/backend/import-stock.test.ts`)
 Valida el endpoint de actualización masiva por lote (`POST /api/products/import-stock`):
@@ -59,6 +59,29 @@ Valida la consistencia de crédito de los clientes B2B:
 *   **Límite de Crédito:** Bloquea la confirmación de pedidos que excedan el límite de crédito disponible.
 *   **Consumo de Crédito:** Aumenta el crédito utilizado (`creditUsed`) de la empresa en el valor bruto del pedido al crearse con método `credit_b2b`.
 *   **Liberación de Crédito:** Resta el valor del pedido de `creditUsed` cuando la orden pasa a estado `CANCELLED` o `REJECTED`.
+
+#### 6. Gestión de Equipo Interno de Clientes (`test/backend/user-management.test.ts`)
+Prueba las reglas de acceso y restricciones del rol `COMPANY_ADMIN`:
+*   **Filtrado de Usuarios:** Valida que `COMPANY_ADMIN` solo liste usuarios pertenecientes a su empresa.
+*   **Restricción de Rol en Creación:** Bloquea la creación de roles administrativos (`ADMIN` / `COMPANY_ADMIN`) por parte de administradores de cliente.
+*   **Consistencia de Empresa:** Asegura que se fuerce el `companyId` del creador al dar de alta nuevos usuarios.
+*   **Edición y Borrado:** Bloquea operaciones sobre perfiles de usuarios de otras empresas B2B.
+
+#### 7. Procesamiento de Webhooks de Mercado Pago (`test/backend/payment-webhook.test.ts`)
+Valida la seguridad y llamadas del endpoint de conciliación automatizada (`POST /api/webhooks/mercadopago`):
+*   **Verificación HMAC:** Exige cabeceras válidas y firma SHA256 sobre el manifest cuando `MP_WEBHOOK_SECRET` está activo.
+*   **Gestión de Errores de Firma:** Retorna `403 Forbidden` ante firmas alteradas o ausentes.
+*   **Procesamiento Exitoso:** Envía el payload a `paymentService.processWebhook` y retorna `200 OK` para confirmar recepción.
+
+#### 8. Reglas de Validación de Empaque Comercial (`test/backend/packaging-validation.test.ts`)
+Verifica el cumplimiento de restricciones de empaque físico en órdenes de compra:
+*   **Mínimo de Compra (`minOrderQty`):** Rechaza compras inferiores al mínimo establecido por producto.
+*   **Múltiplos de Compra (`inner`):** Exige que la cantidad del ítem coincida estrictamente con múltiplos de su caja o empaque mínimo.
+
+#### 9. Modificación de Crédito Manual (`test/backend/customer-api.test.ts`)
+Valida la seguridad de actualización de límites financieros en `/api/customers/[id]`:
+*   **Bloqueo de Modificación Financiera:** Deniega a `COMPANY_ADMIN` el cambio de `creditLimit` o `defaultDiscount`.
+*   **Permiso Administrativo:** Permite únicamente a usuarios con rol `ADMIN` modificar los cupos financieros y descuentos comerciales de los clientes.
 
 ---
 
