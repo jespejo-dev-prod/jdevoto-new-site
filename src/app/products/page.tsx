@@ -24,11 +24,12 @@ export default async function CatalogPage(props: {
     recentlyViewed?: string;
     searchHistory?: string;
     related?: string;
+    limit?: string;
   }> 
 }) {
   const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
-  const limit = 24;
+  const limit = Number(searchParams.limit) || 24;
   const skip = (page - 1) * limit;
 
   // 1. Fetch categories and brands metadata first to resolve slugs to IDs in memory

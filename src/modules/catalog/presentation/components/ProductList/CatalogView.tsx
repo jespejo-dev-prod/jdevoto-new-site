@@ -49,6 +49,7 @@ export function CatalogView({
   const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string[]>>({});
   const [overrideProducts, setOverrideProducts] = useState<any[] | null>(null);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [brandSearch, setBrandSearch] = useState('');
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -131,6 +132,7 @@ export function CatalogView({
     subcategories?: string[] | null;
     search?: string | null;
     brands?: string[] | null;
+    limit?: number | null;
   }) => {
     const params = new URLSearchParams(searchParams.toString());
     
@@ -192,6 +194,14 @@ export function CatalogView({
         params.set('brands', brandSlugs.join(','));
       } else {
         params.delete('brands');
+      }
+    }
+
+    if (updates.limit !== undefined) {
+      if (updates.limit && updates.limit !== 24) {
+        params.set('limit', String(updates.limit));
+      } else {
+        params.delete('limit');
       }
     }
 
@@ -279,6 +289,10 @@ export function CatalogView({
   const activeParentId = activeCategoryObj?.parentId || (activeCategoryObj && !activeCategoryObj.parentId ? activeCategoryObj.id : null);
 
   const baseList = overrideProducts !== null ? overrideProducts : initialProducts;
+
+  const filteredBrands = brands.filter(b => 
+    b.name.toLowerCase().includes(brandSearch.toLowerCase())
+  );
 
   const filteredProducts = baseList.filter(p => {
     // 1. Filtro Categoría
@@ -461,13 +475,25 @@ export function CatalogView({
                   })}
               </div>
             </div>
-
-            {/* Marcas (Filtro Checkbox) */}
+               {/* Marcas (Filtro Checkbox con Buscador) */}
             {brands && brands.length > 0 && (
               <div>
                 <h3 className="text-base font-black uppercase text-zinc-900 tracking-wide mb-4 border-b border-zinc-100 pb-2.5">Mejores marcas</h3>
+                
+                {brands.length > 6 && (
+                  <div className="relative mb-3.5">
+                    <input 
+                      type="text" 
+                      placeholder="Buscar marca..." 
+                      value={brandSearch}
+                      onChange={(e) => setBrandSearch(e.target.value)}
+                      className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-zinc-200 bg-white placeholder:text-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors text-zinc-800"
+                    />
+                  </div>
+                )}
+
                 <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
-                  {brands.map((b) => {
+                  {filteredBrands.map((b) => {
                     const isChecked = selectedBrands.includes(b.id);
                     return (
                       <label key={b.id} className="flex items-center gap-3 text-sm font-semibold text-zinc-650 hover:text-zinc-950 cursor-pointer select-none py-1 transition-all">
@@ -490,6 +516,9 @@ export function CatalogView({
                       </label>
                     );
                   })}
+                  {filteredBrands.length === 0 && (
+                    <div className="text-xs text-zinc-400 font-bold py-1 uppercase pl-4">Sin coincidencias</div>
+                  )}
                 </div>
               </div>
             )}
@@ -592,6 +621,8 @@ export function CatalogView({
               onViewChange={setView}
               total={totalCount}
               variant="catalog"
+              limit={itemsPerPage}
+              onLimitChange={(val) => navigateWithFilters({ limit: val, page: 1 })}
             />
           </div>
         </div>
@@ -814,8 +845,19 @@ export function CatalogView({
               {brands && brands.length > 0 && (
                 <div>
                   <h3 className="text-xs font-black uppercase text-zinc-950 tracking-wide mb-3 border-b border-zinc-100 pb-1.5">Marcas</h3>
+                  
+                  {brands.length > 6 && (
+                    <input 
+                      type="text" 
+                      placeholder="Buscar marca..." 
+                      value={brandSearch}
+                      onChange={(e) => setBrandSearch(e.target.value)}
+                      className="w-full text-[10px] px-2 py-1 mb-2 rounded-md border border-zinc-200 bg-white placeholder:text-zinc-400 focus:outline-none focus:border-zinc-550 text-zinc-800"
+                    />
+                  )}
+
                   <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
-                    {brands.map((b) => {
+                    {filteredBrands.map((b) => {
                       const isChecked = selectedBrands.includes(b.id);
                       return (
                         <label key={b.id} className="flex items-center gap-2.5 text-xs font-semibold text-zinc-650 hover:text-zinc-950 cursor-pointer select-none py-1">
@@ -838,6 +880,9 @@ export function CatalogView({
                         </label>
                       );
                     })}
+                    {filteredBrands.length === 0 && (
+                      <div className="text-[10px] text-zinc-400 font-bold py-1 uppercase pl-4">Sin coincidencias</div>
+                    )}
                   </div>
                 </div>
               )}

@@ -14,6 +14,8 @@ interface ProductsFilterBarProps {
   onViewChange: (view: 'grid' | 'list') => void;
   total?: number;
   variant?: 'dashboard' | 'catalog';
+  limit?: number;
+  onLimitChange?: (limit: number) => void;
 }
 
 const DEBOUNCE_MS = 350;
@@ -28,6 +30,8 @@ export function ProductsFilterBar({
   onViewChange,
   total,
   variant = 'dashboard',
+  limit = 24,
+  onLimitChange,
 }: ProductsFilterBarProps) {
   const isDashboard = variant === 'dashboard';
   const [localSearch, setLocalSearch] = useState(search);
@@ -111,6 +115,24 @@ export function ProductsFilterBar({
           </select>
           <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500 pointer-events-none" />
         </div>
+
+        {/* Selector de cantidad por página (Límite) */}
+        {!isDashboard && onLimitChange && (
+          <div className="relative">
+            <select
+              id="product-limit-filter"
+              value={limit}
+              onChange={(e) => onLimitChange(Number(e.target.value))}
+              className={selectClasses}
+            >
+              <option value="24">24 POR PÁGINA</option>
+              <option value="100">100 POR PÁGINA</option>
+              <option value="500">500 POR PÁGINA</option>
+              <option value="1000">1000 POR PÁGINA</option>
+            </select>
+            <ArrowUpDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500 pointer-events-none" />
+          </div>
+        )}
 
         {/* Limpiar filtros */}
         {hasActiveFilters && (

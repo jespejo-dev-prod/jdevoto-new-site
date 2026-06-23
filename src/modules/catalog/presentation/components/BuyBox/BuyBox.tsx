@@ -131,7 +131,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
         {discountPercent > 0 ? (
           <>
             <div className="flex items-baseline gap-3 flex-wrap">
-              <span className="text-[36px] font-black text-zinc-950 transition-all duration-300 leading-none">
+              <span className="text-[36px] font-black text-zinc-950 transition-all duration-300 leading-none whitespace-nowrap">
                 $ {displayNetPrice.toLocaleString('es-CL')}
               </span>
               <span className="text-base font-black text-blue-600 whitespace-nowrap bg-blue-50 px-2 py-0.5 rounded-md">
@@ -140,7 +140,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
             </div>
             
             <div className="flex items-center gap-1.5 text-[17px] text-zinc-400 uppercase tracking-tight">
-              <span className="line-through">
+              <span className="line-through whitespace-nowrap">
                 $ {Math.round(b2bPrice?.unitNetPrice || baseNetPrice).toLocaleString('es-CL')}
               </span>
               <span>•</span>
@@ -157,7 +157,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
           </>
         ) : (
           <>
-            <div className="text-[36px] font-black text-zinc-950 transition-all duration-300 leading-none">
+            <div className="text-[36px] font-black text-zinc-950 transition-all duration-300 leading-none whitespace-nowrap">
               $ {displayNetPrice.toLocaleString('es-CL')}
             </div>
             <span className="text-sm sm:text-base text-zinc-500 font-bold uppercase tracking-widest block">Precio Neto (sin IVA)</span>
