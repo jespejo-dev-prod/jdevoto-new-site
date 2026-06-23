@@ -29,6 +29,7 @@ export const GET = withApiHandler(async (req: NextRequest, ctx: RouteContext) =>
     where: { id, isActive: true },
     include: {
       category: { select: { id: true, name: true, slug: true } },
+      brand: { select: { id: true, name: true, slug: true } },
     },
   });
 

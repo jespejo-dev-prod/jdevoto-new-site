@@ -51,6 +51,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       take: 12,
       include: {
         category: { select: { id: true, name: true, slug: true } },
+        brand: { select: { id: true, name: true, slug: true } },
         images: {
           select: { url: true, isPrimary: true, altText: true },
           where: { isPrimary: true },

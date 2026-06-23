@@ -156,6 +156,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       take: 500,
       include: {
         category: { select: { id: true, name: true, slug: true } },
+        brand: { select: { id: true, name: true, slug: true } },
         images: {
           select: { url: true, isPrimary: true, altText: true, position: true },
           orderBy: { position: "asc" },
@@ -224,6 +225,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
         orderBy: { name: "asc" },
         include: {
           category: { select: { id: true, name: true, slug: true } },
+          brand: { select: { id: true, name: true, slug: true } },
           images: {
             select: { url: true, isPrimary: true, altText: true, position: true },
             orderBy: { position: "asc" },
