@@ -64,3 +64,6 @@ next-env.d.ts
 # Scripts
 /scripts
 /src/scripts
+
+# Gemini progress
+gemini-progress.json

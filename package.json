@@ -9,6 +9,7 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "generate-descriptions": "tsx src/scripts/generate-all-descriptions.ts",
+    "check-quota": "tsx src/scripts/check-quota.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

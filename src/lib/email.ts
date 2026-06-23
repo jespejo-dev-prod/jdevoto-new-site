@@ -357,6 +357,19 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
       });
     }
 
+    const isPdf = messageData.attachmentName?.toLowerCase().endsWith('.pdf');
+    const emailSubject = isPdf 
+      ? `Factura adjunta para tu pedido #${order.orderNumber.split('-').pop()}`
+      : `Actualización de pedido #${order.orderNumber.split('-').pop()}`;
+      
+    const headerTitle = isPdf
+      ? `Factura de tu pedido #${order.orderNumber.split('-').pop()}`
+      : `Actualización en tu pedido #${order.orderNumber.split('-').pop()}`;
+      
+    const introText = isPdf
+      ? `Se ha adjuntado la factura en PDF para tu pedido.`
+      : `Tienes una nueva actualización o documento adjunto para tu pedido.`;
+
     const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -370,9 +383,9 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
     </head>
     <body>
       <div class="container">
-        <h2 style="color: #1e40af;">Actualización en tu pedido #${order.orderNumber.split('-').pop()}</h2>
+        <h2 style="color: #1e40af;">${headerTitle}</h2>
         <p>Hola,</p>
-        <p>Tienes una nueva actualización o documento adjunto para tu pedido.</p>
+        <p>${introText}</p>
         
         ${messageData.message ? `
         <div class="message-box">
@@ -382,7 +395,7 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
         ` : ''}
 
         ${attachments.length > 0 ? `
-        <p style="margin-top: 20px;"><strong>📎 Se ha adjuntado un documento a este correo.</strong></p>
+        <p style="margin-top: 20px;"><strong>📎 Se ha adjuntado la factura en PDF a este correo.</strong></p>
         ` : ''}
 
         <p style="margin-top: 30px;">
@@ -397,7 +410,7 @@ export async function sendOrderMessageEmail(order: any, messageData: any, attach
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
-      subject: `Actualización de pedido #${order.orderNumber.split('-').pop()}`,
+      subject: emailSubject,
       html: htmlContent,
       attachments
     });

@@ -46,52 +46,88 @@ export default function SupportPage() {
   // --- DATA ---
   const faqs: FAQ[] = [
     { 
-      category: 'manualidades', 
-      categoryName: 'Manualidades y Escolar',
+      category: 'registro', 
+      categoryName: 'Registro y Cuentas',
+      q: '¿Cómo registro mi empresa para acceder a los precios mayoristas?', 
+      a: 'Para comprar en nuestra plataforma B2B, es necesario registrarse ingresando el RUT de tu empresa, razón social y giro. Once que tu cuenta sea validada por nuestro equipo comercial, podrás iniciar sesión para ver los precios mayoristas y aplicar a condiciones de crédito B2B.' 
+    },
+    { 
+      category: 'registro', 
+      categoryName: 'Registro y Cuentas',
+      q: '¿Puedo agregar a otros colaboradores de mi empresa para que realicen pedidos?', 
+      a: 'Sí. Si eres el Administrador de la cuenta de tu empresa (Company Admin), puedes ingresar a tu panel de administración, invitar a otros colaboradores y crearles cuentas de tipo Comprador. Esto les permitirá generar pedidos bajo el cupo y condiciones de la empresa.' 
+    },
+    { 
+      category: 'descuentos', 
+      categoryName: 'Precios y Descuentos',
+      q: '¿Qué descuentos se aplican según los días de plazo de pago (0, 30, 60 y 90 días)?', 
+      a: 'Ofrecemos incentivos en el subtotal de tu pedido según las condiciones de pago de tu empresa: la condición Contado (0 días) otorga un 10% de descuento adicional, el plazo a 30 días otorga un 7% de descuento, a 60 días otorga un 4% de descuento, y la condición a 90 días no aplica descuento adicional (0%).' 
+    },
+    { 
+      category: 'credito', 
+      categoryName: 'Finanzas y Crédito',
+      q: '¿Cómo puedo pagar mis pedidos mediante Mercado Pago?', 
+      a: 'Si tu cuenta no tiene línea de crédito activa o prefieres pagar al instante, puedes seleccionar "Mercado Pago" en la sección de Checkout. Podrás pagar de forma segura con tarjetas de crédito, débito (Redcompra/Webpay) o saldo en tu cuenta de Mercado Pago. Tu pedido será procesado de inmediato una vez confirmado el pago.' 
+    },
+    { 
+      category: 'credito', 
+      categoryName: 'Finanzas y Crédito',
+      q: '¿Cómo funciona el pago con Crédito B2B y cómo libero mi cupo?', 
+      a: 'El pago con Crédito B2B te permite realizar compras utilizando la línea de crédito aprobada para tu empresa. Al procesar un pedido bajo esta modalidad, se consume el cupo disponible. Puedes pagar tus facturas vencidas o pendientes directamente a través de Mercado Pago (o utilizando dinero en tu cuenta de Mercado Libre), lo cual liberará tu cupo de crédito de forma 100% automática en el sistema.' 
+    },
+    { 
+      category: 'descuentos', 
+      categoryName: 'Precios y Descuentos',
+      q: '¿Cómo se aplican las listas de precios y los descuentos especiales a empresas en mi cuenta?', 
+      a: 'Nuestro motor de precios aplica una jerarquía automática para que siempre obtengas las mejores condiciones comerciales. La prioridad de precios es: 1) Descuentos de Outlet, 2) Listas de precios personalizadas o el Descuento de Empresa asignado a tu cuenta por convenio corporativo, 3) Promociones temporales, y 4) Precio base. Los descuentos especiales aplicados a tu empresa se reflejarán de forma automática en el subtotal del carrito una vez inicies sesión. Ten en cuenta que estos descuentos corporativos específicos son independientes del descuento de plazos de pago (0, 30, 60 o 90 días).' 
+    },
+    { 
+      category: 'pedidos', 
+      categoryName: 'Gestión de Pedidos',
+      q: '¿Puedo enviar mis listas de compras o cotizaciones por correo electrónico?', 
+      a: 'Sí, desde el carrito de compras puedes exportar y enviar el detalle de tu lista de insumos por correo electrónico en formato PDF o Excel. Esta funcionalidad es ideal para enviar la cotización a los departamentos de compras o aprobación interna antes de generar el pedido.' 
+    },
+    { 
+      category: 'pedidos', 
+      categoryName: 'Gestión de Pedidos',
+      q: '¿Cómo puedo repetir o duplicar un pedido anterior?', 
+      a: 'Para repetir un pedido, accede a tu panel de usuario en la sección "Mis Pedidos". Busca la compra anterior que deseas duplicar y presiona el botón "Repetir Pedido". Todos los artículos correspondientes se agregarán de inmediato al carrito de compras con sus existencias disponibles actuales.' 
+    },
+    { 
+      category: 'despacho', 
+      categoryName: 'Despachos y Fletes',
+      q: '¿Cuáles son las políticas de flete y montos mínimos para despacho gratuito?', 
+      a: 'El monto mínimo de compra neta para despacho gratuito en la Región Metropolitana es de $100.000 CLP. Para la zona extrema norte el mínimo es de $500.000 CLP y para la zona extrema sur es de $1.000.000 CLP. Los despachos a territorios insulares no son elegibles para despacho gratuito. Cabe destacar que el subtotal neto mínimo para realizar cualquier pedido en la plataforma es de $100.000 CLP netos (monto obligatorio que se calcula sobre los precios de lista y que no incluye ni considera los descuentos específicos adicionales otorgados a empresas o convenios corporativos).' 
+    },
+    { 
+      category: 'despacho', 
+      categoryName: 'Despachos y Fletes',
+      q: '¿Con qué empresas de transporte trabajan en la modalidad "Flete Pagado" y cuáles son los plazos?', 
+      a: 'Si tu compra cumple con el monto mínimo para despacho gratuito (Flete Pagado), el sistema asignará de forma automática el transporte y los tiempos según tu ciudad/comuna de destino: Santiago se despacha vía T. Espinoza (24-48 hrs); la Quinta Región a domicilio (12-48 hrs); Chillán, Concepción, Talcahuano, Valdivia, Temuco y Osorno vía Ecoex (24-48 hrs); ciudades del norte y sur (Arica, Iquique, Copiapó, La Serena, Puerto Montt, Chiloé) vía FedEx (24-96 hrs); Coyhaique y Puerto Aysén vía A.T.E. (6-8 días); y Punta Arenas o Porvenir vía Swisslog (5-7 días).' 
+    },
+    { 
+      category: 'despacho', 
+      categoryName: 'Despachos y Fletes',
+      q: '¿Cómo funciona la modalidad "Flete por Pagar" y qué transporte debo elegir?', 
+      a: 'Si tu pedido no alcanza el monto mínimo para despacho gratis, se enviará bajo la modalidad "Flete por Pagar". Al finalizar tu compra en el Checkout, el usuario deberá indicar obligatoriamente el transporte por el cual desea recibir sus productos, pudiendo seleccionar entre Starken, Chilexpress, Blue Express, Pullman Cargo, Varmontt, Cruz del Sur o especificar otro alternativo. El costo del flete se cancela directamente al transportista elegido al momento de recibir la mercadería.' 
+    },
+    { 
+      category: 'descuentos', 
+      categoryName: 'Precios y Descuentos',
       q: '¿Tienen precios especiales para librerías o compras escolares por volumen?', 
-      a: 'Sí, en jdevoto.cl nos especializamos en ventas al por mayor para oficinas y librerías. Al agregar productos al carrito, puedes seleccionar la opción "Solicitar Cotización" para recibir un descuento por volumen.' 
+      a: 'Sí, en JDevoto.cl nos especializamos en ventas al por mayor para oficinas y librerías. Al agregar productos al carrito, puedes seleccionar la opción "Solicitar Cotización" para recibir un descuento por volumen.' 
     },
     { 
-      category: 'manualidades', 
-      categoryName: 'Manualidades y Escolar',
-      q: '¿Los materiales para manualidades (como goma EVA y paño lenci) son seguros para niños?', 
-      a: 'Todos nuestros productos escolares y de manualidades cumplen con las normativas de seguridad chilenas vigentes y son libres de elementos tóxicos, siendo totalmente aptos para el uso escolar.' 
-    },
-    { 
-      category: 'oficina', 
-      categoryName: 'Oficina y Escritorio',
-      q: '¿Tienen stock continuo de repuestos como corchetes y papel térmico?', 
-      a: 'Sí, mantenemos un stock permanente de corchetes 26/6, N°10, grapas de acero de distintas medidas y rollos de papel térmico para boletas y terminales de punto de venta (POS).' 
-    },
-    { 
-      category: 'oficina', 
-      categoryName: 'Oficina y Escritorio',
+      category: 'credito', 
+      categoryName: 'Finanzas y Crédito',
       q: '¿Cómo descargo mi factura electrónica?', 
       a: 'Todas las facturas electrónicas emitidas por JDevoto se envían automáticamente al correo registrado en el Servicio de Impuestos Internos. También puedes visualizarlas y descargarlas en tu panel de usuario en la sección de "Mis Pedidos".' 
     },
     { 
-      category: 'ferreteria', 
-      categoryName: 'Ferretería y Fijaciones',
-      q: '¿Qué tipo de garantía tienen las herramientas de mano y pistolas de silicona?', 
-      a: 'Todos nuestros productos de ferretería y herramientas cuentan con la garantía de 6 meses ante fallas o defectos de fabricación. Si tu equipo presenta problemas, puedes iniciar un caso de cambio o devolución.' 
-    },
-    { 
-      category: 'ferreteria', 
-      categoryName: 'Ferretería y Fijaciones',
-      q: '¿Los clavos de exterior y las grapas galvanizadas resisten la humedad?', 
-      a: 'Sí, las líneas de clavos exterior y grapas galvanizadas de nuestro catálogo cuentan con tratamientos anticorrosivos que les permiten soportar la humedad y la intemperie, siendo ideales para carpintería exterior.' 
-    },
-    { 
-      category: 'regalos', 
-      categoryName: 'Regalos y Novedades',
-      q: '¿Los juegos de mesa, tarots y naipes vienen sellados?', 
-      a: 'Sí, todas las barajas de naipes emoji, tarots y juegos de mesa comercializados en nuestra tienda son productos 100% nuevos y vienen con el sello hermético de fábrica para asegurar la integridad de todas sus cartas.' 
-    },
-    { 
-      category: 'regalos', 
-      categoryName: 'Regalos y Novedades',
-      q: '¿Cuáles son las políticas si compro un regalo y quiero cambiarlo?', 
-      a: 'Dispones de 10 días corridos desde la recepción de tu compra para solicitar cambios o retracto. El producto debe estar sellado, sin uso, y con su empaque original intacto.' 
+      category: 'pedidos', 
+      categoryName: 'Gestión de Pedidos',
+      q: '¿Cómo puedo generar una cotización formal desde la web?', 
+      a: 'Al tener productos en el carrito de compras, puedes presionar la opción "Solicitar Cotización" en lugar de proceder al pago. El sistema generará automáticamente un documento PDF formal con la validez de stock y precios vigentes, el cual se enviará a tu correo de contacto.' 
     }
   ];
 
@@ -237,7 +273,7 @@ export default function SupportPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Ingresa tu duda (ej. despacho, factura, corchetera)..." 
+                placeholder="Ingresa tu duda (ej. despacho, factura, garantía)..." 
                 className="w-full bg-transparent text-zinc-900 placeholder-zinc-400 py-5 pl-16 pr-28 outline-none text-base font-medium"
               />
               {searchQuery && (
@@ -256,7 +292,7 @@ export default function SupportPage() {
             {/* Quick Suggestions underneath */}
             <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs text-zinc-400">
               <span className="font-semibold text-zinc-500">Búsquedas populares:</span>
-              {['Factura Electrónica', 'Garantía', 'Despacho', 'Goma EVA'].map((tag) => (
+              {['Factura Electrónica', 'Garantía', 'Despacho', 'Juegos de mesa'].map((tag) => (
                 <button
                   key={tag}
                   onClick={() => handleTagClick(tag)}

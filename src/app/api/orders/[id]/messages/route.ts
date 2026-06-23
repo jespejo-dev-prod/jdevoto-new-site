@@ -91,26 +91,38 @@ export const POST = withApiHandler(async (
     }
   });
 
+  const isInvoicePdf = file && file.type === 'application/pdf' && isAdmin;
+
   // 4.1 Crear Notificaciones Globales
   if (isAdmin) {
     // Notificar al comprador
     if (order.createdById !== user.id) {
+      const notifTitle = isInvoicePdf
+        ? `Factura adjunta para Pedido #${order.orderNumber}`
+        : `Nuevo mensaje en Pedido #${order.orderNumber}`;
+
+      const notifMessage = isInvoicePdf
+        ? `El administrador ha adjuntado la factura en PDF para tu pedido.`
+        : `El administrador ha enviado un mensaje o factura.`;
+
       const notif = await prisma.notification.create({
         data: {
           userId: order.createdById,
-          title: `Nuevo mensaje en Pedido #${order.orderNumber}`,
-          message: `El administrador ha enviado un mensaje o factura.`,
+          title: notifTitle,
+          message: notifMessage,
           link: `/dashboard/orders/${order.id}`
         }
       });
-      // Enviar correo de notificación
-      try {
-        const { sendNotificationEmail } = await import('@/lib/email');
-        if (order.createdBy?.email) {
-          await sendNotificationEmail(order.createdBy.email, notif.title, notif.message, notif.link || undefined);
+      // Enviar correo de notificación (sólo si no se envía el email del mensaje detallado abajo)
+      if (!notifyCustomer && !isInvoicePdf) {
+        try {
+          const { sendNotificationEmail } = await import('@/lib/email');
+          if (order.createdBy?.email) {
+            await sendNotificationEmail(order.createdBy.email, notif.title, notif.message, notif.link || undefined);
+          }
+        } catch (err) {
+          console.error("Error al enviar correo de notificación:", err);
         }
-      } catch (err) {
-        console.error("Error al enviar correo de notificación:", err);
       }
     }
   } else {
@@ -147,8 +159,8 @@ export const POST = withApiHandler(async (
     }
   }
 
-  // 5. Notificar al cliente por correo si se solicitó (sólo si es admin)
-  if (notifyCustomer && isAdmin) {
+  // 5. Notificar al cliente por correo si se solicitó o si es una factura en PDF (sólo si es admin)
+  if ((notifyCustomer || isInvoicePdf) && isAdmin) {
     try {
       const { sendOrderMessageEmail } = await import('@/lib/email');
       let customerEmail = (order.billingAddress as any)?.email;
