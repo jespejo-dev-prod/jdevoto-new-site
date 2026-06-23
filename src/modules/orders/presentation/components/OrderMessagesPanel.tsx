@@ -130,6 +130,7 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="hidden"
                 accept=".pdf,.jpg,.jpeg,.png"
+                data-testid="chat-file-input"
               />
               <div className="flex items-center gap-3">
                 <Button

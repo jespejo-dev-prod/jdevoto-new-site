@@ -442,6 +442,7 @@ export default function ImportStockPage() {
                   onChange={handleFileChange}
                   accept=".csv,.txt,.xlsx,.xls"
                   className="hidden"
+                  data-testid="file-input"
                 />
                 
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
