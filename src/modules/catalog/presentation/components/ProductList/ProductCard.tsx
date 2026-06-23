@@ -210,6 +210,11 @@ export const ProductCard = memo(function ProductCard({
                   SKU: {product.sku}
                 </span>
               )}
+              {!isDashboard && product.sku && (
+                <span className="text-sm font-mono font-black text-blue-600 shrink-0">
+                  SKU: {product.sku}
+                </span>
+              )}
             </div>
             <h3 className={cn(
               "transition-colors",
