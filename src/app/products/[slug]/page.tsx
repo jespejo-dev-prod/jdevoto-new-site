@@ -123,6 +123,11 @@ export default async function DynamicProductPage(props: ProductPageProps) {
     ? product.brand
     : (product.brand as any)?.name || '';
 
+  const hasDimensions = (Number(product.length) || 0) > 0 ||
+    (Number(product.width) || 0) > 0 ||
+    (Number(product.height) || 0) > 0 ||
+    (Number(product.weight) || 0) > 0;
+
   // Precio base con IVA para el JSON-LD (el BuyBox lo actualizará con precio B2B)
   const basePriceGross = Math.round(Number(product.basePrice) * (1 + TAX_RATE));
 
@@ -328,10 +333,12 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   <ChevronDown className="h-6 w-6 text-zinc-400" />
                 </div>
                 <div className="p-8 rounded-3xl bg-zinc-50 border border-zinc-100 text-base sm:text-lg text-zinc-700 space-y-6 font-medium">
-                  <div className="flex justify-between items-center">
-                    <span className="text-zinc-400 uppercase font-black text-xs sm:text-[13px] tracking-widest">Dimensiones</span>
-                    <span className="text-zinc-950 font-bold">{Number(product.length) || '—'} x {Number(product.width) || '—'} x {Number(product.height) || '—'} cm; {Number(product.weight) || '—'} kg</span>
-                  </div>
+                  {hasDimensions && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-400 uppercase font-black text-xs sm:text-[13px] tracking-widest">Dimensiones</span>
+                      <span className="text-zinc-950 font-bold">{Number(product.length) || '—'} x {Number(product.width) || '—'} x {Number(product.height) || '—'} cm; {Number(product.weight) || '—'} kg</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center">
                     <span className="text-zinc-400 uppercase font-black text-xs sm:text-[13px] tracking-widest">Fabricante</span>
                     <span className="text-zinc-950 font-bold">{brandName || '—'}</span>

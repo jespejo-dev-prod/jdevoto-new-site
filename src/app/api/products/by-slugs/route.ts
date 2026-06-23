@@ -14,6 +14,16 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   }
   const companyId = user?.companyId || null;
 
+  const isPrivileged = user && (user.role === "ADMIN" || user.role === "SALES_REP");
+  let hideOutOfStock = false;
+  if (!isPrivileged) {
+    const hideSetting = await prisma.storeSettings.findUnique({
+      where: { key: "hideOutOfStock" },
+    });
+    hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
+  }
+  const stockFilter = hideOutOfStock ? { stockQuantity: { gt: 0 } } : {};
+
   const slugsQuery = req.nextUrl.searchParams.get("slugs") || "";
   const slugs = slugsQuery.split(",").filter(Boolean);
   const related = req.nextUrl.searchParams.get("related") === "true";
@@ -43,6 +53,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
         id: { notIn: excludeIds },
         isActive: true,
         isDeleted: false,
+        ...stockFilter,
         OR: [
           ...(categoryIds.length > 0 ? [{ categoryId: { in: categoryIds } }] : []),
           ...(brandIds.length > 0 ? [{ brandId: { in: brandIds } }] : [])
@@ -74,6 +85,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       slug: { in: slugs },
       isActive: true,
       isDeleted: false,
+      ...stockFilter,
     },
     include: {
       category: { select: { id: true, name: true, slug: true } },
