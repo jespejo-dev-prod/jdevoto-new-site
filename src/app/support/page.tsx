@@ -225,18 +225,19 @@ export default function SupportPage() {
 
 
 
-  // Pre-fill search from tags
-  const handleTagClick = (tag: string) => {
-    setSearchQuery(tag);
-  };
-
-  // FAQ Filter Logic (Filters questions directly as user types)
+  // FAQ Filter Logic (Filters questions directly as user types with accent/diacritic-insensitive matching)
   const filteredFaqs = useMemo(() => {
     if (!searchQuery.trim()) return faqs;
-    return faqs.filter(faq => 
-      faq.q.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      faq.a.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
+
+    const normalize = (text: string) =>
+      text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+    const normalizedQuery = normalize(searchQuery);
+
+    return faqs.filter(faq =>
+      normalize(faq.q).includes(normalizedQuery) ||
+      normalize(faq.a).includes(normalizedQuery) ||
+      normalize(faq.categoryName).includes(normalizedQuery)
     );
   }, [searchQuery]);
 
@@ -289,19 +290,7 @@ export default function SupportPage() {
               </span>
             </div>
 
-            {/* Quick Suggestions underneath */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs text-zinc-400">
-              <span className="font-semibold text-zinc-500">Búsquedas populares:</span>
-              {['Factura Electrónica', 'Garantía', 'Despacho', 'Juegos de mesa'].map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => handleTagClick(tag)}
-                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-zinc-300 font-medium px-3 py-1 rounded-full transition-all duration-200 cursor-pointer"
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
+
           </div>
         </div>
       </section>
