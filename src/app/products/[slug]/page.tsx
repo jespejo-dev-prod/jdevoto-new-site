@@ -23,6 +23,9 @@ import { BundleAction } from '@/modules/catalog/presentation/components/BundleAc
 import { prisma } from '@/lib/client';
 import { TAX_RATE } from '@/types/domain';
 import { TrackProduct } from '@/components/catalog/track-product';
+import { RecentlyViewedSlider } from '@/components/home/client-sliders';
+import { serializeDecimal } from '@/lib/utils';
+import { priceService } from '@/modules/pricing/domain/price.service';
 
 /**
  * Request-level cache:
@@ -379,12 +382,130 @@ async function RelatedProductsSection({
   categoryId: string | null;
   currentProductId: string;
 }) {
-  const related = await getRelatedProductsUseCase(categoryId, currentProductId, null);
-  if (!related || related.length === 0) return null;
+  const hideSetting = await prisma.storeSettings.findUnique({
+    where: { key: 'hideOutOfStock' },
+  });
+  const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
+
+  const productSelect = {
+    id: true,
+    sku: true,
+    name: true,
+    slug: true,
+    basePrice: true,
+    stockQuantity: true,
+    minOrderQty: true,
+    unit: true,
+    inner: true,
+    brandId: true,
+    categoryId: true,
+    category: { select: { id: true, name: true, isOutlet: true } },
+    brand: { select: { id: true, name: true } },
+    images: {
+      where: { isPrimary: true },
+      take: 1,
+      select: { url: true, isPrimary: true },
+    },
+  };
+
+  async function fetchEnrichedProducts(whereClause: any, limit: number): Promise<any[]> {
+    const products = await prisma.product.findMany({
+      where: {
+        ...whereClause,
+        isActive: true,
+        isDeleted: false,
+        ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
+      },
+      take: limit,
+      orderBy: [
+        { stockQuantity: "desc" },
+        { createdAt: "desc" }
+      ],
+      select: productSelect,
+    });
+
+    if (products.length === 0) return [];
+
+    const enriched = await priceService.enrichProductsWithPrices(products as any, null);
+    return enriched.map((p: any) => serializeDecimal(p as Record<string, unknown>));
+  }
+
+  // 1. Fetch child category products
+  const childProducts = categoryId
+    ? await fetchEnrichedProducts({ categoryId, id: { not: currentProductId } }, 8)
+    : [];
+
+  // Determine parent category
+  let parentId: string | null = null;
+  let parentName: string | null = null;
+  let childName: string | null = null;
+  let parentCategoryIds: string[] = [];
+
+  if (categoryId) {
+    const currentCategory = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { id: true, name: true, parentId: true }
+    });
+
+    if (currentCategory) {
+      childName = currentCategory.name;
+      if (currentCategory.parentId) {
+        parentId = currentCategory.parentId;
+        const parentCategory = await prisma.category.findUnique({
+          where: { id: parentId },
+          select: { name: true }
+        });
+        parentName = parentCategory?.name || null;
+      } else {
+        parentId = currentCategory.id;
+        parentName = currentCategory.name;
+      }
+    }
+  }
+
+  if (parentId) {
+    const subcategories = await prisma.category.findMany({
+      where: { parentId },
+      select: { id: true }
+    });
+    parentCategoryIds = [parentId, ...subcategories.map(c => c.id)];
+  } else if (categoryId) {
+    parentCategoryIds = [categoryId];
+  }
+
+  // 2. Fetch parent category products
+  const showChildSlider = childProducts.length >= 1;
+  const excludeIds: string[] = [currentProductId];
+  if (showChildSlider) {
+    excludeIds.push(...childProducts.map((p: any) => p.id as string));
+  }
+
+  const parentProducts = parentCategoryIds.length > 0
+    ? await fetchEnrichedProducts({ categoryId: { in: parentCategoryIds }, id: { notIn: excludeIds } }, 8)
+    : [];
+
+  if (parentProducts.length === 0 && childProducts.length === 0) return null;
 
   return (
-    <div className="mt-12 border-t border-zinc-100 pt-16">
-      <ProductSlider title="Productos Relacionados" products={related} />
+    <div className="mt-12 border-t border-zinc-100 pt-16 space-y-16">
+      {/* 1. Direct Category (Child/Hijo) Slider - Only shown if it has >= 1 products */}
+      {showChildSlider && (
+        <ProductSlider 
+          title={childName ? `Productos de ${childName}` : "Productos Relacionados"} 
+          products={childProducts} 
+        />
+      )}
+
+      {/* 2. Parent Category Slider - Always shown */}
+      {parentProducts.length > 0 && (
+        <ProductSlider 
+          title={parentName || "Categoría Principal"} 
+          products={parentProducts} 
+        />
+      )}
+
+      {/* 3. Vistos Recientemente Slider - Always shown */}
+      <RecentlyViewedSlider fallbackProducts={parentProducts.slice(0, 10)} />
     </div>
   );
 }

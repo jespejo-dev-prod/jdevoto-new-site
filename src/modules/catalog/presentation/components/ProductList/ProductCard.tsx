@@ -250,7 +250,7 @@ export const ProductCard = memo(function ProductCard({
                     {originalNetPrice && originalNetPrice !== price ? (
                       <>
                         <div className="flex items-baseline gap-2">
-                          <span className="text-3xl font-black text-zinc-950 tracking-tight">
+                          <span className="text-3xl font-black text-zinc-950 tracking-tight whitespace-nowrap">
                             $ {price.toLocaleString('es-CL')}
                           </span>
                           <span className="text-[14px] font-black text-blue-600 whitespace-nowrap">
@@ -258,7 +258,7 @@ export const ProductCard = memo(function ProductCard({
                           </span>
                         </div>
                         <div className="flex items-center gap-1 text-[15px] text-zinc-400 uppercase tracking-tight">
-                          <span className="line-through">
+                          <span className="line-through whitespace-nowrap">
                             $ {originalNetPrice.toLocaleString('es-CL')}
                           </span>
                           <span>•</span>
@@ -267,7 +267,7 @@ export const ProductCard = memo(function ProductCard({
                       </>
                     ) : (
                       <>
-                        <span className="text-3xl font-black text-zinc-950 tracking-tight">
+                        <span className="text-3xl font-black text-zinc-950 tracking-tight whitespace-nowrap">
                           $ {price.toLocaleString('es-CL')}
                         </span>
                         <span className="text-[11px] text-zinc-400 font-bold uppercase tracking-tight">Neto</span>
