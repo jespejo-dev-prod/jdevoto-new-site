@@ -49,7 +49,7 @@ export default function SupportPage() {
       category: 'registro', 
       categoryName: 'Registro y Cuentas',
       q: '¿Cómo registro mi empresa para acceder a los precios mayoristas?', 
-      a: 'Para comprar en nuestra plataforma B2B, es necesario registrarse ingresando el RUT de tu empresa, razón social y giro. Once que tu cuenta sea validada por nuestro equipo comercial, podrás iniciar sesión para ver los precios mayoristas y aplicar a condiciones de crédito B2B.' 
+      a: 'Para comprar en nuestra plataforma B2B, es necesario registrarse ingresando el RUT de tu empresa, razón social y giro. Una vez que tu cuenta sea validada por nuestro equipo comercial, podrás iniciar sesión para ver los precios mayoristas y aplicar a condiciones de crédito B2B.' 
     },
     { 
       category: 'registro', 
@@ -73,7 +73,7 @@ export default function SupportPage() {
       category: 'credito', 
       categoryName: 'Finanzas y Crédito',
       q: '¿Cómo funciona el pago con Crédito B2B y cómo libero mi cupo?', 
-      a: 'El pago con Crédito B2B te permite realizar compras utilizando la línea de crédito aprobada para tu empresa. Al procesar un pedido bajo esta modalidad, se consume el cupo disponible. Puedes pagar tus facturas vencidas o pendientes directamente a través de Mercado Pago (o utilizando dinero en tu cuenta de Mercado Libre), lo cual liberará tu cupo de crédito de forma 100% automática en el sistema.' 
+      a: 'El pago con Crédito B2B te permite realizar compras utilizando la línea de crédito aprobada para tu empresa. Al procesar un pedido bajo esta modalidad, se consume el cupo disponible. Puedes  liberará tu cupo de crédito de forma 100% automática en el sistema.' 
     },
     { 
       category: 'descuentos', 
@@ -262,9 +262,6 @@ export default function SupportPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
             ¿Cómo podemos ayudarte hoy?
           </h1>
-          <p className="text-zinc-400 text-base md:text-lg max-w-xl mx-auto">
-            Busca respuestas rápidas sobre tus compras de papelería, oficina, herramientas de ferretería y regalos.
-          </p>
 
           {/* Clean Functional Search Bar */}
           <div className="max-w-2xl mx-auto mt-8 relative">
