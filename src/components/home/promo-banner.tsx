@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 export function PromoBanner() {
   return (
@@ -15,21 +15,23 @@ export function PromoBanner() {
             Campaña Especial B2B
           </div>
           <h3 className="text-2xl md:text-3xl font-black tracking-tight uppercase leading-tight text-zinc-950">
-            Abastece tu Oficina y Empresa con Flete Incluido
+            Abastece tu Negocio y Empresa con Flete Incluido
           </h3>
           <p className="text-zinc-500 text-xs md:text-sm font-semibold leading-relaxed">
-            Catálogo completo de papelería, manualidades, herramientas de oficina y ferretería. Activa tu cuenta corriente corporativa para recibir flete 100% bonificado en Santiago y regiones.
+            Catálogo completo de papelería, manualidades, productos de oficina y
+            ferretería. Activa tu cuenta corriente corporativa para recibir
+            flete 100% bonificado en Santiago y regiones.
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto shrink-0">
-          <Link 
+          <Link
             href="/login"
             className="px-6 py-3 rounded-full bg-zinc-950 text-white font-bold text-xs uppercase tracking-wider hover:bg-zinc-900 transition-all shadow-md active:scale-95 text-center"
           >
             Inicia Sesión
           </Link>
-          <Link 
+          <Link
             href="/support"
             className="px-6 py-3 rounded-full bg-white border border-zinc-300 text-zinc-800 font-bold text-xs uppercase tracking-wider hover:bg-zinc-50 hover:border-zinc-400 transition-all active:scale-95 text-center flex items-center justify-center gap-1.5"
           >

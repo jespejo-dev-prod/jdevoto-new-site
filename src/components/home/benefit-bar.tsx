@@ -1,26 +1,26 @@
-import { Truck, Clock, ShieldCheck, Building2 } from 'lucide-react';
+import { Truck, Clock, ShieldCheck, Building2 } from "lucide-react";
 
 export function BenefitBar() {
   const items = [
     {
       icon: Truck,
-      title: 'Flete Incluido',
-      desc: 'En pedidos mayoristas seleccionados',
+      title: "Flete Incluido",
+      desc: "En pedidos mayoristas seleccionados",
     },
     {
       icon: Clock,
-      title: 'Despacho Rápido',
-      desc: 'Despacho prioritario en 24/48 hrs',
+      title: "Despacho Rápido",
+      desc: "Despacho prioritario en 24/48 hrs",
     },
     {
       icon: ShieldCheck,
-      title: 'Garantía y Soporte',
-      desc: 'Respaldado por soporte corporativo',
+      title: "Garantía y Soporte",
+      desc: "Respaldado por soporte corporativo",
     },
     {
       icon: Building2,
-      title: 'Convenios B2B',
-      desc: 'Precios por volumen y líneas de crédito',
+      title: "Convenios B2B",
+      desc: "Precios y condiciones especiales al comercio",
     },
   ];
 
@@ -31,8 +31,8 @@ export function BenefitBar() {
           <div
             key={idx}
             className={`flex items-center gap-4 lg:px-6 ${
-              idx === 0 ? 'lg:pl-2' : ''
-            } ${idx > 0 ? 'pt-4 sm:pt-0 lg:pt-0' : ''}`}
+              idx === 0 ? "lg:pl-2" : ""
+            } ${idx > 0 ? "pt-4 sm:pt-0 lg:pt-0" : ""}`}
           >
             <div className="h-10 w-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center shrink-0">
               <item.icon className="h-5 w-5 text-zinc-700" />

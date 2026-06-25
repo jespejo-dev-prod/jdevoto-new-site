@@ -5,9 +5,33 @@ import { Search, ShoppingCart, LogOut, User, LogIn, Menu, X, Heart } from 'lucid
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/auth-context';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { CategoriesMenu } from './categories-menu';
+
+const FIREWORK_PARTICLES = [
+  { dx: -32, dy: -32, color: 'bg-yellow-250' },
+  { dx: 32, dy: -32, color: 'bg-yellow-300' },
+  { dx: -45, dy: 8, color: 'bg-white' },
+  { dx: 45, dy: 8, color: 'bg-yellow-100' },
+  { dx: -22, dy: 38, color: 'bg-amber-300' },
+  { dx: 22, dy: 38, color: 'bg-amber-200' },
+  { dx: 0, dy: -46, color: 'bg-white' },
+  { dx: 0, dy: 46, color: 'bg-yellow-400' },
+];
+
+const FIREWORK_BURSTS = [
+  { left: '50%', top: '50%', delay: '0s', scale: 'scale-[1.8] z-20' }, // Center main burst
+  { left: '42%', top: '35%', delay: '0.2s', scale: 'scale-[1.1] opacity-80' },
+  { left: '58%', top: '65%', delay: '0.25s', scale: 'scale-[1.1] opacity-80' },
+  { left: '35%', top: '60%', delay: '0.3s', scale: 'scale-[0.9] opacity-70' },
+  { left: '65%', top: '30%', delay: '0.35s', scale: 'scale-[0.9] opacity-70' },
+  { left: '22%', top: '40%', delay: '0.45s', scale: 'scale-[0.7] opacity-55' },
+  { left: '78%', top: '60%', delay: '0.45s', scale: 'scale-[0.7] opacity-55' },
+];
+
+
+
 
 export function PublicHeader() {
   const { items = [], itemCount, subtotal = 0 } = useCart();
@@ -20,6 +44,7 @@ export function PublicHeader() {
   const router = useRouter();
 
   const [isMobile, setIsMobile] = useState(false);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -78,6 +103,23 @@ export function PublicHeader() {
   const formattedMissing = missingAmount.toLocaleString('es-CL');
   const percent = Math.min(100, (roundedSubtotal / 100000) * 100);
   const isMinimumMet = roundedSubtotal >= 100000;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (!isMinimumMet) {
+      sessionStorage.removeItem('hasCelebratedMinimum');
+      setShouldAnimate(false);
+    } else {
+      const hasCelebrated = sessionStorage.getItem('hasCelebratedMinimum');
+      if (!hasCelebrated) {
+        setShouldAnimate(true);
+        sessionStorage.setItem('hasCelebratedMinimum', 'true');
+      } else {
+        setShouldAnimate(false);
+      }
+    }
+  }, [isMinimumMet]);
 
   return (
     <header className="sticky top-0 z-50 w-full flex flex-col">
@@ -220,12 +262,52 @@ export function PublicHeader() {
 
       {/* Barra de progreso de compra mínima */}
       {showProgressBar && (
-        <div className={`h-[46px] flex items-center justify-center gap-4 sm:gap-6 px-4 sm:px-8 text-xs sm:text-[13px] font-bold uppercase tracking-wider select-none transition-all duration-300 ${
+        <div className={`relative h-[46px] flex items-center justify-center gap-4 sm:gap-6 px-4 sm:px-8 text-xs sm:text-[13px] font-bold uppercase tracking-wider select-none transition-all duration-300 ${
           isMinimumMet 
             ? 'bg-emerald-600 text-white border-b border-emerald-700' 
-            : 'bg-sky-500 text-white border-b border-sky-600'
+            : 'bg-zinc-600 text-white border-b border-zinc-700'
         }`}>
-          <div className="flex items-center gap-2 truncate font-black">
+          {shouldAnimate && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+              <style>{`
+                @keyframes firework-particle {
+                  0% {
+                    transform: translate(0, 0) scale(1);
+                    opacity: 1;
+                  }
+                  80% {
+                    opacity: 0.8;
+                  }
+                  100% {
+                    transform: translate(var(--dx), var(--dy)) scale(0);
+                    opacity: 0;
+                  }
+                }
+              `}</style>
+              {FIREWORK_BURSTS.map((burst, bIdx) => (
+                <div
+                  key={bIdx}
+                  className={`absolute ${burst.scale}`}
+                  style={{ left: burst.left, top: burst.top }}
+                >
+                  {FIREWORK_PARTICLES.map((p, pIdx) => (
+                    <div
+                      key={pIdx}
+                      className={`absolute w-2 h-2 rounded-full ${p.color} shadow-sm`}
+                      style={{
+                        '--dx': `${p.dx}px`,
+                        '--dy': `${p.dy}px`,
+                        animation: 'firework-particle 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        animationDelay: burst.delay,
+                      } as CSSProperties}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 truncate font-black relative z-10">
             {isMinimumMet ? (
               <span>
                 🎉 ¡Mínimo Alcanzado! | Neto: ${formattedSubtotal}
@@ -236,9 +318,9 @@ export function PublicHeader() {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 relative z-10">
             <div className={`w-20 sm:w-44 h-2.5 rounded-full overflow-hidden relative border ${
-              isMinimumMet ? 'bg-emerald-800 border-emerald-700' : 'bg-sky-700/30 border-sky-600/30'
+              isMinimumMet ? 'bg-emerald-800 border-emerald-700' : 'bg-zinc-950 border-zinc-900/50'
             }`}>
               <div 
                 className="h-full transition-all duration-500 ease-out bg-white"

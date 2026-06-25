@@ -197,9 +197,9 @@ export class OrderService {
         freeShippingMin = 100000;
       }
 
-      if (subtotalBeforeCompanyDiscount < freeShippingMin) {
+      if (baseSubtotalNet < freeShippingMin) {
         throw new BusinessRuleError(
-          `El subtotal neto del pedido ($${subtotalBeforeCompanyDiscount.toLocaleString("es-CL")}) ` +
+          `El subtotal neto del pedido ($${baseSubtotalNet.toLocaleString("es-CL")}) ` +
             `es inferior al mínimo requerido para flete incluido en su zona ($${freeShippingMin.toLocaleString("es-CL")} netos).`,
           "FREE_SHIPPING_MINIMUM_NOT_MET"
         );

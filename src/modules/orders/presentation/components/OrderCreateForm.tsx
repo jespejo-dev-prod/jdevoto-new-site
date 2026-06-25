@@ -328,12 +328,12 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
 
   // Auto-selection of shipping method based on eligibility
   useEffect(() => {
-    if (shippingAddress.region && shippingAddress.commune && subtotalBeforeCompanyDiscount >= freeShippingMin && !isInsularValparaiso) {
+    if (shippingAddress.region && shippingAddress.commune && totals.baseNet >= freeShippingMin && !isInsularValparaiso) {
       setShippingMethod('free');
     } else {
       setShippingMethod('client_pays');
     }
-  }, [shippingAddress.region, shippingAddress.commune, subtotalBeforeCompanyDiscount, freeShippingMin, isInsularValparaiso]);
+  }, [shippingAddress.region, shippingAddress.commune, totals.baseNet, freeShippingMin, isInsularValparaiso]);
 
   const addItem = (product: any) => {
     const existing = items.find(i => i.productId === product.id);
@@ -1181,8 +1181,8 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                       </div>
                     ) : (
                       (() => {
-                        const canFreeShipping = subtotalBeforeCompanyDiscount >= freeShippingMin;
-                        const missingForFree = freeShippingMin - subtotalBeforeCompanyDiscount;
+                        const canFreeShipping = totals.baseNet >= freeShippingMin;
+                        const missingForFree = freeShippingMin - totals.baseNet;
                         return (
                           <button
                             type="button"

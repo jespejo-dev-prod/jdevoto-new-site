@@ -311,12 +311,12 @@ export default function CheckoutPage() {
 
   // Validate shipping method compatibility and automatically select the correct flete option
   useEffect(() => {
-    if (region && comuna && baseNet >= freeShippingMin && !isInsularValparaiso) {
+    if (region && comuna && subtotalAfterCompany >= freeShippingMin && !isInsularValparaiso) {
       setShippingMethod('free');
     } else {
       setShippingMethod('client_pays');
     }
-  }, [region, comuna, baseNet, freeShippingMin, isInsularValparaiso]);
+  }, [region, comuna, subtotalAfterCompany, freeShippingMin, isInsularValparaiso]);
 
   const shippingCost = 0; // Both shipping options are $0 in invoice (freight to be paid by client or free shipping)
   
@@ -695,7 +695,7 @@ export default function CheckoutPage() {
                      <div className="pt-6 border-t border-zinc-100 grid grid-cols-1 gap-6">
                         {/* Selector de tipo de flete */}
                         {region && comuna && (() => {
-                           const showClientPaysOption = baseNet < freeShippingMin || isInsularValparaiso;
+                           const showClientPaysOption = subtotalAfterCompany < freeShippingMin || isInsularValparaiso;
                            return (
                              <div className="space-y-3">
                                 <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Modalidad de Flete</Label>
@@ -734,8 +734,8 @@ export default function CheckoutPage() {
                                         );
                                       }
 
-                                      const canFreeShipping = baseNet >= freeShippingMin;
-                                      const missingForFree = freeShippingMin - baseNet;
+                                      const canFreeShipping = subtotalAfterCompany >= freeShippingMin;
+                                      const missingForFree = freeShippingMin - subtotalAfterCompany;
 
                                       return (
                                        <label className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col gap-2 ${
