@@ -66,7 +66,9 @@ export async function proxy(request: NextRequest) {
     || pathname.startsWith('/orders')
     || pathname.startsWith('/checkout')
     || pathname.startsWith('/cart')
-    || pathname.startsWith('/wishlist');
+    || pathname.startsWith('/wishlist')
+    || pathname.startsWith('/profile')
+    || pathname.startsWith('/compra-rapida');
 
   const isGuestRoute = pathname === '/login'
     || pathname === '/register';

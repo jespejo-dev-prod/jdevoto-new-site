@@ -126,7 +126,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(data.data.access_token); // JWT en memoria
     setUser(data.data.user);               // Datos del usuario autenticado
 
-    router.push(callbackUrl || '/dashboard'); // Redirige tras login exitoso
+    if (typeof window !== 'undefined') {
+      window.location.href = callbackUrl || '/dashboard';
+    } else {
+      router.push(callbackUrl || '/dashboard');
+    }
     return data.data;
   };
 
@@ -155,7 +159,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(data.data.access_token); // JWT en memoria
     setUser(data.data.user);               // Datos del usuario autenticado
 
-    router.push(callbackUrl || '/dashboard'); // Redirige tras login exitoso
+    if (typeof window !== 'undefined') {
+      window.location.href = callbackUrl || '/dashboard';
+    } else {
+      router.push(callbackUrl || '/dashboard');
+    }
     return data.data;
   };
 
@@ -184,7 +192,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(data.data.access_token);
     setUser(data.data.user);
 
-    router.push('/dashboard');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/dashboard';
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   /**
@@ -208,7 +220,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Siempre limpia la memoria local, aunque el servidor falle
       setAccessToken(null);
       setUser(null);
-      router.push('/login');
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      } else {
+        router.push('/login');
+      }
     }
   };
 
