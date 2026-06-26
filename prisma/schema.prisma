@@ -147,15 +147,18 @@ model Product {
   brand          Brand?          @relation(fields: [brandId], references: [id])
   category       Category?       @relation(fields: [categoryId], references: [id])
 
-  @@index([sku])
-  @@index([slug])
+  // Lookups puntuales (slug y sku ya tienen UNIQUE que sirve como índice de lectura)
   @@index([categoryId])
-  @@index([isActive])
   @@index([brandId])
-  @@index([isActive, categoryId])
-  @@index([isActive, createdAt(sort: Desc)])
-  @@index([isActive, name])
-  @@index([isActive, isDeleted])
+  // Patrones de query del catálogo
+  @@index([isActive, categoryId])                         // filtro por categoría
+  @@index([isActive, createdAt(sort: Desc)])              // orden por defecto (sin filtros extra)
+  @@index([isActive, name])                              // búsqueda ILIKE
+  // Filtro hideOutOfStock: los 3 campos juntos en el WHERE
+  @@index([isActive, isDeleted, stockQuantity])
+  // Regla ESR: brandId (igualdad, más selectivo) → isActive, isDeleted (igualdad) → createdAt (sort)
+  // Cubre: WHERE brandId=? AND isActive=true AND isDeleted=false ORDER BY createdAt DESC LIMIT 24
+  @@index([brandId, isActive, isDeleted, createdAt(sort: Desc)])
   @@map("products")
 }
 

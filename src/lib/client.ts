@@ -30,9 +30,27 @@ import pg from 'pg';
  */
 const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL;
-  const pool    = new pg.Pool({ connectionString, max: 5 }); // Pool de conexiones pg limitado a 5 max
-  const adapter = new PrismaPg(pool);               // Adaptador Prisma ↔ pg
 
+  // ── Pool de conexiones pg ──────────────────────────────────────────────────
+  //
+  // Regla general: max = (número de CPU del servidor DB * 2) + disco activos
+  // Para un servidor típico con 2-4 vCPU → 10 conexiones es un punto de partida.
+  //
+  // En dev: 5 evita agotar el Postgres local con HMR de Next.js.
+  // En prod: 10 permite mayor concurrencia de SSR requests simultáneos.
+  //
+  // Si usas PgBouncer o Supabase Pooler en producción, baja max a 2-3
+  // porque el pooler ya gestiona las conexiones reales a Postgres.
+  const isProd = process.env.NODE_ENV === 'production';
+
+  const pool = new pg.Pool({
+    connectionString,
+    max: isProd ? 10 : 5,            // conexiones máximas al pool
+    idleTimeoutMillis: 30_000,       // cerrar conexiones idle tras 30s
+    connectionTimeoutMillis: 5_000,  // error si no hay conexión libre en 5s
+  });
+
+  const adapter = new PrismaPg(pool);
 
   // @ts-ignore - Ignore type error with Prisma's adapter option during TypeScript check
   return new PrismaClient({ adapter });
