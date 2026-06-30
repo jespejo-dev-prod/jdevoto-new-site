@@ -44,6 +44,10 @@ interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// ISR: 1 hora — datos de producto son estables.
+// generateStaticParams pre-construye todas las URLs en build.
+export const revalidate = 3600;
+
 /**
  * generateStaticParams
  * Pre-construye todas las páginas de producto activas en build time.
@@ -62,28 +66,54 @@ export async function generateStaticParams() {
   }
 }
 
-// ─── SEO Metadata ─────────────────────────────────────────────────────────────
+// ─── SEO Metadata ────────────────────────────────────────────────────────
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
   try {
     const product = await getCachedProduct(slug);
+    const brandName = typeof product.brand === 'string'
+      ? product.brand
+      : (product.brand as any)?.name || '';
+
+    // Limpiar HTML y truncar a 155 chars para meta description
+    const rawDesc = product.description || '';
+    const cleanDesc = rawDesc.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    const metaDesc = cleanDesc.length > 0
+      ? (cleanDesc.length > 155 ? cleanDesc.substring(0, 152) + '...' : cleanDesc)
+      : `Compra ${product.name}${brandName ? ` de ${brandName}` : ''} al mejor precio mayorista en Antigravity Chile.`;
+
+    const canonicalUrl = `${baseUrl}/products/${product.slug}`;
+    const ogImages = (product.images as any[]).map((img) => ({
+      url: img.url,
+      width: 800,
+      height: 800,
+      alt: `${product.name}${brandName ? ` — ${brandName}` : ''}`,
+    }));
+
     return {
-      title: product.name,
-      description: product.description || `Compra ${product.name} al mejor precio mayorista en Antigravity.`,
+      title: `${product.name}${brandName ? ` | ${brandName}` : ''}`,
+      description: metaDesc,
+      alternates: { canonical: canonicalUrl },
+      robots: { index: true, follow: true },
       openGraph: {
-        title: product.name,
-        description: product.description || '',
+        title: `${product.name}${brandName ? ` — ${brandName}` : ''} | Antigravity`,
+        description: metaDesc,
+        url: canonicalUrl,
         type: 'website',
-        images: product.images.length > 0 ? [{ url: (product.images[0] as any).url }] : [],
+        locale: 'es_CL',
+        siteName: 'Antigravity',
+        images: ogImages,
       },
       twitter: {
         card: 'summary_large_image',
-        title: product.name,
-        description: product.description || '',
+        title: `${product.name}${brandName ? ` | ${brandName}` : ''} | Antigravity`,
+        description: metaDesc,
+        images: ogImages.length > 0 ? [ogImages[0].url] : [],
       },
     };
   } catch {
-    return { title: 'Producto no encontrado' };
+    return { title: 'Producto no encontrado', robots: { index: false } };
   }
 }
 
@@ -128,20 +158,32 @@ export default async function DynamicProductPage(props: ProductPageProps) {
     (Number(product.height) || 0) > 0 ||
     (Number(product.weight) || 0) > 0;
 
+  // Limpiar HTML de description para JSON-LD
+  const cleanDescription = (product.description || '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
+  const canonicalUrl = `${baseUrl}/products/${product.slug}`;
+
   // Precio base con IVA para el JSON-LD (el BuyBox lo actualizará con precio B2B)
   const basePriceGross = Math.round(Number(product.basePrice) * (1 + TAX_RATE));
 
-  const jsonLd = {
+  // JSON-LD: Producto
+  const productJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
     image: product.images.map((img: any) => img.url),
-    description: product.description,
+    description: cleanDescription,
     sku: product.sku,
+    mpn: product.sku,
     brand: { '@type': 'Brand', name: brandName || 'Antigravity' },
+    category: (product.category as any)?.name,
     offers: {
       '@type': 'Offer',
-      url: `https://antigravity.cl/products/${product.slug}`,
+      url: canonicalUrl,
       priceCurrency: 'CLP',
       price: basePriceGross,
       availability: product.stockQuantity > 0
@@ -151,11 +193,32 @@ export default async function DynamicProductPage(props: ProductPageProps) {
     },
   };
 
+  // JSON-LD: Breadcrumb
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Catálogo', item: `${baseUrl}/products` },
+      ...((product.category as any)?.name ? [{
+        '@type': 'ListItem',
+        position: 3,
+        name: (product.category as any).name,
+        item: `${baseUrl}/products?category=${(product.category as any).slug || ''}`,
+      }] : []),
+      { '@type': 'ListItem', position: (product.category as any)?.name ? 4 : 3, name: product.name },
+    ],
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans selection:bg-primary/20">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       <PublicHeader />

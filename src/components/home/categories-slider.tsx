@@ -87,7 +87,7 @@ export function CategoriesSlider({ categories }: CategoriesSliderProps) {
             >
               {/* Zoom background image */}
               <div 
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-[1200ms] ease-out group-hover:scale-105 filter brightness-[0.85] contrast-105"
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-[transition-duration:1200ms] ease-out group-hover:scale-105 filter brightness-[0.85] contrast-105"
                 style={{ backgroundImage: `url(${getCategoryImage(category.name, category.slug)})` }}
               />
               

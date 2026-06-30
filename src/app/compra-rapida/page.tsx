@@ -11,7 +11,9 @@ import { QuickBuyView } from '@/modules/catalog/presentation/components/QuickBuy
 export const metadata = {
   title: 'Compra Rápida',
   description: 'Ingresa SKUs de forma manual, carga archivos de Excel o busca por categoría para acelerar tus compras B2B.',
+  robots: { index: false, follow: false },
 };
+
 
 export default async function CompraRapidaPage() {
   // 1. Validar autenticación B2B del usuario

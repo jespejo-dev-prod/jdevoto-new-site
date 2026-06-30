@@ -21,18 +21,41 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: {
-    default: 'Home - Jdevoto',
-    template: '%s - Jdevoto',
+    default: 'Mayorista B2B de Tecnología en Chile | Antigravity',
+    template: '%s | Antigravity',
   },
-  description: 'Plataforma de ventas corporativas B2B',
+  description: 'Compra al por mayor productos de tecnología, computación y electrónica. Plataforma B2B con crédito 30/60/90 días para empresas en Chile.',
+  keywords: ['mayorista tecnología chile', 'b2b tecnología', 'compra al por mayor computación', 'mayorista electronica chile', 'distribuidor tecnologia b2b'],
+  authors: [{ name: 'Antigravity Technology Chile Ltd.' }],
+  creator: 'Antigravity',
+  publisher: 'Antigravity',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
     apple: '/favicon.ico',
   },
+  openGraph: {
+    type: 'website',
+    locale: 'es_CL',
+    siteName: 'Antigravity',
+    title: 'Mayorista B2B de Tecnología en Chile | Antigravity',
+    description: 'Compra al por mayor productos de tecnología, computación y electrónica. Plataforma B2B con crédito 30/60/90 días para empresas en Chile.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mayorista B2B de Tecnología en Chile | Antigravity',
+    description: 'Compra al por mayor productos de tecnología, computación y electrónica.',
+  },
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
@@ -41,9 +64,27 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const orgJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Antigravity Technology Chile Ltd.',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl',
+    logo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl'}/logo-svg.png`,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'sales',
+      areaServed: 'CL',
+      availableLanguage: 'Spanish',
+    },
+  };
+
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${roboto.variable} font-sans antialiased min-h-screen`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         <ThemeProvider>
           <QueryProvider>
             <AuthProvider>

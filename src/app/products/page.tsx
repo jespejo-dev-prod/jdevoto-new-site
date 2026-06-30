@@ -16,8 +16,10 @@
  */
 
 import React, { Suspense } from 'react';
+import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+// ISR: shell estático cacheado, grid via streaming con Suspense.
+export const revalidate = 60;
 
 import { getServerUser } from '@/lib/server-auth';
 import { PublicHeader } from '@/components/layout/public-header';
@@ -26,6 +28,55 @@ import { getCatalogFiltersUseCase } from '@/modules/catalog/application/getCatal
 import { ProductGridServer } from './ProductGridServer';
 import CatalogLoading from './loading';
 import type { CatalogFilters } from '@/modules/catalog/application/getCatalogProducts.use-case';
+
+// ─── SEO Metadata dinámica ───────────────────────────────────────────────────────
+// Búsquedas y paginación: NO indexar (thin content)
+// Categorías y catálogo base: SÍ indexar
+export async function generateMetadata(
+  props: { searchParams: Promise<Record<string, string | undefined>> }
+): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
+
+  const hasSearch = !!searchParams.search;
+  const hasPagination = Number(searchParams.page) > 1;
+  const categorySlug = searchParams.category || searchParams.categoryId || '';
+
+  // Búsquedas y páginas 2+ generan thin content: no indexar
+  const shouldNoIndex = hasSearch || hasPagination;
+
+  let title = 'Catálogo Mayorista de Tecnología';
+  let description = 'Explora más de 2000 productos de tecnología al por mayor: computación, electrónica, iluminación y más. Precios mayoristas B2B con crédito para empresas en Chile.';
+
+  if (categorySlug && !hasSearch) {
+    // Capitalizar el slug para el título
+    const readable = categorySlug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    title = `${readable} al por mayor`;
+    description = `Compra ${readable} al por mayor. Catálogo mayorista B2B con los mejores precios para empresas en Chile.`;
+  }
+
+  const canonicalUrl = categorySlug
+    ? `${baseUrl}/products?category=${categorySlug}`
+    : `${baseUrl}/products`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: canonicalUrl },
+    robots: shouldNoIndex
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
+    openGraph: shouldNoIndex ? undefined : {
+      title: `${title} | Antigravity`,
+      description,
+      url: canonicalUrl,
+      type: 'website',
+      locale: 'es_CL',
+      siteName: 'Antigravity',
+    },
+  };
+}
+
 
 // ─── Parser de searchParams ─────────────────────────────────────────────────────
 

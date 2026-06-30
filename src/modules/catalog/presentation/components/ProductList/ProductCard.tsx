@@ -74,7 +74,7 @@ export const ProductCard = memo(function ProductCard({
       )}>
         <Image
           src={primaryImage?.url || '/placeholder-product.png'}
-          alt={product.name}
+          alt={`${product.name}${product.brand?.name ? ` — ${product.brand.name}` : ''}`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className={cn(

@@ -47,7 +47,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               fill
               sizes="80px"
               className="object-cover" 
-              alt={img.altText || `Thumbnail ${i + 1}`} 
+              alt={img.altText || `${productName} — imagen ${i + 1}`} 
             />
           </div>
         ))}

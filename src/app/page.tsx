@@ -1,6 +1,10 @@
 import React from 'react';
+import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+// ISR: regenera la home cada 5 minutos en Vercel Edge.
+// Googlebot recibe HTML pre-generado (TTFB < 50ms).
+export const revalidate = 300;
+
 import { prisma } from '@/lib/client';
 import { priceService } from '@/modules/pricing/domain/price.service';
 import { getServerUser } from '@/lib/server-auth';
@@ -17,6 +21,28 @@ import { ScrollReveal } from '@/components/home/scroll-reveal';
 import { BenefitBar } from '@/components/home/benefit-bar';
 import { PromoBanner } from '@/components/home/promo-banner';
 import { ProductSlider } from '@/components/ui/product-slider';
+
+export const metadata: Metadata = {
+  title: 'Mayorista B2B de Tecnología en Chile',
+  description: 'Compra al por mayor productos de tecnología, computación y electrónica con crédito 30, 60 o 90 días. Distribución mayorista B2B en Chile.',
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl',
+  },
+  openGraph: {
+    title: 'Mayorista B2B de Tecnología en Chile | Antigravity',
+    description: 'Compra al por mayor productos de tecnología, computación y electrónica con crédito 30, 60 o 90 días.',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl',
+    type: 'website',
+    locale: 'es_CL',
+    siteName: 'Antigravity',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mayorista B2B de Tecnología en Chile | Antigravity',
+    description: 'Compra al por mayor productos de tecnología, computación y electrónica.',
+  },
+};
+
 
 export default async function HomePage() {
   const user = await getServerUser();
