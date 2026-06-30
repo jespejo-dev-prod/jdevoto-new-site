@@ -77,6 +77,15 @@ export function HeroSlider() {
   const prevSlide = () =>
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
+  const handleDragEnd = (event: any, info: any) => {
+    const threshold = 50;
+    if (info.offset.x < -threshold) {
+      nextSlide();
+    } else if (info.offset.x > threshold) {
+      prevSlide();
+    }
+  };
+
   const activeSlide = slides[current];
 
   return (
@@ -93,7 +102,11 @@ export function HeroSlider() {
           initial="hidden"
           animate="visible"
           exit="hidden"
-          className="absolute inset-0 flex flex-col md:flex-row items-center justify-between"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={handleDragEnd}
+          className="absolute inset-0 flex flex-col md:flex-row items-center justify-between cursor-grab active:cursor-grabbing select-none"
         >
           {/* Background image & gradient overlay (Spans full width) */}
           <div className="absolute inset-0 z-0">

@@ -101,7 +101,7 @@ export function BundleAction({ currentProduct, suggestedProduct }: BundleActionP
   const totalMOQ = (priceA * (currentProduct.inner || currentProduct.minOrderQty || 1)) + (priceB * (suggestedProduct.inner || suggestedProduct.minOrderQty || 1));
 
   return (
-    <div className="flex flex-col gap-6 md:min-w-[350px] border-l border-zinc-100 pl-0 lg:pl-12 text-center lg:text-left">
+    <div className="flex flex-col gap-6 w-full sm:min-w-[320px] md:min-w-[350px] border-t lg:border-t-0 lg:border-l border-zinc-200/60 pt-8 lg:pt-0 lg:pl-12 text-center lg:text-left items-center lg:items-start">
       <div className="space-y-2">
         <div className="text-xs sm:text-[13px] font-black text-zinc-400 uppercase tracking-widest">Inversión Total (Inner Pack)</div>
         <div className="text-5xl font-black text-zinc-950 tracking-tighter">

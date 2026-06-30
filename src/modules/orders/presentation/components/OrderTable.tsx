@@ -82,7 +82,11 @@ export function OrderTable({ orders }: OrderTableProps) {
             </tr>
           ) : (
             orders.map((order) => (
-              <tr key={order.id} className="group hover:bg-zinc-800/20 transition-colors text-sm">
+              <tr 
+                key={order.id} 
+                onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                className="group hover:bg-zinc-800/20 transition-colors text-sm cursor-pointer"
+              >
                 <td className="px-6 py-4 pl-8">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center text-primary shadow-inner">
@@ -126,7 +130,7 @@ export function OrderTable({ orders }: OrderTableProps) {
                   </div>
                 </td>
 
-                <td className="px-6 py-4 text-right pr-8">
+                <td className="px-6 py-4 text-right pr-8" onClick={(e) => e.stopPropagation()}>
                   <div className="flex justify-end items-center gap-2">
                     <button
                       type="button"

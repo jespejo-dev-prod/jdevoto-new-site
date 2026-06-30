@@ -19,6 +19,11 @@ export function CartContent({ recentOrders = [] }: CartContentProps) {
   const { fetcher } = useApi();
   const [isRepeating, setIsRepeating] = useState<string | null>(null);
 
+  // State for dynamic orders listing in CartContent
+  const [orders, setOrders] = useState<any[]>(recentOrders);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(recentOrders.length > 0);
+
   const handleRepeatOrder = async (orderId: string, orderNumber: string) => {
     if (isRepeating) return;
     
@@ -48,6 +53,48 @@ export function CartContent({ recentOrders = [] }: CartContentProps) {
       toast.error(err.message || "Error al intentar repetir el pedido. Inténtalo de nuevo.");
     } finally {
       setIsRepeating(null);
+    }
+  };
+
+  const handleLoadMoreOrders = async () => {
+    if (isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      // Pedimos las órdenes (página 1, límite 50) para traer todas las órdenes anteriores de la empresa
+      const res = await fetcher('/api/orders?page=1&limit=50');
+      
+      const fetchedData = res && res.data ? res.data : (Array.isArray(res) ? res : []);
+      
+      if (fetchedData.length > 0) {
+        // Mapeamos al formato esperado
+        const fetched = fetchedData.map((o: any) => ({
+          id: o.id,
+          orderNumber: o.orderNumber,
+          totalGross: Number(o.totalGross),
+          createdAt: o.createdAt,
+          status: o.status,
+          itemCount: o.itemCount
+        }));
+
+        // Filtrar duplicados
+        const existingIds = new Set(orders.map(o => o.id));
+        const newOrders = fetched.filter((o: any) => !existingIds.has(o.id));
+
+        if (newOrders.length > 0) {
+          setOrders(prev => [...prev, ...newOrders]);
+          toast.success(`Se cargaron ${newOrders.length} órdenes anteriores.`);
+        } else {
+          toast.info('No hay más órdenes anteriores para cargar.');
+        }
+      } else {
+        toast.info('No hay más órdenes anteriores para cargar.');
+      }
+      setHasMore(false); // Ya cargamos el listado completo (límite 50)
+    } catch (err: any) {
+      console.error("Error loading past orders:", err);
+      toast.error("No se pudieron cargar las órdenes anteriores.");
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -103,45 +150,66 @@ export function CartContent({ recentOrders = [] }: CartContentProps) {
               <Link href="/dashboard/orders" className="text-xs sm:text-sm font-black text-zinc-400 hover:text-primary uppercase tracking-widest transition-colors">Historial completo</Link>
             </div>
             
-            {recentOrders && recentOrders.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {recentOrders.map((order: any) => (
-                  <div key={order.id} className="p-6 bg-zinc-50 border border-zinc-100 rounded-3xl flex flex-col justify-between gap-4 shadow-sm hover:shadow-md transition-all group">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs sm:text-sm font-bold text-zinc-950 font-mono">{order.orderNumber}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-zinc-200 text-zinc-700">
-                          {order.status}
-                        </span>
+            {orders && orders.length > 0 ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {orders.map((order: any) => (
+                    <div key={order.id} className="p-6 bg-zinc-50 border border-zinc-100 rounded-3xl flex flex-col justify-between gap-4 shadow-sm hover:shadow-md transition-all group">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs sm:text-sm font-bold text-zinc-950 font-mono">{order.orderNumber}</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-zinc-200 text-zinc-700">
+                            {order.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-400 font-semibold">
+                          {new Date(order.createdAt).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </p>
+                        <div className="h-px bg-zinc-200/60 my-2" />
+                        <div className="flex items-center justify-between text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                          <span>Artículos</span>
+                          <span className="text-zinc-950">{order.itemCount}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm font-black text-zinc-950 uppercase tracking-wide">
+                          <span>Total Bruto</span>
+                          <span>${order.totalGross.toLocaleString('es-CL')}</span>
+                        </div>
                       </div>
-                      <p className="text-xs text-zinc-400 font-semibold">
-                        {new Date(order.createdAt).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </p>
-                      <div className="h-px bg-zinc-200/60 my-2" />
-                      <div className="flex items-center justify-between text-xs font-bold text-zinc-500 uppercase tracking-wide">
-                        <span>Artículos</span>
-                        <span className="text-zinc-950">{order.itemCount}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm font-black text-zinc-950 uppercase tracking-wide">
-                        <span>Total Bruto</span>
-                        <span>${order.totalGross.toLocaleString('es-CL')}</span>
-                      </div>
-                    </div>
 
+                      <Button 
+                        onClick={() => handleRepeatOrder(order.id, order.orderNumber)}
+                        disabled={isRepeating !== null}
+                        className="w-full mt-4 bg-zinc-950 hover:bg-zinc-900 text-white rounded-xl h-11 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 group-hover:scale-[1.02] active:scale-95 transition-all shadow-sm animate-in fade-in duration-200"
+                      >
+                        {isRepeating === order.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin text-white" />
+                        ) : (
+                          <RotateCcw className="h-3 w-3 text-white animate-pulse" />
+                        )}
+                        Repetir Pedido
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+
+                {hasMore && (
+                  <div className="flex justify-center pt-2">
                     <Button 
-                      onClick={() => handleRepeatOrder(order.id, order.orderNumber)}
-                      disabled={isRepeating !== null}
-                      className="w-full mt-4 bg-zinc-950 hover:bg-zinc-900 text-white rounded-xl h-11 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 group-hover:scale-[1.02] active:scale-95 transition-all shadow-sm"
+                      onClick={handleLoadMoreOrders}
+                      disabled={isLoadingMore}
+                      className="rounded-xl px-8 h-11 text-xs font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-500 text-white hover:text-black transition-all flex items-center gap-2 shadow-md cursor-pointer border-none"
                     >
-                      {isRepeating === order.id ? (
-                        <Loader2 className="h-3 w-3 animate-spin text-white" />
+                      {isLoadingMore ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin text-white" />
+                          Cargando...
+                        </>
                       ) : (
-                        <RotateCcw className="h-3 w-3 text-white animate-pulse" />
+                        'Cargar órdenes'
                       )}
-                      Repetir Pedido
                     </Button>
                   </div>
-                ))}
+                )}
               </div>
             ) : (
               <div className="space-y-4 text-zinc-400 text-xs font-bold uppercase tracking-widest py-8 text-center bg-zinc-50 rounded-[32px] border border-dashed border-zinc-200">

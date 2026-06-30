@@ -28,15 +28,15 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   };
 
   return (
-    <div className="lg:col-span-6 flex gap-6">
+    <div className="lg:col-span-6 flex flex-col-reverse lg:flex-row gap-6">
       {/* Thumbnails */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-row lg:flex-col gap-4 justify-center lg:justify-start">
         {images.map((img, i) => (
           <div
             key={i}
             onClick={() => setActiveImage(img.url)}
             className={cn(
-              "w-20 h-20 rounded-2xl border-2 cursor-pointer overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md relative",
+              "w-20 h-20 rounded-2xl border-2 cursor-pointer overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md relative shrink-0",
               activeImage === img.url 
                 ? "border-blue-500 ring-2 ring-blue-500/20" 
                 : "border-transparent hover:border-zinc-200"
@@ -61,7 +61,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           setIsHovered(false);
           setCoords({ x: 50, y: 50 });
         }}
-        className="flex-1 rounded-[48px] overflow-hidden bg-zinc-50/50 border border-zinc-100 flex items-center justify-center min-h-[500px] lg:min-h-[600px] relative shadow-inner group cursor-zoom-in"
+        className="flex-1 rounded-[48px] overflow-hidden bg-zinc-50/50 border border-zinc-100 flex items-center justify-center min-h-[300px] sm:min-h-[400px] lg:min-h-[600px] relative shadow-inner group cursor-zoom-in"
       >
         <div 
           className="absolute inset-0 w-full h-full transition-transform duration-150 ease-out"
@@ -75,7 +75,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-contain p-12 mix-blend-multiply"
+            className="object-contain p-4 sm:p-8 lg:p-12 mix-blend-multiply"
             alt={productName}
           />
         </div>

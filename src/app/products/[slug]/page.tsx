@@ -594,52 +594,55 @@ async function BundleSuggestionSection({
   if (!bundle) return null;
 
   return (
-    <section className="mt-20 p-8 lg:p-10 rounded-[48px] border-2 border-zinc-50 bg-zinc-50/30 overflow-hidden relative">
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full" />
+    <section className="mt-20 p-5 sm:p-8 lg:p-10 rounded-[32px] sm:rounded-[48px] border-2 border-zinc-50 bg-zinc-50/30 overflow-hidden relative">
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 max-w-6xl mx-auto relative z-10">
-        <div className="flex flex-col gap-6 flex-1">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-6 w-full lg:flex-1">
+          <div className="flex flex-col gap-2 text-center lg:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight">Sugerencia de compra</h2>
-            <p className="text-sm text-zinc-400 font-bold uppercase tracking-wider">Aumenta tu rentabilidad combinando estos productos</p>
+            <p className="text-xs sm:text-sm text-zinc-400 font-bold uppercase tracking-wider">Aumenta tu rentabilidad combinando estos productos</p>
           </div>
-          <div className="flex items-center gap-6 sm:gap-8">
-            {/* Producto Actual */}
-            <div className="group relative">
-              <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden">
-                <Image
-                  src={primaryImageUrl || '/placeholder-product.png'}
-                  fill
-                  sizes="144px"
-                  className="object-contain p-4 mix-blend-multiply"
-                  alt="Producto actual"
-                />
+          
+          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 justify-center lg:justify-start">
+            <div className="flex items-center gap-4 sm:gap-6 justify-center shrink-0">
+              {/* Producto Actual */}
+              <div className="group relative shrink-0">
+                <div className="w-24 h-24 sm:w-36 sm:h-36 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden">
+                  <Image
+                    src={primaryImageUrl || '/placeholder-product.png'}
+                    fill
+                    sizes="144px"
+                    className="object-contain p-4 mix-blend-multiply"
+                    alt="Producto actual"
+                  />
+                </div>
+                <div className="absolute -bottom-2 -right-2 bg-zinc-900 text-white text-xs font-black px-2.5 py-1 rounded-lg">
+                  x{product.inner || product.minOrderQty || 1}
+                </div>
               </div>
-              <div className="absolute -bottom-2 -right-2 bg-zinc-900 text-white text-xs font-black px-2.5 py-1 rounded-lg">
-                x{product.inner || product.minOrderQty || 1}
-              </div>
-            </div>
 
-            <Plus className="h-6 w-6 text-zinc-300 shrink-0" />
+              <Plus className="h-5 w-5 text-zinc-300 shrink-0" />
 
-            {/* Producto Sugerido */}
-            <div className="group relative">
-              <Link href={`/products/${bundle.slug}`} className="block w-32 h-32 sm:w-36 sm:h-36 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden">
-                <Image
-                  src={(bundle.images as any)?.[0]?.url || '/placeholder-product.png'}
-                  fill
-                  sizes="144px"
-                  className="object-contain p-4 mix-blend-multiply"
-                  alt={bundle.name}
-                />
-              </Link>
-              <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white text-xs font-black px-2.5 py-1 rounded-lg">
-                x{bundle.inner || bundle.minOrderQty || 1}
+              {/* Producto Sugerido */}
+              <div className="group relative shrink-0">
+                <Link href={`/products/${bundle.slug}`} className="block w-24 h-24 sm:w-36 sm:h-36 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden">
+                  <Image
+                    src={(bundle.images as any)?.[0]?.url || '/placeholder-product.png'}
+                    fill
+                    sizes="144px"
+                    className="object-contain p-4 mix-blend-multiply"
+                    alt={bundle.name}
+                  />
+                </Link>
+                <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white text-xs font-black px-2.5 py-1 rounded-lg">
+                  x{bundle.inner || bundle.minOrderQty || 1}
+                </div>
               </div>
             </div>
             
-            <div className="flex flex-col gap-1.5 max-w-[240px]">
-              <div className="text-xs font-black text-blue-600 uppercase tracking-widest">Sugerido</div>
-              <Link href={`/products/${bundle.slug}`} className="text-base sm:text-lg font-black text-zinc-950 hover:text-blue-600 transition-colors line-clamp-2 uppercase leading-snug">
+            <div className="flex flex-col gap-1 text-center sm:text-left max-w-sm">
+              <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Sugerido</div>
+              <Link href={`/products/${bundle.slug}`} className="text-sm sm:text-base font-black text-zinc-950 hover:text-blue-600 transition-colors line-clamp-2 uppercase leading-snug">
                 {bundle.name}
               </Link>
             </div>

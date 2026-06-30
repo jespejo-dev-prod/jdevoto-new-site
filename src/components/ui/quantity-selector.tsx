@@ -86,7 +86,7 @@ export function QuantitySelector({
 
   return (
     <div className={cn(
-      "flex items-center border border-zinc-200 rounded-md bg-white shrink-0 overflow-hidden",
+      "flex items-center border border-zinc-200 rounded-md bg-white sm:shrink-0 overflow-hidden",
       isSm ? "h-9" : "h-12",
       className
     )}>
@@ -109,7 +109,7 @@ export function QuantitySelector({
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         className={cn(
-          "bg-transparent text-center font-bold text-zinc-900 text-sm focus:outline-none focus:ring-0 select-all border-none focus:border-none ring-0 focus:ring-0 p-0",
+          "bg-transparent text-center font-bold text-zinc-900 text-sm focus:outline-none focus:ring-0 select-all border-none focus:border-none ring-0 focus:ring-0 p-0 flex-1 min-w-[2rem]",
           isSm ? "w-6" : "w-12"
         )}
       />

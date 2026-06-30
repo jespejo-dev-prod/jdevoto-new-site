@@ -18,7 +18,8 @@ import {
   Shield,
   Building2,
   Ticket,
-  CreditCard
+  CreditCard,
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
@@ -202,7 +203,14 @@ export function Sidebar() {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-in fade-in duration-300"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="relative w-64 border-r border-zinc-800 bg-zinc-950 flex flex-col h-full z-50 overflow-y-auto animate-in slide-in-from-left duration-300">
+          <aside className="relative w-full bg-zinc-950 flex flex-col h-full z-50 overflow-y-auto animate-in slide-in-from-left duration-300">
+            <button 
+              onClick={() => setSidebarOpen(false)}
+              className="absolute top-6 right-6 text-zinc-400 hover:text-white transition-colors p-2 z-50"
+              aria-label="Cerrar menú"
+            >
+              <X className="h-6 w-6" />
+            </button>
             {sidebarContent}
           </aside>
         </div>

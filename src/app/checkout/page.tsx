@@ -931,7 +931,7 @@ export default function CheckoutPage() {
            
            {/* RESUMEN LATERAL */}
            <div className="lg:col-span-4">
-              <div className="bg-zinc-950 text-white p-8 lg:p-10 rounded-[50px] shadow-2xl space-y-8 sticky top-24 border border-zinc-800">
+              <div className="bg-zinc-950 text-white p-6 sm:p-8 lg:p-10 rounded-[32px] sm:rounded-[50px] shadow-2xl space-y-8 static lg:sticky lg:top-24 border border-zinc-800">
                  <div className="flex items-center justify-between">
                    <h2 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white">Tu Orden</h2>
                    <Link href="/cart">
@@ -1053,17 +1053,17 @@ export default function CheckoutPage() {
                     </label>
                  </div>
 
-                 <Button 
+                 <button 
                    onClick={handleProcessOrder}
                    disabled={isProcessing || !isFormValid || items.length === 0}
-                   className="w-full h-14 bg-primary hover:bg-primary/90 text-zinc-950 font-bold uppercase text-sm sm:text-base rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                   className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase text-sm sm:text-base rounded-2xl shadow-xl shadow-blue-600/20 transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                  >
                    {isProcessing ? (
                      "Procesando..."
                    ) : (
                      <>Finalizar Pedido <ChevronRight className="h-5 w-5" /></>
                    )}
-                 </Button>
+                 </button>
                  
                  {!isFormValid && items.length > 0 && (
                    <p className="text-[10px] sm:text-xs text-red-400 text-center uppercase tracking-wider font-semibold">

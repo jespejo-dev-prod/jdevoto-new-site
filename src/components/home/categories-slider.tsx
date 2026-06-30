@@ -36,11 +36,50 @@ const getCategoryImage = (name: string, slug: string) => {
 export function CategoriesSlider({ categories }: CategoriesSliderProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Lógica de arrastre con mouse para usuarios de escritorio
+  const isDown = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    isDown.current = true;
+    e.preventDefault();
+    startX.current = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeft.current = scrollRef.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDown.current || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5; // Multiplicador de velocidad de scroll
+    scrollRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
+      const { scrollLeft: currentScrollLeft, clientWidth, scrollWidth } = scrollRef.current;
       const scrollAmount = clientWidth * 0.85;
-      const scrollTo = direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
+      
+      let scrollTo = direction === 'left' ? currentScrollLeft - scrollAmount : currentScrollLeft + scrollAmount;
+      
+      // Chequear límites para hacer scroll infinito
+      const tolerance = 10;
+      if (direction === 'right' && currentScrollLeft + clientWidth >= scrollWidth - tolerance) {
+        scrollTo = 0; // Volver al inicio
+      } else if (direction === 'left' && currentScrollLeft <= tolerance) {
+        scrollTo = scrollWidth - clientWidth; // Ir al final
+      }
+
       scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
     }
   };
@@ -76,7 +115,11 @@ export function CategoriesSlider({ categories }: CategoriesSliderProps) {
        {/* Cards Grid / Carousel */}
        <div 
          ref={scrollRef}
-         className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-4 pt-1"
+         onMouseDown={handleMouseDown}
+         onMouseLeave={handleMouseLeave}
+         onMouseUp={handleMouseUp}
+         onMouseMove={handleMouseMove}
+         className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pt-1 cursor-grab active:cursor-grabbing select-none"
          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
        >
           {categories.map((category, index) => (

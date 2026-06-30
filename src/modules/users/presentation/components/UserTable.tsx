@@ -1,6 +1,7 @@
 import { Mail, CheckCircle2, Trash2, Loader2, Pencil, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface UserTableProps {
   users: any[];
@@ -10,6 +11,7 @@ interface UserTableProps {
 }
 
 export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserTableProps) {
+  const router = useRouter();
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-x-auto shadow-2xl">
       <table className="w-full text-left border-collapse">
@@ -38,7 +40,11 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
             </tr>
           ) : (
             users.map((u) => (
-              <tr key={u.id} className="hover:bg-zinc-900/20 transition-colors group text-sm">
+              <tr 
+                key={u.id} 
+                onClick={() => router.push(`/dashboard/users/${u.id}`)}
+                className="hover:bg-zinc-900/20 transition-colors group text-sm cursor-pointer"
+              >
                 <td className="p-4 pl-8">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 border border-zinc-700">
@@ -72,7 +78,7 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                     <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">Activo</span>
                   </div>
                 </td>
-                <td className="p-4 pr-8">
+                <td className="p-4 pr-8" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center gap-1">
                     <button 
                       onClick={() => onResetPassword(u.id)}

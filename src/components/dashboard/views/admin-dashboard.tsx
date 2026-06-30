@@ -15,6 +15,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { OrderStatusBadge } from '@/modules/orders/presentation/components/OrderStatusBadge';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -22,6 +23,7 @@ import { es } from 'date-fns/locale';
 
 export function AdminDashboard() {
   const { fetcher } = useApi();
+  const router = useRouter();
   
   const { data, isLoading } = useQuery({
     queryKey: ['operational-dashboard'],
@@ -181,7 +183,11 @@ export function AdminDashboard() {
                     </tr>
                   ) : (
                     recentOrders.map((order: any) => (
-                      <tr key={order.id} className="text-sm group hover:bg-zinc-950/20 transition-colors">
+                      <tr 
+                        key={order.id} 
+                        onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                        className="text-sm group hover:bg-zinc-950/20 transition-colors cursor-pointer"
+                      >
                         <td className="px-4 py-4 font-mono font-medium text-white truncate max-w-[90px]">
                           #{order.orderNumber.split('-').pop()}
                         </td>
@@ -194,7 +200,7 @@ export function AdminDashboard() {
                         <td className="px-4 py-4">
                           <OrderStatusBadge status={order.status} />
                         </td>
-                        <td className="px-4 py-4 text-center">
+                        <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
                           <Link href={`/dashboard/orders/${order.id}`}>
                             <button className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-primary hover:text-white rounded-lg transition-all shadow-md cursor-pointer">
                               <ExternalLink className="h-3.5 w-3.5" />

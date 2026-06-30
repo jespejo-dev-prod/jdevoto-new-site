@@ -47,7 +47,8 @@ export function PublicHeader() {
   const [shouldAnimate, setShouldAnimate] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    // Usar breakpoint 768 (md) para consistencia con los menús colapsables
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -80,8 +81,8 @@ export function PublicHeader() {
   // Progress bar es exactamente 46px
   const showProgressBar = !!user && itemCount > 0;
   const topOffset = showProgressBar 
-    ? (isMobile ? '119px' : '123px')
-    : (isMobile ? '73px' : '77px');
+    ? (isMobile ? '190px' : '123px')
+    : (isMobile ? '144px' : '77px');
 
   const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
   const excludedSubtotal = items
@@ -138,10 +139,10 @@ export function PublicHeader() {
               setIsCategoriesOpen(!isCategoriesOpen);
               setIsMobileMenuOpen(false);
             }}
-            className="flex items-center gap-1.5 sm:gap-2 h-10 sm:h-11 px-3 sm:px-4 rounded-xl bg-zinc-900 border border-zinc-850 hover:bg-zinc-800 hover:border-zinc-700 hover:text-white transition-all font-bold text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer text-zinc-400 select-none active:scale-[0.98]"
+            className="hidden md:flex items-center gap-1.5 sm:gap-2 h-10 sm:h-11 px-3 sm:px-4 rounded-xl bg-zinc-900 border border-zinc-850 hover:bg-zinc-800 hover:border-zinc-700 hover:text-white transition-all font-bold text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer text-zinc-400 select-none active:scale-[0.98]"
           >
             {isCategoriesOpen ? <X className="h-4 w-4 text-primary" /> : <Menu className="h-4 w-4" />}
-            <span className="hidden xs:inline">Categorías</span>
+            <span>Categorías</span>
           </button>
         </div>
 
@@ -259,6 +260,32 @@ export function PublicHeader() {
           </button>
         </div>
       </nav>
+
+      {/* Sub-nav móvil con Categorías y Buscador (Separado para evitar doble hamburguesa) */}
+      <div className="flex md:hidden items-center gap-3 bg-zinc-900 p-3 px-4 border-b border-zinc-800 text-white">
+        <button
+          onClick={() => {
+            setIsCategoriesOpen(!isCategoriesOpen);
+            setIsMobileMenuOpen(false);
+          }}
+          className="flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl bg-zinc-950 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 font-bold text-xs uppercase tracking-wider select-none active:scale-[0.98] shrink-0"
+        >
+          {isCategoriesOpen ? <X className="h-4.5 w-4.5 text-primary" /> : <Menu className="h-4.5 w-4.5" />}
+          <span>Categorías</span>
+        </button>
+
+        <form onSubmit={handleSearch} className="flex-grow relative flex items-center">
+          <input 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar en catálogo..." 
+            className="w-full h-10 rounded-xl bg-zinc-950 border border-zinc-800 pl-4 pr-10 text-xs focus:ring-2 focus:ring-primary/50 outline-none text-white placeholder:text-zinc-650" 
+          />
+          <button type="submit" className="absolute right-1.5 bg-primary p-1.5 rounded-lg cursor-pointer">
+            <Search className="h-3.5 w-3.5 text-zinc-950" />
+          </button>
+        </form>
+      </div>
 
       {/* Barra de progreso de compra mínima */}
       {showProgressBar && (

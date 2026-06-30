@@ -55,7 +55,7 @@ export function AddToCartAction({
 
   return (
     <div 
-      className={cn("flex items-center gap-2 w-full", className)}
+      className={cn("flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-2 w-full", className)}
       onClick={(e) => e.stopPropagation()} // Evitar navegar al producto al interactuar
     >
       {hasEnoughStock && (
@@ -66,7 +66,7 @@ export function AddToCartAction({
           step={minQty}
           onChange={setQuantity}
           size={isCompact ? 'sm' : 'default'}
-          className={cn(isCompact ? "text-xs" : "")}
+          className={cn(isCompact ? "text-xs w-full sm:w-auto" : "w-full sm:w-auto")}
         />
       )}
       
@@ -88,7 +88,7 @@ export function AddToCartAction({
         ) : (
           <>
             <Plus className={cn(isCompact ? "h-3 w-3" : "h-4 w-4")} />
-            <span className="hidden sm:inline truncate">{isCompact ? "Añadir" : "Agregar"}</span>
+            <span className="truncate">{isCompact ? "Añadir" : "Agregar"}</span>
           </>
         )}
       </Button>
