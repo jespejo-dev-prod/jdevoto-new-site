@@ -186,31 +186,76 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
     setManualText('');
   };
 
-  // --- CSV parsing for Tab 2 ---
+  // --- File parsing for Tab 2 (CSV and Excel) ---
   const handleFileUpload = (file: File) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target?.result as string;
-      const lines = text.split('\n');
-      const items: { sku: string; quantity: number }[] = [];
 
-      lines.forEach((line, idx) => {
-        // Skip header
-        if (idx === 0 && line.toLowerCase().includes('sku')) return;
-        if (!line.trim()) return;
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
 
-        const parts = line.split(/[;,]/);
-        const sku = parts[0]?.trim();
-        const qty = parseInt(parts[1]?.trim()) || 1;
-        if (sku) {
-          items.push({ sku, quantity: qty });
+    if (fileExtension === 'csv') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        const lines = text.split('\n');
+        const items: { sku: string; quantity: number }[] = [];
+
+        lines.forEach((line, idx) => {
+          // Omitir cabecera
+          if (idx === 0 && (line.toLowerCase().includes('sku') || line.toLowerCase().includes('producto'))) return;
+          if (!line.trim()) return;
+
+          const parts = line.split(/[;,]/);
+          const sku = parts[0]?.trim();
+          const qty = parseInt(parts[1]?.trim()) || 1;
+          if (sku) {
+            items.push({ sku, quantity: qty });
+          }
+        });
+
+        validateItems(items);
+      };
+      reader.readAsText(file);
+    } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          // Importación dinámica para mantener el tamaño del bundle inicial bajo
+          const XLSX = await import('xlsx');
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+
+          const items: { sku: string; quantity: number }[] = [];
+
+          json.forEach((row, idx) => {
+            if (!row || row.length === 0) return;
+            // Omitir cabecera si contiene palabras clave comunes
+            if (idx === 0) {
+              const col1 = String(row[0] || '').toLowerCase();
+              if (col1.includes('sku') || col1.includes('producto') || col1.includes('id')) {
+                return;
+              }
+            }
+
+            const sku = String(row[0] || '').trim();
+            const qty = parseInt(String(row[1] || '')) || 1;
+            if (sku) {
+              items.push({ sku, quantity: qty });
+            }
+          });
+
+          validateItems(items);
+        } catch (err) {
+          console.error(err);
+          toast.error('Error al procesar el archivo Excel.');
         }
-      });
-
-      validateItems(items);
-    };
-    reader.readAsText(file);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      toast.error('Formato de archivo no soportado. Sube un archivo .xlsx, .xls o .csv');
+    }
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -310,15 +355,15 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
           </div>
         )}
 
-        {/* TAB 2: Carga archivo CSV */}
+        {/* TAB 2: Carga archivo Excel/CSV */}
         {activeTab === 'file' && (
           <div className="space-y-6 animate-in fade-in duration-300">
             <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-100 flex flex-col gap-2">
               <h2 className="text-base font-black text-zinc-950 uppercase tracking-tight">
-                Sube o arrastra tu lista en formato CSV
+                Sube o arrastra tu lista en formato Excel o CSV
               </h2>
               <p className="text-xs text-zinc-500 font-medium leading-relaxed">
-                Carga un archivo CSV con dos columnas: una para los SKUs y otra para las cantidades correspondientes. Para facilitar el proceso, puedes descargar nuestro archivo modelo a continuación. Luego presiona <span className="font-black text-blue-600">“Validar”</span> para comprobar que el documento esté en el formato correcto.
+                Carga un archivo Excel (.xlsx, .xls) o CSV con dos columnas: una para los SKUs y otra para las cantidades correspondientes. Para facilitar el proceso, puedes descargar nuestro archivo modelo a continuación. Luego presiona <span className="font-black text-blue-600">“Validar”</span> para comprobar que el documento esté en el formato correcto.
               </p>
             </div>
 
@@ -338,7 +383,7 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
                 type="file" 
                 ref={fileInputRef} 
                 onChange={(e) => e.target.files && handleFileUpload(e.target.files[0])}
-                accept=".csv"
+                accept=".csv, .xlsx, .xls"
                 className="hidden" 
               />
               <div className="p-4 bg-zinc-100 rounded-full text-zinc-500">
@@ -349,19 +394,19 @@ export function QuickBuyView({ categories }: QuickBuyViewProps) {
                   Arrastra tu archivo aquí o haz clic para buscar
                 </p>
                 <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest">
-                  Soporta formato .CSV delimitado por comas o punto y coma
+                  Soporta formatos .xlsx, .xls y .csv delimitados por comas o punto y coma
                 </p>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-zinc-100">
               <a 
-                href="/templates/modelo_compra_rapida.csv" 
+                href="/templates/modelo_compra_rapida.xlsx" 
                 download
                 className="flex items-center gap-2 text-xs font-black text-blue-600 hover:text-blue-700 transition-colors uppercase tracking-wider border-b-2 border-blue-600/10 hover:border-blue-600"
               >
                 <Download className="h-4 w-4" />
-                Descargar modelo de hoja de cálculo
+                Descargar modelo de hoja de cálculo (Excel)
               </a>
 
               {isValidating && (
