@@ -178,95 +178,132 @@ export class PriceService {
    * GENERAL siempre se carga; COMPANY solo si hay companyId.
    * unstable_cache persiste entre requests (Data Cache de Next.js).
    */
-  private loadPriceLists(companyId: string | null): Promise<PriceListWithItems[]> {
+  private async loadPriceLists(companyId: string | null): Promise<PriceListWithItems[]> {
     const cacheKey = companyId ?? "public";
 
-    return unstable_cache(
-      async () => {
-        const now = new Date();
-        const dateFilter = {
-          OR: [{ validFrom: null }, { validFrom: { lte: now } }],
-          AND: [{ OR: [{ validTo: null }, { validTo: { gte: now } }] }],
-        };
+    const fetchFn = async () => {
+      const now = new Date();
+      const dateFilter = {
+        OR: [{ validFrom: null }, { validFrom: { lte: now } }],
+        AND: [{ OR: [{ validTo: null }, { validTo: { gte: now } }] }],
+      };
 
-        const [generalLists, companyLists] = await Promise.all([
-          // Lista general (aplica a todos)
-          prisma.priceList.findMany({
-            where: { isActive: true, type: "GENERAL", ...dateFilter },
-            include: { items: true },
-          }),
-          // Lista específica de la empresa (mayor prioridad)
-          companyId
-            ? prisma.priceList.findMany({
-                where: {
-                  isActive: true,
-                  type: "COMPANY",
-                  companies: { some: { companyId } },
-                  ...dateFilter,
-                },
-                include: { items: true },
-              })
-            : Promise.resolve([]),
-        ]);
+      const [generalLists, companyLists] = await Promise.all([
+        // Lista general (aplica a todos)
+        prisma.priceList.findMany({
+          where: { isActive: true, type: "GENERAL", ...dateFilter },
+          include: { items: true },
+        }),
+        // Lista específica de la empresa (mayor prioridad)
+        companyId
+          ? prisma.priceList.findMany({
+              where: {
+                isActive: true,
+                type: "COMPANY",
+                companies: { some: { companyId } },
+                ...dateFilter,
+              },
+              include: { items: true },
+            })
+          : Promise.resolve([]),
+      ]);
 
-        // General primero → empresa sobreescribe si hay colisión (prioridad correcta)
-        return [...generalLists, ...companyLists] as PriceListWithItems[];
-      },
-      [`price-lists-${cacheKey}`],
-      { revalidate: 300, tags: ["price-lists"] }
-    )();
+      // General primero → empresa sobreescribe si hay colisión (prioridad correcta)
+      return [...generalLists, ...companyLists] as PriceListWithItems[];
+    };
+
+    try {
+      return await unstable_cache(
+        fetchFn,
+        [`price-lists-${cacheKey}`],
+        { revalidate: 300, tags: ["price-lists"] }
+      )();
+    } catch (error: any) {
+      if (error?.message?.includes("incrementalCache")) {
+        return fetchFn();
+      }
+      throw error;
+    }
   }
 
   /** Carga las promociones activas y vigentes. */
-  private loadPromotions(): Promise<Promotion[]> {
-    return unstable_cache(
-      async () => {
-        const now = new Date();
-        return prisma.promotion.findMany({
-          where: {
-            isActive: true,
-            OR: [{ validFrom: null }, { validFrom: { lte: now } }],
-            AND: [{ OR: [{ validTo: null }, { validTo: { gte: now } }] }],
-          },
-        });
-      },
-      ["promotions-active"],
-      { revalidate: 300, tags: ["promotions"] }
-    )();
+  private async loadPromotions(): Promise<Promotion[]> {
+    const fetchFn = async () => {
+      const now = new Date();
+      return prisma.promotion.findMany({
+        where: {
+          isActive: true,
+          OR: [{ validFrom: null }, { validFrom: { lte: now } }],
+          AND: [{ OR: [{ validTo: null }, { validTo: { gte: now } }] }],
+        },
+      });
+    };
+
+    try {
+      return await unstable_cache(
+        fetchFn,
+        ["promotions-active"],
+        { revalidate: 300, tags: ["promotions"] }
+      )();
+    } catch (error: any) {
+      if (error?.message?.includes("incrementalCache")) {
+        return fetchFn();
+      }
+      throw error;
+    }
   }
 
   /** Carga el descuento por defecto de la empresa. */
-  private loadCompanyDiscount(companyId: string | null) {
+  private async loadCompanyDiscount(companyId: string | null) {
     if (!companyId) return Promise.resolve(null);
 
-    return unstable_cache(
-      () =>
-        prisma.company.findUnique({
-          where: { id: companyId },
-          select: { defaultDiscount: true },
-        }),
-      [`company-discount-${companyId}`],
-      { revalidate: 300, tags: ["companies"] }
-    )();
+    const fetchFn = () =>
+      prisma.company.findUnique({
+        where: { id: companyId },
+        select: { defaultDiscount: true },
+      });
+
+    try {
+      return await unstable_cache(
+        fetchFn,
+        [`company-discount-${companyId}`],
+        { revalidate: 300, tags: ["companies"] }
+      )();
+    } catch (error: any) {
+      if (error?.message?.includes("incrementalCache")) {
+        return fetchFn();
+      }
+      throw error;
+    }
   }
 
   /** Carga el mapa de parentId por categoryId. */
-  private loadCategoryParentMap(): Promise<Record<string, string | null>> {
-    return unstable_cache(
-      async () => {
-        const categories = await prisma.category.findMany({
-          select: { id: true, parentId: true },
-        });
-        const map: Record<string, string | null> = {};
-        for (const cat of categories) {
-          map[cat.id] = cat.parentId;
-        }
-        return map;
-      },
-      ["category-parent-map"],
-      { revalidate: 300, tags: ["categories"] }
-    )();
+  private async loadCategoryParentMap(): Promise<Record<string, string | null>> {
+    const fetchFn = async () => {
+      const categories = await prisma.category.findMany({
+        select: { id: true, parentId: true },
+      });
+      const map: Record<string, string | null> = {};
+      for (const cat of categories) {
+        map[cat.id] = cat.parentId;
+      }
+      return map;
+    };
+
+    try {
+      return await unstable_cache(
+        fetchFn,
+        ["category-parent-map"],
+        { revalidate: 300, tags: ["categories"] }
+      )();
+    } catch (error: any) {
+      if (error?.message?.includes("incrementalCache")) {
+        return fetchFn();
+      }
+      throw error;
+    }
   }
+
 }
 
 // ─── Helpers de construcción ───────────────────────────────────────────────────
