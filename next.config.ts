@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "plus.unsplash.com" },
       { protocol: "https", hostname: "www.jdevoto.cl" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "http", hostname: "localhost" },
     ],
     // Formatos modernos: WebP primero, luego AVIF para los que lo soportan
@@ -39,7 +40,7 @@ const nextConfig: NextConfig = {
     if (isProd) {
       securityHeaders.push({
         key: "Content-Security-Policy",
-        value: "default-src 'self'; connect-src 'self' https://nominatim.openstreetmap.org; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com https://www.jdevoto.cl; font-src 'self' data:;"
+        value: "default-src 'self'; connect-src 'self' https://nominatim.openstreetmap.org; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com https://www.jdevoto.cl https://res.cloudinary.com; font-src 'self' data:;"
       });
     }
 
