@@ -21,8 +21,13 @@ import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal, clearCart, syncPrices } = useCart();
   const { user, accessToken, refresh } = useAuth();
+
+  // Sync cart prices when visiting checkout to discard any expired promotions
+  useEffect(() => {
+    syncPrices();
+  }, [syncPrices]);
 
   const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
   const paymentTermsDays = user?.company?.paymentTerms ?? 30;

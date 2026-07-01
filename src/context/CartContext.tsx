@@ -42,6 +42,7 @@ interface CartContextType {
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  syncPrices: () => Promise<void>;
   itemCount: number;    // Total de unidades (suma de quantities)
   subtotal: number;     // Suma de price × quantity (ya es precio neto)
   totalSavings: number; // Suma de descuentos aplicados
@@ -60,85 +61,98 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { accessToken } = useAuth();
 
   /**
-   * Carga el carrito desde localStorage y sincroniza los precios y stock con la base de datos.
+   * Sincroniza los precios y stock del carrito con la base de datos en tiempo real.
+   */
+  const syncPrices = React.useCallback(async () => {
+    if (typeof window === 'undefined') return;
+    const savedCart = localStorage.getItem('antigravity_cart');
+    if (!savedCart) return;
+
+    let loadedItems: CartItem[] = [];
+    try {
+      loadedItems = JSON.parse(savedCart);
+    } catch (e) {
+      console.error('Failed to parse cart', e);
+      return;
+    }
+
+    if (loadedItems.length === 0) return;
+    const slugs = loadedItems.map(item => item.slug).filter(Boolean);
+    if (slugs.length === 0) return;
+
+    const headers: HeadersInit = {};
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    try {
+      const res = await fetch(`/api/products/by-slugs?slugs=${slugs.join(',')}`, { headers });
+      if (!res.ok) throw new Error('Failed to fetch updated prices');
+      const resData = await res.json();
+      const freshProducts = resData.data || [];
+
+      setItems(prevItems => {
+        let changed = false;
+        const updated = prevItems.map(item => {
+          const fresh = freshProducts.find((p: any) => p.slug === item.slug);
+          if (fresh) {
+            const finalPrice = fresh.price?.discountedNetPrice || fresh.price?.unitNetPrice || fresh.basePrice || 0;
+            const discountPct = fresh.price?.discountPercent || 0;
+            const originalPrice = fresh.price?.unitNetPrice || fresh.basePrice || 0;
+            const stockQuantity = Number(fresh.stockQuantity) || 0;
+            const minOrderQty = fresh.minOrderQty || 1;
+            const inner = fresh.inner || 1;
+            const priceSource = fresh.price?.priceSource || 'BASE_PRICE';
+            const brandName = fresh.brand?.name || '';
+
+            if (
+              item.price !== finalPrice ||
+              item.originalPrice !== originalPrice ||
+              item.discountPercent !== discountPct ||
+              item.stockQuantity !== stockQuantity ||
+              item.minOrderQty !== minOrderQty ||
+              item.inner !== inner ||
+              item.priceSource !== priceSource ||
+              item.brandName !== brandName
+            ) {
+              changed = true;
+              return {
+                ...item,
+                price: finalPrice,
+                originalPrice: originalPrice,
+                discountAmount: originalPrice - finalPrice,
+                discountPercent: discountPct,
+                priceSource: priceSource,
+                stockQuantity: stockQuantity,
+                minOrderQty: minOrderQty,
+                inner: inner,
+                brandName: brandName,
+              };
+            }
+          }
+          return item;
+        });
+        return changed ? updated : prevItems;
+      });
+    } catch (err) {
+      console.error('Error syncing cart prices:', err);
+    }
+  }, [accessToken]);
+
+  /**
+   * Carga el carrito desde localStorage y sincroniza los precios al montar.
    */
   useEffect(() => {
     const savedCart = localStorage.getItem('antigravity_cart');
-    let loadedItems: CartItem[] = [];
     if (savedCart) {
       try {
-        loadedItems = JSON.parse(savedCart);
-        setItems(loadedItems);
+        setItems(JSON.parse(savedCart));
       } catch (e) {
         console.error('Failed to parse cart', e);
       }
     }
-
-    if (loadedItems.length > 0) {
-      const slugs = loadedItems.map(item => item.slug).filter(Boolean);
-      if (slugs.length > 0) {
-        const headers: HeadersInit = {};
-        if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`;
-        }
-
-        fetch(`/api/products/by-slugs?slugs=${slugs.join(',')}`, { headers })
-          .then(res => {
-            if (!res.ok) throw new Error('Failed to fetch updated prices');
-            return res.json();
-          })
-          .then(resData => {
-            const freshProducts = resData.data || [];
-            setItems(prevItems => {
-              let changed = false;
-              const updated = prevItems.map(item => {
-                const fresh = freshProducts.find((p: any) => p.slug === item.slug);
-                if (fresh) {
-                  const finalPrice = fresh.price?.discountedNetPrice || fresh.price?.unitNetPrice || fresh.basePrice || 0;
-                  const discountPct = fresh.price?.discountPercent || 0;
-                  const originalPrice = fresh.price?.unitNetPrice || fresh.basePrice || 0;
-                  const stockQuantity = Number(fresh.stockQuantity) || 0;
-                  const minOrderQty = fresh.minOrderQty || 1;
-                  const inner = fresh.inner || 1;
-                  const priceSource = fresh.price?.priceSource || 'BASE_PRICE';
-                  const brandName = fresh.brand?.name || '';
-
-                  if (
-                    item.price !== finalPrice ||
-                    item.originalPrice !== originalPrice ||
-                    item.discountPercent !== discountPct ||
-                    item.stockQuantity !== stockQuantity ||
-                    item.minOrderQty !== minOrderQty ||
-                    item.inner !== inner ||
-                    item.priceSource !== priceSource ||
-                    item.brandName !== brandName
-                  ) {
-                    changed = true;
-                    return {
-                      ...item,
-                      price: finalPrice,
-                      originalPrice: originalPrice,
-                      discountAmount: originalPrice - finalPrice,
-                      discountPercent: discountPct,
-                      priceSource: priceSource,
-                      stockQuantity: stockQuantity,
-                      minOrderQty: minOrderQty,
-                      inner: inner,
-                      brandName: brandName,
-                    };
-                  }
-                }
-                return item;
-              });
-              return changed ? updated : prevItems;
-            });
-          })
-          .catch(err => {
-            console.error('Error syncing cart prices:', err);
-          });
-      }
-    }
-  }, [accessToken]);
+    syncPrices();
+  }, [accessToken, syncPrices]);
 
   /**
    * Sincroniza el carrito en localStorage cada vez que cambia el array de items.
@@ -262,6 +276,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem,
       updateQuantity,
       clearCart,
+      syncPrices,
       itemCount,
       subtotal,
       totalSavings

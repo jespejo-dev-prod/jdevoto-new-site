@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ShoppingBag, History, RotateCcw, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -15,9 +15,14 @@ interface CartContentProps {
 }
 
 export function CartContent({ recentOrders = [] }: CartContentProps) {
-  const { items, itemCount, clearCart, addItem } = useCart();
+  const { items, itemCount, clearCart, addItem, syncPrices } = useCart();
   const { fetcher } = useApi();
   const [isRepeating, setIsRepeating] = useState<string | null>(null);
+
+  // Sync prices when visiting the cart page
+  useEffect(() => {
+    syncPrices();
+  }, [syncPrices]);
 
   // State for dynamic orders listing in CartContent
   const [orders, setOrders] = useState<any[]>(recentOrders);
