@@ -1,6 +1,18 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary using process.env
+if (process.env.CLOUDINARY_URL) {
+  // Cloudinary automatically picks up CLOUDINARY_URL from env
+} else if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+}
 
 export interface FileStorageService {
   upload(file: File, options?: { isTemp?: boolean }): Promise<string>;
@@ -9,7 +21,7 @@ export interface FileStorageService {
   rollbackMove(paths: string[]): Promise<void>;
 }
 
-export class LocalStorageService implements FileStorageService {
+export class DiskStorageService implements FileStorageService {
   private tempDir: string;
   private productsDir: string;
 
@@ -92,5 +104,93 @@ export class LocalStorageService implements FileStorageService {
       case 'image/gif': return '.gif';
       default: return '';
     }
+  }
+}
+
+export class CloudinaryStorageService implements FileStorageService {
+  async upload(file: File, options?: { isTemp?: boolean }): Promise<string> {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    return new Promise((resolve, reject) => {
+      const folderName = options?.isTemp ? 'jdevoto_temp' : 'jdevoto_products';
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: folderName,
+          resource_type: 'auto',
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else if (result?.secure_url) {
+            resolve(result.secure_url);
+          } else {
+            reject(new Error("Cloudinary upload failed - no secure_url returned"));
+          }
+        }
+      );
+      uploadStream.end(buffer);
+    });
+  }
+
+  async move(tempUrl: string, finalFolder: string = 'products'): Promise<string> {
+    // If it's already a Cloudinary URL, keep it as is
+    if (tempUrl.startsWith('http') || tempUrl.includes('cloudinary')) {
+      return tempUrl;
+    }
+    // Fallback if local file
+    const local = new DiskStorageService();
+    return local.move(tempUrl, finalFolder);
+  }
+
+  async delete(urlPath: string): Promise<void> {
+    if (urlPath.startsWith('http') || urlPath.includes('cloudinary')) {
+      const parts = urlPath.split('/');
+      const filenameWithExtension = parts.pop();
+      const folder = parts.pop(); // e.g. jdevoto_products or jdevoto_temp
+      if (filenameWithExtension && folder) {
+        const publicId = `${folder}/${filenameWithExtension.split('.')[0]}`;
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (e) {
+          console.error(`Failed to delete Cloudinary asset: ${publicId}`, e);
+        }
+      }
+      return;
+    }
+    const local = new DiskStorageService();
+    await local.delete(urlPath);
+  }
+
+  async rollbackMove(urlPaths: string[]): Promise<void> {
+    for (const urlPath of urlPaths) {
+      await this.delete(urlPath);
+    }
+  }
+}
+
+// Delegate pattern to expose LocalStorageService name without changing other files
+export class LocalStorageService implements FileStorageService {
+  private delegate: FileStorageService;
+
+  constructor() {
+    const useCloudinary = !!(process.env.CLOUDINARY_URL || process.env.CLOUDINARY_CLOUD_NAME);
+    this.delegate = useCloudinary ? new CloudinaryStorageService() : new DiskStorageService();
+  }
+
+  async upload(file: File, options?: { isTemp?: boolean }): Promise<string> {
+    return this.delegate.upload(file, options);
+  }
+
+  async move(tempUrl: string, finalFolder: string = 'products'): Promise<string> {
+    return this.delegate.move(tempUrl, finalFolder);
+  }
+
+  async delete(path: string): Promise<void> {
+    return this.delegate.delete(path);
+  }
+
+  async rollbackMove(paths: string[]): Promise<void> {
+    return this.delegate.rollbackMove(paths);
   }
 }
