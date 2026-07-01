@@ -82,40 +82,92 @@ export default async function HomePage() {
   });
 
   // 2. Fetch Active Promotions for the Slider
+  const now = new Date();
   const activePromotions = await prisma.promotion.findMany({
-    where: { isActive: true }
+    where: {
+      isActive: true,
+      OR: [{ validFrom: null }, { validFrom: { lte: now } }],
+      AND: [{ OR: [{ validTo: null }, { validTo: { gte: now } }] }],
+    },
+    include: {
+      category: { select: { slug: true } },
+      brand: { select: { slug: true } },
+    }
   });
-  const promoBrandIds = activePromotions.map(p => p.brandId).filter(Boolean) as string[];
-  const promoCategoryIds = activePromotions.map(p => p.categoryId).filter(Boolean) as string[];
 
-  // Query child categories for categories in promotion to include their products
-  const activeCategoryPromoChildren = await prisma.category.findMany({
-    where: { parentId: { in: promoCategoryIds } },
-    select: { id: true }
-  });
-  const allPromoCategoryIds = [...promoCategoryIds, ...activeCategoryPromoChildren.map(c => c.id)];
+  const serialize = (items: any[]) => items.map(p => ({
+    ...p,
+    basePrice: Number(p.basePrice),
+    stockQuantity: Number(p.stockQuantity),
+    minOrderQty: Number(p.minOrderQty || 1),
+  }));
 
-  const wherePromos: any = {
-    isActive: true,
-    isDeleted: false,
-    ...stockFilter,
-    OR: [
-      ...(promoBrandIds.length > 0 ? [{ brandId: { in: promoBrandIds } }] : []),
-      ...(allPromoCategoryIds.length > 0 ? [{ categoryId: { in: allPromoCategoryIds } }] : [])
-    ]
-  };
+  const promoSliders = [];
 
-  const hasPromos = promoBrandIds.length > 0 || allPromoCategoryIds.length > 0;
+  for (const promo of activePromotions) {
+    if (!promo.showInSlider) continue;
 
-  // 3. Fetch Products in Promotion
-  const ofertasDelMesRaw = hasPromos
-    ? await prisma.product.findMany({
-        where: wherePromos,
-        take: 15,
-        select: productSelectFields,
-        orderBy: { createdAt: 'desc' }
-      })
-    : [];
+    const promoCategoryIds = promo.categoryId ? [promo.categoryId] : [];
+    const promoBrandIds = promo.brandId ? [promo.brandId] : [];
+
+    let allPromoCategoryIds = [...promoCategoryIds];
+    if (promoCategoryIds.length > 0) {
+      const children = await prisma.category.findMany({
+        where: { parentId: { in: promoCategoryIds } },
+        select: { id: true }
+      });
+      allPromoCategoryIds.push(...children.map(c => c.id));
+    }
+
+    // Guard: skip promo with no category/brand targets to avoid matching ALL products
+    if (promoBrandIds.length === 0 && allPromoCategoryIds.length === 0) continue;
+
+    const where: any = {
+      isActive: true,
+      isDeleted: false,
+      ...stockFilter,
+      OR: [
+        ...(promoBrandIds.length > 0 ? [{ brandId: { in: promoBrandIds } }] : []),
+        ...(allPromoCategoryIds.length > 0 ? [{ categoryId: { in: allPromoCategoryIds } }] : [])
+      ]
+    };
+
+    const productsRaw = await prisma.product.findMany({
+      where,
+      take: 15,
+      select: productSelectFields,
+      orderBy: { createdAt: 'desc' }
+    });
+
+    if (productsRaw.length > 0) {
+      const enriched = await priceService.enrichProductsWithPrices(productsRaw as any, companyId);
+      const serialized = serialize(enriched);
+
+      // isPromoSlider is true whenever the promotion is shown as a slider (campaign layout)
+      // It does NOT require a validTo - N/A promotions also use the campaign layout but without timer
+      const isPromoSlider = true;
+      const validToSerialized = promo.validTo ? promo.validTo.toISOString() : null;
+
+      let linkHref = '/products?offers=true';
+      if (promo.category?.slug && promo.brand?.slug) {
+        linkHref = `/products?category=${promo.category.slug}&brands=${promo.brand.slug}&offers=true`;
+      } else if (promo.category?.slug) {
+        linkHref = `/products?category=${promo.category.slug}&offers=true`;
+      } else if (promo.brand?.slug) {
+        linkHref = `/products?brands=${promo.brand.slug}&offers=true`;
+      }
+
+      promoSliders.push({
+        id: promo.id,
+        title: promo.name,
+        products: serialized,
+        isPromoSlider,
+        validTo: validToSerialized,
+        color: promo.color,
+        linkHref,
+      });
+    }
+  }
 
   // 4. Fetch general fallback products
   const fallbackRaw = await prisma.product.findMany({
@@ -125,30 +177,13 @@ export default async function HomePage() {
     orderBy: { name: 'asc' }
   });
 
-  // 5. Enrich all raw products with B2B pricing
-  const [
-    ofertasDelMes,
-    fallbackProducts
-  ] = await Promise.all([
-    priceService.enrichProductsWithPrices(ofertasDelMesRaw as any, companyId),
-    priceService.enrichProductsWithPrices(fallbackRaw as any, companyId),
-  ]);
-
-  // 6. Serialize BigInt/Decimal to normal numbers
-  const serialize = (items: any[]) => items.map(p => ({
-    ...p,
-    basePrice: Number(p.basePrice),
-    stockQuantity: Number(p.stockQuantity),
-    minOrderQty: Number(p.minOrderQty || 1),
-  }));
-
-  const serializedOfertas = serialize(ofertasDelMes);
+  const fallbackProducts = await priceService.enrichProductsWithPrices(fallbackRaw as any, companyId);
   const serializedFallback = serialize(fallbackProducts);
 
-  // Sliders fallback divisions
-  const rvFallback = serializedFallback.slice(0, 10);
-  const shFallback = serializedFallback.slice(5, 15);
-  const relFallback = serializedFallback.slice(10, 20);
+  // Sliders fallback divisions (non-overlapping slices)
+  const rvFallback = serializedFallback.slice(0, 7);
+  const shFallback = serializedFallback.slice(7, 14);
+  const relFallback = serializedFallback.slice(14, 20);
 
   return (
     <div className="min-h-screen bg-[#e8e8e8] flex flex-col">
@@ -164,16 +199,20 @@ export default async function HomePage() {
         </ScrollReveal>
 
         {/* Productos en Promoción Slider */}
-        {serializedOfertas.length > 0 && (
-          <ScrollReveal>
+        {/* Active Promotion Sliders */}
+        {promoSliders.map((slider) => (
+          <ScrollReveal key={slider.id}>
             <ProductSlider
-              title="Productos en Promoción"
-              products={serializedOfertas}
-              linkHref="/products?offers=true"
+              title={slider.title}
+              products={slider.products}
+              linkHref={slider.linkHref}
               linkLabel="Ver todas las ofertas"
+              isPromoSlider={slider.isPromoSlider}
+              validTo={slider.validTo}
+              campaignColor={slider.color}
             />
           </ScrollReveal>
-        )}
+        ))}
 
         {/* High-Impact Campaign Banner */}
         <ScrollReveal>

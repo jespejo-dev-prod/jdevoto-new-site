@@ -105,7 +105,13 @@ export async function getCatalogProductsUseCase(
   const [hideSetting, activePromotions, topSoldItems] = await Promise.all([
     prisma.storeSettings.findUnique({ where: { key: 'hideOutOfStock' } }),
     offersOnly
-      ? prisma.promotion.findMany({ where: { isActive: true } })
+      ? prisma.promotion.findMany({
+          where: {
+            isActive: true,
+            OR: [{ validFrom: null }, { validFrom: { lte: new Date() } }],
+            AND: [{ OR: [{ validTo: null }, { validTo: { gte: new Date() } }] }],
+          }
+        })
       : Promise.resolve(null),
     bestSellersOnly
       ? prisma.orderItem.groupBy({

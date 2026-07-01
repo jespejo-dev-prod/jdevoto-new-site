@@ -23,6 +23,9 @@ const createPromotionSchema = z.object({
   brandId: z.string().optional().nullable(),
   validFrom: z.string().optional().nullable(),
   validTo: z.string().optional().nullable(),
+  showInSlider: z.boolean().optional(),
+  color: z.string().optional().nullable(),
+  isActive: z.boolean().optional(),
 }).refine(
   (data) => {
     if (data.discountType === "CATEGORY") return !!data.categoryId;
@@ -89,6 +92,8 @@ export const POST = withApiHandler(async (req) => {
       isActive: true,
       validFrom: data.validFrom ? new Date(data.validFrom) : null,
       validTo: data.validTo ? new Date(data.validTo) : null,
+      showInSlider: data.showInSlider !== undefined ? data.showInSlider : true,
+      color: data.color || "#dc2626",
     },
     include: {
       category: { select: { id: true, name: true, slug: true, isOutlet: true } },
@@ -96,7 +101,7 @@ export const POST = withApiHandler(async (req) => {
     },
   });
 
-  revalidateTag("promotions", { expire: 0 });
+  revalidateTag("promotions");
 
   return created(promotion);
 });
@@ -115,7 +120,7 @@ export const DELETE = withApiHandler(async (req) => {
 
   await prisma.promotion.delete({ where: { id } });
 
-  revalidateTag("promotions", { expire: 0 });
+  revalidateTag("promotions");
 
   return noContent();
 });
@@ -157,6 +162,9 @@ export const PUT = withApiHandler(async (req) => {
       brandId: data.discountType === "CATEGORY" ? null : (data.brandId ?? null),
       validFrom: data.validFrom ? new Date(data.validFrom) : null,
       validTo: data.validTo ? new Date(data.validTo) : null,
+      showInSlider: data.showInSlider !== undefined ? data.showInSlider : true,
+      color: data.color || "#dc2626",
+      ...(data.isActive !== undefined && { isActive: data.isActive }),
     },
     include: {
       category: { select: { id: true, name: true, slug: true, isOutlet: true } },

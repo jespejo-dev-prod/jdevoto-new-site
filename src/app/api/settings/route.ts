@@ -4,7 +4,6 @@ import { withApiHandler } from '@/lib/api-handler';
 import { extractUserFromRequest } from '@/lib/auth';
 
 export const GET = withApiHandler(async (req: NextRequest) => {
-  const user = extractUserFromRequest(req);
   const { searchParams } = new URL(req.url);
   const key = searchParams.get('key');
 

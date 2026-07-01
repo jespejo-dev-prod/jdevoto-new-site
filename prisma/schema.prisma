@@ -1,5 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
+  output          = "../src/generated/client"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -300,18 +301,20 @@ model Brand {
 }
 
 model Promotion {
-  id         String    @id @default(cuid())
-  name       String
-  discount   Decimal   @db.Decimal(5, 2)
-  brandId    String?
-  categoryId String?
-  isActive   Boolean   @default(true)
-  validFrom  DateTime?
-  validTo    DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  brand      Brand?    @relation(fields: [brandId], references: [id])
-  category   Category? @relation(fields: [categoryId], references: [id])
+  id           String    @id @default(cuid())
+  name         String
+  discount     Decimal   @db.Decimal(5, 2)
+  brandId      String?
+  categoryId   String?
+  isActive     Boolean   @default(true)
+  showInSlider Boolean   @default(true)
+  color        String?   @default("#dc2626")
+  validFrom    DateTime?
+  validTo      DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  brand        Brand?    @relation(fields: [brandId], references: [id])
+  category     Category? @relation(fields: [categoryId], references: [id])
 
   @@index([brandId])
   @@index([categoryId])

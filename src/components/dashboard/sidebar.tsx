@@ -19,7 +19,8 @@ import {
   Building2,
   Ticket,
   CreditCard,
-  X
+  X,
+  Sliders
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
@@ -52,6 +53,7 @@ const mainItems = [
   { icon: Users, label: 'Equipo', href: '/dashboard/users' },
   { icon: CreditCard, label: 'Pagos', href: '/dashboard/pagos' },
   { icon: CreditCard, label: 'Cuenta Corriente', href: '/dashboard/cuenta-corriente' },
+  { icon: Sliders, label: 'Slider Home', href: '/dashboard/slider' },
 ];
 
 export function Sidebar() {
@@ -82,6 +84,8 @@ export function Sidebar() {
     if (item.label === "Cuenta Corriente") {
       return user?.role === "ADMIN" || user?.role === "SALES_REP";
     }
+    // Slider Home solo para ADMIN
+    if (item.label === "Slider Home" && user?.role !== "ADMIN") return false;
     // Descuentos solo para ADMIN
     if (item.label === "Descuentos" && user?.role !== "ADMIN") return false;
     // Pagos solo para ADMIN

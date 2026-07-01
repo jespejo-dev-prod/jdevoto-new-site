@@ -12,7 +12,29 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-const slides = [
+interface SlideItem {
+  id: string | number;
+  image: string;
+  badge?: string;
+  badgeIcon?: any;
+  badgeColor?: string;
+  title: string;
+  description: string;
+  cta: string;
+  href: string;
+  gradient?: string;
+  imageClass?: string;
+  imagePositionX?: number;
+  imageScale?: number;
+}
+
+const iconMap: Record<string, any> = {
+  Zap,
+  Truck,
+  ShieldCheck
+};
+
+const DEFAULT_SLIDES: SlideItem[] = [
   {
     id: 1,
     image: "/home/outlet.jpg",
@@ -61,21 +83,65 @@ const slides = [
 ];
 
 export function HeroSlider() {
+  const [activeSlides, setActiveSlides] = useState<SlideItem[]>(DEFAULT_SLIDES);
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
+    // Cargar sliders dinámicos desde API pública de configuraciones
+    fetch("/api/settings?key=home_slides")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.value && Array.isArray(data.value) && data.value.length > 0) {
+          const mapped = data.value.map((s: any) => {
+            let BadgeIcon = null;
+            if (s.badgeIcon) {
+              if (typeof s.badgeIcon === "string") {
+                BadgeIcon = iconMap[s.badgeIcon] || null;
+              } else {
+                BadgeIcon = s.badgeIcon;
+              }
+            }
+            return {
+              id: s.id,
+              image: s.image,
+              badge: s.badge,
+              badgeIcon: BadgeIcon,
+              badgeColor: s.badgeColor || "text-sky-700 bg-sky-50 border-sky-100",
+              title: s.title,
+              description: s.description,
+              cta: s.cta || "Ver Más",
+              href: s.href || "/products",
+              gradient: s.gradient || "from-sky-100/10 via-zinc-100/30 to-transparent",
+              imageClass: s.imageClass || "object-center scale-100",
+              imagePositionX: s.imagePositionX,
+              imageScale: s.imageScale
+            };
+          });
+          setActiveSlides(mapped);
+        } else {
+          setActiveSlides(DEFAULT_SLIDES);
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading dynamic slides:", err);
+        setActiveSlides(DEFAULT_SLIDES);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (activeSlides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length);
+      setCurrent((prev) => (prev + 1) % activeSlides.length);
     }, 5000);
 
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [activeSlides]);
 
-  const nextSlide = () => setCurrent((prev) => (prev + 1) % slides.length);
+  const nextSlide = () => setCurrent((prev) => (prev + 1) % activeSlides.length);
   const prevSlide = () =>
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrent((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
 
   const handleDragEnd = (event: any, info: any) => {
     const threshold = 50;
@@ -86,7 +152,7 @@ export function HeroSlider() {
     }
   };
 
-  const activeSlide = slides[current];
+  const activeSlide = activeSlides[current] || DEFAULT_SLIDES[0];
 
   return (
     <div className="relative h-[420px] md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group">
@@ -110,13 +176,29 @@ export function HeroSlider() {
         >
           {/* Background image & gradient overlay (Spans full width) */}
           <div className="absolute inset-0 z-0">
-            <Image
-              src={activeSlide.image}
-              alt={activeSlide.title}
-              fill
-              className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${activeSlide.imageClass}`}
-              priority
-            />
+            {/* When using inline style transforms, strip any conflicting Tailwind scale/translate classes */}
+            {(() => {
+              const hasInlineTransform = activeSlide.imagePositionX !== undefined || activeSlide.imageScale !== undefined;
+              const safeImageClass = hasInlineTransform
+                ? (activeSlide.imageClass || '').replace(/\bscale-\S+\b|\btranslate-x-\S+\b/g, '').trim()
+                : (activeSlide.imageClass || '');
+              return (
+                <Image
+                  src={activeSlide.image}
+                  alt={activeSlide.title}
+                  fill
+                  className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${safeImageClass}`}
+                  priority
+                  style={
+                    hasInlineTransform
+                      ? {
+                          transform: `scale(${(activeSlide.imageScale || 100) / 100}) translateX(${activeSlide.imagePositionX || 0}%)`
+                        }
+                      : undefined
+                  }
+                />
+              );
+            })()}
             {/* Light gradient fade for text legibility */}
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent md:hidden" />
@@ -136,24 +218,28 @@ export function HeroSlider() {
             className="relative z-10 flex flex-col justify-center px-8 md:px-16 lg:px-24 h-full md:w-[50%] lg:w-[45%] text-left pt-12 md:pt-0"
           >
             {/* Badge */}
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: -10 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-                },
-              }}
-              className="mb-4"
-            >
-              <span
-                className={`inline-flex items-center gap-2 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${activeSlide.badgeColor}`}
+            {activeSlide.badge && (
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: -10 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
+                  },
+                }}
+                className="mb-4"
               >
-                <activeSlide.badgeIcon className="h-3.5 w-3.5" />
-                {activeSlide.badge}
-              </span>
-            </motion.div>
+                <span
+                  className={`inline-flex items-center gap-2 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${activeSlide.badgeColor || ""}`}
+                >
+                  {activeSlide.badgeIcon && (
+                    <activeSlide.badgeIcon className="h-3.5 w-3.5" />
+                  )}
+                  {activeSlide.badge}
+                </span>
+              </motion.div>
+            )}
 
             {/* Title */}
             <motion.h1
@@ -228,7 +314,7 @@ export function HeroSlider() {
 
       {/* Dots Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2.5 z-20">
-        {slides.map((_, idx) => (
+        {activeSlides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrent(idx)}

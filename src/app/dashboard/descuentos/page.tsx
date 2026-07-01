@@ -12,6 +12,18 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/auth-context';
 
+const formatForDateTimeLocal = (dateStr: string | null) => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const pad = (num: number) => String(num).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const min = pad(d.getMinutes());
+  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+};
+
 interface Category {
   id: string;
   name: string;
@@ -34,6 +46,8 @@ interface Promotion {
   category: Category | null;
   brand: Brand | null;
   isActive: boolean;
+  showInSlider: boolean;
+  color: string | null;
   validFrom: string | null;
   validTo: string | null;
   createdAt: string;
@@ -59,6 +73,11 @@ export default function DescuentosPage() {
   const [discountPercent, setDiscountPercent] = useState('');
   const [promoName, setPromoName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [durationMode, setDurationMode] = useState<'NA' | 'STOCK' | '24H' | '1W' | 'CUSTOM'>('NA');
+  const [customValidTo, setCustomValidTo] = useState('');
+  const [showInSlider, setShowInSlider] = useState(true);
+  const [color, setColor] = useState('#dc2626');
 
   // ─── Fetch Data ──────────────────────────────────────────────────────────────
 
@@ -121,6 +140,21 @@ export default function DescuentosPage() {
       const url = editingId ? `/api/promotions?id=${editingId}` : '/api/promotions';
       const method = editingId ? 'PUT' : 'POST';
 
+      let validToValue: string | null = null;
+      if (durationMode === 'STOCK') {
+        validToValue = new Date('9999-12-31T23:59:59.999Z').toISOString();
+      } else if (durationMode === '24H') {
+        const date = new Date();
+        date.setHours(date.getHours() + 24);
+        validToValue = date.toISOString();
+      } else if (durationMode === '1W') {
+        const date = new Date();
+        date.setDate(date.getDate() + 7);
+        validToValue = date.toISOString();
+      } else if (durationMode === 'CUSTOM') {
+        validToValue = customValidTo ? new Date(customValidTo).toISOString() : null;
+      }
+
       const res = await fetch(url, {
         method,
         headers,
@@ -130,6 +164,9 @@ export default function DescuentosPage() {
           discountType,
           categoryId: discountType !== 'BRAND' ? selectedCategoryId || null : null,
           brandId: discountType !== 'CATEGORY' ? selectedBrandId || null : null,
+          validTo: validToValue,
+          showInSlider,
+          color,
         }),
       });
 
@@ -167,6 +204,23 @@ export default function DescuentosPage() {
       setSelectedBrandId(promo.brandId);
       setSelectedCategoryId('');
     }
+
+    if (promo.validTo) {
+      const year = new Date(promo.validTo).getFullYear();
+      if (year === 9999) {
+        setDurationMode('STOCK');
+        setCustomValidTo('');
+      } else {
+        setDurationMode('CUSTOM');
+        setCustomValidTo(formatForDateTimeLocal(promo.validTo));
+      }
+    } else {
+      setDurationMode('NA');
+      setCustomValidTo('');
+    }
+
+    setShowInSlider(promo.showInSlider !== undefined ? promo.showInSlider : true);
+    setColor(promo.color || '#dc2626');
   };
 
   const handleDelete = async (id: string, name: string) => {
@@ -197,6 +251,10 @@ export default function DescuentosPage() {
     setDiscountPercent('');
     setPromoName('');
     setEditingId(null);
+    setDurationMode('NA');
+    setCustomValidTo('');
+    setShowInSlider(true);
+    setColor('#dc2626');
   };
 
   const generateName = () => {
@@ -333,6 +391,41 @@ export default function DescuentosPage() {
               className="h-12 rounded-xl bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-600 font-medium"
             />
           </div>
+
+          {/* Duración / Expiración */}
+          <div className="space-y-2">
+            <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Duración / Expiración</Label>
+            <select
+              value={durationMode}
+              onChange={(e) => {
+                setDurationMode(e.target.value as any);
+                if (e.target.value !== 'CUSTOM') {
+                  setCustomValidTo('');
+                }
+              }}
+              className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-all"
+            >
+              <option value="NA">Sin fecha de expiración (N/A)</option>
+              <option value="STOCK">Hasta agotar stock</option>
+              <option value="24H">24 horas</option>
+              <option value="1W">1 semana</option>
+              <option value="CUSTOM">Fecha personalizada</option>
+            </select>
+          </div>
+
+          {/* Fecha personalizada */}
+          {durationMode === 'CUSTOM' && (
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Fecha y hora límite</Label>
+              <Input
+                type="datetime-local"
+                value={customValidTo}
+                onChange={(e) => setCustomValidTo(e.target.value)}
+                required
+                className="h-12 rounded-xl bg-zinc-800 border-zinc-700 text-white font-medium"
+              />
+            </div>
+          )}
         </div>
 
         {/* Nombre (opcional) */}
@@ -344,6 +437,41 @@ export default function DescuentosPage() {
             onChange={(e) => setPromoName(e.target.value)}
             className="h-12 rounded-xl bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-600 font-medium max-w-lg"
           />
+        </div>
+
+        {/* Display Settings (carrusel and color) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-lg">
+          {/* Mostrar en Slider */}
+          <div className="flex items-center gap-3 h-12">
+            <input
+              type="checkbox"
+              id="showInSlider"
+              checked={showInSlider}
+              onChange={(e) => setShowInSlider(e.target.checked)}
+              className="h-5 w-5 rounded border-zinc-700 bg-zinc-800 text-primary focus:ring-primary focus:ring-offset-zinc-900 focus:ring-2"
+            />
+            <Label htmlFor="showInSlider" className="text-sm font-bold text-zinc-300 cursor-pointer select-none">
+              Mostrar como carrusel (slider) en el Home
+            </Label>
+          </div>
+
+          {/* Color Picker */}
+          <div className="flex items-center gap-3">
+            <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest whitespace-nowrap">
+              Color fuentes campaña:
+            </Label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="w-10 h-10 border-0 rounded-lg cursor-pointer bg-zinc-800 p-0.5"
+              />
+              <span className="text-xs font-mono font-bold text-zinc-500 uppercase">
+                {color}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Info Banner */}
@@ -402,6 +530,7 @@ export default function DescuentosPage() {
                   <th className="text-left px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Categoría</th>
                   <th className="text-left px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Marca</th>
                   <th className="text-center px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Descuento</th>
+                  <th className="text-left px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Vigencia</th>
                   <th className="text-right px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Acciones</th>
                 </tr>
               </thead>
@@ -445,6 +574,49 @@ export default function DescuentosPage() {
                       <span className="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-black border border-emerald-500/20">
                         {Number(promo.discount)}%
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {promo.validTo ? (
+                        (() => {
+                          const now = new Date();
+                          const to = new Date(promo.validTo);
+                          if (to.getFullYear() === 9999) {
+                            return (
+                              <span className="text-[11px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
+                                Hasta agotar stock
+                              </span>
+                            );
+                          }
+                          const diffMs = to.getTime() - now.getTime();
+                          if (diffMs <= 0) {
+                            return (
+                              <span className="text-[10px] font-bold text-red-500 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-lg">
+                                Expirado
+                              </span>
+                            );
+                          }
+                          const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                          if (diffDays > 1) {
+                            return (
+                              <span className="text-[11px] text-amber-400 font-bold bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+                                Quedan {diffDays} días
+                              </span>
+                            );
+                          }
+                          // Menos de 24 horas
+                          const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+                          const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                          return (
+                            <span className="text-[11px] text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 rounded-lg">
+                              Quedan {diffHrs}h {diffMins}m
+                            </span>
+                          );
+                        })()
+                      ) : (
+                        <span className="text-[11px] text-zinc-400 font-bold bg-zinc-500/10 border border-zinc-500/20 px-2.5 py-1 rounded-lg">
+                          N/A (Sin expiración)
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">

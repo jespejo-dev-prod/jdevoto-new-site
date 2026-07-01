@@ -18,6 +18,7 @@ interface ProductCardProps {
   isDeleting?: boolean;
   /** Primeras 4 cards son above-the-fold: cargarlas con priority */
   priority?: boolean;
+  compact?: boolean;
 }
 
 export const ProductCard = memo(function ProductCard({
@@ -26,6 +27,7 @@ export const ProductCard = memo(function ProductCard({
   onDelete,
   isDeleting,
   priority = false,
+  compact = false,
 }: ProductCardProps) {
   const { accessToken, user } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -195,12 +197,13 @@ export const ProductCard = memo(function ProductCard({
       </div>
 
       {/* Body */}
-      <div className="p-5 space-y-4 flex flex-col flex-1 relative">
+      <div className={cn("p-5 space-y-4 flex flex-col flex-1 relative shrink-0", compact && "p-3.5 space-y-2.5 pt-2.5")}>
         <div className="flex justify-between items-start gap-2 pointer-events-none w-full">
           <div className="min-w-0 w-full">
             <div className="flex items-center justify-between gap-2 mb-1.5 w-full">
               <p className={cn(
-                "text-[16px] font-black uppercase tracking-widest font-mono",
+                "font-black uppercase tracking-widest font-mono",
+                compact ? "text-[10px]" : "text-[16px]",
                 isDashboard ? "text-zinc-400" : "text-zinc-400"
               )}>
                 {product.brand?.name || 'SIN MARCA'}
@@ -211,7 +214,10 @@ export const ProductCard = memo(function ProductCard({
                 </span>
               )}
               {!isDashboard && product.sku && (
-                <span className="text-sm font-mono font-black text-blue-600 shrink-0">
+                <span className={cn(
+                  "font-mono font-black text-blue-600 shrink-0",
+                  compact ? "text-xs" : "text-sm"
+                )}>
                   SKU: {product.sku}
                 </span>
               )}
@@ -220,7 +226,9 @@ export const ProductCard = memo(function ProductCard({
               "transition-colors",
               isDashboard 
                 ? "text-base font-bold leading-snug line-clamp-2 h-[48px] overflow-hidden text-white group-hover:text-primary" 
-                : "text-lg sm:text-[19px] font-bold leading-snug line-clamp-2 h-[50px] sm:h-[54px] overflow-hidden text-zinc-900 group-hover:text-primary"
+                : (compact
+                    ? "text-sm font-extrabold leading-snug line-clamp-2 h-[40px] overflow-hidden text-zinc-900 group-hover:text-primary"
+                    : "text-lg sm:text-[19px] font-bold leading-snug line-clamp-2 h-[50px] sm:h-[54px] overflow-hidden text-zinc-900 group-hover:text-primary")
             )}>
               {product.name}
             </h3>
@@ -255,14 +263,23 @@ export const ProductCard = memo(function ProductCard({
                     {originalNetPrice && originalNetPrice !== price ? (
                       <>
                         <div className="flex items-baseline gap-2">
-                          <span className="text-3xl font-black text-zinc-950 tracking-tight whitespace-nowrap">
+                          <span className={cn(
+                            "font-black text-zinc-950 tracking-tight whitespace-nowrap",
+                            compact ? "text-2xl" : "text-3xl"
+                          )}>
                             $ {price.toLocaleString('es-CL')}
                           </span>
-                          <span className="text-[14px] font-black text-blue-600 whitespace-nowrap">
+                          <span className={cn(
+                            "font-black text-blue-600 whitespace-nowrap",
+                            compact ? "text-xs" : "text-[14px]"
+                          )}>
                             Ahorra $ {(originalNetPrice - price).toLocaleString('es-CL')}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1 text-[15px] text-zinc-400 uppercase tracking-tight">
+                        <div className={cn(
+                          "flex items-center gap-1 text-zinc-400 uppercase tracking-tight",
+                          compact ? "text-[12px]" : "text-[15px]"
+                        )}>
                           <span className="line-through whitespace-nowrap">
                             $ {originalNetPrice.toLocaleString('es-CL')}
                           </span>
@@ -272,10 +289,16 @@ export const ProductCard = memo(function ProductCard({
                       </>
                     ) : (
                       <>
-                        <span className="text-3xl font-black text-zinc-950 tracking-tight whitespace-nowrap">
+                        <span className={cn(
+                          "font-black text-zinc-950 tracking-tight whitespace-nowrap",
+                          compact ? "text-2xl" : "text-3xl"
+                        )}>
                           $ {price.toLocaleString('es-CL')}
                         </span>
-                        <span className="text-[11px] text-zinc-400 font-bold uppercase tracking-tight">Neto</span>
+                        <span className={cn(
+                          "font-bold uppercase tracking-tight",
+                          compact ? "text-[10px]" : "text-[11px]"
+                        )}>Neto</span>
                       </>
                     )}
                   </div>
@@ -290,10 +313,11 @@ export const ProductCard = memo(function ProductCard({
               </div>
               
               {/* Row 2: Stock (Catalog only, below price to avoid superposition) */}
-              <div className="flex justify-end w-full pt-0.5">
+              <div className={cn("flex justify-end w-full pt-0.5", compact && "pt-0")}>
                 {isAuthenticated ? (
                   <span className={cn(
-                    "text-[11px] font-black px-2 py-1 rounded uppercase tracking-widest whitespace-nowrap",
+                    "font-black px-2 py-1 rounded uppercase tracking-widest whitespace-nowrap",
+                    compact ? "text-[10px] px-1.5 py-0.5" : "text-[11px]",
                     product.stockQuantity > 0 ? "text-green-600 bg-green-50 border border-green-200/50" : "text-red-600 bg-red-50 border border-red-200/50"
                   )}>
                     {product.stockQuantity > 0 ? `${product.stockQuantity} En Stock` : "Sin Stock"}
