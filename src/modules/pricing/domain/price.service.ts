@@ -371,8 +371,13 @@ function buildPromotionMaps(promotions: Promotion[]) {
   const promotionBrandMap = new Map<string, Promotion>();
   const promotionCategoryMap = new Map<string, Promotion>();
   const promotionCombinedMap = new Map<string, Promotion>();
+  const now = Date.now();
 
   for (const promo of promotions) {
+    // Real-time verification to discard cached promotions that have just expired in the 5-min cache window
+    if (promo.validFrom && new Date(promo.validFrom).getTime() > now) continue;
+    if (promo.validTo && new Date(promo.validTo).getTime() < now) continue;
+
     if (promo.brandId && promo.categoryId) {
       // Combinado: categoría + marca — mayor prioridad
       promotionCombinedMap.set(`${promo.categoryId}:${promo.brandId}`, promo);
