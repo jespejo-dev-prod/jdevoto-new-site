@@ -109,14 +109,17 @@ export function ProductSlider({
 
   if (!products || products.length === 0) return null;
 
+  const isStockMode = validTo ? new Date(validTo).getFullYear() === 9999 : false;
+  const isExpired = isPromoSlider && validTo && !isStockMode && (new Date(validTo).getTime() <= new Date().getTime());
+
+  if (isExpired) return null;
+
   const hasTimeLeft = timeLeft !== null;
   
   // Calculate total days remaining for sub-label
   let daysLeft = 0;
-  let isStockMode = false;
   if (validTo) {
     const toDate = new Date(validTo);
-    isStockMode = toDate.getFullYear() === 9999;
     const diff = toDate.getTime() - new Date().getTime();
     daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
