@@ -101,7 +101,7 @@ export const POST = withApiHandler(async (req) => {
     },
   });
 
-  revalidateTag("promotions");
+  revalidateTag("promotions", { expire: 0 });
 
   return created(promotion);
 });
@@ -120,7 +120,7 @@ export const DELETE = withApiHandler(async (req) => {
 
   await prisma.promotion.delete({ where: { id } });
 
-  revalidateTag("promotions");
+  revalidateTag("promotions", { expire: 0 });
 
   return noContent();
 });
