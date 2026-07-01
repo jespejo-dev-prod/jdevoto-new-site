@@ -9,6 +9,7 @@ import { CartItem } from '@/modules/cart/presentation/components/CartItem/CartIt
 import { OrderSummary } from '@/modules/cart/presentation/components/OrderSummary/OrderSummary';
 import { useApi } from '@/shared/infrastructure/api/use-api';
 import { toast } from 'sonner';
+import { PromoCountdownBanner } from '@/components/cart/PromoCountdownBanner';
 
 interface CartContentProps {
   recentOrders?: any[];
@@ -120,6 +121,10 @@ export function CartContent({ recentOrders = [] }: CartContentProps) {
             Vaciar Carrito
           </button>
         )}
+      </div>
+
+      <div className="mb-8">
+        <PromoCountdownBanner />
       </div>
 
       <h1 className="text-2xl sm:text-3xl font-black text-zinc-950 mb-10 flex items-baseline gap-4">

@@ -83,7 +83,10 @@ function resolvePrice(
   
   const promo = combinedPromo || categoryPromo || parentCategoryPromo || brandPromo;
   if (promo) {
-    return buildPrice(product, basePrice, Number(promo.discount), "PROMOTION");
+    const validToIso = promo.validTo
+      ? (promo.validTo instanceof Date ? promo.validTo.toISOString() : String(promo.validTo))
+      : null;
+    return buildPrice(product, basePrice, Number(promo.discount), "PROMOTION", validToIso);
   }
 
   // 4. Descuento por defecto de la empresa - DESACTIVADO POR SOLICITUD DE USUARIO (Se maneja a nivel global de orden en Carrito y Checkout)
@@ -318,7 +321,8 @@ function buildPrice(
   product: Product,
   unitNetPrice: number,
   discountPercent: number,
-  priceSource: PriceBreakdown["priceSource"]
+  priceSource: PriceBreakdown["priceSource"],
+  validTo?: string | null
 ): PriceBreakdown {
   const discountedNet = unitNetPrice * (1 - discountPercent / 100);
   const tax = discountedNet * TAX_RATE;
@@ -335,6 +339,7 @@ function buildPrice(
     taxAmount: round2(tax),
     unitGrossPrice: round2(discountedNet + tax),
     priceSource,
+    validTo: validTo || null,
   };
 }
 
@@ -374,9 +379,11 @@ function buildPromotionMaps(promotions: Promotion[]) {
   const now = Date.now();
 
   for (const promo of promotions) {
-    // Real-time verification to discard cached promotions that have just expired in the 5-min cache window
-    if (promo.validFrom && new Date(promo.validFrom).getTime() > now) continue;
-    if (promo.validTo && new Date(promo.validTo).getTime() < now) continue;
+    const validFromTime = promo.validFrom ? new Date(promo.validFrom).getTime() : null;
+    const validToTime = promo.validTo ? new Date(promo.validTo).getTime() : null;
+
+    if (validFromTime && validFromTime > now) continue;
+    if (validToTime && validToTime < now) continue;
 
     if (promo.brandId && promo.categoryId) {
       // Combinado: categoría + marca — mayor prioridad

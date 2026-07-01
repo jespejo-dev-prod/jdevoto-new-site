@@ -45,6 +45,7 @@ export interface PriceBreakdown {
   taxAmount: number;          // discountedNetPrice * 0.19
   unitGrossPrice: number;     // discountedNetPrice + taxAmount
   priceSource: "COMPANY_LIST" | "GENERAL_LIST" | "BASE_PRICE" | "OUTLET" | "PROMOTION";
+  validTo?: string | null;
 }
 
 // ============================================================

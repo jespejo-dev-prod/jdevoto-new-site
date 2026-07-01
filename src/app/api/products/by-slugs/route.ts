@@ -26,9 +26,11 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
   const slugsQuery = req.nextUrl.searchParams.get("slugs") || "";
   const slugs = slugsQuery.split(",").filter(Boolean);
+  const idsQuery = req.nextUrl.searchParams.get("ids") || "";
+  const ids = idsQuery.split(",").filter(Boolean);
   const related = req.nextUrl.searchParams.get("related") === "true";
 
-  if (slugs.length === 0) {
+  if (slugs.length === 0 && ids.length === 0) {
     return ok([]);
   }
 
@@ -36,7 +38,12 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   if (related) {
     // Find category and brand ids for the specified slugs
     const baseProducts = await prisma.product.findMany({
-      where: { slug: { in: slugs } },
+      where: {
+        OR: [
+          ...(slugs.length > 0 ? [{ slug: { in: slugs } }] : []),
+          ...(ids.length > 0 ? [{ id: { in: ids } }] : [])
+        ]
+      },
       select: { categoryId: true, brandId: true, id: true }
     });
 
@@ -79,10 +86,13 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     return ok(serializeDecimal(productsWithPrices));
   }
 
-  // 2. Fetch specific products by slugs
+  // 2. Fetch specific products by slugs or ids
   const products = await prisma.product.findMany({
     where: {
-      slug: { in: slugs },
+      OR: [
+        ...(slugs.length > 0 ? [{ slug: { in: slugs } }] : []),
+        ...(ids.length > 0 ? [{ id: { in: ids } }] : [])
+      ],
       isActive: true,
       isDeleted: false,
       ...stockFilter,

@@ -16,6 +16,7 @@ import { CHILE_REGIONS } from '@/lib/chile-data';
 import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { toast } from 'sonner';
+import { PromoCountdownBanner } from '@/components/cart/PromoCountdownBanner';
 
 import { useRouter } from 'next/navigation';
 
@@ -530,6 +531,9 @@ export default function CheckoutPage() {
       </nav>
 
       <main className="max-w-[1400px] mx-auto p-6 lg:p-12">
+        <div className="mb-8">
+          <PromoCountdownBanner />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
            
             <div className="lg:col-span-8 space-y-10">
