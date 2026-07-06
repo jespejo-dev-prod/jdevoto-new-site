@@ -4,12 +4,14 @@
  * OrderService — Lógica de Negocio de Pedidos B2B (Schema Updated)
  *
  * Responsabilidades:
- *  1. Validar stock disponible antes de crear el pedido.
+ *  1. Validar stock disponible antes de crear el pedido (stockQuantity - stockReserved).
  *  2. Calcular precios aplicando la lista correcta por empresa.
  *  3. Crear el pedido con sus ítems en una transacción atómica.
- *  4. Decrementar stock al confirmar.
- *  5. Verificar límite de crédito de la empresa.
- *  6. Gestionar transiciones de estado del pedido.
+ *  4. Reservar stock al crear (stockReserved += qty) — no descuenta físico.
+ *  5. Descontar stock físico al entregar (stockQuantity -= qty, stockReserved -= qty).
+ *  6. Liberar reserva al cancelar/rechazar (stockReserved -= qty).
+ *  7. Verificar límite de crédito de la empresa.
+ *  8. Gestionar transiciones de estado del pedido.
  */
 
 import { prisma } from "@/lib/client";
@@ -89,10 +91,12 @@ export class OrderService {
         );
       }
 
-      if (product.stockQuantity < item.quantity) {
+      // Stock disponible = stock físico - stock ya reservado por otras órdenes activas
+      const stockDisponible = Number(product.stockQuantity) - Number(product.stockReserved);
+      if (stockDisponible < item.quantity) {
         throw new BusinessRuleError(
           `Stock insuficiente para '${product.name}'. ` +
-            `Disponible: ${product.stockQuantity}, solicitado: ${item.quantity}`,
+            `Disponible: ${stockDisponible}, solicitado: ${item.quantity}`,
           "INSUFFICIENT_STOCK"
         );
       }
@@ -290,12 +294,13 @@ export class OrderService {
         },
       });
 
-      // Decrementar stock de cada producto en paralelo (Evitar N+1)
+      // Reservar stock de cada producto (no se descuenta del stock físico todavía)
+      // El descuento real ocurre cuando el pedido pasa a DELIVERED
       await Promise.all(
         items.map((item) =>
           tx.product.update({
             where: { id: item.productId },
-            data: { stockQuantity: { decrement: item.quantity } },
+            data: { stockReserved: { increment: item.quantity } },
           })
         )
       );
@@ -390,12 +395,17 @@ export class OrderService {
         },
       });
 
-      // Si se cancela o rechaza, devolver stock y crédito
+      // Si se cancela o rechaza, liberar reserva de stock y crédito
       if (newStatus === OrderStatus.CANCELLED || newStatus === OrderStatus.REJECTED) {
         await this.reverseOrderEffects(tx, orderId);
       }
+
+      // Si se completa (DELIVERED), descontar el stock físico real
+      if (newStatus === OrderStatus.DELIVERED) {
+        await this.commitStockOnDelivery(tx, orderId);
+      }
       
-      // Si se reactiva desde cancelado/rechazado, volver a descontar stock y crédito
+      // Si se reactiva desde cancelado/rechazado, volver a reservar stock y crédito
       if ((order.status === OrderStatus.CANCELLED || order.status === OrderStatus.REJECTED) && 
           (newStatus !== OrderStatus.CANCELLED && newStatus !== OrderStatus.REJECTED)) {
         await this.applyOrderEffects(tx, orderId);
@@ -479,11 +489,12 @@ export class OrderService {
 
         const productMap = new Map(products.map((p) => [p.id, p]));
 
-        // Validar stock (ahora que hemos devuelto el del pedido anterior)
+        // Validar stock (ahora que hemos devuelto la reserva del pedido anterior)
         for (const item of input.items) {
           const product = productMap.get(item.productId)!;
-          if (product.stockQuantity < item.quantity) {
-             throw new BusinessRuleError(`Stock insuficiente para ${product.name}`, "INSUFFICIENT_STOCK");
+          const stockDisponible = Number(product.stockQuantity) - Number(product.stockReserved);
+          if (stockDisponible < item.quantity) {
+             throw new BusinessRuleError(`Stock insuficiente para ${product.name}. Disponible: ${stockDisponible}`, "INSUFFICIENT_STOCK");
           }
         }
 
@@ -768,7 +779,7 @@ export class OrderService {
 
   /**
    * Revierte los efectos de un pedido cancelado:
-   *  - Restaura el stock de cada producto.
+   *  - Libera la reserva de stock (stockReserved) de cada producto.
    *  - Reduce el crédito usado de la empresa.
    */
   private async reverseOrderEffects(
@@ -781,12 +792,12 @@ export class OrderService {
     });
     if (!order) return;
 
-    // Restaurar stock en paralelo (Evitar N+1)
+    // Liberar reserva de stock (no tocar stockQuantity — ese es el stock físico real)
     await Promise.all(
       order.items.map((item) =>
         tx.product.update({
           where: { id: item.productId },
-          data: { stockQuantity: { increment: item.quantity } },
+          data: { stockReserved: { decrement: item.quantity } },
         })
       )
     );
@@ -805,8 +816,8 @@ export class OrderService {
   }
 
   /**
-   * Aplica los efectos de un pedido (Reactivación):
-   *  - Descuenta stock.
+   * Aplica los efectos de un pedido (Reactivación desde CANCELLED/REJECTED → DRAFT):
+   *  - Reserva stock nuevamente (stockReserved).
    *  - Incrementa crédito usado.
    */
   private async applyOrderEffects(
@@ -819,12 +830,12 @@ export class OrderService {
     });
     if (!order) return;
 
-    // Descontar stock en paralelo (Evitar N+1)
+    // Reservar stock nuevamente (solo incrementar stockReserved)
     await Promise.all(
       order.items.map((item) =>
         tx.product.update({
           where: { id: item.productId },
-          data: { stockQuantity: { decrement: item.quantity } },
+          data: { stockReserved: { increment: item.quantity } },
         })
       )
     );
@@ -851,6 +862,35 @@ export class OrderService {
         }
       }
     }
+  }
+
+  /**
+   * Confirma el consumo físico de stock cuando el pedido se entrega (DELIVERED).
+   * Descuenta stockQuantity (stock físico) y libera la reserva stockReserved.
+   * Ambas operaciones se hacen en la misma transacción de updateOrderStatus.
+   */
+  private async commitStockOnDelivery(
+    tx: Prisma.TransactionClient,
+    orderId: string
+  ): Promise<void> {
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
+    if (!order) return;
+
+    // Descontar stock físico y liberar reserva en paralelo
+    await Promise.all(
+      order.items.map((item) =>
+        tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stockQuantity: { decrement: item.quantity }, // descuento real del físico
+            stockReserved: { decrement: item.quantity }, // liberar la reserva
+          },
+        })
+      )
+    );
   }
 }
 

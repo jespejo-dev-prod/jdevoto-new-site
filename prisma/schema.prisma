@@ -65,6 +65,7 @@ model User {
   phone             String?
   role              UserRole       @default(BUYER)
   isActive          Boolean        @default(true)
+  emailUnsubscribed Boolean        @default(false)
   twoFactorSecret   String?
   companyId         String
   createdAt         DateTime       @default(now())
@@ -77,6 +78,7 @@ model User {
   attributedOrders  Order[]        @relation("OrderSalesRep")
   refreshTokens     RefreshToken[]
   company           Company        @relation(fields: [companyId], references: [id])
+  campaignRecipients EmailCampaignRecipient[]
 
   @@index([email])
   @@index([companyId])
@@ -128,6 +130,7 @@ model Product {
   inner          Int             @default(1)
   basePrice      Decimal         @db.Decimal(15, 2)
   stockQuantity  BigInt          @default(0)
+  stockReserved  BigInt          @default(0)
   minOrderQty    Int             @default(1)
   stockAlert     Int             @default(5)
   isActive       Boolean         @default(true)
@@ -405,6 +408,54 @@ model SystemErrorLog {
   @@map("system_error_logs")
 }
 
+model EmailCampaign {
+  id              String                   @id @default(cuid())
+  title           String
+  subject         String
+  previewText     String?
+  headerImageUrl  String?
+  ctaText         String?
+  ctaUrl          String?
+  status          CampaignStatus           @default(DRAFT)
+  recipientTarget RecipientTarget          @default(ALL)
+  totalSent       Int                      @default(0)
+  totalDelivered  Int                      @default(0)
+  totalOpened     Int                      @default(0)
+  totalClicked    Int                      @default(0)
+  totalBounced    Int                      @default(0)
+  totalComplained Int                      @default(0)
+  sentAt          DateTime?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  recipients      EmailCampaignRecipient[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("email_campaigns")
+}
+
+model EmailCampaignRecipient {
+  id             String          @id @default(cuid())
+  campaignId     String
+  userId         String?
+  email          String
+  status         RecipientStatus @default(QUEUED)
+  resendEmailId  String?
+  openedAt       DateTime?
+  clickedAt      DateTime?
+  bouncedAt      DateTime?
+  createdAt      DateTime        @default(now())
+  campaign       EmailCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user           User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([campaignId, email])
+  @@index([campaignId])
+  @@index([userId])
+  @@index([resendEmailId])
+  @@index([status])
+  @@map("email_campaign_recipients")
+}
+
 enum UserRole {
   ADMIN
   SALES_REP
@@ -433,4 +484,27 @@ enum PaymentStatus {
 enum PriceListType {
   GENERAL
   COMPANY
+}
+
+enum CampaignStatus {
+  DRAFT
+  SENDING
+  SENT
+  FAILED
+}
+
+enum RecipientTarget {
+  ALL
+  BY_COMPANY
+  MANUAL
+}
+
+enum RecipientStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  COMPLAINED
 }

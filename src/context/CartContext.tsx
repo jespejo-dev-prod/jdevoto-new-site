@@ -33,6 +33,7 @@ export interface CartItem {
   inner: number;          // Unidades por empaque (Inner)
   stockQuantity: number;  // Stock disponible (para validar máximo)
   brandName?: string;     // Marca del producto
+  categoryName?: string;  // Categoría del producto
   validTo?: string | null; // Fecha de término de promoción
 }
 
@@ -106,6 +107,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           const inner = fresh.inner || 1;
           let priceSource: string = fresh.price?.priceSource || 'BASE_PRICE';
           const brandName: string = fresh.brand?.name || '';
+          const categoryName: string = fresh.category?.name || '';
           const validTo: string | null = fresh.price?.validTo || null;
 
           // Client-side safety net: discard server response if server cache
@@ -125,6 +127,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             item.inner !== inner ||
             item.priceSource !== priceSource ||
             item.brandName !== brandName ||
+            item.categoryName !== categoryName ||
             item.validTo !== validTo;
 
           if (!needsUpdate) return item;
@@ -141,6 +144,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             minOrderQty,
             inner,
             brandName,
+            categoryName,
             validTo,
           };
         });
@@ -203,6 +207,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       : (product.price?.priceSource || 'BASE_PRICE');
 
     const brandName = product.brand?.name || product.brandName || '';
+    const categoryName = product.category?.name || product.categoryName || '';
     const image = product.images?.[0]?.url || product.image || '';
 
     setItems(prevItems => {
@@ -223,6 +228,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               discountPercent: discountPct,
               priceSource: priceSource || item.priceSource || 'BASE_PRICE',
               brandName: brandName || item.brandName || '',
+              categoryName: categoryName || item.categoryName || '',
               validTo: validTo || item.validTo || null,
             }
             : item
@@ -246,6 +252,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         inner: product.inner || 1,
         stockQuantity: product.stockQuantity || 0,
         brandName: brandName,
+        categoryName: categoryName,
         validTo: validTo || null,
       };
 

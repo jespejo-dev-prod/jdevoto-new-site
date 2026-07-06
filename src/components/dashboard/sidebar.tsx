@@ -20,7 +20,8 @@ import {
   Ticket,
   CreditCard,
   X,
-  Sliders
+  Sliders,
+  Mail
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
@@ -54,6 +55,7 @@ const mainItems = [
   { icon: CreditCard, label: 'Pagos', href: '/dashboard/pagos' },
   { icon: CreditCard, label: 'Cuenta Corriente', href: '/dashboard/cuenta-corriente' },
   { icon: Sliders, label: 'Slider Home', href: '/dashboard/slider' },
+  { icon: Mail, label: 'Emails Masivos', href: '/dashboard/emails' },
 ];
 
 export function Sidebar() {
@@ -94,6 +96,8 @@ export function Sidebar() {
     if (item.label === "Mi Empresa") return false;
     // Team solo para ADMIN o COMPANY_ADMIN
     if (item.label === "Equipo" && user?.role !== "ADMIN") return false;
+    // Emails Masivos solo para ADMIN
+    if (item.label === "Emails Masivos" && user?.role !== "ADMIN") return false;
     return true;
   });
 

@@ -4,6 +4,23 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
+function formatCategoryName(name: string): string {
+  if (!name) return '';
+  const root = name.split('>')[0].trim().toUpperCase();
+  
+  const mappings: Record<string, string> = {
+    'ESCOLAR': 'Escolar',
+    'FERRETERIA': 'Ferretería',
+    'PAPELERIA': 'Papelería',
+    'MANUALIDADES': 'Manualidades',
+    'OFICINA': 'Oficina',
+    'OUTLET': 'Outlet',
+    'REGALOS': 'Regalos',
+  };
+
+  return mappings[root] || root.charAt(0) + root.slice(1).toLowerCase();
+}
+
 export function PromoCountdownBanner() {
   const { items, syncPrices } = useCart();
   const [now, setNow] = useState<number>(Date.now());
@@ -14,9 +31,7 @@ export function PromoCountdownBanner() {
     return () => clearInterval(interval);
   }, []);
 
-  // Select the most urgently-expiring promotion in the cart.
-  // This memo only depends on `items`, not on `now`, so it does NOT
-  // recompute on every clock tick — avoiding unnecessary re-selections.
+  // Select the single most urgently-expiring promotion in the cart.
   const urgentPromoItem = useMemo(() => {
     let closestItem: (typeof items)[0] | null = null;
     let minExpiration = Infinity;
@@ -34,8 +49,6 @@ export function PromoCountdownBanner() {
 
   // Schedule a single one-shot timer that fires exactly when the promotion
   // expires (+ 1.5 s grace period for server clock skew).
-  // Dependencies are the item's id and validTo — NOT `now` — so the timer
-  // is set once per promotion and never cancelled mid-flight by the clock tick.
   useEffect(() => {
     if (!urgentPromoItem?.validTo) return;
 
@@ -75,6 +88,10 @@ export function PromoCountdownBanner() {
 
   const isCritical = diffMs < 1000 * 60 * 5; // < 5 minutes
 
+  // Format the promotion message, prioritizing "X% dcto en [Category]"
+  const formattedCategory = formatCategoryName(urgentPromoItem.categoryName || '');
+  const hasDiscountAndCategory = urgentPromoItem.discountPercent > 0 && formattedCategory;
+
   return (
     <div
       className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border transition-all duration-300 shadow-sm animate-in fade-in slide-in-from-top-2 ${
@@ -90,8 +107,19 @@ export function PromoCountdownBanner() {
           <Clock className="h-4.5 w-4.5 shrink-0" />
         )}
         <span className="text-xs sm:text-sm font-semibold truncate">
-          ¡Apresúrate! La promoción para{' '}
-          <strong className="font-extrabold uppercase">{urgentPromoItem.name}</strong>{' '}
+          ¡Apresúrate!{' '}
+          {hasDiscountAndCategory ? (
+            <>
+              <strong className="font-extrabold uppercase">
+                {urgentPromoItem.discountPercent}% dcto en {formattedCategory}
+              </strong>{' '}
+            </>
+          ) : (
+            <>
+              La promoción para{' '}
+              <strong className="font-extrabold uppercase">{urgentPromoItem.name}</strong>{' '}
+            </>
+          )}
           expira en:
         </span>
       </div>
@@ -109,3 +137,5 @@ export function PromoCountdownBanner() {
     </div>
   );
 }
+
+
