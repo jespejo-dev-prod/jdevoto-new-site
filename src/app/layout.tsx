@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   openGraph: {
     type: 'website',
@@ -66,16 +66,33 @@ export default function RootLayout({
 }) {
   const orgJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'Antigravity Technology Chile Ltd.',
-    url: process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl',
-    logo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl'}/logo-svg.png`,
-    contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'sales',
-      areaServed: 'CL',
-      availableLanguage: 'Spanish',
-    },
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl'}#organization`,
+        name: 'Antigravity Technology Chile Ltd.',
+        url: process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl',
+        logo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl'}/logo-svg.png`,
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'sales',
+          email: 'jespejo@jdevoto.cl',
+          areaServed: 'CL',
+          availableLanguage: 'Spanish',
+        },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl'}#website`,
+        url: process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl',
+        name: 'Antigravity B2B',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl'}/products?search={search_term_string}`,
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    ],
   };
 
   return (

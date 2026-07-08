@@ -179,7 +179,7 @@ export const POST = withApiHandler(async (req, ctx: RouteContext<{ id: string }>
         const result = await resend.batch.send(emails);
 
         if (result.data) {
-          const updatePromises = result.data.map((sent: { id?: string } | null, idx: number) => {
+          const updatePromises = (result.data as unknown as any[]).map((sent: { id?: string } | null, idx: number) => {
             const recipientEmail = batchWithUrls[idx]?.email;
             if (!recipientEmail || !sent?.id) return Promise.resolve();
             return prisma.emailCampaignRecipient.updateMany({

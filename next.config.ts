@@ -61,6 +61,7 @@ const nextConfig: NextConfig = {
 
   // ── Optimizaciones del compilador ────────────────────────────────────────
   experimental: {
+    cpus: 2,
     // Optimizar imports de paquetes grandes para reducir bundle size
     optimizePackageImports: [
       "lucide-react",

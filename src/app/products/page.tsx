@@ -73,6 +73,14 @@ export async function generateMetadata(
       type: 'website',
       locale: 'es_CL',
       siteName: 'Antigravity',
+      images: [
+        {
+          url: `${baseUrl}/opengraph-image.png`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
   };
 }
