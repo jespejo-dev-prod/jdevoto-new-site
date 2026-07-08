@@ -13,6 +13,7 @@ interface ProductSliderProps {
   isPromoSlider?: boolean;
   validTo?: string | null;
   campaignColor?: string | null;
+  prioritizeLcp?: boolean;
 }
 
 export function ProductSlider({
@@ -23,6 +24,7 @@ export function ProductSlider({
   isPromoSlider = false,
   validTo = null,
   campaignColor = null,
+  prioritizeLcp = false,
 }: ProductSliderProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -303,7 +305,7 @@ export function ProductSlider({
               key={`${p.id}-${index}`} 
               className="w-[72vw] sm:w-[calc((100%-2rem)/3)] md:w-[calc((100%-3rem)/4)] lg:w-[calc((100%-5rem)/6)] shrink-0 snap-start"
             >
-              <ProductCard product={p} variant="catalog" compact={isPromoSlider} priority={index < 2} />
+              <ProductCard product={p} variant="catalog" compact={isPromoSlider} priority={prioritizeLcp && index < 4} />
             </div>
           ))}
         </div>
@@ -365,7 +367,7 @@ export function ProductSlider({
               // En móvil: 80% ancho. En md: 3 por fila (gap-4 = 1rem). En lg: exactamente 5 por fila (gap-4 = 1rem * 4 = 4rem total gap)
               className="w-[80vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
             >
-              <ProductCard product={p} variant="catalog" priority={index < 2} />
+              <ProductCard product={p} variant="catalog" priority={prioritizeLcp && index < 4} />
             </div>
           ))}
        </div>

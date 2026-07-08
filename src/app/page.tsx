@@ -201,15 +201,13 @@ export default async function HomePage() {
         {/* Hero Section */}
         <HeroSlider />
 
-        {/* Sleek Benefit Bar */}
-        <ScrollReveal>
-          <BenefitBar />
-        </ScrollReveal>
+        {/* Sleek Benefit Bar - No ScrollReveal here since it's above the fold */}
+        <BenefitBar />
 
         {/* Productos en Promoción Slider */}
         {/* Active Promotion Sliders */}
-        {promoSliders.map((slider) => (
-          <ScrollReveal key={slider.id}>
+        {promoSliders.map((slider, index) => {
+          const content = (
             <ProductSlider
               title={slider.title}
               products={slider.products}
@@ -218,9 +216,20 @@ export default async function HomePage() {
               isPromoSlider={slider.isPromoSlider}
               validTo={slider.validTo}
               campaignColor={slider.color}
+              prioritizeLcp={index === 0}
             />
-          </ScrollReveal>
-        ))}
+          );
+
+          // Only apply ScrollReveal to sliders below the first one
+          if (index === 0) {
+            return <React.Fragment key={slider.id}>{content}</React.Fragment>;
+          }
+          return (
+            <ScrollReveal key={slider.id}>
+              {content}
+            </ScrollReveal>
+          );
+        })}
 
         {/* High-Impact Campaign Banner */}
         <ScrollReveal>
