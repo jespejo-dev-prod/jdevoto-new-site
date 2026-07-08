@@ -16,7 +16,7 @@ import { Resend } from 'resend';
 import jwt from 'jsonwebtoken';
 import type { RouteContext } from '@/lib/api-handler';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key_for_build');
 const BATCH_SIZE = 50;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'JDevoto <no-reply@jdevoto.cl>';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://jdevoto.cl';
