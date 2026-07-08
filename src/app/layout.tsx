@@ -21,14 +21,14 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: {
-    default: 'Mayorista B2B de Tecnología en Chile | Antigravity',
-    template: '%s | Antigravity',
+    default: 'Comercial J. Devoto | Distribución Mayorista a Todo Chile',
+    template: '%s | Comercial J. Devoto',
   },
-  description: 'Compra al por mayor productos de tecnología, computación y electrónica. Plataforma B2B con crédito 30/60/90 días para empresas en Chile.',
-  keywords: ['mayorista tecnología chile', 'b2b tecnología', 'compra al por mayor computación', 'mayorista electronica chile', 'distribuidor tecnologia b2b'],
-  authors: [{ name: 'Antigravity Technology Chile Ltd.' }],
-  creator: 'Antigravity',
-  publisher: 'Antigravity',
+  description: 'Comercial J. Devoto - Distribución Mayorista a Todo Chile. Encuentra el más amplio catálogo de papelería, oficina, arte, manualidades, regalos y ferretería para tu negocio desde nuestro centro de distribución.',
+  keywords: ['mayorista escolar chile', 'b2b libreria', 'compra al por mayor papeleria', 'mayorista manualidades chile', 'distribuidor j devoto', 'articulos de oficina al por mayor'],
+  authors: [{ name: 'Comercial J. Devoto' }],
+  creator: 'J. Devoto',
+  publisher: 'J. Devoto',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
@@ -37,14 +37,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'es_CL',
-    siteName: 'Antigravity',
-    title: 'Mayorista B2B de Tecnología en Chile | Antigravity',
-    description: 'Compra al por mayor productos de tecnología, computación y electrónica. Plataforma B2B con crédito 30/60/90 días para empresas en Chile.',
+    siteName: 'J. Devoto',
+    title: 'Comercial J. Devoto | Importadora y Distribuidora Mayorista',
+    description: 'Devoto | Importadora y Distribuidora Mayorista en Chile con más de 50 años abasteciendo a librerías y empresas con las mejores marcas del mundo en artículos escolares, oficina, manualidades y regalos. ¡Descubre nuestro catálogo exclusivo aquí!',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mayorista B2B de Tecnología en Chile | Antigravity',
-    description: 'Compra al por mayor productos de tecnología, computación y electrónica.',
+    title: 'Comercial J. Devoto | Distribución Mayorista a Todo Chile',
+    description: 'Encuentra el más amplio catálogo de papelería, oficina, arte, manualidades, regalos y ferretería para tu negocio.',
   },
   robots: {
     index: true,

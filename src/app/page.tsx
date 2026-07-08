@@ -23,31 +23,31 @@ import { PromoBanner } from '@/components/home/promo-banner';
 import { ProductSlider } from '@/components/ui/product-slider';
 
 export const metadata: Metadata = {
-  title: 'Mayorista B2B de Tecnología en Chile',
-  description: 'Compra al por mayor productos de tecnología, computación y electrónica con crédito 30, 60 o 90 días. Distribución mayorista B2B en Chile.',
+  title: 'Comercial J. Devoto | Distribución Mayorista a Todo Chile',
+  description: 'Comercial J. Devoto - Distribución Mayorista a Todo Chile. Encuentra el más amplio catálogo de papelería, oficina, arte, manualidades, regalos y ferretería para tu negocio desde nuestro centro de distribución.',
   alternates: {
     canonical: process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl',
   },
   openGraph: {
-    title: 'Mayorista B2B de Tecnología en Chile | Antigravity',
-    description: 'Compra al por mayor productos de tecnología, computación y electrónica con crédito 30, 60 o 90 días.',
+    title: 'Comercial J. Devoto | Importadora y Distribuidora Mayorista',
+    description: 'Devoto | Importadora y Distribuidora Mayorista en Chile con más de 50 años abasteciendo a librerías y empresas con las mejores marcas del mundo en artículos escolares, oficina, manualidades y regalos. ¡Descubre nuestro catálogo exclusivo aquí!',
     url: process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl',
     type: 'website',
     locale: 'es_CL',
-    siteName: 'Antigravity',
+    siteName: 'J. Devoto',
     images: [
       {
         url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl'}/opengraph-image.png`,
         width: 1200,
         height: 630,
-        alt: 'Antigravity B2B Mayorista de Tecnología',
+        alt: 'J. Devoto Distribución Mayorista',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mayorista B2B de Tecnología en Chile | Antigravity',
-    description: 'Compra al por mayor productos de tecnología, computación y electrónica.',
+    title: 'Comercial J. Devoto | Distribución Mayorista',
+    description: 'Comercial J. Devoto - Distribución Mayorista a Todo Chile.',
   },
 };
 
