@@ -174,7 +174,7 @@ export function PublicHeader() {
           )}
 
           <div className="hidden md:flex flex-col text-right">
-            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Empresa</span>
+            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Empresa</span>
             <span className="text-sm font-black text-white uppercase tracking-wide">{user?.company?.razonSocial || 'Invitado'}</span>
           </div>
 
@@ -412,7 +412,7 @@ export function PublicHeader() {
 
             {user && (
               <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-850 flex flex-col gap-1">
-                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Empresa</span>
+                <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Empresa</span>
                 <span className="text-xs font-bold text-white tracking-tighter uppercase">{user?.company?.razonSocial || 'Invitado'}</span>
               </div>
             )}

@@ -183,20 +183,21 @@ export function HeroSlider() {
                 ? (activeSlide.imageClass || '').replace(/\bscale-\S+\b|\btranslate-x-\S+\b/g, '').trim()
                 : (activeSlide.imageClass || '');
               return (
-                <Image
-                  src={activeSlide.image}
-                  alt={activeSlide.title}
-                  fill
-                  className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${safeImageClass}`}
-                  priority
-                  style={
-                    hasInlineTransform
-                      ? {
-                          transform: `scale(${(activeSlide.imageScale || 100) / 100}) translateX(${activeSlide.imagePositionX || 0}%)`
-                        }
-                      : undefined
-                  }
-                />
+                  <Image
+                    src={activeSlide.image}
+                    alt={activeSlide.title}
+                    fill
+                    sizes="100vw"
+                    className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${safeImageClass}`}
+                    priority
+                    style={
+                      hasInlineTransform
+                        ? {
+                            transform: `scale(${(activeSlide.imageScale || 100) / 100}) translateX(${activeSlide.imagePositionX || 0}%)`
+                          }
+                        : undefined
+                    }
+                  />
               );
             })()}
             {/* Light gradient fade for text legibility */}
@@ -318,13 +319,17 @@ export function HeroSlider() {
           <button
             key={idx}
             onClick={() => setCurrent(idx)}
-            className={`h-1.5 rounded-full transition-all duration-500 ${
-              idx === current
-                ? "w-8 bg-zinc-950"
-                : "w-2 bg-zinc-300 hover:bg-zinc-400"
-            }`}
+            className="h-8 w-8 flex items-center justify-center focus:outline-none"
             aria-label={`Slide ${idx + 1}`}
-          />
+          >
+            <span 
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                idx === current
+                  ? "w-8 bg-zinc-950"
+                  : "w-2 bg-zinc-300 group-hover:bg-zinc-400"
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>
