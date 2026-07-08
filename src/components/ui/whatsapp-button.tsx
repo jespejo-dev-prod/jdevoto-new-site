@@ -4,7 +4,8 @@ import React from 'react';
 
 export function WhatsAppButton() {
   const phoneNumber = '56964247084';
-  const message = 'Hola, necesito ayuda con la plataforma B2B';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
+  const message = `Hola Comercial J. Devoto, necesito ayuda con la plataforma B2B.\n${appUrl}`;
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
   return (
