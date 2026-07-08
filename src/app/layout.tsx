@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     locale: 'es_CL',
     siteName: 'J. Devoto',
     title: 'Comercial J. Devoto | Importadora y Distribuidora Mayorista',
-    description: 'Devoto | Importadora y Distribuidora Mayorista en Chile con más de 50 años abasteciendo a librerías y empresas con las mejores marcas del mundo en artículos escolares, oficina, manualidades y regalos. ¡Descubre nuestro catálogo exclusivo aquí!',
+    description: 'Devoto | Importadora y Distribuidora Mayorista en Chile con más de 50 años abasteciendo a librerías y empresas con las mejores marcas del mercado en artículos escolares, oficina, manualidades y regalos. ¡Descubre nuestro catálogo exclusivo aquí!',
   },
   twitter: {
     card: 'summary_large_image',
