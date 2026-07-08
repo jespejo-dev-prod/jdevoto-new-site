@@ -252,7 +252,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     "w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none transition-all",
                     errors.razonSocial && "border-red-500/50"
                   )}
-                  placeholder="Ej: Antigravity SPA"
+                  placeholder="Ej: J. Devoto"
                 />
                 {errors.razonSocial && <p className="text-red-400 text-[10px] font-bold px-1">{errors.razonSocial.message}</p>}
               </div>

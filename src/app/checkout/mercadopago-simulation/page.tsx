@@ -574,8 +574,8 @@ export default function MercadoPagoSimulationPage() {
                     ag
                   </div>
                   <div className="flex flex-col leading-none">
-                    <span className="font-black text-sm text-zinc-900">antigravity.</span>
-                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">Antigravity S.A.</span>
+                    <span className="font-black text-sm text-zinc-900">jdevoto.</span>
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">Comercial J. Devoto</span>
                   </div>
                 </div>
 
@@ -584,7 +584,7 @@ export default function MercadoPagoSimulationPage() {
                   
                   <div className="flex justify-between items-start text-sm bg-zinc-50 p-3 rounded-xl border border-zinc-150">
                     <div className="flex flex-col">
-                      <span className="font-bold text-zinc-900">antigravity.cl</span>
+                      <span className="font-bold text-zinc-900">jdevoto.cl</span>
                       <span className="text-[10px] text-zinc-500 font-bold">ORDEN #{order?.orderNumber?.replace('ORD-', '') || orderId?.substring(0,8).toUpperCase()}</span>
                     </div>
                     <span className="font-black text-zinc-900">{formattedTotal}</span>

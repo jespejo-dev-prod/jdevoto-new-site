@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Centro de Ayuda y Soporte',
-  description: 'Resuelve tus dudas sobre la plataforma mayorista B2B Antigravity. Preguntas frecuentes, guías de compra, facturación y contacto con soporte.',
+  description: 'Resuelve tus dudas sobre la plataforma mayorista B2B J. Devoto. Preguntas frecuentes, guías de compra, facturación y contacto con soporte.',
   alternates: {
     canonical: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl'}/support`,
   },

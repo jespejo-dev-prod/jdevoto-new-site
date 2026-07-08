@@ -67,12 +67,12 @@ export async function generateMetadata(
       ? { index: false, follow: true }
       : { index: true, follow: true },
     openGraph: shouldNoIndex ? undefined : {
-      title: `${title} | Antigravity`,
+      title: `${title} | J. Devoto`,
       description,
       url: canonicalUrl,
       type: 'website',
       locale: 'es_CL',
-      siteName: 'Antigravity',
+      siteName: 'J. Devoto',
       images: [
         {
           url: `${baseUrl}/opengraph-image.png`,

@@ -378,7 +378,7 @@ export default function ProductSinglePage() {
                <span className="hover:text-primary cursor-pointer transition-colors">Privacidad B2B</span>
                <span className="hover:text-primary cursor-pointer transition-colors">Portal de Facturación</span>
             </div>
-            <p className="text-[11px] text-zinc-700 font-bold uppercase tracking-[0.2em]">© 2026 Antigravity Technology Chile Ltd. Ingeniería para Empresas.</p>
+            <p className="text-[11px] text-zinc-700 font-bold uppercase tracking-[0.2em]">© 2026 Comercial J. Devoto Ingeniería para Empresas.</p>
          </div>
       </footer>
     </div>

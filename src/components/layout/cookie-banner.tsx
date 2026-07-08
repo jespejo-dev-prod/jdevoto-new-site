@@ -42,7 +42,7 @@ export function CookieBanner() {
             {/* Left Column: Text */}
             <div className="flex flex-col gap-0.5 max-w-4xl text-left">
               <h4 className="text-[11px] font-black text-zinc-900 uppercase tracking-wider">
-                Antigravity y las Cookies
+                J. Devoto y las Cookies
               </h4>
               <p className="text-[10px] md:text-[11px] text-zinc-500 leading-relaxed font-semibold">
                 Nuestra web usa cookies, incluidas las cookies opcionales para ofrecerle la mejor experiencia en nuestro sitio y para mostrarle anuncios relevantes según su uso de nuestro sitio web. Usted puede manejar sus preferencias o aceptar todas las cookies. Para obtener más información, consulte nuestra{' '}

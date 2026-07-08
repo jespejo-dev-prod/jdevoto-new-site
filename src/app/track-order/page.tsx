@@ -91,7 +91,7 @@ export default function TrackOrderPage() {
 
            <div className="pt-8 border-t border-zinc-100 text-center">
               <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                 <ShieldCheck className="h-4 w-4" /> Logística Protegida por Antigravity
+                 <ShieldCheck className="h-4 w-4" /> Logística Protegida por J. Devoto
               </p>
            </div>
         </div>

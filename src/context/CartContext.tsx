@@ -159,7 +159,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
    * Carga el carrito desde localStorage y sincroniza los precios al montar.
    */
   useEffect(() => {
-    const savedCart = localStorage.getItem('antigravity_cart');
+    const savedCart = localStorage.getItem('jdevoto_cart');
     if (savedCart) {
       try {
         setItems(JSON.parse(savedCart));
@@ -175,7 +175,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
    * Se ejecuta DESPUÉS de cada render donde items haya cambiado.
    */
   useEffect(() => {
-    localStorage.setItem('antigravity_cart', JSON.stringify(items));
+    localStorage.setItem('jdevoto_cart', JSON.stringify(items));
   }, [items]);
 
   /**
@@ -282,7 +282,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => {
     setItems([]);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('antigravity_cart');
+      localStorage.removeItem('jdevoto_cart');
     }
   };
 

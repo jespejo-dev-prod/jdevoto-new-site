@@ -47,7 +47,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   // 1. Cargar desde localStorage al montar y sincronizar precios/stock
   useEffect(() => {
-    const savedWishlist = localStorage.getItem('antigravity_wishlist');
+    const savedWishlist = localStorage.getItem('jdevoto_wishlist');
     let loadedItems: WishlistItem[] = [];
     if (savedWishlist) {
       try {
@@ -126,7 +126,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   // 2. Persistir en localStorage cuando cambia el estado
   useEffect(() => {
-    localStorage.setItem('antigravity_wishlist', JSON.stringify(items));
+    localStorage.setItem('jdevoto_wishlist', JSON.stringify(items));
   }, [items]);
 
   // 3. toggleWishlist - Agrega o remueve un producto de la wishlist
@@ -178,7 +178,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const clearWishlist = () => {
     setItems([]);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('antigravity_wishlist');
+      localStorage.removeItem('jdevoto_wishlist');
     }
   };
 

@@ -10,7 +10,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const secret = generateBase32Secret();
   
   // Construir la URL otpauth estándar de Google Authenticator
-  const issuer = 'Antigravity B2B';
+  const issuer = 'J. Devoto B2B';
   const otpauthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(user.email)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
   
   // Generar URL del código QR mediante una API pública ligera y rápida

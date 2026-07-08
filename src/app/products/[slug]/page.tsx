@@ -81,7 +81,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     const cleanDesc = rawDesc.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
     const metaDesc = cleanDesc.length > 0
       ? (cleanDesc.length > 155 ? cleanDesc.substring(0, 152) + '...' : cleanDesc)
-      : `Compra ${product.name}${brandName ? ` de ${brandName}` : ''} al mejor precio mayorista en Antigravity Chile.`;
+      : `Compra ${product.name}${brandName ? ` de ${brandName}` : ''} al mejor precio mayorista en J. Devoto.`;
 
     const canonicalUrl = `${baseUrl}/products/${product.slug}`;
     const ogImages = (product.images as any[]).map((img) => ({
@@ -97,17 +97,17 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       alternates: { canonical: canonicalUrl },
       robots: { index: true, follow: true },
       openGraph: {
-        title: `${product.name}${brandName ? ` — ${brandName}` : ''} | Antigravity`,
+        title: `${product.name}${brandName ? ` — ${brandName}` : ''} | J. Devoto`,
         description: metaDesc,
         url: canonicalUrl,
         type: 'website',
         locale: 'es_CL',
-        siteName: 'Antigravity',
+        siteName: 'J. Devoto',
         images: ogImages,
       },
       twitter: {
         card: 'summary_large_image',
-        title: `${product.name}${brandName ? ` | ${brandName}` : ''} | Antigravity`,
+        title: `${product.name}${brandName ? ` | ${brandName}` : ''} | J. Devoto`,
         description: metaDesc,
         images: ogImages.length > 0 ? [ogImages[0].url] : [],
       },
@@ -179,7 +179,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
     description: cleanDescription,
     sku: product.sku,
     mpn: product.sku,
-    brand: { '@type': 'Brand', name: brandName || 'Antigravity' },
+    brand: { '@type': 'Brand', name: brandName || 'J. Devoto' },
     category: (product.category as any)?.name,
     offers: {
       '@type': 'Offer',
@@ -189,7 +189,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
       availability: product.stockQuantity > 0
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
-      seller: { '@type': 'Organization', name: 'Antigravity Technology Chile Ltd.' },
+      seller: { '@type': 'Organization', name: 'Comercial J. Devoto' },
     },
   };
 

@@ -115,7 +115,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
         sku: product.sku,
         name: product.name,
         slug: product.slug,
-        brand: (product.brand as any)?.name || "Antigravity",
+        brand: (product.brand as any)?.name || "J. Devoto",
         unit: product.unit,
         inner: product.inner,
         minOrderQty,

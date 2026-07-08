@@ -13,11 +13,11 @@ export function OrderSummary() {
   const [paymentMethod, setPaymentMethod] = useState<string>('webpay');
 
   useEffect(() => {
-    const saved = localStorage.getItem('antigravity_payment_method');
+    const saved = localStorage.getItem('jdevoto_payment_method');
     if (saved) {
       setPaymentMethod(saved);
     } else {
-      localStorage.setItem('antigravity_payment_method', 'webpay');
+      localStorage.setItem('jdevoto_payment_method', 'webpay');
     }
   }, []);
 
@@ -80,7 +80,7 @@ export function OrderSummary() {
                 onChange={(e) => {
                   const val = e.target.value;
                   setPaymentMethod(val);
-                  localStorage.setItem('antigravity_payment_method', val);
+                  localStorage.setItem('jdevoto_payment_method', val);
                 }}
                 className="w-full h-12 rounded-xl border border-zinc-200 px-4 pr-10 text-sm font-semibold text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition-all bg-zinc-50 cursor-pointer appearance-none"
               >

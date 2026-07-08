@@ -199,7 +199,7 @@ export default function CheckoutPage() {
       })
       .catch(() => {});
 
-    const saved = localStorage.getItem('antigravity_payment_method');
+    const saved = localStorage.getItem('jdevoto_payment_method');
     if (saved && ['credit_b2b', 'webpay', 'transfer', 'mercadopago'].includes(saved)) {
       setPaymentMethod(saved as any);
     }
