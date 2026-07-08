@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Category {
   id: string;
@@ -129,9 +130,12 @@ export function CategoriesSlider({ categories }: CategoriesSliderProps) {
               className="w-[80vw] sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-2.5rem)/3)] lg:w-[calc((100%-5rem)/5)] shrink-0 snap-start group relative h-[360px] rounded-[28px] overflow-hidden flex flex-col justify-end p-6 border border-zinc-200/40 shadow-[0_8px_25px_rgba(0,0,0,0.02)] hover:shadow-2xl transition-all duration-500"
             >
               {/* Zoom background image */}
-              <div 
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-[transition-duration:1200ms] ease-out group-hover:scale-105 filter brightness-[0.85] contrast-105"
-                style={{ backgroundImage: `url(${getCategoryImage(category.name, category.slug)})` }}
+              <Image 
+                src={getCategoryImage(category.name, category.slug)}
+                alt={category.name}
+                fill
+                sizes="(max-width: 640px) 80vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                className="object-cover object-center transition-transform duration-[1200ms] ease-out group-hover:scale-105 filter brightness-[0.85] contrast-105"
               />
               
               {/* Elegant dark gradient overlay */}
