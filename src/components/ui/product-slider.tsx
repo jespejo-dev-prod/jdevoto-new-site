@@ -273,12 +273,14 @@ export function ProductSlider({
               <button 
                 onClick={() => scroll('left')}
                 className="h-11 w-11 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
+                aria-label="Desplazar a la izquierda"
               >
                 <ChevronLeft className="h-5 w-5 text-zinc-400" />
               </button>
               <button 
                 onClick={() => scroll('right')}
                 className="h-11 w-11 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
+                aria-label="Desplazar a la derecha"
               >
                 <ChevronRight className="h-5 w-5 text-zinc-400" />
               </button>
@@ -326,12 +328,14 @@ export function ProductSlider({
              <button 
                onClick={() => scroll('left')}
                className="h-10 w-10 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
+               aria-label="Desplazar a la izquierda"
              >
                <ChevronLeft className="h-5 w-5 text-zinc-400" />
              </button>
              <button 
                onClick={() => scroll('right')}
                className="h-10 w-10 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
+               aria-label="Desplazar a la derecha"
              >
                <ChevronRight className="h-5 w-5 text-zinc-400" />
              </button>

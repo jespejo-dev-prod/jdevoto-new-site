@@ -38,9 +38,9 @@ export function BenefitBar() {
               <item.icon className="h-5 w-5 text-zinc-700" />
             </div>
             <div>
-              <h4 className="text-xs font-black text-zinc-900 uppercase tracking-wider leading-none mb-1">
+              <div className="text-xs font-black text-zinc-900 uppercase tracking-wider leading-none mb-1">
                 {item.title}
-              </h4>
+              </div>
               <p className="text-[10px] font-semibold text-zinc-400 leading-tight">
                 {item.desc}
               </p>

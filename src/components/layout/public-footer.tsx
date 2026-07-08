@@ -10,6 +10,8 @@ export function PublicFooter() {
             src="/home/devoto.png"
             alt="JDevoto Logo"
             className="h-14 w-auto"
+            width="200"
+            height="56"
           />
         </div>
 

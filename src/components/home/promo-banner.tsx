@@ -14,9 +14,9 @@ export function PromoBanner() {
             <Sparkles className="h-3 w-3 text-amber-500" />
             Campaña Especial B2B
           </div>
-          <h3 className="text-2xl md:text-3xl font-black tracking-tight uppercase leading-tight text-zinc-950">
+          <h2 className="text-2xl md:text-3xl font-black tracking-tight uppercase leading-tight text-zinc-950">
             Abastece tu Negocio y Empresa con Flete Incluido
-          </h3>
+          </h2>
           <p className="text-zinc-500 text-xs md:text-sm font-semibold leading-relaxed">
             Catálogo completo de papelería, manualidades, productos de oficina y
             ferretería. Activa tu cuenta corriente corporativa para recibir

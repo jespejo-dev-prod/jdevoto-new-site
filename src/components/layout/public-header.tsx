@@ -131,6 +131,8 @@ export function PublicHeader() {
               src="/home/devoto.png" 
               alt="JDevoto Logo" 
               className="h-11 w-auto"
+              width="180"
+              height="44"
             />
           </Link>
           
@@ -154,7 +156,7 @@ export function PublicHeader() {
             placeholder="Buscar en el catálogo mayorista..." 
             className="w-full h-11 rounded-xl bg-zinc-900 border border-zinc-800 px-5 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-zinc-650" 
           />
-          <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary p-2 rounded-lg cursor-pointer">
+          <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary p-2 rounded-lg cursor-pointer" aria-label="Buscar">
             <Search className="h-4 w-4 text-zinc-950" />
           </button>
         </form>
@@ -180,6 +182,7 @@ export function PublicHeader() {
               onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
               className="relative group cursor-pointer flex items-center justify-center focus:outline-none p-1.5 rounded-lg hover:bg-zinc-900 transition-colors"
               title="Menú de usuario"
+              aria-label="Menú de usuario"
             >
               <User className="h-6 w-6 text-zinc-400 group-hover:text-white transition-colors" />
             </button>
@@ -255,6 +258,7 @@ export function PublicHeader() {
               setIsCategoriesOpen(false);
             }}
             className="md:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-all cursor-pointer text-zinc-400 hover:text-white active:scale-95"
+            aria-label="Menú principal"
           >
             {isMobileMenuOpen ? <X className="h-5 w-5 text-primary" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -281,7 +285,7 @@ export function PublicHeader() {
             placeholder="Buscar en catálogo..." 
             className="w-full h-10 rounded-xl bg-zinc-950 border border-zinc-800 pl-4 pr-10 text-xs focus:ring-2 focus:ring-primary/50 outline-none text-white placeholder:text-zinc-650" 
           />
-          <button type="submit" className="absolute right-1.5 bg-primary p-1.5 rounded-lg cursor-pointer">
+          <button type="submit" className="absolute right-1.5 bg-primary p-1.5 rounded-lg cursor-pointer" aria-label="Buscar">
             <Search className="h-3.5 w-3.5 text-zinc-950" />
           </button>
         </form>
