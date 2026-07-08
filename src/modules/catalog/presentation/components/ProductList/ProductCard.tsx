@@ -78,6 +78,7 @@ export const ProductCard = memo(function ProductCard({
           src={primaryImage?.url || '/placeholder-product.png'}
           alt={`${product.name}${product.brand?.name ? ` — ${product.brand.name}` : ''}`}
           fill
+          priority={priority}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className={cn(
             "object-contain p-4 group-hover:scale-[1.04] transition-transform duration-700 ease-out",

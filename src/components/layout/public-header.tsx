@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, ShoppingCart, LogOut, User, LogIn, Menu, X, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, LogOut, ChevronDown, User, Search, MapPin, Check, Menu, X, Package, ShieldCheck, Clock, CheckCircle2, List, LogIn } from 'lucide-react';
+import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/auth-context';
@@ -127,12 +128,13 @@ export function PublicHeader() {
       <nav className="bg-zinc-950 text-white p-4 px-4 sm:px-8 flex items-center justify-between border-b border-zinc-800 shadow-md">
         <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="hover:scale-105 transition-transform shrink-0">
-            <img 
+            <Image 
               src="/home/devoto.png" 
               alt="JDevoto Logo" 
               className="h-11 w-auto"
-              width="180"
-              height="44"
+              width={180}
+              height={44}
+              priority
             />
           </Link>
           

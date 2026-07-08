@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export function PublicFooter() {
   return (
@@ -6,12 +7,12 @@ export function PublicFooter() {
       <div className="max-w-[1400px] mx-auto text-center space-y-12">
         {/* Logo */}
         <div className="flex justify-center">
-          <img
+          <Image
             src="/home/devoto.png"
             alt="JDevoto Logo"
             className="h-14 w-auto"
-            width="200"
-            height="56"
+            width={200}
+            height={56}
           />
         </div>
 
@@ -103,11 +104,11 @@ export function PublicFooter() {
         </div>
 
         {/* Seguridad y Datos Corporativos (estilo Ripley) */}
-        <div className="max-w-[1000px] mx-auto pt-6 border-t border-zinc-900/60 text-center space-y-3 text-zinc-500 text-[10px] sm:text-[11px] font-medium leading-relaxed">
+        <div className="max-w-[1000px] mx-auto pt-6 border-t border-zinc-900/60 text-center space-y-3 text-zinc-400 text-[10px] sm:text-[11px] font-medium leading-relaxed">
           <p>
             Por tu seguridad, recuerda revisar siempre en tu navegador que el
             sitio que visitas sea la versión oficial. La dirección{" "}
-            <span className="text-zinc-400 font-bold">
+            <span className="text-zinc-300 font-bold">
               https://www.jdevoto.cl
             </span>{" "}
             es la única del sitio oficial de Jdevoto.
@@ -117,11 +118,11 @@ export function PublicFooter() {
             es 100% seguro.
           </p>
           <p>
-            <span className="text-zinc-400 font-bold">
+            <span className="text-zinc-300 font-bold">
               COMERCIAL J. DEVOTO LIMITADA
             </span>
             , Rut N°{" "}
-            <span className="text-zinc-400 font-bold">84.915.400-1</span>, Calle
+            <span className="text-zinc-300 font-bold">84.915.400-1</span>, Calle
             Décima Avenida 1740 Placilla Oriente, Valparaíso. Teléfono: (32) 331
             5100.
           </p>

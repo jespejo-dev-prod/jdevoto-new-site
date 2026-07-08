@@ -41,7 +41,7 @@ export function BenefitBar() {
               <div className="text-xs font-black text-zinc-900 uppercase tracking-wider leading-none mb-1">
                 {item.title}
               </div>
-              <p className="text-[10px] font-semibold text-zinc-400 leading-tight">
+              <p className="text-[10px] font-semibold text-zinc-500 leading-tight">
                 {item.desc}
               </p>
             </div>
