@@ -50,7 +50,7 @@ export const ProductCard = memo(function ProductCard({
     : null;
 
   const cardClasses = cn(
-    "group relative rounded-2xl border transition-all duration-300 ease-out flex flex-col overflow-hidden",
+    "group relative rounded-2xl border transition-transform transition-opacity transition-colors duration-300 ease-out flex flex-col overflow-hidden",
     isDashboard 
       ? "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:shadow-primary/5 hover:-translate-y-0.5" 
       : "border-zinc-100 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-zinc-200 hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1"
@@ -79,7 +79,7 @@ export const ProductCard = memo(function ProductCard({
           alt={`${product.name}${product.brand?.name ? ` — ${product.brand.name}` : ''}`}
           fill
           priority={priority}
-          sizes="(max-width: 640px) 72vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 17vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 17vw"
           className={cn(
             "object-contain p-4 group-hover:scale-[1.04] transition-transform duration-700 ease-out"
           )}
@@ -123,13 +123,13 @@ export const ProductCard = memo(function ProductCard({
       </div>
 
       {/* Actions overlay */}
-      <div className="absolute top-3.5 right-3.5 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0 z-10 pointer-events-auto">
+      <div className="absolute top-3.5 right-3.5 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-transform transition-opacity transition-colors duration-300 transform translate-x-1 group-hover:translate-x-0 z-10 pointer-events-auto">
         {isDashboard ? (
           <>
             <Link href={`/dashboard/products/${product.id}/edit`}>
               <button
                 type="button"
-                className="p-2.5 rounded-2xl bg-zinc-900/90 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-primary hover:border-primary/50 transition-all shadow-xl"
+                className="p-2.5 rounded-2xl bg-zinc-900/90 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-primary hover:border-primary/50 transition-transform transition-opacity transition-colors shadow-xl"
                 title="Editar producto"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -144,7 +144,7 @@ export const ProductCard = memo(function ProductCard({
                 onDelete?.(product.id, product.name);
               }}
               disabled={isDeleting}
-              className="p-2.5 rounded-2xl bg-zinc-900/90 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-red-400 hover:border-red-500/50 transition-all shadow-xl disabled:opacity-50"
+              className="p-2.5 rounded-2xl bg-zinc-900/90 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-red-400 hover:border-red-500/50 transition-transform transition-opacity transition-colors shadow-xl disabled:opacity-50"
               title="Eliminar producto"
             >
               <Trash2 className="h-3.5 w-3.5" />
@@ -156,7 +156,7 @@ export const ProductCard = memo(function ProductCard({
               <Link href={`/dashboard/products/${product.id}/edit`} onClick={(e) => e.stopPropagation()}>
                 <button
                   type="button"
-                  className="p-2.5 rounded-2xl bg-white/95 text-zinc-800 hover:bg-primary hover:text-zinc-950 shadow-md transition-all border border-zinc-200/50 flex items-center justify-center"
+                  className="p-2.5 rounded-2xl bg-white/95 text-zinc-800 hover:bg-primary hover:text-zinc-950 shadow-md transition-transform transition-opacity transition-colors border border-zinc-200/50 flex items-center justify-center"
                   title="Editar producto (Admin)"
                 >
                   <Pencil className="h-3.5 w-3.5" />
@@ -182,7 +182,7 @@ export const ProductCard = memo(function ProductCard({
                   );
                 }}
                 className={cn(
-                  "p-2.5 rounded-2xl shadow-md transition-all border flex items-center justify-center",
+                  "p-2.5 rounded-2xl shadow-md transition-transform transition-opacity transition-colors border flex items-center justify-center",
                   isSaved 
                     ? "bg-red-50 text-red-500 border-red-200 hover:bg-red-100/70"
                     : "bg-white/95 text-zinc-800 hover:bg-red-500 hover:text-white border-zinc-200/50"
