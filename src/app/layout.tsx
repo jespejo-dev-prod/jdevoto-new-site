@@ -111,13 +111,14 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        {/* Preload de imagen LCP del hero (primer slide). El slider es 'use client', por lo que
-            el browser no puede descubrir la imagen en el HTML — este link resuelve el issue
-            "LCP image not discoverable" de Lighthouse y mejora el LCP significativamente. */}
+        {/* Preload responsivo de la imagen LCP del hero (primer slide).
+            El slider es 'use client' por lo que el browser no puede descubrirla
+            en el HTML inicial. imageSrcSet evita descargar 1920px en mobile. */}
         <link
           rel="preload"
           as="image"
-          href="/_next/image?url=%2Fhome%2Foutlet.jpg&w=1920&q=75"
+          imageSrcSet="/_next/image?url=%2Fhome%2Foutlet.jpg&w=640&q=75 640w, /_next/image?url=%2Fhome%2Foutlet.jpg&w=828&q=75 828w, /_next/image?url=%2Fhome%2Foutlet.jpg&w=1080&q=75 1080w, /_next/image?url=%2Fhome%2Foutlet.jpg&w=1440&q=75 1440w, /_next/image?url=%2Fhome%2Foutlet.jpg&w=1920&q=75 1920w"
+          imageSizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
           fetchPriority="high"
         />
       </head>

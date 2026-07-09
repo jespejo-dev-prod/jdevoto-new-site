@@ -63,6 +63,12 @@ const nextConfig: NextConfig = {
   // ── Optimizaciones del compilador ────────────────────────────────────────
   experimental: {
     cpus: 2,
+    // Inline CSS: convierte <link> CSS en <style> inlineados en el HTML inicial.
+    // Elimina el render-blocking de los chunks CSS (17.7 KiB + 2.8 KiB).
+    // Ideal para Tailwind (CSS atómico, ~20 KiB) y primeros visitantes.
+    // Trade-off: devuelve retornantes no usan cache de CSS, pero para Lighthouse
+    // (siempre primer visitante) es el cambio más impactante.
+    inlineCss: true,
     // Optimizar imports de paquetes grandes para tree-shaking más agresivo
     optimizePackageImports: [
       "lucide-react",

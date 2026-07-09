@@ -162,6 +162,42 @@ export function HeroSlider() {
       {/* Light glow effects */}
       <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[60%] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
 
+      {/* Background image — FUERA del AnimatePresence para que sea visible
+          inmediatamente (LCP detectable por Lighthouse sin initial='hidden') */}
+      <div className="absolute inset-0 z-0">
+        {(() => {
+          const hasInlineTransform = activeSlide.imagePositionX !== undefined || activeSlide.imageScale !== undefined;
+          const safeImageClass = hasInlineTransform
+            ? (activeSlide.imageClass || '').replace(/\bscale-\S+\b|\btranslate-x-\S+\b/g, '').trim()
+            : (activeSlide.imageClass || '');
+          return (
+            <Image
+              src={activeSlide.image}
+              alt={activeSlide.title}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
+              className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${safeImageClass}`}
+              priority
+              fetchPriority="high"
+              style={
+                hasInlineTransform
+                  ? {
+                      transform: `scale(${(activeSlide.imageScale || 100) / 100}) translateX(${activeSlide.imagePositionX || 0}%)`
+                    }
+                  : undefined
+              }
+            />
+          );
+        })()}
+        {/* Light gradient fade for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent md:hidden" />
+        {/* Subtle color highlight gradient glow */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-r ${activeSlide.gradient} opacity-40 pointer-events-none`}
+        />
+      </div>
+
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -174,42 +210,6 @@ export function HeroSlider() {
           onDragEnd={handleDragEnd}
           className="absolute inset-0 flex flex-col md:flex-row items-center justify-between cursor-grab active:cursor-grabbing select-none"
         >
-          {/* Background image & gradient overlay (Spans full width) */}
-          <div className="absolute inset-0 z-0">
-            {/* When using inline style transforms, strip any conflicting Tailwind scale/translate classes */}
-            {(() => {
-              const hasInlineTransform = activeSlide.imagePositionX !== undefined || activeSlide.imageScale !== undefined;
-              const safeImageClass = hasInlineTransform
-                ? (activeSlide.imageClass || '').replace(/\bscale-\S+\b|\btranslate-x-\S+\b/g, '').trim()
-                : (activeSlide.imageClass || '');
-              return (
-                  <Image
-                    src={activeSlide.image}
-                    alt={activeSlide.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
-                    className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${safeImageClass}`}
-                    priority
-                    fetchPriority="high"
-                    style={
-                      hasInlineTransform
-                        ? {
-                            transform: `scale(${(activeSlide.imageScale || 100) / 100}) translateX(${activeSlide.imagePositionX || 0}%)`
-                          }
-                        : undefined
-                    }
-                  />
-              );
-            })()}
-            {/* Light gradient fade for text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent md:hidden" />
-
-            {/* Subtle color highlight gradient glow */}
-            <div
-              className={`absolute inset-0 bg-gradient-to-r ${activeSlide.gradient} opacity-40 pointer-events-none`}
-            />
-          </div>
 
           {/* Slide Text Content (Left / Top) */}
           <motion.div
@@ -246,11 +246,10 @@ export function HeroSlider() {
             {/* Title */}
             <motion.h1
               variants={{
-                hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
+                hidden: { opacity: 0, y: 20 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  filter: "blur(0px)",
                   transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
                 },
               }}

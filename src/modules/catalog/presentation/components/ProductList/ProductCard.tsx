@@ -81,8 +81,7 @@ export const ProductCard = memo(function ProductCard({
           priority={priority}
           sizes="(max-width: 640px) 72vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 17vw"
           className={cn(
-            "object-contain p-4 group-hover:scale-[1.04] transition-transform duration-700 ease-out",
-            isDashboard ? "opacity-80 group-hover:opacity-100 mix-blend-lighten" : "mix-blend-multiply"
+            "object-contain p-4 group-hover:scale-[1.04] transition-transform duration-700 ease-out"
           )}
         />
 
