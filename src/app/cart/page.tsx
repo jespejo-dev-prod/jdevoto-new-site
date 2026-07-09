@@ -10,6 +10,7 @@ import { PublicFooter } from '@/components/layout/public-footer';
 import { CartContent } from './CartContent';
 import { prisma } from '@/lib/client';
 import { ProductSlider } from '@/components/ui/product-slider';
+import { ProductCard } from '@/modules/catalog/presentation/components/ProductList/ProductCard';
 import { priceService } from '@/modules/pricing/domain/price.service';
 import { getServerUser } from '@/lib/server-auth';
 
@@ -84,10 +85,16 @@ export default async function CartPage() {
       {/* Recommended Products at the bottom */}
       <section className="bg-zinc-50 py-16 border-t border-zinc-100">
         <div className="max-w-[1400px] mx-auto w-full px-6 lg:px-12">
-          <ProductSlider 
-            title="Productos recomendados para ti" 
-            products={recommendedProducts} 
-          />
+          <ProductSlider title="Productos recomendados para ti">
+            {recommendedProducts.map((p: any, idx: number) => (
+              <div 
+                key={`${p.id}-${idx}`} 
+                className="w-[85vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
+              >
+                <ProductCard product={p} variant="catalog" isAuthenticated={!!user} />
+              </div>
+            ))}
+          </ProductSlider>
         </div>
       </section>
 

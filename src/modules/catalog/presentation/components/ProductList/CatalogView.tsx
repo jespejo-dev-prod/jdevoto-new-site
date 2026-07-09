@@ -10,6 +10,7 @@ import { ProductCard } from './ProductCard';
 import { ProductTable } from './ProductTable';
 import { ProductsFilterBar } from './ProductsFilterBar';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/context/auth-context';
 
 import { trackSearchQuery, getRecentlyViewed, getSearchQueries } from '@/lib/tracking';
 
@@ -57,6 +58,9 @@ export function CatalogView({
   const showRecentlyViewed = searchParams.get('recentlyViewed') === 'true';
   const showSearchHistory = searchParams.get('searchHistory') === 'true';
   const showRelated = searchParams.get('related') === 'true';
+  
+  const { accessToken } = useAuth();
+  const isAuthenticated = !!accessToken;
 
   useEffect(() => {
     if (showRecentlyViewed) {
@@ -639,7 +643,7 @@ export function CatalogView({
                 className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
               >
                 {filteredProducts.map((p, i) => (
-                  <ProductCard key={p.id} product={p} variant="catalog" priority={i < 6} />
+                  <ProductCard key={p.id} product={p} variant="catalog" priority={i < 6} isAuthenticated={isAuthenticated} />
                 ))}
               </motion.div>
             ) : (

@@ -7,24 +7,24 @@ import { ProductCard } from '@/modules/catalog/presentation/components/ProductLi
 
 interface ProductSliderProps {
   title: string;
-  products: any[];
   linkHref?: string;
   linkLabel?: string;
   isPromoSlider?: boolean;
   validTo?: string | null;
   campaignColor?: string | null;
   prioritizeLcp?: boolean;
+  children?: React.ReactNode;
 }
 
 export function ProductSlider({
   title,
-  products,
   linkHref,
-  linkLabel = "Ver todas las ofertas",
+  linkLabel,
   isPromoSlider = false,
   validTo = null,
   campaignColor = null,
   prioritizeLcp = false,
+  children,
 }: ProductSliderProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -109,7 +109,7 @@ export function ProductSlider({
     return () => clearInterval(timer);
   }, [validTo]);
 
-  if (!products || products.length === 0) return null;
+  if (!children) return null;
 
   const isStockMode = validTo ? new Date(validTo).getFullYear() === 9999 : false;
   const isExpired = isPromoSlider && validTo && !isStockMode && (new Date(validTo).getTime() <= new Date().getTime());
@@ -297,17 +297,10 @@ export function ProductSlider({
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing select-none"
+          className="relative z-10 flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pt-1 cursor-grab active:cursor-grabbing select-none"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {products.map((p, index) => (
-            <div 
-              key={`${p.id}-${index}`} 
-              className="w-[72vw] sm:w-[calc((100%-2rem)/3)] md:w-[calc((100%-3rem)/4)] lg:w-[calc((100%-5rem)/6)] shrink-0 snap-start"
-            >
-              <ProductCard product={p} variant="catalog" compact={isPromoSlider} priority={prioritizeLcp && index < 4} />
-            </div>
-          ))}
+          {children}
         </div>
       </section>
     );
@@ -358,18 +351,10 @@ export function ProductSlider({
          onMouseLeave={handleMouseLeave}
          onMouseUp={handleMouseUp}
          onMouseMove={handleMouseMove}
-         className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing select-none"
+         className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pt-1 cursor-grab active:cursor-grabbing select-none"
          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
        >
-          {products.map((p, index) => (
-            <div 
-              key={`${p.id}-${index}`} 
-              // En móvil: 80% ancho. En md: 3 por fila (gap-4 = 1rem). En lg: exactamente 5 por fila (gap-4 = 1rem * 4 = 4rem total gap)
-              className="w-[80vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
-            >
-              <ProductCard product={p} variant="catalog" priority={prioritizeLcp && index < 4} />
-            </div>
-          ))}
+          {children}
        </div>
     </section>
   );

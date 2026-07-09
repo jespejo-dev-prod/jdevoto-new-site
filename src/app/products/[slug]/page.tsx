@@ -23,6 +23,7 @@ import { BundleAction } from '@/modules/catalog/presentation/components/BundleAc
 import { prisma } from '@/lib/client';
 import { TAX_RATE } from '@/types/domain';
 import { TrackProduct } from '@/components/catalog/track-product';
+import { ProductCard } from '@/modules/catalog/presentation/components/ProductList/ProductCard';
 import { RecentlyViewedSlider } from '@/components/home/client-sliders';
 import { serializeDecimal } from '@/lib/utils';
 import { priceService } from '@/modules/pricing/domain/price.service';
@@ -452,6 +453,9 @@ async function RelatedProductsSection({
   categoryId: string | null;
   currentProductId: string;
 }) {
+  const user = await getServerUser();
+  const isAuthenticated = !!user;
+
   const hideSetting = await prisma.storeSettings.findUnique({
     where: { key: 'hideOutOfStock' },
   });
@@ -560,18 +564,30 @@ async function RelatedProductsSection({
     <div className="mt-12 border-t border-zinc-100 pt-16 space-y-16">
       {/* 1. Direct Category (Child/Hijo) Slider - Only shown if it has >= 1 products */}
       {showChildSlider && (
-        <ProductSlider 
-          title={childName ? `Productos de ${childName}` : "Productos Relacionados"} 
-          products={childProducts} 
-        />
+        <ProductSlider title={childName ? `Productos de ${childName}` : "Productos Relacionados"}>
+          {childProducts.map((p: any, idx: number) => (
+            <div 
+              key={`${p.id}-${idx}`} 
+              className="w-[85vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
+            >
+              <ProductCard product={p} variant="catalog" isAuthenticated={isAuthenticated} />
+            </div>
+          ))}
+        </ProductSlider>
       )}
 
       {/* 2. Parent Category Slider - Always shown */}
       {parentProducts.length > 0 && (
-        <ProductSlider 
-          title={parentName || "Categoría Principal"} 
-          products={parentProducts} 
-        />
+        <ProductSlider title={parentName || "Categoría Principal"}>
+          {parentProducts.map((p: any, idx: number) => (
+            <div 
+              key={`${p.id}-${idx}`} 
+              className="w-[85vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
+            >
+              <ProductCard product={p} variant="catalog" isAuthenticated={isAuthenticated} />
+            </div>
+          ))}
+        </ProductSlider>
       )}
 
       {/* 3. Vistos Recientemente Slider - Always shown */}

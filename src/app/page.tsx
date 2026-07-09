@@ -21,6 +21,7 @@ import { ScrollReveal } from '@/components/home/scroll-reveal';
 import { BenefitBar } from '@/components/home/benefit-bar';
 import { PromoBanner } from '@/components/home/promo-banner';
 import { ProductSlider } from '@/components/ui/product-slider';
+import { ProductCard } from '@/modules/catalog/presentation/components/ProductList/ProductCard';
 
 export const metadata: Metadata = {
   title: 'Comercial J. Devoto | Distribución Mayorista a Todo Chile',
@@ -215,14 +216,22 @@ export default async function HomePage() {
           const content = (
             <ProductSlider
               title={slider.title}
-              products={slider.products}
               linkHref={slider.linkHref}
               linkLabel="Ver todas las ofertas"
               isPromoSlider={slider.isPromoSlider}
               validTo={slider.validTo}
               campaignColor={slider.color}
               prioritizeLcp={index === 0}
-            />
+            >
+              {slider.products.map((p: any, idx: number) => (
+                <div 
+                  key={`${p.id}-${idx}`} 
+                  className="w-[85vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
+                >
+                  <ProductCard product={p} variant="catalog" priority={index === 0 && idx < 4} isAuthenticated={!!user} />
+                </div>
+              ))}
+            </ProductSlider>
           );
 
           // Only apply ScrollReveal to sliders below the first one
