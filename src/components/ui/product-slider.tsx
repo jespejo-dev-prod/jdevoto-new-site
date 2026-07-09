@@ -3,7 +3,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Flame } from 'lucide-react';
 import Link from 'next/link';
-import { ProductCard } from '@/modules/catalog/presentation/components/ProductList/ProductCard';
 
 interface ProductSliderProps {
   title: string;

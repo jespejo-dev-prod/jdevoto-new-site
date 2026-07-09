@@ -13,10 +13,11 @@ import { PublicFooter } from '@/components/layout/public-footer';
 import { HeroSlider } from '@/components/home/hero-slider';
 import { CategoriesSlider } from '@/components/home/categories-slider';
 import { 
-  RecentlyViewedSlider, 
-  SearchHistorySlider, 
-  RelatedToViewedSlider 
-} from '@/components/home/client-sliders';
+  DynamicRecentlyViewedSlider, 
+  DynamicSearchHistorySlider, 
+  DynamicRelatedToViewedSlider 
+} from '@/components/home/dynamic-sliders';
+
 import { ScrollReveal } from '@/components/home/scroll-reveal';
 import { BenefitBar } from '@/components/home/benefit-bar';
 import { PromoBanner } from '@/components/home/promo-banner';
@@ -257,17 +258,17 @@ export default async function HomePage() {
 
         {/* Vistos Recientemente Slider */}
         <ScrollReveal>
-          <RecentlyViewedSlider fallbackProducts={rvFallback} />
+          <DynamicRecentlyViewedSlider fallbackProducts={rvFallback} />
         </ScrollReveal>
 
         {/* Tu Historial de Búsqueda Slider */}
         <ScrollReveal>
-          <SearchHistorySlider fallbackProducts={shFallback} />
+          <DynamicSearchHistorySlider fallbackProducts={shFallback} />
         </ScrollReveal>
 
         {/* Relacionado con lo que viste Slider */}
         <ScrollReveal>
-          <RelatedToViewedSlider fallbackProducts={relFallback} />
+          <DynamicRelatedToViewedSlider fallbackProducts={relFallback} />
         </ScrollReveal>
         
         {/* Spacer before footer */}
