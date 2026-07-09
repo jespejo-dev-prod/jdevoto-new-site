@@ -198,7 +198,11 @@ export function HeroSlider() {
         />
       </div>
 
-      <AnimatePresence mode="wait">
+      {/* initial={false}: renderiza estado `animate` (visible) en SSR.
+          Sin esto, el hero h1 empieza opacity:0 y se convierte en el LCP
+          tardío a ~2.9s (post-hidratación). Con initial={false}, el texto
+          es visible desde el primer paint → LCP = FCP ≈ 1.1s */}
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={current}
           initial="hidden"
