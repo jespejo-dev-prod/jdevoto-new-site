@@ -98,14 +98,14 @@ export function CategoriesSlider({ categories }: CategoriesSliderProps) {
           <div className="flex gap-2">
              <button 
                onClick={() => scroll('left')}
-               className="h-10 w-10 rounded-full border border-zinc-200/80 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
+               className="h-10 w-10 rounded-full border border-zinc-200/80 flex items-center justify-center hover:bg-zinc-50 transition-colors shadow-sm active:scale-90 bg-white"
                aria-label="Deslizar izquierda"
              >
                <ChevronLeft className="h-5 w-5 text-zinc-400" />
              </button>
              <button 
                onClick={() => scroll('right')}
-               className="h-10 w-10 rounded-full border border-zinc-200/80 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
+               className="h-10 w-10 rounded-full border border-zinc-200/80 flex items-center justify-center hover:bg-zinc-50 transition-colors shadow-sm active:scale-90 bg-white"
                aria-label="Deslizar derecha"
              >
                <ChevronRight className="h-5 w-5 text-zinc-400" />
@@ -127,7 +127,7 @@ export function CategoriesSlider({ categories }: CategoriesSliderProps) {
             <Link 
               key={category.id} 
               href={`/products?category=${category.slug}`}
-              className="w-[80vw] sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-2.5rem)/3)] lg:w-[calc((100%-5rem)/5)] shrink-0 snap-start group relative h-[360px] rounded-[28px] overflow-hidden flex flex-col justify-end p-6 border border-zinc-200/40 shadow-[0_8px_25px_rgba(0,0,0,0.02)] hover:shadow-2xl transition-all duration-500"
+              className="w-[80vw] sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-2.5rem)/3)] lg:w-[calc((100%-5rem)/5)] shrink-0 snap-start group relative h-[360px] rounded-[28px] overflow-hidden flex flex-col justify-end p-6 border border-zinc-200/40 shadow-[0_8px_25px_rgba(0,0,0,0.02)] hover:shadow-2xl transition-shadow duration-500"
             >
               {/* Zoom background image */}
               <Image 
@@ -136,6 +136,7 @@ export function CategoriesSlider({ categories }: CategoriesSliderProps) {
                 fill
                 loading="lazy"
                 sizes="(max-width: 640px) 80vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                quality={60}
                 className="object-cover object-center transition-transform duration-[1200ms] ease-out group-hover:scale-105"
               />
               

@@ -176,8 +176,9 @@ export function HeroSlider() {
               alt={activeSlide.title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
-              className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${safeImageClass}`}
+              className={`object-cover opacity-85 md:opacity-95 transition-opacity transition-transform duration-700 ${safeImageClass}`}
               priority
+              quality={60}
               fetchPriority="high"
               style={
                 hasInlineTransform
@@ -291,7 +292,7 @@ export function HeroSlider() {
             >
               <Link
                 href={activeSlide.href}
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-zinc-950 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 transition-all shadow-xl shadow-zinc-900/10 hover:scale-[1.03] active:scale-95 duration-300"
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-zinc-950 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 transition-colors shadow-xl shadow-zinc-900/10 hover:scale-[1.03] active:scale-95 duration-300"
               >
                 {activeSlide.cta}
               </Link>
@@ -303,15 +304,15 @@ export function HeroSlider() {
       {/* Navigation Buttons (Sleek Circle Controls) */}
       <button
         onClick={prevSlide}
-        className="absolute left-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/90 shadow-sm z-20"
+        className="absolute left-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/90 shadow-sm z-20"
         aria-label="Anterior"
       >
-        <ChevronLeft className="h-5 w-5" />
+        <ChevronLeft className="h-6 w-6" />
       </button>
 
       <button
         onClick={nextSlide}
-        className="absolute right-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/90 shadow-sm z-20"
+        className="absolute right-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/90 shadow-sm z-20"
         aria-label="Siguiente"
       >
         <ChevronRight className="h-5 w-5" />
@@ -327,7 +328,7 @@ export function HeroSlider() {
             aria-label={`Slide ${idx + 1}`}
           >
             <span 
-              className={`h-1.5 rounded-full transition-all duration-500 ${
+              className={`h-1.5 rounded-full transition-colors duration-500 ${
                 idx === current
                   ? "w-8 bg-zinc-950"
                   : "w-2 bg-zinc-300 group-hover:bg-zinc-400"

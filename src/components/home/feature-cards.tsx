@@ -41,11 +41,11 @@ export function FeatureCards() {
       {features.map((feature, idx) => (
         <div 
           key={idx} 
-          className={`group bg-white rounded-[28px] p-6 border border-zinc-100 shadow-[0_10px_35px_-10px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_45px_-12px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between gap-6 cursor-default`}
+          className={`group bg-white rounded-[28px] p-6 border border-zinc-100 shadow-[0_10px_35px_-10px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_45px_-12px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-shadow duration-300 flex flex-col justify-between gap-6 cursor-default`}
         >
           <div className="flex items-start justify-between">
             {/* Icon Wrapper with sleek borders */}
-            <div className={`h-12 w-12 rounded-2xl ${feature.iconBg} border border-zinc-200/60 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-transparent transition-all duration-300`}>
+            <div className={`h-12 w-12 rounded-2xl ${feature.iconBg} border border-zinc-200/60 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-transparent transition-transform duration-300`}>
               <feature.icon className={`h-5 w-5 ${feature.iconColor} transition-colors duration-300`} />
             </div>
             {/* Minimal top border indicator on hover */}
