@@ -134,7 +134,7 @@ export function CategoriesSlider({ categories }: CategoriesSliderProps) {
                 src={getCategoryImage(category.name, category.slug)}
                 alt={category.name}
                 fill
-                loading="lazy"
+                priority={index < 3}
                 sizes="(max-width: 640px) 80vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                 quality={60}
                 className="object-cover object-center transition-transform duration-[1200ms] ease-out group-hover:scale-105"

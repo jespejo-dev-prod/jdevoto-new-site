@@ -62,6 +62,11 @@ export default async function HomePage() {
   const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
   const stockFilter = hideOutOfStock ? { stockQuantity: { gt: 0 } } : {};
 
+  const homeSlidesSetting = await prisma.storeSettings.findUnique({
+    where: { key: 'home_slides' },
+  });
+  const initialHomeSlides = homeSlidesSetting ? (homeSlidesSetting.value as any) : null;
+
   const productSelectFields = {
     id: true,
     sku: true,
@@ -199,7 +204,7 @@ export default async function HomePage() {
 
       <main className="max-w-[1440px] mx-auto w-full p-4 md:p-8 lg:p-12 flex-grow overflow-hidden">
         {/* Hero Section */}
-        <HeroSlider />
+        <HeroSlider initialSlides={initialHomeSlides} />
 
         {/* Sleek Benefit Bar - No ScrollReveal here since it's above the fold */}
         <BenefitBar />

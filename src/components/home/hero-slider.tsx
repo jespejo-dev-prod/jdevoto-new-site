@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
@@ -82,51 +81,42 @@ const DEFAULT_SLIDES: SlideItem[] = [
   },
 ];
 
-export function HeroSlider() {
-  const [activeSlides, setActiveSlides] = useState<SlideItem[]>(DEFAULT_SLIDES);
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    // Cargar sliders dinámicos desde API pública de configuraciones
-    fetch("/api/settings?key=home_slides")
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.value && Array.isArray(data.value) && data.value.length > 0) {
-          const mapped = data.value.map((s: any) => {
-            let BadgeIcon = null;
-            if (s.badgeIcon) {
-              if (typeof s.badgeIcon === "string") {
-                BadgeIcon = iconMap[s.badgeIcon] || null;
-              } else {
-                BadgeIcon = s.badgeIcon;
-              }
-            }
-            return {
-              id: s.id,
-              image: s.image,
-              badge: s.badge,
-              badgeIcon: BadgeIcon,
-              badgeColor: s.badgeColor || "text-sky-700 bg-sky-50 border-sky-100",
-              title: s.title,
-              description: s.description,
-              cta: s.cta || "Ver Más",
-              href: s.href || "/products",
-              gradient: s.gradient || "from-sky-100/10 via-zinc-100/30 to-transparent",
-              imageClass: s.imageClass || "object-center scale-100",
-              imagePositionX: s.imagePositionX,
-              imageScale: s.imageScale
-            };
-          });
-          setActiveSlides(mapped);
-        } else {
-          setActiveSlides(DEFAULT_SLIDES);
+export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) {
+  const [activeSlides, setActiveSlides] = useState<SlideItem[]>(() => {
+    if (initialSlides && Array.isArray(initialSlides) && initialSlides.length > 0) {
+      return initialSlides.map((s: any) => {
+        let BadgeIcon = null;
+        if (s.badgeIcon) {
+          if (typeof s.badgeIcon === "string") {
+            BadgeIcon = iconMap[s.badgeIcon] || null;
+          } else {
+            BadgeIcon = s.badgeIcon;
+          }
         }
-      })
-      .catch((err) => {
-        console.error("Error loading dynamic slides:", err);
-        setActiveSlides(DEFAULT_SLIDES);
+        return {
+          id: s.id,
+          image: s.image,
+          badge: s.badge,
+          badgeIcon: BadgeIcon,
+          badgeColor: s.badgeColor || "text-sky-700 bg-sky-50 border-sky-100",
+          title: s.title,
+          description: s.description,
+          cta: s.cta || "Ver Más",
+          href: s.href || "/products",
+          gradient: s.gradient || "from-sky-100/10 via-zinc-100/30 to-transparent",
+          imageClass: s.imageClass || "object-center scale-100",
+          imagePositionX: s.imagePositionX,
+          imageScale: s.imageScale
+        };
       });
-  }, []);
+    }
+    return DEFAULT_SLIDES;
+  });
+  const [current, setCurrent] = useState(0);
+  const [isClient, setIsClient] = useState(false);
+
+  // Fetch dinámico eliminado: ahora los slides se inyectan mediante SSR (initialSlides)
+  // para evitar retrasos en el LCP generados por el renderizado asíncrono en cliente.
 
   useEffect(() => {
     if (activeSlides.length <= 1) return;
@@ -143,15 +133,6 @@ export function HeroSlider() {
   const prevSlide = () =>
     setCurrent((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
 
-  const handleDragEnd = (event: any, info: any) => {
-    const threshold = 50;
-    if (info.offset.x < -threshold) {
-      nextSlide();
-    } else if (info.offset.x > threshold) {
-      prevSlide();
-    }
-  };
-
   const activeSlide = activeSlides[current] || DEFAULT_SLIDES[0];
 
   return (
@@ -162,8 +143,7 @@ export function HeroSlider() {
       {/* Light glow effects */}
       <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[60%] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
 
-      {/* Background image — FUERA del AnimatePresence para que sea visible
-          inmediatamente (LCP detectable por Lighthouse sin initial='hidden') */}
+      {/* Background image — visible Inmediatamente (LCP detectable por Lighthouse) */}
       <div className="absolute inset-0 z-0">
         {(() => {
           const hasInlineTransform = activeSlide.imagePositionX !== undefined || activeSlide.imageScale !== undefined;
@@ -199,107 +179,46 @@ export function HeroSlider() {
         />
       </div>
 
-      {/* initial={false}: renderiza estado `animate` (visible) en SSR.
-          Sin esto, el hero h1 empieza opacity:0 y se convierte en el LCP
-          tardío a ~2.9s (post-hidratación). Con initial={false}, el texto
-          es visible desde el primer paint → LCP = FCP ≈ 1.1s */}
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={current}
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
-          onDragEnd={handleDragEnd}
-          className="absolute inset-0 flex flex-col md:flex-row items-center justify-between cursor-grab active:cursor-grabbing select-none"
-        >
+      {/* Text Container: Pure CSS Animations */}
+      <div
+        key={current}
+        className="absolute inset-0 flex flex-col md:flex-row items-center justify-between select-none"
+      >
+        <div className="relative z-10 flex flex-col justify-center px-8 md:px-16 lg:px-24 h-full md:w-[50%] lg:w-[45%] text-left pt-12 md:pt-0">
+          
+          {/* Badge */}
+          {activeSlide.badge && (
+            <div className="mb-4 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
+              <span className={`inline-flex items-center gap-2 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${activeSlide.badgeColor || ""}`}>
+                {activeSlide.badgeIcon && (
+                  <activeSlide.badgeIcon className="h-3.5 w-3.5" />
+                )}
+                {activeSlide.badge}
+              </span>
+            </div>
+          )}
 
-          {/* Slide Text Content (Left / Top) */}
-          <motion.div
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
-            }}
-            className="relative z-10 flex flex-col justify-center px-8 md:px-16 lg:px-24 h-full md:w-[50%] lg:w-[45%] text-left pt-12 md:pt-0"
-          >
-            {/* Badge */}
-            {activeSlide.badge && (
-              <motion.div
-                variants={{
-                  hidden: { opacity: 0, y: -10 },
-                  visible: {
-                    opacity: 1,
-                    y: 0,
-                    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-                  },
-                }}
-                className="mb-4"
-              >
-                <span
-                  className={`inline-flex items-center gap-2 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${activeSlide.badgeColor || ""}`}
-                >
-                  {activeSlide.badgeIcon && (
-                    <activeSlide.badgeIcon className="h-3.5 w-3.5" />
-                  )}
-                  {activeSlide.badge}
-                </span>
-              </motion.div>
-            )}
+          {/* Title */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-zinc-950 max-w-xl leading-[1.1] tracking-tight uppercase animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
+            {activeSlide.title}
+          </h1>
 
-            {/* Title */}
-            <motion.h1
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-                },
-              }}
-              className="text-4xl md:text-5xl lg:text-6xl font-black text-zinc-950 max-w-xl leading-[1.1] tracking-tight uppercase"
+          {/* Description */}
+          <p className="text-sm md:text-base lg:text-lg text-zinc-600 mt-4 max-w-md font-semibold leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
+            {activeSlide.description}
+          </p>
+
+          {/* CTA Button */}
+          <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
+            <Link
+              href={activeSlide.href}
+              className="inline-flex items-center justify-center px-8 py-3.5 bg-zinc-950 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 transition-colors shadow-xl shadow-zinc-900/10 hover:scale-[1.03] active:scale-95 duration-300"
             >
-              {activeSlide.title}
-            </motion.h1>
-
-            {/* Description */}
-            <motion.p
-              variants={{
-                hidden: { opacity: 0, y: 15 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-                },
-              }}
-              className="text-sm md:text-base lg:text-lg text-zinc-600 mt-4 max-w-md font-semibold leading-relaxed"
-            >
-              {activeSlide.description}
-            </motion.p>
-
-            {/* CTA Button */}
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 15 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-                },
-              }}
-              className="mt-8"
-            >
-              <Link
-                href={activeSlide.href}
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-zinc-950 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 transition-colors shadow-xl shadow-zinc-900/10 hover:scale-[1.03] active:scale-95 duration-300"
-              >
-                {activeSlide.cta}
-              </Link>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </AnimatePresence>
+              {activeSlide.cta}
+            </Link>
+          </div>
+        </div>
+      </div>
 
       {/* Navigation Buttons (Sleek Circle Controls) */}
       <button
