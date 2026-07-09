@@ -15,6 +15,7 @@ const roboto = Roboto({
   weight: ["300", "400", "500", "700", "900"],
   subsets: ["latin"],
   display: "swap",
+  preload: true,
   variable: "--font-roboto",
 });
 
@@ -109,6 +110,17 @@ export default function RootLayout({
 
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        {/* Preload de imagen LCP del hero (primer slide). El slider es 'use client', por lo que
+            el browser no puede descubrir la imagen en el HTML — este link resuelve el issue
+            "LCP image not discoverable" de Lighthouse y mejora el LCP significativamente. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/_next/image?url=%2Fhome%2Foutlet.jpg&w=1920&q=75"
+          fetchPriority="high"
+        />
+      </head>
       <body className={`${roboto.variable} font-sans antialiased min-h-screen`}>
         <script
           type="application/ld+json"

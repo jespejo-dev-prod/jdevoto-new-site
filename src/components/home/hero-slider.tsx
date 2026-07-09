@@ -187,9 +187,10 @@ export function HeroSlider() {
                     src={activeSlide.image}
                     alt={activeSlide.title}
                     fill
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
                     className={`object-cover opacity-85 md:opacity-95 transition-all duration-700 ${safeImageClass}`}
                     priority
+                    fetchPriority="high"
                     style={
                       hasInlineTransform
                         ? {

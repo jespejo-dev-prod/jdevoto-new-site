@@ -15,13 +15,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "http", hostname: "localhost" },
     ],
-    // Formatos modernos: WebP primero, luego AVIF para los que lo soportan
-    formats: ["image/webp", "image/avif"],
+    // AVIF primero: ~50% más ligero que WebP; soporte en todos los browsers modernos.
+    // WebP como fallback para browsers sin soporte AVIF.
+    formats: ["image/avif", "image/webp"],
     // Tamaños de dispositivo para el srcset automático
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Tiempo de caché en la CDN/browser (1 semana)
-    minimumCacheTTL: 60 * 60 * 24 * 7,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1440, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 192, 256, 384],
+    // Tiempo de caché en la CDN/browser (30 días)
+    minimumCacheTTL: 60 * 60 * 24 * 30,
   },
 
   // ── Compresión de respuestas HTTP ────────────────────────────────────────
@@ -62,11 +63,13 @@ const nextConfig: NextConfig = {
   // ── Optimizaciones del compilador ────────────────────────────────────────
   experimental: {
     cpus: 2,
-    // Optimizar imports de paquetes grandes para reducir bundle size
+    // Optimizar imports de paquetes grandes para tree-shaking más agresivo
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
       "@tanstack/react-query",
+      "recharts",
+      "date-fns",
     ],
   },
 };
