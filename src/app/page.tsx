@@ -17,7 +17,6 @@ import {
   DynamicSearchHistorySlider, 
   DynamicRelatedToViewedSlider 
 } from '@/components/home/dynamic-sliders';
-import { InViewRender } from '@/components/ui/in-view-render';
 
 import { ScrollReveal } from '@/components/home/scroll-reveal';
 import { BenefitBar } from '@/components/home/benefit-bar';
@@ -259,23 +258,17 @@ export default async function HomePage() {
 
         {/* Vistos Recientemente Slider */}
         <ScrollReveal>
-          <InViewRender rootMargin="300px">
-            <DynamicRecentlyViewedSlider fallbackProducts={rvFallback} />
-          </InViewRender>
+          <DynamicRecentlyViewedSlider fallbackProducts={rvFallback} />
         </ScrollReveal>
 
         {/* Tu Historial de Búsqueda Slider */}
         <ScrollReveal>
-          <InViewRender rootMargin="300px">
-            <DynamicSearchHistorySlider fallbackProducts={shFallback} />
-          </InViewRender>
+          <DynamicSearchHistorySlider fallbackProducts={shFallback} />
         </ScrollReveal>
 
         {/* Relacionado con lo que viste Slider */}
         <ScrollReveal>
-          <InViewRender rootMargin="300px">
-            <DynamicRelatedToViewedSlider fallbackProducts={relFallback} />
-          </InViewRender>
+          <DynamicRelatedToViewedSlider fallbackProducts={relFallback} />
         </ScrollReveal>
         
         {/* Spacer before footer */}

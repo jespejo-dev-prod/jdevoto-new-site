@@ -72,7 +72,7 @@ export const ProductCard = memo(function ProductCard({
           priority={priority}
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 17vw"
           className={cn(
-            "object-contain p-4 group-hover:scale-[1.04] transition-transform duration-300 ease-out"
+            "object-contain p-4 group-hover:scale-[1.04] transition-transform duration-700 ease-out"
           )}
         />
 
@@ -128,7 +128,7 @@ export const ProductCard = memo(function ProductCard({
               <p className={cn(
                 "font-black uppercase tracking-widest font-mono",
                 compact ? "text-[10px]" : "text-[16px]",
-                isDashboard ? "text-zinc-500" : "text-zinc-500"
+                isDashboard ? "text-zinc-400" : "text-zinc-400"
               )}>
                 {product.brand?.name || 'SIN MARCA'}
               </p>
@@ -168,13 +168,13 @@ export const ProductCard = memo(function ProductCard({
           {isDashboard ? (
             <div className="flex items-center justify-between w-full">
               <div>
-                <p className="text-xs font-bold text-zinc-500 mb-1 uppercase">Precio Neto</p>
+                <p className="text-xs font-bold text-zinc-400 mb-1 uppercase">Precio Neto</p>
                 <p className="text-xl font-black text-white tracking-tight">
                   ${Number(product.basePrice).toLocaleString('es-CL')}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs font-bold text-zinc-500 mb-1 uppercase text-right">Stock</p>
+                <p className="text-xs font-bold text-zinc-400 mb-1 uppercase text-right">Stock</p>
                 <StockBadge stock={product.stockQuantity} stockAlert={product.stockAlert} />
               </div>
             </div>
@@ -201,7 +201,7 @@ export const ProductCard = memo(function ProductCard({
                           </span>
                         </div>
                         <div className={cn(
-                          "flex items-center gap-1 text-zinc-500 uppercase tracking-tight",
+                          "flex items-center gap-1 text-zinc-400 uppercase tracking-tight",
                           compact ? "text-[12px]" : "text-[15px]"
                         )}>
                           <span className="line-through whitespace-nowrap">
@@ -231,7 +231,7 @@ export const ProductCard = memo(function ProductCard({
                     <span className="text-xs sm:text-[13.5px] font-bold text-blue-600 uppercase tracking-wider">
                       🔒 Inicia sesión
                     </span>
-                    <span className="text-[10px] sm:text-[11px] text-zinc-500 font-bold uppercase mt-0.5">Para ver precios</span>
+                    <span className="text-[10px] sm:text-[11px] text-zinc-400 font-bold uppercase mt-0.5">Para ver precios</span>
                   </div>
                 )}
               </div>
