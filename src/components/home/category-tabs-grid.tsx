@@ -38,7 +38,7 @@ export function CategoryTabsGrid({
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-zinc-200/60">
         <div>
           <h2 className="text-xl md:text-2xl font-black text-zinc-950 tracking-tight uppercase">Catálogo Recomendado</h2>
-          <p className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest">
+          <p className="text-[10px] font-bold text-zinc-500 mt-1 uppercase tracking-widest">
             Selecciona una categoría para explorar productos con stock inmediato
           </p>
         </div>
@@ -68,7 +68,7 @@ export function CategoryTabsGrid({
                   : 'bg-white border-zinc-200/80 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900'
               }`}
             >
-              <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-primary' : 'text-zinc-400'}`} />
+              <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-primary' : 'text-zinc-500'}`} />
               {tab.label}
               {tab.products.length > 0 && (
                 <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono font-bold ${
@@ -91,7 +91,7 @@ export function CategoryTabsGrid({
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-zinc-200/60 p-12 text-center">
-          <p className="text-sm font-medium text-zinc-400 uppercase tracking-wider">
+          <p className="text-sm font-medium text-zinc-500 uppercase tracking-wider">
             No hay productos disponibles en esta categoría por el momento.
           </p>
         </div>
