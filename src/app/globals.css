@@ -163,3 +163,16 @@
     background: transparent !important;
   }
 }
+
+
+/* Cookie Banner slide-up animation (replaces framer-motion) */
+@keyframes slideUp {
+  from {
+    transform: translateY(120px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

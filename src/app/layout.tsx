@@ -1,9 +1,8 @@
 import React from "react";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/auth-context";
-import { QueryProvider } from "@/providers/query-provider";
+import { ClientToaster } from "@/components/ui/client-toaster";
 import { Metadata } from "next";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
@@ -118,18 +117,16 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         <ThemeProvider>
-          <QueryProvider>
-            <AuthProvider>
-              <CartProvider>
-                <WishlistProvider>
-                  {children}
-                  <Toaster position="bottom-right" richColors closeButton />
-                  <WhatsAppButton />
-                  <CookieBanner />
-                </WishlistProvider>
-              </CartProvider>
-            </AuthProvider>
-          </QueryProvider>
+          <AuthProvider>
+            <CartProvider>
+              <WishlistProvider>
+                {children}
+                <ClientToaster position="bottom-right" richColors closeButton />
+                <WhatsAppButton />
+                <CookieBanner />
+              </WishlistProvider>
+            </CartProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

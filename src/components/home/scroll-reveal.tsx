@@ -8,5 +8,6 @@ interface ScrollRevealProps {
 
 export function ScrollReveal({ children }: ScrollRevealProps) {
   // Deshabilitado por impacto negativo en Speed Index de Lighthouse
-  return <div className="will-change-transform">{children}</div>;
+  // Eliminamos will-change-transform para evitar forzar capas de composición innecesarias
+  return <div className="">{children}</div>;
 }
