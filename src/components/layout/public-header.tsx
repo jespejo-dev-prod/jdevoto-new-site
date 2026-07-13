@@ -8,7 +8,9 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/auth-context';
 import { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
-import { CategoriesMenu } from './categories-menu';
+import dynamic from 'next/dynamic';
+
+const CategoriesMenu = dynamic(() => import('./categories-menu').then(mod => mod.CategoriesMenu), { ssr: false });
 
 const FIREWORK_PARTICLES = [
   { dx: -32, dy: -32, color: 'bg-yellow-250' },

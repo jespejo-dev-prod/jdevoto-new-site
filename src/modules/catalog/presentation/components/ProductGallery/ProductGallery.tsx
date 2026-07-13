@@ -74,14 +74,18 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             src={activeImage}
             fill
             priority
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            fetchPriority="high"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
             className="object-contain p-4 sm:p-8 lg:p-12 mix-blend-multiply"
             alt={productName}
           />
         </div>
         
         {/* Wishlist Button */}
-        <button className="absolute top-10 right-10 h-14 w-14 rounded-full bg-white shadow-2xl flex items-center justify-center text-zinc-300 hover:text-red-500 transition-all duration-300 hover:scale-110 active:scale-90 z-10">
+        <button 
+          aria-label="Añadir a lista de deseos"
+          className="absolute top-10 right-10 h-14 w-14 rounded-full bg-white shadow-2xl flex items-center justify-center text-zinc-300 hover:text-red-500 transition-all duration-300 hover:scale-110 active:scale-90 z-10"
+        >
           <Heart className="h-7 w-7" />
         </button>
 

@@ -247,7 +247,7 @@ export const ProductCard = memo(function ProductCard({
                     {product.stockQuantity > 0 ? `${product.stockQuantity} En Stock` : "Sin Stock"}
                   </span>
                 ) : (
-                  <span className="text-xs sm:text-[12.5px] font-bold text-zinc-450 uppercase tracking-wider">
+                  <span className="text-[10px] sm:text-[11px] font-black text-zinc-500 uppercase tracking-widest bg-zinc-100 px-2 py-1 rounded">
                     Stock Privado
                   </span>
                 )}

@@ -117,7 +117,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
             </Button>
           </Link>
         </div>
-        <div className="pt-4 border-t border-zinc-100 flex items-center justify-center gap-2 text-zinc-400 text-[11px] font-bold uppercase tracking-wider">
+        <div className="pt-4 border-t border-zinc-100 flex items-center justify-center gap-2 text-zinc-500 text-[11px] font-bold uppercase tracking-wider">
           <ShieldCheck className="h-4 w-4 text-blue-500" />
           <span>Acceso verificado para empresas</span>
         </div>

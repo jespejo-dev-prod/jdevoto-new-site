@@ -277,19 +277,19 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   <table className="w-full text-[16px] uppercase tracking-tight">
                     <tbody className="divide-y divide-zinc-50">
                       <tr className="group">
-                        <td className="py-2.5 text-zinc-400 group-hover:text-zinc-600 transition-colors">SKU</td>
+                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">SKU</td>
                         <td className="py-2.5 text-right text-zinc-950">{product.sku}</td>
                       </tr>
                       <tr className="group">
-                        <td className="py-2.5 text-zinc-400 group-hover:text-zinc-600 transition-colors">Marca</td>
+                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">Marca</td>
                         <td className="py-2.5 text-right text-zinc-950">{brandName || '—'}</td>
                       </tr>
                       <tr className="group">
-                        <td className="py-2.5 text-zinc-400 group-hover:text-zinc-600 transition-colors">Unidad</td>
+                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">Unidad</td>
                         <td className="py-2.5 text-right text-zinc-950">{product.unit}</td>
                       </tr>
                       <tr className="group">
-                        <td className="py-2.5 text-zinc-400 group-hover:text-zinc-600 transition-colors">Unidades Inner</td>
+                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">Unidades Inner</td>
                         <td className="py-2.5 text-right text-zinc-950">{product.inner ?? 1}</td>
                       </tr>
                     </tbody>
@@ -330,7 +330,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-xs sm:text-[13px] font-black text-zinc-400 uppercase tracking-widest mb-3">Crédito Directo</h4>
+                    <h4 className="text-xs sm:text-[13px] font-black text-zinc-500 uppercase tracking-widest mb-3">Crédito Directo</h4>
                     <div className="flex flex-wrap gap-1.5">
                       {['Contado', '30 días', '60 días', '90 días'].map(term => (
                         <div key={term} className="px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-100 text-xs sm:text-[13px] font-bold text-zinc-750">
@@ -340,7 +340,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-[13px] font-black text-zinc-400 uppercase tracking-widest mb-3">Tarjetas de Crédito y Débito</h4>
+                    <h4 className="text-xs sm:text-[13px] font-black text-zinc-500 uppercase tracking-widest mb-3">Tarjetas de Crédito y Débito</h4>
                     <div className="flex flex-wrap gap-1.5">
                       {['Visa', 'Mastercard', 'Mercado Pago', 'Transferencia'].map(method => (
                         <div key={method} className="px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-100 text-xs sm:text-[13px] font-bold text-zinc-750">
@@ -383,7 +383,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                       ))
                     ) : (
                       <tr>
-                        <td className="py-5 px-4 text-zinc-400 italic text-base sm:text-lg" colSpan={2}>No hay especificaciones disponibles.</td>
+                        <td className="py-5 px-4 text-zinc-500 italic text-base sm:text-lg" colSpan={2}>No hay especificaciones disponibles.</td>
                       </tr>
                     )}
                   </tbody>
@@ -399,16 +399,16 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                 <div className="p-8 rounded-3xl bg-zinc-50 border border-zinc-100 text-base sm:text-lg text-zinc-700 space-y-6 font-medium">
                   {hasDimensions && (
                     <div className="flex justify-between items-center">
-                      <span className="text-zinc-400 uppercase font-black text-xs sm:text-[13px] tracking-widest">Dimensiones</span>
+                      <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">Dimensiones</span>
                       <span className="text-zinc-950 font-bold">{Number(product.length) || '—'} x {Number(product.width) || '—'} x {Number(product.height) || '—'} cm; {Number(product.weight) || '—'} kg</span>
                     </div>
                   )}
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-400 uppercase font-black text-xs sm:text-[13px] tracking-widest">Fabricante</span>
+                    <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">Fabricante</span>
                     <span className="text-zinc-950 font-bold">{brandName || '—'}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-400 uppercase font-black text-xs sm:text-[13px] tracking-widest">SKU</span>
+                    <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">SKU</span>
                     <span className="text-zinc-950 font-mono font-black">{product.sku}</span>
                   </div>
                 </div>
