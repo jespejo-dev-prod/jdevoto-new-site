@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { ProductCard } from './ProductCard';
 import { ProductTable } from './ProductTable';
 import { ProductsFilterBar } from './ProductsFilterBar';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/auth-context';
 
 import { trackSearchQuery, getRecentlyViewed, getSearchQueries } from '@/lib/tracking';
@@ -632,47 +631,38 @@ export function CatalogView({
         </div>
 
         {/* LISTADO DE PRODUCTOS (GRID/LIST) */}
-        <AnimatePresence mode="wait">
+        <div className="relative">
           {filteredProducts.length > 0 ? (
             view === 'grid' ? (
-              <motion.div 
+              <div 
                 key="grid"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500"
               >
                 {filteredProducts.map((p, i) => (
                   <ProductCard key={p.id} product={p} variant="catalog" priority={i < 6} isAuthenticated={isAuthenticated} />
                 ))}
-              </motion.div>
+              </div>
             ) : (
-              <motion.div 
+              <div 
                 key="list"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="w-full min-w-0"
+                className="w-full min-w-0 animate-in fade-in slide-in-from-left-4 duration-500"
               >
                 <ProductTable products={filteredProducts} variant="catalog" />
-              </motion.div>
+              </div>
             )
           ) : (
-            <motion.div 
+            <div 
               key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-center py-24 bg-white rounded-3xl border border-zinc-100 p-8 space-y-4"
+              className="text-center py-24 bg-white rounded-3xl border border-zinc-100 p-8 space-y-4 animate-in fade-in duration-500"
             >
               <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto text-zinc-300">
                 <Zap className="h-8 w-8" />
               </div>
               <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-widest">No se encontraron productos</h3>
               <p className="text-xs text-zinc-500 font-medium">Intenta ajustando o limpiando tus filtros para encontrar lo que buscas.</p>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </div>
 
         {/* PAGINACIÓN */}
         {totalPages > 1 && (
