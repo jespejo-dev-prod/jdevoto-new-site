@@ -146,7 +146,7 @@ const ProductRow = memo(function ProductRow({
             {product.stockQuantity > 0 ? `${product.stockQuantity}` : "Sin Stock"}
           </span>
         ) : (
-          <span className="text-[10px] sm:text-[11px] font-black text-zinc-500 uppercase tracking-widest whitespace-nowrap bg-zinc-100 px-2 py-1 rounded">Stock Privado</span>
+          <span className="text-[10px] sm:text-[11px] font-black text-zinc-600 uppercase tracking-widest whitespace-nowrap bg-zinc-200/80 px-2 py-1 rounded">Stock Privado</span>
         )}
       </td>
 
