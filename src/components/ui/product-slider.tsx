@@ -276,14 +276,14 @@ export function ProductSlider({
                 className="h-11 w-11 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
                 aria-label="Desplazar a la izquierda"
               >
-                <ChevronLeft className="h-5 w-5 text-zinc-400" />
+                <ChevronLeft className="h-5 w-5 text-zinc-600" />
               </button>
               <button 
                 onClick={() => scroll('right')}
                 className="h-11 w-11 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
                 aria-label="Desplazar a la derecha"
               >
-                <ChevronRight className="h-5 w-5 text-zinc-400" />
+                <ChevronRight className="h-5 w-5 text-zinc-600" />
               </button>
             </div>
           </div>
@@ -313,7 +313,7 @@ export function ProductSlider({
             <h2 className="text-xl md:text-2xl font-black text-zinc-950 tracking-tight">{title}</h2>
             
             {linkHref && (
-              <Link href={linkHref} className="hidden sm:block text-sm font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-widest mb-1">
+              <Link href={linkHref} className="hidden sm:block text-sm font-bold text-zinc-900 hover:text-zinc-700 transition-colors uppercase tracking-widest mb-1">
                 {linkLabel}
               </Link>
             )}
@@ -324,21 +324,21 @@ export function ProductSlider({
                className="h-10 w-10 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
                aria-label="Desplazar a la izquierda"
              >
-               <ChevronLeft className="h-5 w-5 text-zinc-400" />
+               <ChevronLeft className="h-5 w-5 text-zinc-600" />
              </button>
              <button 
                onClick={() => scroll('right')}
                className="h-10 w-10 rounded-full border border-zinc-200 flex items-center justify-center hover:bg-zinc-50 transition-all shadow-sm active:scale-90 bg-white"
                aria-label="Desplazar a la derecha"
              >
-               <ChevronRight className="h-5 w-5 text-zinc-400" />
+               <ChevronRight className="h-5 w-5 text-zinc-600" />
              </button>
           </div>
        </div>
        
        {/* Link visible en mobile */}
        {linkHref && (
-          <Link href={linkHref} className="sm:hidden block text-xs font-bold text-primary mb-6 uppercase tracking-widest">
+          <Link href={linkHref} className="sm:hidden block text-xs font-bold text-zinc-900 mb-6 uppercase tracking-widest">
             {linkLabel}
           </Link>
        )}

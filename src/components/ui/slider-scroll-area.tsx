@@ -77,7 +77,7 @@ export function SliderScrollArea({
                  {title}
                </h2>
                {subtitle && (
-                 <p className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest text-center md:text-left">
+                 <p className="text-[10px] font-bold text-zinc-600 mt-1 uppercase tracking-widest text-center md:text-left">
                    {subtitle}
                  </p>
                )}
@@ -91,14 +91,14 @@ export function SliderScrollArea({
              className="h-10 w-10 rounded-full border border-zinc-200/80 flex items-center justify-center hover:bg-zinc-50 transition-colors shadow-sm active:scale-90 bg-white"
              aria-label="Deslizar izquierda"
            >
-             <ChevronLeft className="h-5 w-5 text-zinc-400" />
+             <ChevronLeft className="h-5 w-5 text-zinc-600" />
            </button>
            <button 
              onClick={() => scroll('right')}
              className="h-10 w-10 rounded-full border border-zinc-200/80 flex items-center justify-center hover:bg-zinc-50 transition-colors shadow-sm active:scale-90 bg-white"
              aria-label="Deslizar derecha"
            >
-             <ChevronRight className="h-5 w-5 text-zinc-400" />
+             <ChevronRight className="h-5 w-5 text-zinc-600" />
            </button>
         </div>
       </div>
