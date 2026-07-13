@@ -97,6 +97,7 @@ export function ProductsFilterBar({
         <div className="relative">
           <select
             id="product-category-filter"
+            aria-label="Categoría"
             value={categoryId}
             onChange={(e) => onCategoryChange(e.target.value)}
             className={selectClasses}
@@ -121,6 +122,7 @@ export function ProductsFilterBar({
           <div className="relative">
             <select
               id="product-limit-filter"
+              aria-label="Productos por página"
               value={limit}
               onChange={(e) => onLimitChange(Number(e.target.value))}
               className={selectClasses}
@@ -151,7 +153,7 @@ export function ProductsFilterBar({
 
         {/* Total */}
         {total !== undefined && (
-          <span className={cn("text-[11px] font-bold uppercase tracking-wider", isDashboard ? "text-zinc-600" : "text-zinc-400")}>
+          <span className={cn("text-[11px] font-bold uppercase tracking-wider", isDashboard ? "text-zinc-600" : "text-zinc-500")}>
             {total} {total === 1 ? 'producto' : 'productos'}
           </span>
         )}

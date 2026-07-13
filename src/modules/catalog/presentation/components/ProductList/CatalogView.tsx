@@ -668,8 +668,8 @@ export function CatalogView({
         {totalPages > 1 && (
           <div className="flex items-center justify-center pt-8 pb-24">
             <div className="flex items-center gap-2 bg-white border border-zinc-200 p-2 rounded-2xl shadow-sm">
-              <Link href={getPageLink(Math.max(1, currentPage - 1))}>
-                <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 text-zinc-400 hover:text-zinc-900" disabled={currentPage === 1}>
+              <Link href={getPageLink(Math.max(1, currentPage - 1))} aria-label="Página anterior">
+                <Button variant="ghost" size="icon" aria-label="Anterior" className="rounded-xl h-10 w-10 text-zinc-400 hover:text-zinc-900" disabled={currentPage === 1}>
                   <ChevronLeft className="h-5 w-5" />
                 </Button>
               </Link>
@@ -697,8 +697,8 @@ export function CatalogView({
                 return null;
               })}
 
-              <Link href={getPageLink(Math.min(totalPages, currentPage + 1))}>
-                <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 text-zinc-400 hover:text-zinc-900" disabled={currentPage === totalPages}>
+              <Link href={getPageLink(Math.min(totalPages, currentPage + 1))} aria-label="Página siguiente">
+                <Button variant="ghost" size="icon" aria-label="Siguiente" className="rounded-xl h-10 w-10 text-zinc-400 hover:text-zinc-900" disabled={currentPage === totalPages}>
                   <ChevronRight className="h-5 w-5" />
                 </Button>
               </Link>
