@@ -70,6 +70,7 @@ export const ProductCard = memo(function ProductCard({
           alt={`${product.name}${product.brand?.name ? ` — ${product.brand.name}` : ''}`}
           fill
           priority={priority}
+          fetchPriority={priority ? "high" : "auto"}
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 17vw"
           className={cn(
             "object-contain p-4 group-hover:scale-[1.04] transition-transform duration-700 ease-out"

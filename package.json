@@ -17,10 +17,10 @@
     "seed": "tsx src/scripts/seed-categories.ts"
   },
   "browserslist": [
-    "chrome >= 91",
-    "firefox >= 90",
-    "safari >= 15",
-    "edge >= 91",
+    "chrome >= 109",
+    "firefox >= 115",
+    "safari >= 16.4",
+    "edge >= 109",
     "not dead"
   ],
   "dependencies": {
