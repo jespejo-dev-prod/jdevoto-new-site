@@ -229,7 +229,7 @@ export default async function HomePage() {
                   key={`${p.id}-${idx}`} 
                   className="w-[85vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
                 >
-                  <ProductCard product={p} variant="catalog" priority={index === 0 && idx < 4} isAuthenticated={!!user} />
+                  <ProductCard product={p} variant="catalog" isAuthenticated={!!user} />
                 </div>
               ))}
             </ProductSlider>
