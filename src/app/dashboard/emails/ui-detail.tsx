@@ -82,8 +82,9 @@ export default function CampaignDetailPage() {
 
   const fetchCampaign = useCallback(async () => {
     try {
-      const res = await fetch(`/api/campaigns/${id}`, {
+      const res = await fetch(`/api/campaigns/${id}?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
+        cache: 'no-store'
       });
       if (!res.ok) throw new Error();
       const json = await res.json();

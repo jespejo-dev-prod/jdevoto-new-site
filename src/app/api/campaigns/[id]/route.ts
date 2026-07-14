@@ -16,10 +16,11 @@ const UpdateCampaignSchema = z.object({
   title: z.string().min(1).optional(),
   subject: z.string().min(1).optional(),
   previewText: z.string().optional().nullable(),
-  headerImageUrl: z.string().url().optional().nullable(),
+  headerImageUrl: z.string().optional().nullable(),
   ctaText: z.string().optional().nullable(),
-  ctaUrl: z.string().url().optional().nullable(),
+  ctaUrl: z.string().optional().nullable(),
   recipientTarget: z.enum(['ALL', 'BY_COMPANY', 'MANUAL']).optional(),
+  manualEmails: z.array(z.string().email('Debe ser un email válido')).optional(),
 }).refine(
   (data) => !(data.ctaText && !data.ctaUrl),
   { message: 'Si defines texto del botón, también debes indicar una URL destino', path: ['ctaUrl'] }
@@ -104,6 +105,22 @@ export const PATCH = withApiHandler(async (req, ctx: RouteContext<{ id: string }
     },
   });
 
+  if (data.recipientTarget === 'MANUAL' && data.manualEmails !== undefined) {
+    await prisma.emailCampaignRecipient.deleteMany({
+      where: { campaignId: id, status: 'QUEUED' }
+    });
+    if (data.manualEmails.length > 0) {
+      await prisma.emailCampaignRecipient.createMany({
+        data: data.manualEmails.map(email => ({
+          campaignId: id,
+          email,
+          status: 'QUEUED'
+        })),
+        skipDuplicates: true
+      });
+    }
+  }
+
   return ok(updated);
 });
 
@@ -115,11 +132,8 @@ export const DELETE = withApiHandler(async (req, ctx: RouteContext<{ id: string 
 
   const campaign = await prisma.emailCampaign.findUnique({ where: { id } });
   if (!campaign) throw new NotFoundError('Campaña', id);
-  if (campaign.status !== 'DRAFT') {
-    throw new ValidationError('Solo se pueden eliminar campañas en estado DRAFT');
-  }
 
   await prisma.emailCampaign.delete({ where: { id } });
 
-  return noContent();
+  return ok({ deleted: true });
 });

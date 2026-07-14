@@ -204,7 +204,6 @@ export default function EmailCampaignsPage() {
                           : format(new Date(c.createdAt), "dd MMM yyyy", { locale: es })}
                       </td>
                       <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
-                        {c.status === 'DRAFT' && (
                           <button
                             onClick={() => deleteCampaign(c.id, c.title)}
                             disabled={deletingId === c.id}
@@ -217,7 +216,6 @@ export default function EmailCampaignsPage() {
                               <Trash2 className="h-4 w-4" />
                             )}
                           </button>
-                        )}
                       </td>
                     </tr>
                   );

@@ -57,27 +57,27 @@ model Company {
 }
 
 model User {
-  id                String         @id @default(cuid())
-  email             String         @unique
-  passwordHash      String
-  firstName         String
-  lastName          String
-  phone             String?
-  role              UserRole       @default(BUYER)
-  isActive          Boolean        @default(true)
-  emailUnsubscribed Boolean        @default(false)
-  twoFactorSecret   String?
-  companyId         String
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  auditLogs         AuditLog[]
-  assignedCompanies Company[]      @relation("CompanySalesRep")
-  notifications     Notification[]
-  sentMessages      OrderMessage[] @relation("OrderMessagesSent")
-  orders            Order[]        @relation("CreatedByUser")
-  attributedOrders  Order[]        @relation("OrderSalesRep")
-  refreshTokens     RefreshToken[]
-  company           Company        @relation(fields: [companyId], references: [id])
+  id                 String                   @id @default(cuid())
+  email              String                   @unique
+  passwordHash       String
+  firstName          String
+  lastName           String
+  phone              String?
+  role               UserRole                 @default(BUYER)
+  isActive           Boolean                  @default(true)
+  emailUnsubscribed  Boolean                  @default(false)
+  twoFactorSecret    String?
+  companyId          String
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  auditLogs          AuditLog[]
+  assignedCompanies  Company[]                @relation("CompanySalesRep")
+  notifications      Notification[]
+  sentMessages       OrderMessage[]           @relation("OrderMessagesSent")
+  orders             Order[]                  @relation("CreatedByUser")
+  attributedOrders   Order[]                  @relation("OrderSalesRep")
+  refreshTokens      RefreshToken[]
+  company            Company                  @relation(fields: [companyId], references: [id])
   campaignRecipients EmailCampaignRecipient[]
 
   @@index([email])
@@ -155,9 +155,9 @@ model Product {
   @@index([categoryId])
   @@index([brandId])
   // Patrones de query del catálogo
-  @@index([isActive, categoryId])                         // filtro por categoría
-  @@index([isActive, createdAt(sort: Desc)])              // orden por defecto (sin filtros extra)
-  @@index([isActive, name])                              // búsqueda ILIKE
+  @@index([isActive, categoryId]) // filtro por categoría
+  @@index([isActive, createdAt(sort: Desc)]) // orden por defecto (sin filtros extra)
+  @@index([isActive, name]) // búsqueda ILIKE
   // Filtro hideOutOfStock: los 3 campos juntos en el WHERE
   @@index([isActive, isDeleted, stockQuantity])
   // Regla ESR: brandId (igualdad, más selectivo) → isActive, isDeleted (igualdad) → createdAt (sort)
@@ -435,18 +435,18 @@ model EmailCampaign {
 }
 
 model EmailCampaignRecipient {
-  id             String          @id @default(cuid())
-  campaignId     String
-  userId         String?
-  email          String
-  status         RecipientStatus @default(QUEUED)
-  resendEmailId  String?
-  openedAt       DateTime?
-  clickedAt      DateTime?
-  bouncedAt      DateTime?
-  createdAt      DateTime        @default(now())
-  campaign       EmailCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  user           User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  id            String          @id @default(cuid())
+  campaignId    String
+  userId        String?
+  email         String
+  status        RecipientStatus @default(QUEUED)
+  resendEmailId String?
+  openedAt      DateTime?
+  clickedAt     DateTime?
+  bouncedAt     DateTime?
+  createdAt     DateTime        @default(now())
+  campaign      EmailCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user          User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([campaignId, email])
   @@index([campaignId])

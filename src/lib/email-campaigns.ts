@@ -27,12 +27,13 @@ function esc(s: string): string {
     .replace(/'/g, '&#x27;');
 }
 
-/** Valida que una URL no use esquemas peligrosos (javascript:, data:, etc.). */
-function safeUrl(url: string, fallback: string): string {
+/** Valida que una URL no use esquemas peligrosos (javascript:, data:, etc.). Convierte rutas relativas a absolutas. */
+function safeUrl(url: string, fallback: string, baseUrl?: string): string {
   try {
-    const parsed = new URL(url);
+    const finalUrl = url.startsWith('/') && baseUrl ? `${baseUrl}${url}` : url;
+    const parsed = new URL(finalUrl);
     if (!['http:', 'https:'].includes(parsed.protocol)) return fallback;
-    return url;
+    return finalUrl;
   } catch {
     return fallback;
   }
@@ -49,16 +50,16 @@ export function buildCampaignHtml(options: CampaignEmailOptions): string {
   } = options;
 
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://jdevoto.cl';
-  const logoUrl = `${siteUrl}/logo.png`;
+  const logoUrl = `${siteUrl}/logo-svg.png`;
   const year = new Date().getFullYear();
 
   // Escapar todos los valores controlados por el usuario
   const safeSubject = esc(subject);
   const safePreviewText = previewText ? esc(previewText) : null;
   const safeCtaText = ctaText ? esc(ctaText) : null;
-  const safeCtaUrl = ctaUrl ? safeUrl(ctaUrl, siteUrl) : null;
-  const safeHeaderImageUrl = headerImageUrl ? safeUrl(headerImageUrl, '') : null;
-  const safeUnsubscribeUrl = safeUrl(unsubscribeUrl, siteUrl);
+  const safeCtaUrl = ctaUrl ? safeUrl(ctaUrl, siteUrl, siteUrl) : null;
+  const safeHeaderImageUrl = headerImageUrl ? safeUrl(headerImageUrl, '', siteUrl) : null;
+  const safeUnsubscribeUrl = safeUrl(unsubscribeUrl, siteUrl, siteUrl);
 
   return `<!DOCTYPE html>
 <html lang="es" xmlns:v="urn:schemas-microsoft-com:vml">
@@ -91,10 +92,9 @@ export function buildCampaignHtml(options: CampaignEmailOptions): string {
 
           <!-- HEADER: Logo -->
           <tr>
-            <td align="center" style="background-color: #18181b; padding: 20px 32px;">
-              <a href="${siteUrl}" target="_blank" style="text-decoration: none;">
-                <img src="${logoUrl}" alt="JDevoto" width="140" style="display: block; height: auto; max-height: 48px; object-fit: contain;" onerror="this.style.display='none'" />
-                <span style="display:block; color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px;">JDevoto</span>
+            <td align="center" style="background-color: #ffffff; padding: 24px 32px; border: 1px solid #e4e4e7; border-bottom: none;">
+              <a href="${siteUrl}" target="_blank" style="display: inline-block; text-decoration: none;">
+                <img src="${logoUrl}" alt="JDevoto" width="180" style="display: block; margin: 0 auto; height: auto; max-height: 60px; object-fit: contain; border: 0;" onerror="this.style.display='none'" />
               </a>
             </td>
           </tr>
@@ -102,9 +102,9 @@ export function buildCampaignHtml(options: CampaignEmailOptions): string {
           <!-- HERO IMAGE -->
           ${safeHeaderImageUrl ? `
           <tr>
-            <td align="center" style="padding: 0;">
+            <td align="center" style="padding: 0; border-left: 1px solid #e4e4e7; border-right: 1px solid #e4e4e7;">
               <a href="${safeCtaUrl ?? siteUrl}" target="_blank" style="display: block;">
-                <img src="${safeHeaderImageUrl}" alt="Campaña JDevoto" class="hero-img" width="600" style="display: block; width: 100%; height: auto; max-width: 600px;" />
+                <img src="${safeHeaderImageUrl}" alt="Campaña JDevoto" class="hero-img" width="600" style="display: block; width: 100%; height: auto; max-width: 600px; border: 0;" />
               </a>
             </td>
           </tr>` : ''}
@@ -112,16 +112,16 @@ export function buildCampaignHtml(options: CampaignEmailOptions): string {
           <!-- CTA BUTTON -->
           ${safeCtaText && safeCtaUrl ? `
           <tr>
-            <td align="center" style="padding: 32px 32px 24px;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <td align="center" style="padding: 40px 32px 32px; background-color: #ffffff; border-left: 1px solid #e4e4e7; border-right: 1px solid #e4e4e7;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
                 <tr>
-                  <td style="border-radius: 8px; background-color: #18181b;">
-                    <a href="${safeCtaUrl}" target="_blank" style="display: inline-block; padding: 14px 36px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 8px; letter-spacing: 0.3px;">${safeCtaText}</a>
+                  <td align="center" style="border-radius: 6px; background-color: #000000; padding: 16px 48px;">
+                    <a href="${safeCtaUrl}" target="_blank" style="display: inline-block; font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: bold; color: #ffffff; text-decoration: none; letter-spacing: 0.5px;">${safeCtaText}</a>
                   </td>
                 </tr>
               </table>
             </td>
-          </tr>` : `<tr><td style="height: 24px;"></td></tr>`}
+          </tr>` : `<tr><td style="height: 24px; background-color: #ffffff; border-left: 1px solid #e4e4e7; border-right: 1px solid #e4e4e7;"></td></tr>`}
 
           <!-- FOOTER -->
           <tr>

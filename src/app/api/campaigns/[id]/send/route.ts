@@ -178,8 +178,13 @@ export const POST = withApiHandler(async (req, ctx: RouteContext<{ id: string }>
       try {
         const result = await resend.batch.send(emails);
 
-        if (result.data) {
-          const updatePromises = (result.data as unknown as any[]).map((sent: { id?: string } | null, idx: number) => {
+        // Resend batch API devuelve los resultados dentro de result.data.data en su SDK Node
+        const batchData = Array.isArray(result.data) 
+          ? result.data 
+          : (result.data as any)?.data;
+
+        if (batchData && Array.isArray(batchData)) {
+          const updatePromises = batchData.map((sent: { id?: string } | null, idx: number) => {
             const recipientEmail = batchWithUrls[idx]?.email;
             if (!recipientEmail || !sent?.id) return Promise.resolve();
             return prisma.emailCampaignRecipient.updateMany({
@@ -188,7 +193,7 @@ export const POST = withApiHandler(async (req, ctx: RouteContext<{ id: string }>
             });
           });
           await Promise.all(updatePromises);
-          totalSent += result.data.length;
+          totalSent += batchData.length;
         }
       } catch (err) {
         console.error('[CAMPAIGN_SEND_BATCH_ERROR]', err);

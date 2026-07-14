@@ -17,6 +17,7 @@ interface FormData {
   ctaText: string;
   ctaUrl: string;
   recipientTarget: 'ALL' | 'BY_COMPANY' | 'MANUAL';
+  manualEmailsText: string;
 }
 
 const STEPS = [
@@ -44,6 +45,7 @@ export default function NuevaCampañaPage() {
     ctaText: '',
     ctaUrl: '',
     recipientTarget: 'ALL',
+    manualEmailsText: '',
   });
 
   function updateForm(field: keyof FormData, value: string) {
@@ -90,6 +92,13 @@ export default function NuevaCampañaPage() {
         ctaUrl: form.ctaUrl || null,
         recipientTarget: form.recipientTarget,
       };
+
+      if (form.recipientTarget === 'MANUAL') {
+        body.manualEmails = form.manualEmailsText
+          .split(',')
+          .map((e) => e.trim())
+          .filter((e) => e.includes('@')); // basic validation before sending to API
+      }
 
       if (savedCampaignId) {
         // Ya existe un borrador — actualizar con PATCH
@@ -152,6 +161,31 @@ export default function NuevaCampañaPage() {
       router.push(`/dashboard/emails/${id}`);
     } catch (err: any) {
       toast.error(err.message ?? 'Error al enviar campaña');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function handleTestSend() {
+    const testEmail = prompt("Ingresa el correo al que quieres enviar la prueba:");
+    if (!testEmail) return;
+
+    const id = await saveDraft();
+    if (!id) return;
+
+    setSending(true);
+    try {
+      const res = await fetch(`/api/campaigns/${id}/test`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ testEmail })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error?.message ?? 'Error al enviar prueba');
+
+      toast.success(`Prueba enviada correctamente a ${testEmail}`);
+    } catch (err: any) {
+      toast.error(err.message ?? 'Error al enviar correo de prueba');
     } finally {
       setSending(false);
     }
@@ -352,28 +386,44 @@ export default function NuevaCampañaPage() {
               <p className="text-sm font-semibold text-zinc-200 mb-3">¿A quién enviar?</p>
               {[
                 { value: 'ALL', label: 'Todos los clientes activos', desc: 'Envía a todos los compradores con cuenta activa (~500 destinatarios)' },
+                { value: 'MANUAL', label: 'Lista manual de correos', desc: 'Ingresa los correos separados por coma (ej: correo1@gmail.com, correo2@hotmail.com)' },
               ].map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${
-                    form.recipientTarget === opt.value
-                      ? 'border-primary/60 bg-primary/5'
-                      : 'border-zinc-700 hover:border-zinc-600'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="recipient-target"
-                    value={opt.value}
-                    checked={form.recipientTarget === opt.value}
-                    onChange={() => updateForm('recipientTarget', opt.value as any)}
-                    className="mt-0.5 accent-primary"
-                  />
-                  <div>
-                    <p className="text-sm font-medium text-zinc-200">{opt.label}</p>
-                    <p className="text-xs text-zinc-500 mt-0.5">{opt.desc}</p>
-                  </div>
-                </label>
+                <div key={opt.value}>
+                  <label
+                    className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${
+                      form.recipientTarget === opt.value
+                        ? 'border-primary/60 bg-primary/5'
+                        : 'border-zinc-700 hover:border-zinc-600'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="recipient-target"
+                      value={opt.value}
+                      checked={form.recipientTarget === opt.value}
+                      onChange={() => updateForm('recipientTarget', opt.value as any)}
+                      className="mt-0.5 accent-primary"
+                    />
+                    <div className="w-full">
+                      <p className="text-sm font-medium text-zinc-200">{opt.label}</p>
+                      <p className="text-xs text-zinc-500 mt-0.5">{opt.desc}</p>
+                    </div>
+                  </label>
+                  
+                  {opt.value === 'MANUAL' && form.recipientTarget === 'MANUAL' && (
+                    <div className="mt-3 pl-8 pr-4">
+                      <textarea
+                        value={form.manualEmailsText}
+                        onChange={(e) => updateForm('manualEmailsText', e.target.value)}
+                        placeholder="ventas@empresa.cl, gerente@empresa.cl, cliente@gmail.com"
+                        className="w-full h-32 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none"
+                      />
+                      <p className="text-xs text-zinc-500 mt-1.5">
+                        Separa cada correo con una coma (,).
+                      </p>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
 
@@ -441,6 +491,14 @@ export default function NuevaCampañaPage() {
           >
             {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
             Guardar borrador
+          </button>
+          <button
+            onClick={handleTestSend}
+            disabled={sending || saving || !form.title.trim() || !form.subject.trim()}
+            className="px-4 py-2.5 rounded-xl border border-blue-700/50 text-sm text-blue-400 hover:bg-blue-900/20 hover:border-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-4 w-4" />}
+            Enviar Prueba
           </button>
         </div>
 

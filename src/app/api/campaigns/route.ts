@@ -16,10 +16,11 @@ const CreateCampaignSchema = z.object({
   title: z.string().min(1, 'El título es obligatorio'),
   subject: z.string().min(1, 'El asunto es obligatorio'),
   previewText: z.string().optional().nullable(),
-  headerImageUrl: z.string().url('URL de imagen inválida').optional().nullable(),
+  headerImageUrl: z.string().optional().nullable(),
   ctaText: z.string().optional().nullable(),
-  ctaUrl: z.string().url('URL del botón inválida').optional().nullable(),
+  ctaUrl: z.string().optional().nullable(),
   recipientTarget: z.enum(['ALL', 'BY_COMPANY', 'MANUAL']).default('ALL'),
+  manualEmails: z.array(z.string().email('Debe ser un email válido')).optional(),
 });
 
 export const GET = withApiHandler(async (req) => {
@@ -90,6 +91,17 @@ export const POST = withApiHandler(async (req) => {
       status: 'DRAFT',
     },
   });
+
+  if (data.recipientTarget === 'MANUAL' && data.manualEmails && data.manualEmails.length > 0) {
+    await prisma.emailCampaignRecipient.createMany({
+      data: data.manualEmails.map(email => ({
+        campaignId: campaign.id,
+        email,
+        status: 'QUEUED'
+      })),
+      skipDuplicates: true
+    });
+  }
 
   return created(campaign);
 });
