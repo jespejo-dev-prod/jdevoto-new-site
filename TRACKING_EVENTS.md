@@ -1,5 +1,7 @@
 # Estrategia de Analíticas y Tracking (B2B E-Commerce)
 
+> ⚠️ **ROADMAP / TODO:** Este documento describe la estrategia planificada. Los eventos de tracking aún **no están implementados** en el código. No hay integración con GA4 ni PostHog actualmente. La sección de "Carritos Abandonados" al final sí está implementada via Cron Job.
+
 Este documento detalla los eventos clave (Sales Funnel & User Behavior) que deben medirse en la plataforma (utilizando herramientas como **Google Analytics 4** o **PostHog**) para tener una visibilidad completa del rendimiento del negocio.
 
 ---

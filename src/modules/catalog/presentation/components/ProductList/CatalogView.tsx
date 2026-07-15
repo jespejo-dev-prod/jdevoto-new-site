@@ -365,6 +365,8 @@ export function CatalogView({
                   .map((parent) => {
                     const isChecked = activeCategory === parent.id;
                     const parentCount = getCategoryProductCount(parent);
+                    if (parentCount === 0 && !isChecked) return null; // Ocultar si no tiene stock/productos, a menos que esté seleccionada
+                    
                     const isExpanded = parent.id === activeParentId;
                     const children = getChildren(parent.id);
                     const hasChildren = children.length > 0;
@@ -435,6 +437,8 @@ export function CatalogView({
                                     .map((child) => {
                                       const isChildChecked = selectedSubcategories.includes(child.id);
                                       const childCount = child._count?.products || 0;
+                                      if (childCount === 0 && !isChildChecked) return null; // Ocultar si no tiene productos, a menos que esté seleccionada
+                                      
                                       const displayName = child.name.includes(" > ")
                                         ? child.name.split(" > ")[1]
                                         : child.name;
@@ -498,6 +502,9 @@ export function CatalogView({
                 <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
                   {filteredBrands.map((b) => {
                     const isChecked = selectedBrands.includes(b.id);
+                    const brandCount = b._count?.products || 0;
+                    if (brandCount === 0 && !isChecked) return null;
+
                     return (
                       <label key={b.id} className="flex items-center gap-3 text-sm font-semibold text-zinc-650 hover:text-zinc-950 cursor-pointer select-none py-1 transition-all">
                         <input 
@@ -516,6 +523,12 @@ export function CatalogView({
                           "tracking-tight transition-colors text-sm sm:text-[14px] font-bold",
                           isChecked ? "text-zinc-950 font-black" : "text-zinc-700"
                         )}>{b.name}</span>
+                        <span className={cn(
+                          "ml-auto text-[10px] px-2 py-0.5 rounded-md font-black shrink-0 transition-colors",
+                          isChecked ? "bg-zinc-950 text-white" : "bg-zinc-100 text-zinc-400"
+                        )}>
+                          {brandCount}
+                        </span>
                       </label>
                     );
                   })}

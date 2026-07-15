@@ -7,8 +7,8 @@
  * independiente (estos datos cambian con poca frecuencia).
  *
  * Usa `unstable_cache` de Next.js → se reutiliza entre requests durante
- * 5 minutos (Data Cache) y se invalida automáticamente al revalidar los
- * tags 'categories' o 'brands'.
+ * 1 hora (Data Cache) y se invalida automáticamente al revalidar los
+ * tags 'categories', 'brands' o 'products'.
  */
 
 import { unstable_cache } from 'next/cache';
@@ -37,33 +37,96 @@ export type CatalogFiltersData = {
  * getCatalogFiltersUseCase
  *
  * Retorna categorías y marcas ordenadas alfabéticamente.
+ * Ahora de forma dinámica:
+ * - Los conteos de categorías solo incluyen productos activos con stock > 0 que pertenezcan a la marca seleccionada.
+ * - Los conteos de marcas solo incluyen productos activos con stock > 0 que pertenezcan a la categoría seleccionada (y subcategorías).
  *
- * TTL: 1 hora — categorías y marcas cambian muy raramente.
- * Invalidación manual: llamar a revalidateTag('categories') o
- * revalidateTag('brands') desde un Server Action cuando un admin
- * crea/edita/elimina una categoría o marca.
+ * TTL: 1 hora. unstable_cache automáticamente incluye los argumentos en la key de caché.
  */
 export const getCatalogFiltersUseCase = unstable_cache(
-  async (): Promise<CatalogFiltersData> => {
+  async (categoryQuery?: string, brandQuery?: string): Promise<CatalogFiltersData> => {
+    const baseProductFilter = {
+      isActive: true,
+      isDeleted: false,
+      stockQuantity: { gt: 0 }
+    };
+
+    // 1. Filtro de Marca (para contar en categorías)
+    let brandFilter = {};
+    if (brandQuery) {
+      const brands = brandQuery.split(',').map(b => b.trim());
+      brandFilter = {
+        brand: {
+          OR: [
+            { id: { in: brands } },
+            { slug: { in: brands } }
+          ]
+        }
+      };
+    }
+
+    // 2. Filtro de Categoría (para contar en marcas)
+    let categoryFilter = {};
+    if (categoryQuery) {
+      // Necesitamos resolver si es padre para incluir hijos
+      const cat = await prisma.category.findFirst({
+        where: {
+          OR: [{ id: categoryQuery }, { slug: categoryQuery }]
+        },
+        include: { children: true }
+      });
+      if (cat) {
+        const catIds = [cat.id, ...cat.children.map(c => c.id)];
+        categoryFilter = {
+          categoryId: { in: catIds }
+        };
+      }
+    }
+
     const [categories, brands] = await Promise.all([
+      // Categorías: Traemos TODAS, pero el _count depende del brandFilter y stock
       prisma.category.findMany({
         select: {
           id: true,
           name: true,
           slug: true,
           parentId: true,
-          _count: { select: { products: true } },
+          _count: { 
+            select: { 
+              products: {
+                where: {
+                  ...baseProductFilter,
+                  ...brandFilter
+                }
+              }
+            } 
+          },
         },
         orderBy: { name: 'asc' },
       }),
+      // Marcas: Traemos TODAS, pero el _count depende del categoryFilter y stock
       prisma.brand.findMany({
-        select: { id: true, name: true, slug: true },
+        select: { 
+          id: true, 
+          name: true, 
+          slug: true,
+          _count: {
+            select: {
+              products: {
+                where: {
+                  ...baseProductFilter,
+                  ...categoryFilter
+                }
+              }
+            }
+          }
+        },
         orderBy: { name: 'asc' },
       }),
     ]);
 
     return { categories, brands };
   },
-  ['catalog-filters'],
-  { revalidate: 3600, tags: ['categories', 'brands'] }
+  ['catalog-filters-dynamic-v2'],
+  { revalidate: 3600, tags: ['categories', 'brands', 'products'] }
 );

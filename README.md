@@ -1,6 +1,6 @@
 # JDevoto B2B E-Commerce
 
-Plataforma de comercio electrónico B2B para JDevoto, desarrollada con **Next.js 14**, **Prisma**, **PostgreSQL** y **Tailwind CSS**. 
+Plataforma de comercio electrónico B2B para JDevoto, desarrollada con **Next.js 16**, **Prisma**, **PostgreSQL** y **Tailwind CSS**. 
 
 Este sistema está diseñado para manejar clientes mayoristas, gestión de inventario, carritos de compra, vendedores asignados, y administración de cuentas.
 
@@ -8,12 +8,13 @@ Este sistema está diseñado para manejar clientes mayoristas, gestión de inven
 
 ## 🚀 Tecnologías Principales
 
-- **Frontend / Backend:** [Next.js](https://nextjs.org/) (App Router).
-- **Base de Datos:** [PostgreSQL](https://www.postgresql.org/) alojada (o local).
-- **ORM:** [Prisma](https://www.prisma.io/).
+- **Frontend / Backend:** [Next.js 16](https://nextjs.org/) (App Router + Turbopack).
+- **Base de Datos:** [PostgreSQL](https://www.postgresql.org/) alojada en Neon.
+- **ORM:** [Prisma](https://www.prisma.io/) con adaptador `@prisma/adapter-pg`.
 - **Estilos:** [Tailwind CSS](https://tailwindcss.com/).
 - **Pagos:** Integración con Mercado Pago.
 - **Emails:** Envío de correos transaccionales a través de Resend / Nodemailer.
+- **Hosting:** Vercel (con cron jobs para tareas programadas).
 
 ---
 
@@ -56,13 +57,20 @@ Sigue estos pasos para arrancar el entorno de desarrollo:
 
 ## 📁 Estructura del Proyecto
 
-La organización del proyecto se basa en el estándar de Next.js (App Router):
+La organización del proyecto se basa en el estándar de Next.js (App Router) con arquitectura modular:
 
 - `/src/app/` - Rutas, páginas y API endpoints del sitio (Frontend y Backend).
-- `/src/components/` - Componentes de React reutilizables de la interfaz.
-- `/src/lib/` - Funciones de utilidad y configuraciones base.
-- `/src/scripts/` - Scripts de soporte y tareas administrativas.
-- `/prisma/` - El esquema de la base de datos (`schema.prisma`) y migraciones.
+- `/src/components/` - Componentes de React reutilizables de la interfaz (layout, UI).
+- `/src/modules/` - Módulos de dominio (catalog, analytics, orders) con capas application/domain/presentation.
+- `/src/context/` - Contextos de React (Auth, Cart, Wishlist).
+- `/src/providers/` - Proveedores globales de la aplicación.
+- `/src/lib/` - Funciones de utilidad y configuraciones base (Prisma client, email, auth).
+- `/src/shared/` - Código compartido entre módulos.
+- `/src/types/` - Definiciones de tipos TypeScript globales.
+- `/src/validations/` - Esquemas de validación (Zod).
+- `/src/proxy.ts` - Proxy de seguridad (rate limiting, JWT, protección de rutas) — convención Next.js 16.
+- `/scripts/` - Scripts de soporte y tareas administrativas.
+- `/prisma/` - El esquema de la base de datos (`schema.prisma`).
 - `/public/` - Archivos estáticos como imágenes o logos.
 
 ---

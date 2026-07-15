@@ -19,44 +19,18 @@ interface CategoriesMenuProps {
 }
 
 export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuProps) {
-  const [categories, setCategories] = useState<Category[]>(staticCategories as Category[]);
-  const [activeParentId, setActiveParentId] = useState<string | null>(null);
-  const [mobileExpandedId, setMobileExpandedId] = useState<string | null>(null);
-
-  // Fetch dynamic categories from the database API
-  useEffect(() => {
-    fetch('/api/categories', { cache: 'no-store' })
-      .then((res) => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-      })
-      .then((json) => {
-        const dataList = json.data;
-        if (Array.isArray(dataList) && dataList.length > 0) {
-          const mapped = dataList.map((c: any) => ({
-            id: c.id,
-            name: c.name,
-            slug: c.slug,
-            parentId: c.parentId || null
-          }));
-          setCategories(mapped);
-        }
-      })
-      .catch((err) => {
-        console.error('Error fetching categories dynamically, using fallback JSON:', err);
-      });
-  }, []);
-
+  const categories = staticCategories as Category[];
+  
   const parentCategories = categories
     .filter((c) => !c.parentId)
     .sort((a, b) => a.name.localeCompare(b.name, 'es'));
 
-  // Establecer la primera categoría activa por defecto
-  useEffect(() => {
-    if (parentCategories.length > 0 && !activeParentId) {
-      setActiveParentId(parentCategories[0].id);
-    }
-  }, [parentCategories, activeParentId]);
+  // Establecer la primera categoría activa por defecto sincrónicamente para evitar parpadeos
+  const [activeParentId, setActiveParentId] = useState<string | null>(
+    parentCategories.length > 0 ? parentCategories[0].id : null
+  );
+  
+  const [mobileExpandedId, setMobileExpandedId] = useState<string | null>(null);
 
   const activeParent = parentCategories.find((c) => c.id === activeParentId);
 
@@ -91,11 +65,13 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
             {parentCategories.map((parent) => {
               const isActive = parent.id === activeParentId;
               return (
-                <button
+                <Link
                   key={parent.id}
+                  href={`/products?category=${parent.slug}`}
                   onMouseEnter={() => setActiveParentId(parent.id)}
                   onClick={() => {
                     setActiveParentId(parent.id);
+                    onClose();
                   }}
                   className={cn(
                     "w-full text-left px-5 py-3.5 text-[13px] font-black uppercase tracking-tight flex items-center justify-between cursor-pointer",
@@ -111,7 +87,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
                       isActive ? "text-zinc-800 translate-x-0.5" : "text-zinc-300"
                     )}
                   />
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -131,7 +107,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
                 <Link
                   href={`/products?category=${activeParent.slug}`}
                   onClick={onClose}
-                  className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
+                  className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-700 bg-zinc-100 hover:bg-zinc-200 transition-colors px-3 py-1.5 rounded-md"
                 >
                   <LayoutGrid className="h-3 w-3" /> Ver Todo
                 </Link>

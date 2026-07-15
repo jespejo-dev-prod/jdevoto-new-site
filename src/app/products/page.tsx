@@ -115,7 +115,7 @@ export default async function CatalogPage(props: {
   // Metadatos de filtros cacheados (categories + brands) — muy rápido (~0ms si hay cache)
   // Se resuelven antes del Suspense para que el sidebar se renderice sin esperar el grid.
   const [filtersData, user] = await Promise.all([
-    getCatalogFiltersUseCase(),
+    getCatalogFiltersUseCase(filters.categoryQuery, filters.brandsQuery),
     getServerUser(),
   ]);
 

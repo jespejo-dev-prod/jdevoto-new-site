@@ -10,7 +10,7 @@ import { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
-const CategoriesMenu = dynamic(() => import('./categories-menu').then(mod => mod.CategoriesMenu), { ssr: false });
+import { CategoriesMenu } from './categories-menu';
 
 const FIREWORK_PARTICLES = [
   { dx: -32, dy: -32, color: 'bg-yellow-250' },
@@ -373,7 +373,7 @@ export function PublicHeader() {
       {isCategoriesOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/40 z-40"
             style={{ top: topOffset }}
             onClick={() => setIsCategoriesOpen(false)}
           />

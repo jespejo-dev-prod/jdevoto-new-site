@@ -20,11 +20,6 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
   const [brandSearch, setBrandSearch] = useState("");
   const [isOpenBrand, setIsOpenBrand] = useState(false);
 
-  console.log("DEBUG ClassificationCard - categoryId:", categoryId);
-  console.log("DEBUG ClassificationCard - brandId:", brandId);
-  console.log("DEBUG ClassificationCard - categories count:", categories.length);
-  console.log("DEBUG ClassificationCard - brands count:", brands.length);
-
   // Filtramos las categorías de primer nivel (Padres)
   const parentCategories = categories.filter(c => !c.parentId);
 
