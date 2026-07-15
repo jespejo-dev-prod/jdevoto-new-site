@@ -40,17 +40,7 @@ export async function GET(req: Request) {
     const csvContent = csvHeaders + csvRows;
 
     // 5. Enviar el correo electrónico con el CSV adjunto
-    // Importamos nodemailer temporalmente aquí si getTransporter no está exportado
-    const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+    const transporter = await getTransporter();
 
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'jespejo@jdevoto.cl';
 

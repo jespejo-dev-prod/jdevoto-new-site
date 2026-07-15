@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 // Cache transporter to avoid recreating test accounts constantly
 let transporterInstance: nodemailer.Transporter | null = null;
 
-async function getTransporter() {
+export async function getTransporter() {
   if (transporterInstance) return transporterInstance;
 
   // Use real SMTP if configured
