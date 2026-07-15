@@ -64,6 +64,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
           <div className="space-y-0.5">
             {parentCategories.map((parent) => {
               const isActive = parent.id === activeParentId;
+              const hasChildren = categories.some((c) => c.parentId === parent.id);
               return (
                 <Link
                   key={parent.id}
@@ -81,12 +82,14 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
                   )}
                 >
                   <span>{parent.name}</span>
-                  <ChevronRight
-                    className={cn(
-                      "h-4 w-4",
-                      isActive ? "text-zinc-800 translate-x-0.5" : "text-zinc-300"
-                    )}
-                  />
+                  {hasChildren && (
+                    <ChevronRight
+                      className={cn(
+                        "h-4 w-4",
+                        isActive ? "text-zinc-800 translate-x-0.5" : "text-zinc-300"
+                      )}
+                    />
+                  )}
                 </Link>
               );
             })}
@@ -94,14 +97,20 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
         </div>
 
         {/* Panel Derecho: Subcategorías Hijas como listas de texto (Full-Height) */}
-        <div className="w-[480px] sm:w-[580px] md:w-[680px] bg-white p-8 overflow-y-auto scrollbar-thin h-full flex flex-col">
-          {activeParent && (
+        {activeParent && activeChildren.length > 0 && (
+          <div className="w-[480px] sm:w-[580px] md:w-[680px] bg-white p-8 overflow-y-auto scrollbar-thin h-full flex flex-col">
             <>
               <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-6">
                 <div>
-                  <h3 className="text-base font-black text-zinc-900 uppercase tracking-tight">
-                    {activeParent.name}
-                  </h3>
+                  <Link 
+                    href={`/products?category=${activeParent.slug}`}
+                    onClick={onClose}
+                    className="hover:underline"
+                  >
+                    <h3 className="text-base font-black text-zinc-900 uppercase tracking-tight">
+                      {activeParent.name}
+                    </h3>
+                  </Link>
                 </div>
                 
                 <Link
@@ -113,12 +122,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
                 </Link>
               </div>
 
-              {activeChildren.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-zinc-400 py-12">
-                  <p className="text-xs font-bold uppercase tracking-wider">No hay subcategorías en esta sección</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1">
                   {activeChildren.map((child) => {
                     const displayName = getSubcategoryDisplayName(child.name);
                     return (
@@ -136,10 +140,9 @@ export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuPr
                     );
                   })}
                 </div>
-              )}
             </>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* ──────────────────────────────────────────────────────── */}
