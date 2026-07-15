@@ -72,12 +72,6 @@
     "parentId": "cmpylbc0z0000u5549ou5314n"
   },
   {
-    "id": "cmpylbc2z000nu554jxaen2oy",
-    "name": "OFICINA > CALCULADORA",
-    "slug": "oficina-calculadora",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
     "id": "cmpylbc32000ou55447pq6lsy",
     "name": "MANUALIDADES",
     "slug": "manualidades",
@@ -90,21 +84,9 @@
     "parentId": "cmpylbc32000ou55447pq6lsy"
   },
   {
-    "id": "cmpylbc36000su5540fa8ops9",
-    "name": "MANUALIDADES > CORTADOR",
-    "slug": "manualidades-cortador",
-    "parentId": "cmpylbc32000ou55447pq6lsy"
-  },
-  {
     "id": "cmpylbc39000uu55416drbrpv",
     "name": "OFICINA > CUCHILLO",
     "slug": "oficina-cuchillo",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbc3d000wu554kcddgnkj",
-    "name": "OFICINA > PLASTICO",
-    "slug": "oficina-plastico",
     "parentId": "cmpylbc0z0000u5549ou5314n"
   },
   {
@@ -174,12 +156,6 @@
     "parentId": "cmpylbc210004u554ft1ehnk1"
   },
   {
-    "id": "cmpylbc48001ku554yzisq58e",
-    "name": "FERRETERIA > LLAVERO",
-    "slug": "ferreteria-llavero",
-    "parentId": "cmpylbc210004u554ft1ehnk1"
-  },
-  {
     "id": "cmpylbc4b001mu55418eyt78h",
     "name": "ESCOLAR > ESCARCHA",
     "slug": "escolar-escarcha",
@@ -225,12 +201,6 @@
     "id": "cmpylbc4t0020u554006r00yt",
     "name": "OFICINA > CORRECTOR",
     "slug": "oficina-corrector",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbc4w0022u5543y9btyu4",
-    "name": "OFICINA > PORTAGOMA",
-    "slug": "oficina-portagoma",
     "parentId": "cmpylbc0z0000u5549ou5314n"
   },
   {
@@ -306,12 +276,6 @@
     "parentId": "cmpylbc2g000bu554btacdjrs"
   },
   {
-    "id": "cmpylbc6m0030u554ba4dbb9v",
-    "name": "ESCOLAR > PUZLE",
-    "slug": "escolar-puzle",
-    "parentId": "cmpylbc2g000bu554btacdjrs"
-  },
-  {
     "id": "cmpylbc6p0032u5549jqybsxu",
     "name": "ESCOLAR > PASTA",
     "slug": "escolar-pasta",
@@ -357,12 +321,6 @@
     "id": "cmpylbc7f003ou55463fe5aaa",
     "name": "ESCOLAR > PLUMAS",
     "slug": "escolar-plumas",
-    "parentId": "cmpylbc2g000bu554btacdjrs"
-  },
-  {
-    "id": "cmpylbc7i003qu554by8iusno",
-    "name": "ESCOLAR > DELANTAL",
-    "slug": "escolar-delantal",
     "parentId": "cmpylbc2g000bu554btacdjrs"
   },
   {
@@ -417,12 +375,6 @@
     "id": "cmpylbc860048u554ofauyiue",
     "name": "PAPELERIA > FILM",
     "slug": "papeleria-film",
-    "parentId": "cmpylbc7r003xu55474ailtls"
-  },
-  {
-    "id": "cmpylbc89004au554fp514cy9",
-    "name": "PAPELERIA > CELOFAN",
-    "slug": "papeleria-celofan",
     "parentId": "cmpylbc7r003xu55474ailtls"
   },
   {
@@ -574,12 +526,6 @@
     "name": "MANUALIDADES > MEZCLADOR",
     "slug": "manualidades-mezclador",
     "parentId": "cmpylbc32000ou55447pq6lsy"
-  },
-  {
-    "id": "cmpylbca2005qu554an632yv9",
-    "name": "ESCOLAR > ARENA",
-    "slug": "escolar-arena",
-    "parentId": "cmpylbc2g000bu554btacdjrs"
   },
   {
     "id": "cmpylbca4005su554gm2lvy44",
@@ -792,21 +738,9 @@
     "parentId": "cmpylbc2g000bu554btacdjrs"
   },
   {
-    "id": "cmpylbccu007zu554ut3p7i5y",
-    "name": "ESCOLAR > MASILLA",
-    "slug": "escolar-masilla",
-    "parentId": "cmpylbc2g000bu554btacdjrs"
-  },
-  {
     "id": "cmpylbccw0081u554p5b8fnkn",
     "name": "ESCOLAR > CINTA",
     "slug": "escolar-cinta",
-    "parentId": "cmpylbc2g000bu554btacdjrs"
-  },
-  {
-    "id": "cmpylbccy0083u554q9qetquc",
-    "name": "ESCOLAR > ACTIVADOR",
-    "slug": "escolar-activador",
     "parentId": "cmpylbc2g000bu554btacdjrs"
   },
   {
@@ -858,12 +792,6 @@
     "parentId": "cmpylbcd9008au5548zb9skrh"
   },
   {
-    "id": "cmpylbcdj008hu5541kca15sf",
-    "name": "REGALOS > MONEDERO",
-    "slug": "regalos-monedero",
-    "parentId": "cmpylbcd9008au5548zb9skrh"
-  },
-  {
     "id": "cmpylbcdm008ju554y9kllat4",
     "name": "REGALOS > CARPETA",
     "slug": "regalos-carpeta",
@@ -888,21 +816,9 @@
     "parentId": "cmpylbcd9008au5548zb9skrh"
   },
   {
-    "id": "cmpylbcdv008ru554icgqdhn3",
-    "name": "REGALOS > SET",
-    "slug": "regalos-set",
-    "parentId": "cmpylbcd9008au5548zb9skrh"
-  },
-  {
     "id": "cmpylbcdx008tu554kubnof4l",
     "name": "REGALOS > CACHO",
     "slug": "regalos-cacho",
-    "parentId": "cmpylbcd9008au5548zb9skrh"
-  },
-  {
-    "id": "cmpylbce2008vu554i65x1l0u",
-    "name": "REGALOS > ESCRITORIO",
-    "slug": "regalos-escritorio",
     "parentId": "cmpylbcd9008au5548zb9skrh"
   },
   {
@@ -990,12 +906,6 @@
     "parentId": "cmpylbc2g000bu554btacdjrs"
   },
   {
-    "id": "cmpylbcfe009vu554dxub1hqz",
-    "name": "ESCOLAR > YOYO",
-    "slug": "escolar-yoyo",
-    "parentId": "cmpylbc2g000bu554btacdjrs"
-  },
-  {
     "id": "cmpylbcfj009yu5548po6lj0w",
     "name": "REGALOS > TAROT",
     "slug": "regalos-tarot",
@@ -1026,12 +936,6 @@
     "parentId": "cmpylbc0z0000u5549ou5314n"
   },
   {
-    "id": "cmpylbcfx00a9u554lngnxknw",
-    "name": "OFICINA > INDICE",
-    "slug": "oficina-indice",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
     "id": "cmpylbcfz00abu5548msrqi56",
     "name": "OFICINA > CARPETA",
     "slug": "oficina-carpeta",
@@ -1053,12 +957,6 @@
     "id": "cmpylbcg600ahu5544el3hr1s",
     "name": "OFICINA > SOBRE",
     "slug": "oficina-sobre",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbcg800aju5543tw3tw9f",
-    "name": "OFICINA > LAMINADO",
-    "slug": "oficina-laminado",
     "parentId": "cmpylbc0z0000u5549ou5314n"
   },
   {
@@ -1084,12 +982,6 @@
     "name": "OFICINA > CLIP",
     "slug": "oficina-clip",
     "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbcgl00atu5544df0zs1b",
-    "name": "ESCOLAR > CLIP",
-    "slug": "escolar-clip",
-    "parentId": "cmpylbc2g000bu554btacdjrs"
   },
   {
     "id": "cmpylbcgn00avu554d7b84vsz",
@@ -1158,12 +1050,6 @@
     "parentId": "cmpylbc0z0000u5549ou5314n"
   },
   {
-    "id": "cmpylbchd00bhu554z9b1bl8m",
-    "name": "OFICINA > FASTENER",
-    "slug": "oficina-fastener",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
     "id": "cmpylbchf00bju554ydzramhs",
     "name": "OFICINA > BROCHES",
     "slug": "oficina-broches",
@@ -1222,18 +1108,6 @@
     "name": "OFICINA > TIRALINEAS",
     "slug": "oficina-tiralineas",
     "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbci600c5u554bf2iu6z5",
-    "name": "OFICINA > PLUMA",
-    "slug": "oficina-pluma",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbci900c7u554fymu93ro",
-    "name": "ESCOLAR > MINAS",
-    "slug": "escolar-minas",
-    "parentId": "cmpylbc2g000bu554btacdjrs"
   },
   {
     "id": "cmpylbcib00c9u554ea3sljmf",
@@ -1344,30 +1218,6 @@
     "parentId": "cmpylbc210004u554ft1ehnk1"
   },
   {
-    "id": "cmpylbcjm00dau5547pmxwk8g",
-    "name": "OFICINA > LACRE",
-    "slug": "oficina-lacre",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbcjo00dcu554hdwhxb6q",
-    "name": "OFICINA > ETIQUETA",
-    "slug": "oficina-etiqueta",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbcjr00deu554b1vh7roh",
-    "name": "OFICINA > RECAMBIO",
-    "slug": "oficina-recambio",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
-    "id": "cmpylbcjv00diu554vu4ydhek",
-    "name": "OFICINA > CHEQUE",
-    "slug": "oficina-cheque",
-    "parentId": "cmpylbc0z0000u5549ou5314n"
-  },
-  {
     "id": "cmpylbcjx00dku554e0buozgr",
     "name": "ESCOLAR > PAÑO",
     "slug": "escolar-pano",
@@ -1408,12 +1258,6 @@
     "name": "ESCOLAR > BARNIZ",
     "slug": "escolar-barniz",
     "parentId": "cmpylbc2g000bu554btacdjrs"
-  },
-  {
-    "id": "cmpylbcki00dyu5548gmpdpdj",
-    "name": "OUTLET > REGALOS",
-    "slug": "outlet-regalos",
-    "parentId": "cmpylbc270007u554mia2ephn"
   },
   {
     "id": "cmpylbckk00e0u554rpsqz3ia",
