@@ -44,18 +44,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   if (!emailResult.success) {
     const errorDetails = emailResult.error;
     const errorMessage = errorDetails instanceof Error ? errorDetails.message : String(errorDetails);
-    const stack = errorDetails instanceof Error ? errorDetails.stack : undefined;
-    
-    await prisma.systemErrorLog.create({
-      data: {
-        path: "/api/auth/forgot-password (email sending)",
-        method: "POST",
-        errorName: "SMTPSendingError",
-        message: `Fallo al enviar correo de recuperación a ${email}: ${errorMessage}`,
-        stack,
-        ipAddress: req.headers.get("x-forwarded-for") || undefined,
-      }
-    }).catch(err => console.error("Error al registrar error SMTP en DB:", err));
+    console.error(`Fallo al enviar correo de recuperación a ${email}: ${errorMessage}`);
   }
 
   return ok({ message: "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación." });
