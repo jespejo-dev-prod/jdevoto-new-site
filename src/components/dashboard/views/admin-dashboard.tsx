@@ -17,7 +17,6 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { OrderStatusBadge } from '@/modules/orders/presentation/components/OrderStatusBadge';
-import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -48,7 +47,7 @@ export function AdminDashboard() {
   const { metrics, recentOrders = [], lowStockProducts = [] } = data;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-8">
       
       {/* Welcome Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

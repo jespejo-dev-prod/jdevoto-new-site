@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+
 import { ShoppingCart, Building2, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/auth-context';
@@ -13,10 +13,7 @@ export function CompanyAdminDashboard() {
   return (
     <>
       {/* Welcome Section */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+      <div 
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
         <div>
@@ -37,7 +34,7 @@ export function CompanyAdminDashboard() {
             </button>
           </Link>
         </div>
-      </motion.div>
+      </div>
 
       {/* Quick Actions / Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -79,14 +76,10 @@ export function CompanyAdminDashboard() {
       </div>
 
       {/* Table Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
+      <div>
         <h2 className="text-xl font-bold text-white mb-4 mt-4">Mis Compras Recientes</h2>
         <TransactionTable />
-      </motion.div>
+      </div>
     </>
   );
 }
