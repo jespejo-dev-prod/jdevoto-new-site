@@ -393,20 +393,7 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-model SystemErrorLog {
-  id        String   @id @default(cuid())
-  path      String
-  method    String
-  errorName String
-  message   String
-  stack     String?
-  userId    String?
-  ipAddress String?
-  createdAt DateTime @default(now())
 
-  @@index([createdAt])
-  @@map("system_error_logs")
-}
 
 model EmailCampaign {
   id              String                   @id @default(cuid())

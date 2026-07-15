@@ -19,7 +19,6 @@ import {
 } from "@/lib/errors";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/client";
-import { fileLogger } from "@/lib/file-logger";
 import type { ApiError, ApiSuccess } from "@/types/domain";
 
 type Handler<T = Record<string, string>> = (req: NextRequest, ctx: RouteContext<T>) => Promise<NextResponse>;
@@ -117,22 +116,10 @@ async function handleError(error: unknown, req?: NextRequest): Promise<NextRespo
       // (No desencriptaremos todo aquí por velocidad, pero si existiera un middleware de Context, se sacaría)
       const ipAddress = req.headers.get("x-forwarded-for") || undefined;
 
-      // 1. Guardar en archivo local
-      fileLogger.error(errorName, errorMessage, ipAddress, req.nextUrl.pathname, stack);
-
-      // 2. Guardar en Base de Datos
-      await prisma.systemErrorLog.create({
-        data: {
-          path: req.nextUrl.pathname,
-          method: req.method,
-          errorName,
-          message: errorMessage,
-          stack,
-          ipAddress,
-        }
-      });
+      // 1. Omitido: fileLogger
+      // 2. Omitido: SystemErrorLog DB
     } catch (logError) {
-      console.error("Fallo al guardar SystemErrorLog:", logError);
+      console.error("Fallo al procesar el error:", logError);
     }
   }
 
