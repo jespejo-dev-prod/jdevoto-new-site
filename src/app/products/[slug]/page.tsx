@@ -62,6 +62,7 @@ export async function generateStaticParams() {
     const products = await prisma.product.findMany({
       where: { isActive: true },
       select: { slug: true },
+      take: 20, // Pre-generamos solo los primeros 20 para no saturar conexiones en Vercel
     });
     return products.map((p) => ({ slug: p.slug }));
   } catch (err) {
