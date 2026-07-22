@@ -34,7 +34,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
-  revalidateTag("categories");
+  revalidateTag("categories", { expire: 0 });
   return created(category);
 });
 
@@ -98,7 +98,7 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
     await prisma.category.delete({ where: { id } });
   }
 
-  revalidateTag("categories");
+  revalidateTag("categories", { expire: 0 });
   return noContent();
 });
 
@@ -122,6 +122,6 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
-  revalidateTag("categories");
+  revalidateTag("categories", { expire: 0 });
   return ok(updated);
 });
