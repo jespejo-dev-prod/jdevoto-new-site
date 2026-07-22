@@ -47,7 +47,7 @@ const prismaClientSingleton = () => {
     connectionString,
     max: isProd ? 10 : 5,            // conexiones máximas al pool
     idleTimeoutMillis: 30_000,       // cerrar conexiones idle tras 30s
-    connectionTimeoutMillis: 5_000,  // error si no hay conexión libre en 5s
+    connectionTimeoutMillis: 30_000, // aumentar a 30s para evitar timeouts en build de Vercel
   });
 
   const adapter = new PrismaPg(pool);

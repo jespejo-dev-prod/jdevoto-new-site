@@ -58,19 +58,10 @@ export const revalidate = 3600;
  * En dev no tiene efecto, pero en producción sirve HTML pre-generado → velocidad máxima.
  */
 export async function generateStaticParams() {
-  try {
-    const products = await prisma.product.findMany({
-      where: { isActive: true },
-      select: { slug: true },
-      take: 20, // Pre-generamos solo los primeros 20 para no saturar conexiones en Vercel
-    });
-    return products.map((p) => ({ slug: p.slug }));
-  } catch (err) {
-    console.warn(
-      "⚠️ Advertencia: No se pudo conectar a la base de datos en generateStaticParams. Omitiendo pre-generación estática de productos.",
-    );
-    return [];
-  }
+  // Retornar arreglo vacío para no pre-generar ningún producto en el build de Vercel.
+  // Esto evita agotar el límite de conexiones a la base de datos (connection timeout).
+  // Los productos se generarán automáticamente (ISR) cuando el primer usuario los visite.
+  return [];
 }
 
 // ─── SEO Metadata ────────────────────────────────────────────────────────
