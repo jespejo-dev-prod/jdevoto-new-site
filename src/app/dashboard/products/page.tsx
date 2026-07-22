@@ -69,7 +69,7 @@ export default function ProductsPage() {
  const searchParams = useSearchParams();
  const urlSearch = searchParams.get('search') || '';
 
- const [view, setView] = useState<'grid' | 'list'>('grid');
+ const [view, setView] = useState<'grid' | 'list'>('list');
  const [search, setSearch] = useState(urlSearch);
  const [categoryId, setCategoryId] = useState('');
  const [brandId, setBrandId] = useState('');

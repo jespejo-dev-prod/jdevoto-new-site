@@ -67,18 +67,25 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   });
 
   // 4. Formatear la lista de productos
-  const formattedProducts = products.map((p) => ({
-    sku: p.sku,
-    name: p.name,
-    basePrice: Number(p.basePrice),
-    stockQuantity: Number(p.stockQuantity),
-    description: p.description || "",
-    unit: p.unit,
-    inner: p.inner,
-    categoryName: p.category?.name || "Sin Categoría",
-    brandName: p.brand?.name || "Sin Marca",
-    status: p.isActive ? "Activo" : "Inactivo",
-  }));
+  const formattedProducts = products.map((p) => {
+    let catName = p.category?.name || "Sin Categoría";
+    if (catName.toLowerCase() === "sin categoría" || catName.toLowerCase() === "sin categoria") {
+      catName = "Sin Categoría";
+    }
+
+    return {
+      sku: p.sku,
+      name: p.name,
+      basePrice: Number(p.basePrice),
+      stockQuantity: Number(p.stockQuantity),
+      description: p.description || "",
+      unit: p.unit,
+      inner: p.inner,
+      categoryName: catName,
+      brandName: p.brand?.name || "Sin Marca",
+      status: p.isActive ? "Activo" : "Inactivo",
+    };
+  });
 
   return ok(formattedProducts);
 });

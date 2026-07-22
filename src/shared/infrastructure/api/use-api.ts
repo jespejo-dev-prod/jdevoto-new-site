@@ -129,6 +129,16 @@ export function useApi() {
   );
 
   /**
+   * patch — Atajo para PATCH requests. Serializa body a JSON automáticamente.
+   * Ejemplo: api.patch('/api/products/123', { name: 'Tornillo actualizado' })
+   */
+  const patch = useCallback(
+    (endpoint: string, body: any, options?: Omit<RequestInit, 'method' | 'body'>) =>
+      fetcher(endpoint, { ...options, method: 'PATCH', body: JSON.stringify(body) }),
+    [fetcher]
+  );
+
+  /**
    * del — Atajo para DELETE requests.
    * (Renombrado porque `delete` es palabra reservada en JS)
    * Ejemplo: api.delete('/api/products/123')
@@ -140,5 +150,5 @@ export function useApi() {
   );
 
   // Exporta fetcher también para casos avanzados (ej: PATCH con headers personalizados)
-  return { get, post, put, delete: del, fetcher };
+  return { get, post, put, patch, delete: del, fetcher };
 }

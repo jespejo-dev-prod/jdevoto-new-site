@@ -65,20 +65,20 @@ model User {
   phone              String?
   role               UserRole                 @default(BUYER)
   isActive           Boolean                  @default(true)
-  emailUnsubscribed  Boolean                  @default(false)
-  twoFactorSecret    String?
   companyId          String
   createdAt          DateTime                 @default(now())
   updatedAt          DateTime                 @updatedAt
+  twoFactorSecret    String?
+  emailUnsubscribed  Boolean                  @default(false)
   auditLogs          AuditLog[]
   assignedCompanies  Company[]                @relation("CompanySalesRep")
+  campaignRecipients EmailCampaignRecipient[]
   notifications      Notification[]
   sentMessages       OrderMessage[]           @relation("OrderMessagesSent")
   orders             Order[]                  @relation("CreatedByUser")
   attributedOrders   Order[]                  @relation("OrderSalesRep")
   refreshTokens      RefreshToken[]
   company            Company                  @relation(fields: [companyId], references: [id])
-  campaignRecipients EmailCampaignRecipient[]
 
   @@index([email])
   @@index([companyId])
@@ -130,7 +130,6 @@ model Product {
   inner          Int             @default(1)
   basePrice      Decimal         @db.Decimal(15, 2)
   stockQuantity  BigInt          @default(0)
-  stockReserved  BigInt          @default(0)
   minOrderQty    Int             @default(1)
   stockAlert     Int             @default(5)
   isActive       Boolean         @default(true)
@@ -145,23 +144,19 @@ model Product {
   weight         Decimal?        @db.Decimal(15, 2)
   width          Decimal?        @db.Decimal(15, 2)
   isDeleted      Boolean         @default(false)
+  stockReserved  BigInt          @default(0)
   orderItems     OrderItem[]
   priceListItems PriceListItem[]
   images         ProductImage[]
   brand          Brand?          @relation(fields: [brandId], references: [id])
   category       Category?       @relation(fields: [categoryId], references: [id])
 
-  // Lookups puntuales (slug y sku ya tienen UNIQUE que sirve como índice de lectura)
   @@index([categoryId])
   @@index([brandId])
-  // Patrones de query del catálogo
-  @@index([isActive, categoryId]) // filtro por categoría
-  @@index([isActive, createdAt(sort: Desc)]) // orden por defecto (sin filtros extra)
-  @@index([isActive, name]) // búsqueda ILIKE
-  // Filtro hideOutOfStock: los 3 campos juntos en el WHERE
+  @@index([isActive, categoryId])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@index([isActive, name])
   @@index([isActive, isDeleted, stockQuantity])
-  // Regla ESR: brandId (igualdad, más selectivo) → isActive, isDeleted (igualdad) → createdAt (sort)
-  // Cubre: WHERE brandId=? AND isActive=true AND isDeleted=false ORDER BY createdAt DESC LIMIT 24
   @@index([brandId, isActive, isDeleted, createdAt(sort: Desc)])
   @@map("products")
 }
@@ -310,12 +305,12 @@ model Promotion {
   brandId      String?
   categoryId   String?
   isActive     Boolean   @default(true)
-  showInSlider Boolean   @default(true)
-  color        String?   @default("#dc2626")
   validFrom    DateTime?
   validTo      DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  color        String?   @default("#dc2626")
+  showInSlider Boolean   @default(true)
   brand        Brand?    @relation(fields: [brandId], references: [id])
   category     Category? @relation(fields: [categoryId], references: [id])
 
@@ -393,8 +388,6 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-
-
 model EmailCampaign {
   id              String                   @id @default(cuid())
   title           String
@@ -410,10 +403,10 @@ model EmailCampaign {
   totalOpened     Int                      @default(0)
   totalClicked    Int                      @default(0)
   totalBounced    Int                      @default(0)
-  totalComplained Int                      @default(0)
   sentAt          DateTime?
   createdAt       DateTime                 @default(now())
   updatedAt       DateTime                 @updatedAt
+  totalComplained Int                      @default(0)
   recipients      EmailCampaignRecipient[]
 
   @@index([status])
@@ -433,7 +426,7 @@ model EmailCampaignRecipient {
   bouncedAt     DateTime?
   createdAt     DateTime        @default(now())
   campaign      EmailCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  user          User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user          User?           @relation(fields: [userId], references: [id])
 
   @@unique([campaignId, email])
   @@index([campaignId])

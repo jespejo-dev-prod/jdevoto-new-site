@@ -375,7 +375,7 @@ export default function ImportStockPage() {
  className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-white font-bold text-sm transition-all shadow-md self-start sm:self-auto cursor-pointer"
  >
  <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
- Exportar Inventario
+ Exportar
  </button>
  </div>
 
