@@ -9,19 +9,39 @@ import { CategorySchema } from "@/validations/taxonomy.schemas";
 import { NotFoundError } from "@/lib/errors";
 import { revalidateTag } from "next/cache";
 
-export const GET = withApiHandler(async () => {
-  const categories = await prisma.category.findMany({
-    orderBy: { name: "asc" },
-    include: {
-      parent: {
-        select: {
-          name: true,
+import { unstable_cache } from "next/cache";
+import { NextResponse } from "next/server";
+
+const getCachedCategories = unstable_cache(
+  async () => {
+    return await prisma.category.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        parent: {
+          select: {
+            name: true,
+          },
         },
       },
-    },
+    });
+  },
+  ['api-categories-list'],
+  { tags: ['categories'], revalidate: 31536000 } // Caché persistente hasta que se invalide
+);
+
+export const GET = async () => {
+  const categories = await getCachedCategories();
+  
+  // Usamos NextResponse directo para agregar headers de caché en el navegador
+  return NextResponse.json({
+    success: true,
+    data: categories
+  }, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=31536000, stale-while-revalidate=59'
+    }
   });
-  return ok(categories);
-});
+};
 
 export const POST = withApiHandler(async (req: NextRequest) => {
   const user = extractUserFromRequest(req);
