@@ -103,8 +103,8 @@ export function AdminDashboard() {
                 <Plus className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white uppercase tracking-wider">Crear Pedido B2B</p>
-                <p className="text-xs text-zinc-400 font-semibold mt-0.5">Ingresar orden manual</p>
+                <p className="text-base font-bold text-white uppercase tracking-wider">Crear Pedido B2B</p>
+                <p className="text-sm text-zinc-400 font-semibold mt-0.5">Ingresar orden manual</p>
               </div>
             </div>
           </Link>
@@ -115,8 +115,8 @@ export function AdminDashboard() {
                 <Database className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white uppercase tracking-wider">Importar Stock</p>
-                <p className="text-xs text-zinc-400 font-semibold mt-0.5">Cargar catálogo por Excel</p>
+                <p className="text-base font-bold text-white uppercase tracking-wider">Importar Stock</p>
+                <p className="text-sm text-zinc-400 font-semibold mt-0.5">Cargar catálogo por Excel</p>
               </div>
             </div>
           </Link>
@@ -127,8 +127,8 @@ export function AdminDashboard() {
                 <Building2 className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white uppercase tracking-wider">Ver Clientes</p>
-                <p className="text-xs text-zinc-400 font-semibold mt-0.5">Cartera de clientes B2B</p>
+                <p className="text-base font-bold text-white uppercase tracking-wider">Ver Clientes</p>
+                <p className="text-sm text-zinc-400 font-semibold mt-0.5">Cartera de clientes B2B</p>
               </div>
             </div>
           </Link>
@@ -139,8 +139,8 @@ export function AdminDashboard() {
                 <TrendingUp className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white uppercase tracking-wider">Métricas de Negocio</p>
-                <p className="text-xs text-zinc-400 font-semibold mt-0.5">Gráficos de ventas y tendencias</p>
+                <p className="text-base font-bold text-white uppercase tracking-wider">Métricas de Negocio</p>
+                <p className="text-sm text-zinc-400 font-semibold mt-0.5">Gráficos de ventas y tendencias</p>
               </div>
             </div>
           </Link>
@@ -164,7 +164,7 @@ export function AdminDashboard() {
 
             <div className="overflow-x-auto w-full">
               <table className="w-full text-left">
-                <thead className="bg-zinc-950/40 text-xs font-bold text-zinc-400 uppercase tracking-widest">
+                <thead className="bg-zinc-950/40 text-sm font-bold text-zinc-400 uppercase tracking-widest">
                   <tr>
                     <th className="px-4 py-3 rounded-l-xl">Pedido</th>
                     <th className="px-4 py-3">Cliente</th>
@@ -185,7 +185,7 @@ export function AdminDashboard() {
                       <tr 
                         key={order.id} 
                         onClick={() => router.push(`/dashboard/orders/${order.id}`)}
-                        className="text-sm group hover:bg-zinc-950/20 transition-colors cursor-pointer"
+                        className="text-base group hover:bg-zinc-950/20 transition-colors cursor-pointer"
                       >
                         <td className="px-4 py-4 font-mono font-medium text-white truncate max-w-[90px]">
                           #{order.orderNumber.split('-').pop()}
@@ -193,7 +193,7 @@ export function AdminDashboard() {
                         <td className="px-4 py-4 text-sky-400 font-bold truncate max-w-[150px]">
                           {order.company.razonSocial}
                         </td>
-                        <td className="px-4 py-4 font-bold text-white text-[15px]">
+                        <td className="px-4 py-4 font-bold text-white text-[17px]">
                           {formatCurrency(Number(order.totalGross))}
                         </td>
                         <td className="px-4 py-4">
@@ -237,12 +237,12 @@ export function AdminDashboard() {
                 lowStockProducts.map((p: any) => (
                   <div key={p.id} className="flex items-center justify-between p-3.5 bg-zinc-950/50 border border-zinc-850 rounded-2xl group hover:border-amber-500/20 transition-all">
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-white truncate max-w-[180px]">{p.name}</p>
-                      <p className="text-xs text-sky-400 font-mono mt-0.5">SKU: {p.sku}</p>
+                      <p className="text-base font-bold text-white truncate max-w-[180px]">{p.name}</p>
+                      <p className="text-sm text-sky-400 font-mono mt-0.5">SKU: {p.sku}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-black text-amber-500">{p.stock} unidades</p>
-                      <p className="text-xs text-zinc-500 font-medium">Alerta: {p.alert}</p>
+                      <p className="text-base font-black text-amber-500">{p.stock} unidades</p>
+                      <p className="text-sm text-zinc-500 font-medium">Alerta: {p.alert}</p>
                     </div>
                   </div>
                 ))

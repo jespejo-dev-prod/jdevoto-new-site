@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation';
 // Hooks
 import { useProducts } from '@/modules/catalog/presentation/hooks/useProducts';
 import { useDeleteProduct } from '@/modules/catalog/presentation/hooks/useDeleteProduct';
-import { useCategories } from '@/modules/catalog/application/hooks/useCatalogData';
+import { useCategories, useBrands } from '@/modules/catalog/application/hooks/useCatalogData';
 import { useAuth } from '@/context/auth-context';
 
 // Components
@@ -72,6 +72,7 @@ export default function ProductsPage() {
  const [view, setView] = useState<'grid' | 'list'>('grid');
  const [search, setSearch] = useState(urlSearch);
  const [categoryId, setCategoryId] = useState('');
+ const [brandId, setBrandId] = useState('');
  const [page, setPage] = useState(1);
  const [status, setStatus] = useState<'all' | 'published' | 'draft' | 'trash'>('all');
 
@@ -129,6 +130,7 @@ export default function ProductsPage() {
  const { data, isLoading, isFetching } = useProducts({
  search,
  categoryId,
+ brandId,
  page,
  limit: 16,
  includeInactive: true,
@@ -136,13 +138,14 @@ export default function ProductsPage() {
  });
 
  const { data: categoriesData = [] } = useCategories();
+ const { data: brandsData = [] } = useBrands();
  const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
 
  const products = data?.products ?? [];
  const total = data?.total ?? 0;
  const totalPages = data?.totalPages ?? 1;
 
- const hasFilters = !!search || !!categoryId;
+ const hasFilters = !!search || !!categoryId || !!brandId;
 
  const handleDelete = useCallback(
  (id: string, name: string) => {
@@ -163,6 +166,11 @@ export default function ProductsPage() {
  setPage(1);
  };
 
+ const handleBrandChange = (value: string) => {
+ setBrandId(value);
+ setPage(1);
+ };
+
  return (
  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
 
@@ -180,10 +188,10 @@ export default function ProductsPage() {
  <button
  onClick={handleToggleHideOutOfStock}
  disabled={isUpdatingSetting}
- className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md active:scale-[0.98] hover:scale-[1.01] cursor-pointer ${
+ className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50 ${
  hideOutOfStock
- ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/20 border border-rose-500/30'
- : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800'
+ ? 'bg-rose-600 text-white'
+ : 'bg-zinc-900 text-zinc-300 border border-zinc-800'
  }`}
  >
  {isUpdatingSetting ? (
@@ -197,7 +205,7 @@ export default function ProductsPage() {
  <Link href="/dashboard/products/new">
  <button
  id="btn-new-product"
- className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs transition-all shadow-lg shadow-primary/20 cursor-pointer"
+ className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity"
  >
  <Plus className="h-4 w-4" />
  Nuevo Producto
@@ -207,7 +215,7 @@ export default function ProductsPage() {
  </div>
 
  {/* WordPress-like status tabs filter */}
- <div className="flex border-b border-zinc-800 gap-6 text-[10px] uppercase tracking-widest font-black pb-1.5 -mb-4">
+ <div className="flex border-b border-zinc-800 gap-6 text-sm uppercase tracking-widest font-black pb-1.5 -mb-4">
  {[
  { id: 'all', label: 'Todos' },
  { id: 'published', label: 'Publicados' },
@@ -238,6 +246,9 @@ export default function ProductsPage() {
  categoryId={categoryId}
  onCategoryChange={handleCategoryChange}
  categories={categoriesData}
+ brandId={brandId}
+ onBrandChange={handleBrandChange}
+ brands={brandsData}
  view={view}
  onViewChange={setView}
  total={isLoading ? undefined : total}

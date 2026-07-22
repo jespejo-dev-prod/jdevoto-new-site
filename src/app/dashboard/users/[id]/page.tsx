@@ -43,7 +43,7 @@ export default function UserDetailPage() {
  return (
  <div className="flex flex-col items-center justify-center py-24 gap-4">
  <Loader2 className="h-10 w-10 text-primary animate-spin" />
- <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Cargando perfil del usuario...</p>
+ <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Cargando perfil del usuario...</p>
  </div>
  );
  }
@@ -57,12 +57,12 @@ export default function UserDetailPage() {
  }
 
  return (
- <div className="p-8 max-w-[1500px] mx-auto space-y-8">
+ <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  {/* Header / Breadcrumbs */}
  <div className="flex flex-col gap-4">
  <Link 
  href="/dashboard/users"
- className="flex items-center gap-2 text-zinc-500 hover:text-primary transition-colors text-xs font-bold uppercase tracking-widest group"
+ className="flex items-center gap-2 text-zinc-500 hover:text-primary transition-colors text-sm font-bold uppercase tracking-widest group"
  >
  <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
  Volver al listado
@@ -78,9 +78,9 @@ export default function UserDetailPage() {
  {user.firstName} {user.lastName}
  </h1>
  <div className="flex items-center gap-4 mt-1">
- <span className="text-zinc-500 font-mono text-sm">{user.email}</span>
+ <span className="text-zinc-500 font-mono text-base">{user.email}</span>
  <div className="h-1 w-1 rounded-full bg-zinc-800" />
- <span className="text-[10px] text-primary font-bold uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+ <span className="text-xs text-primary font-bold uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
  {user.role}
  </span>
  </div>
@@ -90,14 +90,14 @@ export default function UserDetailPage() {
  <div className="flex items-center gap-2">
  <button 
  onClick={() => handleResetPassword(user.id, user.email)}
- className="flex items-center justify-center gap-2 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-350 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-zinc-800"
+ className="flex items-center justify-center gap-2 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-350 hover:text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-all border border-zinc-800"
  >
  <Key className="h-4 w-4 text-yellow-500/80" />
  Reset Pass
  </button>
  <button 
  onClick={() => handleForceLogout(user.id, user.firstName)}
- className="flex items-center justify-center gap-2 py-2.5 px-4 bg-red-500/5 hover:bg-red-500/10 text-red-500 hover:text-red-400 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-red-500/10"
+ className="flex items-center justify-center gap-2 py-2.5 px-4 bg-red-500/5 hover:bg-red-500/10 text-red-500 hover:text-red-400 rounded-xl text-sm font-bold uppercase tracking-wider transition-all border border-red-500/10"
  >
  <LogOut className="h-4 w-4" />
  Cerrar Sesión

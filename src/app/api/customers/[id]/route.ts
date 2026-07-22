@@ -20,6 +20,7 @@ export const GET = withApiHandler(async (req: NextRequest, { params }: RouteCont
     where: { id },
     include: {
       users: {
+        where: { isActive: true },
         select: {
           id: true,
           firstName: true,

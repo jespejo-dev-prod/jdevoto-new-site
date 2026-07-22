@@ -11,14 +11,17 @@ import {
  LayoutGrid, 
  List,
  Filter,
+ Link as LinkIcon
 } from 'lucide-react';
 import Link from 'next/link';
+import { AssignCustomerModal } from '@/modules/customers/presentation/components/AssignCustomerModal';
 
 export default function CustomersPage() {
  const [page, setPage] = useState(1);
  const [limit, setLimit] = useState(100);
  const [searchTerm, setSearchTerm] = useState('');
  const [debouncedSearch, setDebouncedSearch] = useState('');
+ const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
  // Debounce search
  useEffect(() => {
@@ -34,7 +37,8 @@ export default function CustomersPage() {
  meta,
  isLoading, 
  deleteCustomer, 
- reactivateCustomer 
+ reactivateCustomer,
+ unassignCustomer 
  } = useCustomers({
  page,
  limit,
@@ -50,15 +54,22 @@ export default function CustomersPage() {
  <Users className="h-8 w-8 text-primary" />
  Clientes B2B
  </h1>
- <p className="text-sm text-zinc-500 mt-1 font-medium">
+ <p className="text-base text-zinc-500 mt-1 font-medium">
  Gestión de empresas, condiciones comerciales y facturación.
- {meta && <span className="ml-2 text-primary/50 text-xs tracking-widest uppercase">Total DB: {meta.total}</span>}
+ {meta && <span className="ml-2 text-primary/50 text-sm tracking-widest uppercase">Total DB: {meta.total}</span>}
  </p>
  </div>
 
  <div className="flex items-center gap-3">
+ <button 
+   onClick={() => setIsAssignModalOpen(true)}
+   className="flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 px-4 py-2.5 rounded-xl font-bold transition-all border border-purple-500/20 text-base"
+ >
+   <LinkIcon className="w-4 h-4" />
+   Vincular Existente
+ </button>
  <Link href="/dashboard/customers/new">
- <button className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+ <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
  <UserPlus className="w-4 h-4" />
  Nuevo Cliente
  </button>
@@ -75,11 +86,11 @@ export default function CustomersPage() {
  placeholder="Buscar por Razón Social, RUT o Nombre de Fantasía..."
  value={searchTerm}
  onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
- className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-sm text-white focus:border-primary/50 outline-none transition-all"
+ className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-base text-white focus:border-primary/50 outline-none transition-all"
  />
  </div>
  <div className="md:col-span-4 flex gap-2">
- <button className="flex-1 bg-zinc-900/40 border border-zinc-800 rounded-2xl flex items-center justify-center gap-2 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all text-xs font-bold uppercase">
+ <button className="flex-1 bg-zinc-900/40 border border-zinc-800 rounded-2xl flex items-center justify-center gap-2 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all text-sm font-bold uppercase">
  <Filter className="h-4 w-4" />
  Filtros
  </button>
@@ -98,7 +109,7 @@ export default function CustomersPage() {
  {isLoading ? (
  <div className="flex flex-col items-center justify-center py-24 gap-4">
  <Loader2 className="h-10 w-10 text-primary animate-spin" />
- <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Cargando cartera de clientes...</p>
+ <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Cargando cartera de clientes...</p>
  </div>
  ) : (
  <div className="space-y-6">
@@ -118,18 +129,24 @@ export default function CustomersPage() {
  }}
  isDeleting={deleteCustomer.isPending}
  isReactivating={reactivateCustomer.isPending}
+ isUnassigning={unassignCustomer.isPending}
+ onUnassign={(id, name) => {
+   if (confirm(`¿Estás seguro de desvincular a "${name}" de tu cartera?`)) {
+     unassignCustomer.mutate(id);
+   }
+ }}
  />
 
  {/* Pagination */}
  {meta && (
  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
  <div className="flex items-center gap-3">
- <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
+ <p className="text-sm text-zinc-500 font-bold uppercase tracking-widest">
  Mostrando página {meta.page} de {meta.totalPages} ({meta.total} clientes)
  </p>
  <div className="h-4 w-px bg-zinc-800 hidden sm:block" />
  <div className="flex items-center gap-1.5">
- <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Por página:</span>
+ <span className="text-sm text-zinc-500 font-bold uppercase tracking-widest">Por página:</span>
  <select
  value={limit === 99999 ?"all" : limit}
  onChange={(e) => {
@@ -137,7 +154,7 @@ export default function CustomersPage() {
  setLimit(val ==="all" ? 99999 : Number(val));
  setPage(1);
  }}
- className="bg-zinc-900 border border-zinc-850 rounded-xl text-xs font-bold text-zinc-400 px-3.5 py-1.5 outline-none focus:border-primary/50 cursor-pointer"
+ className="bg-zinc-900 border border-zinc-850 rounded-xl text-sm font-bold text-zinc-400 px-3.5 py-1.5 outline-none focus:border-primary/50 cursor-pointer"
  >
  <option value={10}>10</option>
  <option value={100}>100</option>
@@ -147,27 +164,36 @@ export default function CustomersPage() {
  </div>
 
  {meta.totalPages > 1 && (
- <div className="flex gap-2">
- <button 
- disabled={page === 1}
- onClick={() => setPage(p => p - 1)}
- className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-bold text-zinc-400 disabled:opacity-50 hover:text-white transition-all"
- >
- Anterior
- </button>
- <button 
- disabled={page === meta.totalPages}
- onClick={() => setPage(p => p + 1)}
- className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-bold text-zinc-400 disabled:opacity-50 hover:text-white transition-all"
- >
- Siguiente
- </button>
+ <div className="flex justify-center mt-6">
+  <div className="flex gap-2">
+    <button
+      onClick={() => setPage(p => Math.max(1, p - 1))}
+      disabled={page === 1 || isLoading}
+      className="px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white disabled:opacity-50 font-medium text-sm transition-colors"
+    >
+      Anterior
+    </button>
+    <span className="px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold text-sm">
+      Página {page} de {meta.totalPages}
+    </span>
+    <button
+      onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+      disabled={page === meta.totalPages || isLoading}
+      className="px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white disabled:opacity-50 font-medium text-sm transition-colors"
+    >
+      Siguiente
+    </button>
+  </div>
  </div>
  )}
  </div>
  )}
  </div>
  )}
+ <AssignCustomerModal 
+   isOpen={isAssignModalOpen} 
+   onClose={() => setIsAssignModalOpen(false)} 
+ />
  </div>
  );
 }

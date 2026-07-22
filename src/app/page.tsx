@@ -247,7 +247,7 @@ export default async function HomePage() {
         })}
 
         {/* High-Impact Campaign Banner */}
-        <ScrollReveal>
+        <ScrollReveal className="min-h-[150px]">
           <PromoBanner />
         </ScrollReveal>
 

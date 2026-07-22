@@ -9,7 +9,7 @@ export function SeoTab() {
   const { register, formState: { errors } } = useFormContext<CreateProductInput>();
 
   return (
-    <div className="space-y-6 max-w-2xl text-[11px]">
+    <div className="space-y-6 max-w-2xl text-sm">
       <div className="flex items-center gap-2 p-4 bg-primary/5 rounded-xl border border-primary/20 mb-6 text-primary">
         <AlertCircle className="h-4 w-4" />
         <span>Si dejas estos campos vacíos, se generarán automáticamente usando el nombre y descripción del producto.</span>
@@ -22,7 +22,7 @@ export function SeoTab() {
       />
       
       <div className="space-y-2">
-        <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+        <Label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
           Meta Descripción
         </Label>
         <Textarea
@@ -31,7 +31,7 @@ export function SeoTab() {
           {...register('seoDescription')}
         />
         {errors.seoDescription && (
-          <span className="text-[9px] text-red-500 font-bold uppercase">
+          <span className="text-xs text-red-500 font-bold uppercase">
             {String(errors.seoDescription?.message || '')}
           </span>
         )}

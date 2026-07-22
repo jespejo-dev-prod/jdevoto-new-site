@@ -232,7 +232,7 @@ export default function SliderPage() {
 
  return (
  <RoleGuard allowedRoles={[ADMIN_ROLE]}>
- <div className="py-8 px-4 sm:px-8 w-full max-w-5xl mx-auto space-y-8">
+ <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  
  {/* Header */}
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-6">
@@ -241,7 +241,7 @@ export default function SliderPage() {
  <Sliders className="h-8 w-8 text-primary" />
  Slider de Inicio (Hero)
  </h1>
- <p className="text-sm text-zinc-500 mt-1 font-medium">
+ <p className="text-base text-zinc-500 mt-1 font-medium">
  Administra las diapositivas que se muestran en el banner principal del home. Máximo 5 banners.
  </p>
  </div>
@@ -250,7 +250,7 @@ export default function SliderPage() {
  <Button
  onClick={handleSaveChanges}
  disabled={isSaving}
- className="flex items-center gap-2 px-6 py-2.5 bg-primary text-black rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-primary/95 transition-all shadow-lg shadow-primary/20"
+ className="flex items-center gap-2 px-6 py-2.5 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-primary/95 transition-all shadow-lg shadow-primary/20"
  >
  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
  Guardar Cambios
@@ -267,7 +267,7 @@ export default function SliderPage() {
  >
  {/* Top bar controls */}
  <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
- <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
+ <span className="text-sm font-bold text-zinc-500 uppercase tracking-widest">
  Banner #{index + 1}
  </span>
  
@@ -310,43 +310,43 @@ export default function SliderPage() {
  {/* Left col - fields */}
  <div className="md:col-span-8 space-y-4 text-left">
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Título del Banner</Label>
+ <Label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Título del Banner</Label>
  <Input
  value={slide.title}
  onChange={(e) => handleFieldChange(slide.id,"title", e.target.value)}
  placeholder="Ej: Ofertas Destacadas"
- className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-11 text-sm focus:border-primary/50"
+ className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-11 text-base focus:border-primary/50"
  />
  </div>
 
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Descripción Corta</Label>
+ <Label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Descripción Corta</Label>
  <textarea
  value={slide.description}
  onChange={(e) => handleFieldChange(slide.id,"description", e.target.value)}
  placeholder="Escribe una descripción corta del banner..."
  rows={3}
- className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-xl p-3.5 text-sm focus:border-primary/50 outline-none transition-all resize-none"
+ className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-xl p-3.5 text-base focus:border-primary/50 outline-none transition-all resize-none"
  />
  </div>
 
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Texto de Botón (CTA)</Label>
+ <Label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Texto de Botón (CTA)</Label>
  <Input
  value={slide.cta ||""}
  onChange={(e) => handleFieldChange(slide.id,"cta", e.target.value)}
  placeholder="Ej: Ver Productos"
- className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-11 text-xs sm:text-sm focus:border-primary/50"
+ className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-11 text-sm sm:text-base focus:border-primary/50"
  />
  </div>
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Enlace del Botón (URL)</Label>
+ <Label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Enlace del Botón (URL)</Label>
  <Input
  value={slide.href ||""}
  onChange={(e) => handleFieldChange(slide.id,"href", e.target.value)}
  placeholder="Ej: /products?category=iluminacion"
- className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-11 text-xs sm:text-sm focus:border-primary/50"
+ className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-11 text-sm sm:text-base focus:border-primary/50"
  />
  </div>
  </div>
@@ -355,7 +355,7 @@ export default function SliderPage() {
  {/* Right col - background image & upload */}
  <div className="md:col-span-4 flex flex-col justify-between gap-4 text-left">
  <div className="space-y-2 flex-grow flex flex-col">
- <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Imagen de Fondo</Label>
+ <Label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Imagen de Fondo</Label>
  
  {/* Image Preview Container */}
  <div className="relative flex-grow min-h-[140px] rounded-2xl bg-zinc-950 border border-zinc-800 overflow-hidden flex items-center justify-center group/preview">
@@ -370,13 +370,13 @@ export default function SliderPage() {
  }}
  />
  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
- <span className="text-[10px] uppercase tracking-widest font-black text-white bg-zinc-900/80 px-2.5 py-1 rounded-md border border-zinc-700">Cambiar</span>
+ <span className="text-xs uppercase tracking-widest font-black text-white bg-zinc-900/80 px-2.5 py-1 rounded-md border border-zinc-700">Cambiar</span>
  </div>
  </>
  ) : (
  <div className="flex flex-col items-center justify-center text-zinc-500 gap-2 p-4">
  <ImageIcon className="h-8 w-8 text-zinc-600" />
- <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600">Sin Imagen</span>
+ <span className="text-xs font-bold uppercase tracking-widest text-zinc-600">Sin Imagen</span>
  </div>
  )}
  </div>
@@ -387,11 +387,11 @@ export default function SliderPage() {
  value={slide.image}
  onChange={(e) => handleFieldChange(slide.id,"image", e.target.value)}
  placeholder="URL de la imagen..."
- className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-10 text-xs focus:border-primary/50"
+ className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-10 text-sm focus:border-primary/50"
  />
  
  <Label 
- className={`w-full h-10 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-900 text-zinc-300 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider cursor-pointer transition-all ${
+ className={`w-full h-10 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-900 text-zinc-300 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wider cursor-pointer transition-all ${
  uploadingId === slide.id ?"opacity-50 pointer-events-none" :""
  }`}
  >
@@ -459,7 +459,7 @@ export default function SliderPage() {
  {slides.length < 5 ? (
  <Button
  onClick={handleAddSlide}
- className="w-full h-14 bg-zinc-900/30 hover:bg-zinc-900/60 border border-zinc-800 border-dashed rounded-[32px] text-zinc-400 hover:text-white flex items-center justify-center gap-2 font-bold uppercase text-xs sm:text-sm tracking-widest transition-all shadow-sm"
+ className="w-full h-14 bg-zinc-900/30 hover:bg-zinc-900/60 border border-zinc-800 border-dashed rounded-[32px] text-zinc-400 hover:text-white flex items-center justify-center gap-2 font-bold uppercase text-sm sm:text-base tracking-widest transition-all shadow-sm"
  >
  <Plus className="h-4 w-4" />
  Añadir Banner ({slides.length}/5)

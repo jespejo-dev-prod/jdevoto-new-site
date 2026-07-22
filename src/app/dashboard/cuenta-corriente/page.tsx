@@ -25,24 +25,24 @@ export default function CuentaCorrientePage() {
  const { user, accessToken } = useAuth();
  const queryClient = useQueryClient();
 
- const isAdminOrSalesRep = user?.role === UserRole.ADMIN || user?.role === UserRole.SALES_REP;
+ const isAdmin = user?.role === UserRole.ADMIN;
  const myCompanyId = user?.companyId || user?.company?.id || '';
 
  // Tab state for admins
  const [activeTab, setActiveTab] = useState<'orders' | 'customers'>('orders');
 
- // Default to"ALL" companies for Admin/Sales Rep so they see global pending orders first
+ // Default to"ALL" companies for Admin so they see global pending orders first
  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
 
  useEffect(() => {
- if (isAdminOrSalesRep) {
+ if (isAdmin) {
  setSelectedCompanyId('ALL');
  } else if (myCompanyId) {
  setSelectedCompanyId(myCompanyId);
  }
- }, [myCompanyId, isAdminOrSalesRep]);
+ }, [myCompanyId, isAdmin]);
 
- // Search state for Admin/Sales Rep
+ // Search state for Admin
  const [searchTerm, setSearchTerm] = useState('');
  const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -50,23 +50,23 @@ export default function CuentaCorrientePage() {
  const [customerPage, setCustomerPage] = useState(1);
 
  useEffect(() => {
- if (!isAdminOrSalesRep) return;
+ if (!isAdmin) return;
  const handler = setTimeout(() => {
  setDebouncedSearch(searchTerm);
  setCustomerPage(1); // Reset page on new search
  }, 300);
  return () => clearTimeout(handler);
- }, [searchTerm, isAdminOrSalesRep]);
+ }, [searchTerm, isAdmin]);
 
  // 1. Query for the dropdown selector (limit 100)
  const { data: selectorCustomersList, meta: selectorMeta } = useCustomers(
- isAdminOrSalesRep ? { limit: 100, search: debouncedSearch } : { limit: 1, enabled: false }
+ isAdmin ? { limit: 100, search: debouncedSearch } : { limit: 1, enabled: false }
  );
  const selectorCustomers = (selectorCustomersList || []).filter((c: any) => c.razonSocial && c.razonSocial.trim() !== '');
 
  // 2. Query for the paginated customer list in Tab 2 (limit 10)
  const { data: tableCustomersList, meta: customersMeta, isLoading: isLoadingCustomers } = useCustomers(
- isAdminOrSalesRep && activeTab === 'customers' 
+ isAdmin && activeTab === 'customers' 
  ? { limit: 10, page: customerPage, search: debouncedSearch } 
  : { limit: 1, enabled: false }
  );
@@ -221,7 +221,7 @@ export default function CuentaCorrientePage() {
  };
 
  return (
- <RoleGuard allowedRoles={[UserRole.COMPANY_ADMIN, UserRole.BUYER, UserRole.ADMIN, UserRole.SALES_REP]}>
+ <RoleGuard allowedRoles={[UserRole.COMPANY_ADMIN, UserRole.BUYER, UserRole.ADMIN]}>
  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  
  {/* Welcome / Header */}
@@ -231,7 +231,7 @@ export default function CuentaCorrientePage() {
  Cuenta Corriente B2B
  </h1>
  <p className="text-sm text-zinc-500">
- {isAdminOrSalesRep 
+ {isAdmin 
  ? 'Panel administrativo para verificar créditos y confirmar pagos por transferencias de clientes.'
  : 'Revisa el estado de tu línea de crédito y salda tus pedidos pendientes online.'
  }
@@ -239,37 +239,37 @@ export default function CuentaCorrientePage() {
  </div>
  
  {/* Customer view company label */}
- {!isAdminOrSalesRep && company && (
+ {!isAdmin && company && (
  <div className="flex items-center gap-2.5 bg-zinc-900/60 border border-zinc-800/80 px-4 py-2 rounded-xl text-zinc-400 text-xs font-semibold select-none shadow-sm">
  <Building className="w-4 h-4 text-primary" />
  {company.razonSocial}
  </div>
  )}
 
- {/* Admin / Sales Rep view company selector dropdown */}
- {isAdminOrSalesRep && (
+ {/* Admin view company selector dropdown */}
+ {isAdmin && (
  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-zinc-900/40 border border-zinc-800 rounded-2xl p-4 shadow-sm">
  <div className="flex items-center gap-2">
- <span className="text-zinc-500 font-bold uppercase tracking-wider text-[10px] select-none">Buscar:</span>
- <input
- type="text"
- placeholder="RUT o Nombre..."
- value={searchTerm}
- onChange={(e) => setSearchTerm(e.target.value)}
- className="bg-zinc-950 text-zinc-100 border border-zinc-850 rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-medium text-xs w-44 transition-all"
- />
+  <span className="text-zinc-500 font-bold uppercase tracking-wider text-xs select-none">Buscar:</span>
+  <input
+  type="text"
+  placeholder="RUT o Nombre..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  className="bg-zinc-950 text-zinc-100 border border-zinc-850 rounded-xl px-3 py-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-medium text-sm w-56 transition-all"
+  />
  </div>
 
  {selectorCustomers && (
  <div className="flex items-center gap-2">
- <span className="text-zinc-500 font-bold uppercase tracking-wider text-[10px] select-none">Seleccionar:</span>
- <div className="relative">
- <select
- key={selectedCompanyId || 'empty'}
- value={selectedCompanyId}
- onChange={(e) => setSelectedCompanyId(e.target.value)}
- className="appearance-none bg-zinc-950 text-zinc-100 border border-zinc-850 hover:border-zinc-750 rounded-xl pl-9 pr-10 py-1.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-bold cursor-pointer text-xs transition-all shadow-lg min-w-[220px]"
- >
+  <span className="text-zinc-500 font-bold uppercase tracking-wider text-xs select-none">Seleccionar:</span>
+  <div className="relative">
+  <select
+  key={selectedCompanyId || 'empty'}
+  value={selectedCompanyId}
+  onChange={(e) => setSelectedCompanyId(e.target.value)}
+  className="appearance-none bg-zinc-950 text-zinc-100 border border-zinc-850 hover:border-zinc-750 rounded-xl pl-9 pr-10 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-bold cursor-pointer text-sm transition-all shadow-lg min-w-[220px]"
+  >
  <option value="ALL" className="bg-zinc-950 text-zinc-100 font-bold">
  Todas las empresas
  </option>
@@ -381,35 +381,35 @@ export default function CuentaCorrientePage() {
  </div>
 
  {/* Admin Tab Bar */}
- {isAdminOrSalesRep && (
+ {isAdmin && (
  <div className="flex border-b border-zinc-800 gap-6">
- <button
- onClick={() => setActiveTab('orders')}
- className={`pb-3 text-sm font-bold tracking-tight border-b-2 transition-all select-none ${
- activeTab === 'orders' 
- ? 'border-primary text-white font-black' 
- : 'border-transparent text-zinc-500 hover:text-zinc-300'
- }`}
- >
- Pedidos Pendientes B2B ({pendingOrders.length})
- </button>
- <button
- onClick={() => setActiveTab('customers')}
- className={`pb-3 text-sm font-bold tracking-tight border-b-2 transition-all select-none ${
- activeTab === 'customers' 
- ? 'border-primary text-white font-black' 
- : 'border-transparent text-zinc-500 hover:text-zinc-300'
- }`}
- >
+  <button
+  onClick={() => setActiveTab('orders')}
+  className={`pb-3 px-4 text-base sm:text-lg font-bold tracking-tight border-b-2 transition-all select-none ${
+  activeTab === 'orders' 
+  ? 'border-primary text-white font-black' 
+  : 'border-transparent text-zinc-500 hover:text-zinc-300'
+  }`}
+  >
+  Pedidos Pendientes B2B ({pendingOrders.length})
+  </button>
+  <button
+  onClick={() => setActiveTab('customers')}
+  className={`pb-3 px-4 text-base sm:text-lg font-bold tracking-tight border-b-2 transition-all select-none ${
+  activeTab === 'customers' 
+  ? 'border-primary text-white font-black' 
+  : 'border-transparent text-zinc-500 hover:text-zinc-300'
+  }`}
+  >
  Clientes y Líneas de Crédito ({customersMeta?.total ?? selectorCustomers.length ?? 0})
  </button>
  </div>
  )}
 
  {/* TAB 1: Pedidos Pendientes */}
- {(!isAdminOrSalesRep || activeTab === 'orders') && (
+ {(!isAdmin || activeTab === 'orders') && (
  <div className="space-y-4">
- {(!isAdminOrSalesRep) && (
+ {(!isAdmin) && (
  <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
  <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
  <span>Pedidos Pendientes de Pago</span>
@@ -523,7 +523,7 @@ export default function CuentaCorrientePage() {
 
  {/* Action Button */}
  <td className="p-5 py-6 text-right">
- {isAdminOrSalesRep ? (
+ {isAdmin ? (
  <button 
  onClick={() => handleConfirmTransfer(order.id, order.orderNumber)}
  disabled={updatingOrderId !== null}
@@ -559,8 +559,8 @@ export default function CuentaCorrientePage() {
  </div>
  )}
 
- {/* TAB 2: Clientes y Líneas de Crédito (Only Admins / Sales Reps) */}
- {isAdminOrSalesRep && activeTab === 'customers' && (
+ {/* TAB 2: Clientes y Líneas de Crédito (Only Admins) */}
+ {isAdmin && activeTab === 'customers' && (
  <div className="space-y-4">
  {isLoadingCustomers ? (
  <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -593,14 +593,14 @@ export default function CuentaCorrientePage() {
  
  return (
  <tr key={c.id} className="hover:bg-zinc-900/20 transition-colors">
- <td className="p-5 py-6">
- <div className="font-extrabold text-white text-base">{c.razonSocial}</div>
- {c.rut && (
- <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mt-1.5 select-none">
- {c.rut}
- </span>
- )}
- </td>
+  <td className="p-5 py-6">
+  <div className="font-extrabold text-white text-xl">{c.razonSocial}</div>
+  {c.rut && (
+  <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mt-2 select-none">
+  {c.rut}
+  </span>
+  )}
+  </td>
  <td className="p-5 py-6 text-lg text-zinc-200 text-right font-bold">
  ${cLimit.toLocaleString('es-CL')}
  </td>
@@ -664,53 +664,53 @@ export default function CuentaCorrientePage() {
  className="fixed inset-0 bg-black/70 backdrop-blur-sm"
  onClick={() => setEditingCompany(null)}
  />
- <div className="bg-zinc-950 border border-zinc-850 rounded-3xl p-6 max-w-md w-full shadow-2xl relative z-10 text-left space-y-5">
+ <div className="bg-zinc-950 border border-zinc-850 rounded-3xl p-8 max-w-xl w-full shadow-2xl relative z-10 text-left space-y-6">
  <div className="space-y-1">
- <h3 className="text-lg font-bold text-white tracking-tight">Asignar / Ajustar Crédito B2B</h3>
- <p className="text-xs text-zinc-450 font-semibold truncate">{editingCompany.razonSocial}</p>
+ <h3 className="text-2xl font-bold text-white tracking-tight">Asignar / Ajustar Crédito B2B</h3>
+ <p className="text-lg text-zinc-450 font-semibold truncate">{editingCompany.razonSocial}</p>
  {editingCompany.rut && (
- <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">{editingCompany.rut}</p>
+ <p className="text-sm text-zinc-600 font-bold uppercase tracking-wider">{editingCompany.rut}</p>
  )}
  </div>
 
  <div className="space-y-4">
  {/* Credit Limit Input */}
  <div className="space-y-1.5">
- <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Cupo Autorizado ($ CLP)</label>
+ <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest block">Cupo Autorizado ($ CLP)</label>
  <input
  type="number"
  value={newCreditLimit}
  onChange={(e) => setNewCreditLimit(e.target.value)}
- className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-1 focus:ring-primary focus:border-primary outline-none font-bold"
+ className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg text-white focus:ring-1 focus:ring-primary focus:border-primary outline-none font-bold"
  />
  </div>
 
  {/* Credit Used Input */}
  <div className="space-y-1.5">
- <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Crédito Utilizado / Deuda ($ CLP)</label>
+ <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest block">Crédito Utilizado / Deuda ($ CLP)</label>
  <input
  type="number"
  value={newCreditUsed}
  onChange={(e) => setNewCreditUsed(e.target.value)}
- className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-white focus:ring-1 focus:ring-primary focus:border-primary outline-none font-bold"
+ className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg text-white focus:ring-1 focus:ring-primary focus:border-primary outline-none font-bold"
  />
  </div>
  </div>
 
- <div className="flex gap-3 pt-2">
+ <div className="flex gap-3 pt-4">
  <button
  onClick={() => setEditingCompany(null)}
  disabled={isSavingCredit}
- className="flex-1 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white text-xs font-bold transition-all disabled:opacity-50"
+ className="flex-1 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white text-base font-bold transition-all disabled:opacity-50"
  >
  Cancelar
  </button>
  <button
  onClick={handleSaveCredit}
  disabled={isSavingCredit}
- className="flex-1 py-2 rounded-xl bg-primary text-primary-foreground hover:opacity-95 text-xs font-bold transition-all shadow-lg shadow-primary/10 flex items-center justify-center gap-1.5 disabled:opacity-50"
+ className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-95 text-base font-bold transition-all shadow-lg shadow-primary/10 flex items-center justify-center gap-2 disabled:opacity-50"
  >
- {isSavingCredit && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+ {isSavingCredit && <Loader2 className="w-5 h-5 animate-spin" />}
  Guardar Cambios
  </button>
  </div>

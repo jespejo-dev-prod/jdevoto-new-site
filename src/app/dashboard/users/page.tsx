@@ -36,14 +36,14 @@ export default function UsersPage() {
  <div className="flex items-center justify-between">
  <div>
  <h1 className="text-3xl font-bold text-white mb-1">Gestión de Equipo</h1>
- <p className="text-sm text-zinc-500">
+ <p className="text-base text-zinc-500">
  Administra los accesos y roles de tu empresa.
- {meta && <span className="ml-2 text-primary/50 text-xs tracking-widest uppercase">Total DB: {meta.total}</span>}
+ {meta && <span className="ml-2 text-primary/50 text-sm tracking-widest uppercase">Total DB: {meta.total}</span>}
  </p>
  </div>
  <button 
  onClick={() => setShowForm(!showForm)}
- className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity"
+ className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity"
  >
  {showForm ?"Cancelar" : <><UserPlus className="w-4 h-4" /> Añadir Miembro</>}
  </button>
@@ -65,7 +65,7 @@ export default function UsersPage() {
  placeholder="Buscar por nombre, email o empresa..."
  value={searchTerm}
  onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
- className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-sm text-white focus:border-primary/50 outline-none transition-all"
+ className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-base text-white focus:border-primary/50 outline-none transition-all"
  />
  </div>
 
@@ -81,12 +81,12 @@ export default function UsersPage() {
  {meta && (
  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
  <div className="flex items-center gap-3">
- <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
+ <p className="text-sm text-zinc-500 font-bold uppercase tracking-widest">
  Mostrando página {meta.page} de {meta.totalPages} ({meta.total} usuarios)
  </p>
  <div className="h-4 w-px bg-zinc-800 hidden sm:block" />
  <div className="flex items-center gap-1.5">
- <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Por página:</span>
+ <span className="text-sm text-zinc-500 font-bold uppercase tracking-widest">Por página:</span>
  <select
  value={limit === 99999 ?"all" : limit}
  onChange={(e) => {
@@ -94,7 +94,7 @@ export default function UsersPage() {
  setLimit(val ==="all" ? 99999 : Number(val));
  setPage(1);
  }}
- className="bg-zinc-900 border border-zinc-850 rounded-xl text-xs font-bold text-zinc-400 px-3.5 py-1.5 outline-none focus:border-primary/50 cursor-pointer"
+ className="bg-zinc-900 border border-zinc-850 rounded-xl text-sm font-bold text-zinc-400 px-3.5 py-1.5 outline-none focus:border-primary/50 cursor-pointer"
  >
  <option value={10}>10</option>
  <option value={100}>100</option>

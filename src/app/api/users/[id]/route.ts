@@ -8,7 +8,7 @@ import { z } from "zod";
 
 const UpdateUserSchema = z.object({
   email: z.string().email().optional(),
-  password: z.string().min(8).optional(),
+  password: z.string().min(7).regex(/[A-Z]/, "Debe contener al menos una mayúscula").regex(/[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/, "Debe contener al menos un número o símbolo").optional(),
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
   role: z.nativeEnum(UserRole).optional(),

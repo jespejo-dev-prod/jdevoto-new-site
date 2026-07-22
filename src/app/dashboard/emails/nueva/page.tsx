@@ -198,7 +198,7 @@ export default function NuevaCampañaPage() {
  };
 
  return (
- <div className="flex flex-col gap-6 p-6 max-w-3xl mx-auto">
+ <div className="flex flex-col gap-6 p-6 w-full max-w-none">
  {/* Header */}
  <div className="flex items-center gap-3">
  <button
@@ -208,11 +208,11 @@ export default function NuevaCampañaPage() {
  <ArrowLeft className="h-5 w-5" />
  </button>
  <div>
- <h1 className="text-xl font-bold text-zinc-100 flex items-center gap-2">
- <Mail className="h-5 w-5 text-primary" />
+ <h1 className="text-3xl font-bold text-zinc-100 flex items-center gap-2">
+ <Mail className="h-6 w-6 text-primary" />
  Nueva Campaña de Email
  </h1>
- <p className="text-sm text-zinc-500">Crea y envía una campaña de email a tus clientes</p>
+ <p className="text-base text-zinc-500">Crea y envía una campaña de email a tus clientes</p>
  </div>
  </div>
 
@@ -225,18 +225,18 @@ export default function NuevaCampañaPage() {
  {i > 0 && (
  <div className={`h-px flex-1 transition-colors ${step > i ? 'bg-primary' : 'bg-zinc-800'}`} />
  )}
- <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors flex-shrink-0 ${
+ <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold transition-colors flex-shrink-0 ${
  step === s.id ? 'bg-primary text-primary-foreground' :
  step > s.id ? 'bg-primary/20 text-primary' :
  'bg-zinc-800 text-zinc-600'
  }`}>
- {step > s.id ? <CheckCircle2 className="h-4 w-4" /> : s.id}
+ {step > s.id ? <CheckCircle2 className="h-5 w-5" /> : s.id}
  </div>
  {i < STEPS.length - 1 && (
  <div className={`h-px flex-1 transition-colors ${step > s.id ? 'bg-primary' : 'bg-zinc-800'}`} />
  )}
  </div>
- <span className={`text-xs font-medium ${step === s.id ? 'text-zinc-200' : 'text-zinc-600'}`}>
+ <span className={`text-sm font-bold ${step === s.id ? 'text-zinc-200' : 'text-zinc-600'}`}>
  {s.label}
  </span>
  </div>
@@ -251,7 +251,7 @@ export default function NuevaCampañaPage() {
  {step === 1 && (
  <>
  <div>
- <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1.5">
+ <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wide mb-1.5">
  Nombre de la campaña <span className="text-red-400">*</span>
  </label>
  <input
@@ -260,13 +260,13 @@ export default function NuevaCampañaPage() {
  value={form.title}
  onChange={(e) => updateForm('title', e.target.value)}
  placeholder="Ej: Lanzamiento Sitio Web Julio 2026"
- className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+ className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-base font-medium text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
  />
- <p className="text-xs text-zinc-600 mt-1">Solo visible en el dashboard, no lo ven los clientes</p>
+ <p className="text-sm text-zinc-600 mt-1">Solo visible en el dashboard, no lo ven los clientes</p>
  </div>
 
  <div>
- <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1.5">
+ <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wide mb-1.5">
  Asunto del email <span className="text-red-400">*</span>
  </label>
  <input
@@ -275,13 +275,13 @@ export default function NuevaCampañaPage() {
  value={form.subject}
  onChange={(e) => updateForm('subject', e.target.value)}
  placeholder="Ej: ¡Conoce el nuevo sitio de JDevoto!"
- className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+ className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-base font-medium text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
  />
- <p className="text-xs text-zinc-600 mt-1">Lo que aparece en el inbox de tus clientes</p>
+ <p className="text-sm text-zinc-600 mt-1">Lo que aparece en el inbox de tus clientes</p>
  </div>
 
  <div>
- <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1.5">
+ <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wide mb-1.5">
  Texto de preview
  </label>
  <input
@@ -290,14 +290,14 @@ export default function NuevaCampañaPage() {
  value={form.previewText}
  onChange={(e) => updateForm('previewText', e.target.value)}
  placeholder="Ej: Descubre las novedades y nuevas funciones..."
- className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+ className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-base font-medium text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
  />
- <p className="text-xs text-zinc-600 mt-1">Texto breve que aparece bajo el asunto en Gmail/Outlook</p>
+ <p className="text-sm text-zinc-600 mt-1">Texto breve que aparece bajo el asunto en Gmail/Outlook</p>
  </div>
 
  {/* Image upload */}
  <div>
- <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1.5">
+ <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wide mb-1.5">
  Imagen principal
  </label>
  {form.headerImageUrl ? (
@@ -325,10 +325,10 @@ export default function NuevaCampañaPage() {
  <Upload className="h-8 w-8 text-zinc-600" />
  )}
  <div className="text-center">
- <p className="text-sm text-zinc-400 font-medium">
+ <p className="text-base text-zinc-400 font-bold">
  {uploading ? 'Subiendo imagen...' : 'Haz clic para subir imagen'}
  </p>
- <p className="text-xs text-zinc-600 mt-0.5">JPG, PNG o WEBP — máx. 10MB</p>
+ <p className="text-sm text-zinc-600 mt-0.5">JPG, PNG o WEBP — máx. 10MB</p>
  </div>
  <input
  id="campaign-image-upload"
@@ -341,7 +341,7 @@ export default function NuevaCampañaPage() {
  />
  </label>
  )}
- <p className="text-xs text-zinc-600 mt-1.5">
+ <p className="text-sm text-zinc-600 mt-1.5">
  Recomendado: diseña tu imagen en Canva con toda la info (600×800px) — igual a PC Factory
  </p>
  </div>
@@ -349,8 +349,8 @@ export default function NuevaCampañaPage() {
  {/* CTA */}
  <div className="grid grid-cols-2 gap-4">
  <div>
- <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1.5">
- <LinkIcon className="h-3 w-3 inline mr-1" />
+ <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wide mb-1.5">
+ <LinkIcon className="h-4 w-4 inline mr-1" />
  Texto del botón
  </label>
  <input
@@ -359,11 +359,11 @@ export default function NuevaCampañaPage() {
  value={form.ctaText}
  onChange={(e) => updateForm('ctaText', e.target.value)}
  placeholder="Ej: Ver catálogo"
- className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+ className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-base font-medium text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
  />
  </div>
  <div>
- <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1.5">
+ <label className="block text-sm font-bold text-zinc-400 uppercase tracking-wide mb-1.5">
  URL del botón
  </label>
  <input
@@ -372,7 +372,7 @@ export default function NuevaCampañaPage() {
  value={form.ctaUrl}
  onChange={(e) => updateForm('ctaUrl', e.target.value)}
  placeholder="https://jdevoto.cl/..."
- className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
+ className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-base font-medium text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow"
  />
  </div>
  </div>
@@ -440,7 +440,7 @@ export default function NuevaCampañaPage() {
  {/* STEP 3: Revisar y enviar */}
  {step === 3 && (
  <div className="space-y-5">
- <p className="text-sm font-semibold text-zinc-200">Resumen de la campaña</p>
+ <p className="text-base font-bold text-zinc-200">Resumen de la campaña</p>
 
  <div className="grid grid-cols-2 gap-3">
  {[
@@ -450,21 +450,21 @@ export default function NuevaCampañaPage() {
  { label: 'Botón CTA', value: form.ctaText || 'Sin botón' },
  ].map((item) => (
  <div key={item.label} className="bg-zinc-800/60 rounded-xl p-3">
- <p className="text-xs text-zinc-500 mb-1">{item.label}</p>
- <p className="text-sm text-zinc-200 font-medium truncate">{item.value}</p>
+ <p className="text-sm font-bold text-zinc-500 mb-1">{item.label}</p>
+ <p className="text-base text-zinc-200 font-bold truncate">{item.value}</p>
  </div>
  ))}
  </div>
 
  {form.headerImageUrl && (
  <div>
- <p className="text-xs text-zinc-500 mb-2">Imagen principal</p>
+ <p className="text-sm font-bold text-zinc-500 mb-2">Imagen principal</p>
  <img src={form.headerImageUrl} alt="Preview" className="w-full max-h-48 object-cover rounded-xl" />
  </div>
  )}
 
  <div className="bg-amber-950/30 border border-amber-800/40 rounded-xl p-4">
- <p className="text-xs text-amber-300">
+ <p className="text-sm text-amber-300">
  <strong>⚠️ Acción irreversible:</strong> Una vez enviada, no se puede cancelar la campaña.
  Los emails se enviarán inmediatamente a todos los destinatarios seleccionados.
  </p>
@@ -479,7 +479,7 @@ export default function NuevaCampañaPage() {
  {step > 1 && (
  <button
  onClick={() => setStep((s) => s - 1)}
- className="px-4 py-2.5 rounded-xl border border-zinc-700 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+ className="px-5 py-3 rounded-xl border border-zinc-700 text-base font-bold text-zinc-300 hover:bg-zinc-800 transition-colors"
  >
  Atrás
  </button>
@@ -487,17 +487,17 @@ export default function NuevaCampañaPage() {
  <button
  onClick={handleSaveDraft}
  disabled={saving || !form.title.trim() || !form.subject.trim()}
- className="px-4 py-2.5 rounded-xl border border-zinc-700 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center gap-2"
+ className="px-5 py-3 rounded-xl border border-zinc-700 text-base font-bold text-zinc-300 hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center gap-2"
  >
- {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+ {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
  Guardar borrador
  </button>
  <button
  onClick={handleTestSend}
  disabled={sending || saving || !form.title.trim() || !form.subject.trim()}
- className="px-4 py-2.5 rounded-xl border border-blue-700/50 text-sm text-blue-400 hover:bg-blue-900/20 hover:border-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+ className="px-5 py-3 rounded-xl border border-blue-700/50 text-base font-bold text-blue-400 hover:bg-blue-900/20 hover:border-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2"
  >
- {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-4 w-4" />}
+ {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Mail className="h-5 w-5" />}
  Enviar Prueba
  </button>
  </div>
@@ -507,7 +507,7 @@ export default function NuevaCampañaPage() {
  <button
  onClick={() => setStep((s) => s + 1)}
  disabled={!canGoNext()}
- className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
+ className="px-6 py-3 rounded-xl bg-primary text-primary-foreground text-base font-bold hover:bg-primary/90 transition-colors disabled:opacity-50"
  >
  Continuar
  </button>
@@ -515,12 +515,12 @@ export default function NuevaCampañaPage() {
  <button
  onClick={handleSend}
  disabled={sending || saving}
- className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-500 transition-colors disabled:opacity-50"
+ className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 text-white text-base font-bold hover:bg-emerald-500 transition-colors disabled:opacity-50"
  >
  {sending ? (
- <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</>
+ <><Loader2 className="h-5 w-5 animate-spin" /> Enviando...</>
  ) : (
- <><Send className="h-4 w-4" /> Enviar campaña</>
+ <><Send className="h-5 w-5" /> Enviar campaña</>
  )}
  </button>
  )}

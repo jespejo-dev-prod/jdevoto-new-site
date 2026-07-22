@@ -139,9 +139,17 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
   
   // Búsqueda
   const [customerSearch, setCustomerSearch] = useState('');
+  const [debouncedCustomerSearch, setDebouncedCustomerSearch] = useState('');
   const [productSearch, setProductSearch] = useState('');
   const [activeProductIndex, setActiveProductIndex] = useState<number>(-1);
   const [activeCustomerIndex, setActiveCustomerIndex] = useState<number>(-1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedCustomerSearch(customerSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [customerSearch]);
 
   const customerSearchInputRef = useRef<HTMLInputElement>(null);
   const creationDateInputRef = useRef<HTMLInputElement>(null);
@@ -195,7 +203,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
   })) || []);
 
   // Hooks de datos
-  const { data: customers = [], isLoading: loadingCustomers } = useCustomers(customerSearch);
+  const { data: customers = [], isLoading: loadingCustomers } = useCustomers({ search: debouncedCustomerSearch, limit: 5 });
   const { data: productsData, isLoading: loadingProducts } = useProducts({ search: productSearch, limit: 10 });
   const products = productsData?.products || [];
 
@@ -630,9 +638,13 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                             <div className="h-8 w-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
                               <Building2 className="h-4 w-4 text-zinc-500" />
                             </div>
-                            <div className="min-w-0 flex-1">
+                            <div className="min-w-0 flex-1 py-1">
                               <p className="text-base font-extrabold text-white truncate">{c.razonSocial}</p>
-                              <p className="text-sm font-bold text-zinc-400 font-mono mt-1">{c.rut}</p>
+                              {c.rut && (
+                                <div className="inline-flex mt-1.5 px-2.5 py-0.5 rounded-lg bg-primary/15 border border-primary/30 text-xs font-bold text-primary w-fit shadow-sm tracking-wide">
+                                  {c.rut}
+                                </div>
+                              )}
                             </div>
                             <Plus className="h-4.5 w-4.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                           </button>
@@ -644,12 +656,18 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                   )}
                 </div>
               ) : (
-                <div className="flex items-center justify-between px-4 h-12 bg-primary/5 border border-primary/20 rounded-2xl">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <Building2 className="h-4.5 w-4.5 text-primary" />
+                <div className="flex items-center justify-between p-4 bg-primary/5 border border-primary/20 rounded-2xl">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="h-12 w-12 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-primary flex-shrink-0 shadow-inner">
+                      <Building2 className="h-6 w-6" />
+                    </div>
                     <div>
-                      <p className="text-base font-extrabold text-white truncate max-w-[300px]">{selectedCustomer.razonSocial}</p>
-                      <p className="text-base font-bold text-zinc-400 font-mono mt-1">{selectedCustomer.rut}</p>
+                      <p className="text-[17px] font-bold text-white truncate max-w-[300px]">{selectedCustomer.razonSocial}</p>
+                      {selectedCustomer.rut && (
+                        <div className="inline-flex mt-1.5 px-3 py-0.5 rounded-lg bg-primary/15 border border-primary/30 text-sm font-bold text-primary w-fit shadow-sm tracking-wide">
+                          {selectedCustomer.rut}
+                        </div>
+                      )}
                     </div>
                   </div>
                   {!isClient && (
@@ -835,7 +853,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                           </div>
                           <div className="min-w-0">
                             <p className="font-bold text-zinc-100 truncate max-w-[320px] text-sm md:text-base uppercase tracking-tight">{item.name}</p>
-                            <p className="text-sm font-extrabold text-amber-500 font-mono mt-1.5">SKU: {item.sku}</p>
+                            <p className="text-[15px] font-extrabold text-amber-500 font-mono mt-1.5">SKU: {item.sku}</p>
                           </div>
                         </div>
                       </td>
@@ -843,8 +861,8 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                         <div className="flex flex-col items-end">
                           {item.discount > 0 && (
                             <div className="flex items-center gap-2 mb-1.5">
-                              <span className="text-sm font-bold text-zinc-500 line-through">{formatCurrency(item.basePrice)}</span>
-                              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-bold">-{item.discount}%</span>
+                              <span className="text-base font-bold text-zinc-500 line-through">{formatCurrency(item.basePrice)}</span>
+                              <span className="text-sm bg-primary/15 text-primary px-2.5 py-0.5 rounded-md font-bold">-{item.discount}%</span>
                             </div>
                           )}
                           <span className="text-white font-black text-lg md:text-xl">{formatCurrency(item.price)}</span>
@@ -960,26 +978,26 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
               {isEditingShipping ? (
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-500 uppercase px-1">Calle</label>
+                    <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">Calle</label>
                     <input 
                       placeholder="Calle" 
                       value={shippingAddress.street}
                       onChange={(e) => setShippingAddress({...shippingAddress, street: e.target.value})}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 text-sm text-white outline-none focus:border-primary/40 font-medium"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-base text-white outline-none focus:border-primary/40 font-medium"
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div className="space-y-1 col-span-1">
-                      <label className="text-xs font-bold text-zinc-500 uppercase px-1">N°</label>
+                      <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">N°</label>
                       <input 
                         placeholder="N°" 
                         value={shippingAddress.number}
                         onChange={(e) => setShippingAddress({...shippingAddress, number: e.target.value})}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 text-sm text-white outline-none focus:border-primary/40 font-medium"
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-base text-white outline-none focus:border-primary/40 font-medium"
                       />
                     </div>
                     <div className="space-y-1 col-span-2">
-                      <label className="text-xs font-bold text-zinc-500 uppercase px-1">Región</label>
+                      <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">Región</label>
                       <div className="relative">
                         <select
                           value={shippingAddress.region}
@@ -993,31 +1011,31 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                               commune: firstComuna
                             });
                           }}
-                          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 pr-8 text-xs text-white outline-none focus:border-primary/40 font-medium appearance-none cursor-pointer"
+                          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 pr-8 text-base text-white outline-none focus:border-primary/40 font-medium appearance-none cursor-pointer"
                         >
                           <option value="">Selecciona Región...</option>
                           {CHILE_REGIONS.map(r => (
                             <option key={r.name} value={r.name}>{r.name}</option>
                           ))}
                         </select>
-                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500 pointer-events-none" />
+                        <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-500 uppercase px-1">Comuna</label>
+                    <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">Comuna</label>
                     <div className="relative">
                       <select
                         value={shippingAddress.commune}
                         onChange={(e) => setShippingAddress({ ...shippingAddress, commune: e.target.value })}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 pr-8 text-xs text-white outline-none focus:border-primary/40 font-medium appearance-none cursor-pointer"
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 pr-8 text-base text-white outline-none focus:border-primary/40 font-medium appearance-none cursor-pointer"
                       >
                         <option value="">Selecciona Comuna...</option>
                         {(CHILE_REGIONS.find(r => r.name === shippingAddress.region)?.comunas || []).map(c => (
                           <option key={c.name} value={c.name}>{c.name}</option>
                         ))}
                       </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500 pointer-events-none" />
+                      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
                     </div>
                   </div>
                 </div>
@@ -1062,51 +1080,51 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
               {isEditingBilling ? (
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-500 uppercase px-1">Calle</label>
+                    <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">Calle</label>
                     <input 
                       placeholder="Calle" 
                       value={billingAddress.street}
                       onChange={(e) => setBillingAddress({...billingAddress, street: e.target.value})}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 text-sm text-white outline-none focus:border-primary/40 font-medium"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-base text-white outline-none focus:border-primary/40 font-medium"
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div className="space-y-1 col-span-1">
-                      <label className="text-xs font-bold text-zinc-500 uppercase px-1">N°</label>
+                      <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">N°</label>
                       <input 
                         placeholder="N°" 
                         value={billingAddress.number}
                         onChange={(e) => setBillingAddress({...billingAddress, number: e.target.value})}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 text-sm text-white outline-none focus:border-primary/40 font-medium"
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-base text-white outline-none focus:border-primary/40 font-medium"
                       />
                     </div>
                     <div className="space-y-1 col-span-2">
-                      <label className="text-xs font-bold text-zinc-500 uppercase px-1">Comuna</label>
+                      <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">Comuna</label>
                       <input 
                         placeholder="Comuna" 
                         value={billingAddress.commune}
                         onChange={(e) => setBillingAddress({...billingAddress, commune: e.target.value})}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 text-sm text-white outline-none focus:border-primary/40 font-medium"
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-base text-white outline-none focus:border-primary/40 font-medium"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-zinc-500 uppercase px-1">Ciudad</label>
+                      <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">Ciudad</label>
                       <input 
                         placeholder="Ciudad" 
                         value={billingAddress.city}
                         onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 text-sm text-white outline-none focus:border-primary/40 font-medium"
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-base text-white outline-none focus:border-primary/40 font-medium"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-zinc-500 uppercase px-1">DTE Email</label>
+                      <label className="text-[13px] font-bold text-zinc-500 uppercase px-1">DTE Email</label>
                       <input 
                         placeholder="facturacion@empresa.cl" 
                         value={billingAddress.email}
                         onChange={(e) => setBillingAddress({...billingAddress, email: e.target.value})}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-11 px-3.5 text-sm text-white outline-none focus:border-primary/40 font-medium"
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-base text-white outline-none focus:border-primary/40 font-medium"
                       />
                     </div>
                   </div>
@@ -1191,13 +1209,16 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                             className={cn(
                               "p-4 rounded-2xl border-2 text-left transition-all flex flex-col gap-1",
                               shippingMethod === 'free'
-                                ? "border-primary bg-primary/5 text-white"
+                                ? "border-emerald-500 bg-emerald-500/10 text-white"
                                 : canFreeShipping
-                                  ? "border-zinc-800 hover:bg-zinc-900/40 text-zinc-455"
-                                  : "border-zinc-800/45 bg-zinc-900/5 opacity-55 cursor-not-allowed text-zinc-600"
+                                  ? "border-zinc-700 hover:border-emerald-500/30 hover:bg-zinc-900/60"
+                                  : "border-zinc-800/80 bg-zinc-900/40 cursor-not-allowed"
                             )}
                           >
-                            <span className="font-extrabold text-base uppercase">Flete Incluido</span>
+                            <span className={cn(
+                              "font-extrabold text-base uppercase",
+                              shippingMethod === 'free' ? "text-emerald-400" : (canFreeShipping ? "text-emerald-500" : "text-emerald-500/60")
+                            )}>Flete Incluido</span>
                             {canFreeShipping ? (
                               <span className="text-xs text-emerald-400 uppercase font-extrabold mt-1">Despacho Gratis</span>
                             ) : (

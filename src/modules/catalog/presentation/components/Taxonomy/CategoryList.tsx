@@ -180,25 +180,25 @@ export function CategoryList() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Nombre</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Nombre</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-white focus:border-primary/50 outline-none transition-all"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-sm text-white focus:border-primary/50 outline-none transition-all"
                 placeholder="Ej: Accesorios de Baño"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Slug (URL)</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Slug (URL)</label>
               <div className="relative">
                 <input
                   type="text"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value.toLowerCase())}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-10 px-4 text-xs text-zinc-400 focus:border-primary/50 outline-none transition-all font-mono"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-10 px-4 text-sm text-zinc-400 focus:border-primary/50 outline-none transition-all font-mono"
                   placeholder="ej-accesorios-de-banio"
                   required
                 />
@@ -206,7 +206,7 @@ export function CategoryList() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Categoría Padre (Opcional)</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Categoría Padre (Opcional)</label>
               <select
                 value={parentId || ''}
                 onChange={(e) => setParentId(e.target.value || null)}
@@ -224,11 +224,11 @@ export function CategoryList() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Descripción</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Descripción</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:border-primary/50 outline-none transition-all min-h-[100px] resize-none"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-sm text-white focus:border-primary/50 outline-none transition-all min-h-[100px] resize-none"
                 placeholder="Breve descripción..."
               />
             </div>
@@ -236,7 +236,7 @@ export function CategoryList() {
             <button
               type="submit"
               disabled={createCategory.isPending || updateCategory.isPending}
-              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-black font-bold h-12 rounded-xl transition-all flex items-center justify-center gap-2"
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-black font-bold text-sm h-12 rounded-xl transition-all flex items-center justify-center gap-2"
             >
               {createCategory.isPending || updateCategory.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -256,7 +256,7 @@ export function CategoryList() {
         <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-zinc-950/60 border-b border-zinc-800 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+              <tr className="bg-zinc-950/60 border-b border-zinc-800 text-xs font-bold text-zinc-500 uppercase tracking-widest">
                 <th className="px-6 py-4">Categoría</th>
                 <th className="px-6 py-4">Slug</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
@@ -302,17 +302,17 @@ export function CategoryList() {
                           <Tag className="h-4.5 w-4.5" />
                         </div>
                         <div>
-                          <p className={`text-sm leading-tight ${isChild ? 'font-medium text-zinc-300' : 'font-bold text-white'}`}>
+                          <p className={`text-base leading-tight ${isChild ? 'font-medium text-zinc-300' : 'font-bold text-white'}`}>
                             {cat.name}
                           </p>
-                          <p className="text-[10px] text-zinc-500 line-clamp-1 mt-1">
+                          <p className="text-sm text-zinc-500 line-clamp-1 mt-1">
                             {cat.description || 'Sin descripción'}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-zinc-500 font-mono text-[10px]">
+                      <div className="flex items-center gap-2 text-zinc-500 font-mono text-sm">
                         <LinkIcon className="h-3 w-3" />
                         {cat.slug}
                       </div>

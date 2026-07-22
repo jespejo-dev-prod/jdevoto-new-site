@@ -152,12 +152,12 @@ export function BrandList() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nombre */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Nombre</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Nombre</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-white focus:border-primary/50 outline-none transition-all"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-sm text-white focus:border-primary/50 outline-none transition-all"
                 placeholder="Ej: Samsung"
                 required
               />
@@ -165,12 +165,12 @@ export function BrandList() {
 
             {/* Slug */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Slug (URL)</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Slug (URL)</label>
               <input
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase())}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-10 px-4 text-xs text-zinc-400 focus:border-primary/50 outline-none transition-all font-mono"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-10 px-4 text-sm text-zinc-400 focus:border-primary/50 outline-none transition-all font-mono"
                 placeholder="samsung-electronics"
                 required
               />
@@ -178,7 +178,7 @@ export function BrandList() {
 
             {/* Imagen / Logo */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Imagen / Logo</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Imagen / Logo</label>
               
               <div className="relative group">
                 <div className="h-32 w-full rounded-xl bg-zinc-950 border border-dashed border-zinc-800 flex flex-col items-center justify-center overflow-hidden transition-all group-hover:border-primary/30">
@@ -219,7 +219,7 @@ export function BrandList() {
                       ) : (
                         <>
                           <Upload className="h-6 w-6" />
-                          <span className="text-[11px] font-medium uppercase tracking-wider">Subir Logo</span>
+                          <span className="text-xs font-medium uppercase tracking-wider">Subir Logo</span>
                         </>
                       )}
                     </button>
@@ -236,7 +236,7 @@ export function BrandList() {
               
               <div className="flex gap-2 items-center">
                 <div className="h-px flex-1 bg-zinc-800" />
-                <span className="text-[9px] text-zinc-600 font-bold uppercase">O usa una URL</span>
+                <span className="text-xs text-zinc-600 font-bold uppercase">O usa una URL</span>
                 <div className="h-px flex-1 bg-zinc-800" />
               </div>
 
@@ -244,18 +244,18 @@ export function BrandList() {
                 type="text"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-10 px-4 text-[11px] text-zinc-400 focus:border-primary/50 outline-none transition-all"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-10 px-4 text-sm text-zinc-400 focus:border-primary/50 outline-none transition-all"
                 placeholder="/api/files/..."
               />
             </div>
 
             {/* Descripción */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Descripción</label>
+              <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Descripción</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:border-primary/50 outline-none transition-all min-h-[100px] resize-none"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-sm text-white focus:border-primary/50 outline-none transition-all min-h-[100px] resize-none"
                 placeholder="Breve descripción..."
               />
             </div>
@@ -263,7 +263,7 @@ export function BrandList() {
             <button
               type="submit"
               disabled={createBrand.isPending || updateBrand.isPending || isUploading}
-              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-black font-bold h-12 rounded-xl transition-all flex items-center justify-center gap-2"
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-sm text-black font-bold h-12 rounded-xl transition-all flex items-center justify-center gap-2"
             >
               {createBrand.isPending || updateBrand.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -283,7 +283,7 @@ export function BrandList() {
         <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-zinc-950/60 border-b border-zinc-800 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+              <tr className="bg-zinc-950/60 border-b border-zinc-800 text-xs font-bold text-zinc-500 uppercase tracking-widest">
                 <th className="px-6 py-4">Marca</th>
                 <th className="px-6 py-4">Slug</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
@@ -307,13 +307,13 @@ export function BrandList() {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-white leading-tight">{brand.name}</p>
-                        <p className="text-[10px] text-zinc-500 line-clamp-1">{brand.description || 'Sin descripción'}</p>
+                        <p className="text-base font-bold text-white leading-tight">{brand.name}</p>
+                        <p className="text-sm text-zinc-500 line-clamp-1">{brand.description || 'Sin descripción'}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-zinc-500 font-mono text-[10px]">
+                    <div className="flex items-center gap-2 text-zinc-500 font-mono text-sm">
                       <LinkIcon className="h-3 w-3" />
                       {brand.slug}
                     </div>

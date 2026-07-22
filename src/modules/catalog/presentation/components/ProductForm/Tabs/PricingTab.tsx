@@ -26,7 +26,7 @@ export function PricingTab() {
         type="number"
         name="basePrice"
       />
-      <div className="text-[10px] text-primary font-bold -mt-4">
+      <div className="text-xs text-primary font-bold -mt-4">
         IVA 19%: ${grossPrice.toLocaleString()}
       </div>
     </div>

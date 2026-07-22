@@ -1,32 +1,35 @@
-import React, { Suspense, cache } from 'react';
-import { Metadata } from 'next';
-import { getProductDetailsUseCase } from '@/modules/catalog/application/getProductDetails.use-case';
-import { getRelatedProductsUseCase } from '@/modules/catalog/application/getRelatedProducts.use-case';
-import { getBundleSuggestionUseCase } from '@/modules/catalog/application/getBundleSuggestion.use-case';
-import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
-import { PublicHeader } from '@/components/layout/public-header';
-import { PublicFooter } from '@/components/layout/public-footer';
-import { getServerUser } from '@/lib/server-auth';
-import { Pencil } from 'lucide-react';
+import React, { Suspense, cache } from "react";
+import { Metadata } from "next";
+import { getProductDetailsUseCase } from "@/modules/catalog/application/getProductDetails.use-case";
+import { getRelatedProductsUseCase } from "@/modules/catalog/application/getRelatedProducts.use-case";
+import { getBundleSuggestionUseCase } from "@/modules/catalog/application/getBundleSuggestion.use-case";
+import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { PublicHeader } from "@/components/layout/public-header";
+import { PublicFooter } from "@/components/layout/public-footer";
+import { getServerUser } from "@/lib/server-auth";
+import { Pencil } from "lucide-react";
 import {
-  ChevronRight, ChevronLeft, Plus,
-  ChevronDown, Package,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import Image from 'next/image';
-import { ProductGallery } from '@/modules/catalog/presentation/components/ProductGallery/ProductGallery';
-import { BuyBox } from '@/modules/catalog/presentation/components/BuyBox/BuyBox';
-import { ProductSlider } from '@/components/ui/product-slider';
-import { BundleAction } from '@/modules/catalog/presentation/components/BundleAction/BundleAction';
-import { prisma } from '@/lib/client';
-import { TAX_RATE } from '@/types/domain';
-import { TrackProduct } from '@/components/catalog/track-product';
-import { ProductCard } from '@/modules/catalog/presentation/components/ProductList/ProductCard';
-import { RecentlyViewedSlider } from '@/components/home/client-sliders';
-import { serializeDecimal } from '@/lib/utils';
-import { priceService } from '@/modules/pricing/domain/price.service';
+  ChevronRight,
+  ChevronLeft,
+  Plus,
+  ChevronDown,
+  Package,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import Image from "next/image";
+import { ProductGallery } from "@/modules/catalog/presentation/components/ProductGallery/ProductGallery";
+import { BuyBox } from "@/modules/catalog/presentation/components/BuyBox/BuyBox";
+import { ProductSlider } from "@/components/ui/product-slider";
+import { BundleAction } from "@/modules/catalog/presentation/components/BundleAction/BundleAction";
+import { prisma } from "@/lib/client";
+import { TAX_RATE } from "@/types/domain";
+import { TrackProduct } from "@/components/catalog/track-product";
+import { ProductCard } from "@/modules/catalog/presentation/components/ProductList/ProductCard";
+import { RecentlyViewedSlider } from "@/components/home/client-sliders";
+import { serializeDecimal } from "@/lib/utils";
+import { priceService } from "@/modules/pricing/domain/price.service";
 
 /**
  * Request-level cache:
@@ -62,59 +65,70 @@ export async function generateStaticParams() {
     });
     return products.map((p) => ({ slug: p.slug }));
   } catch (err) {
-    console.warn("⚠️ Advertencia: No se pudo conectar a la base de datos en generateStaticParams. Omitiendo pre-generación estática de productos.");
+    console.warn(
+      "⚠️ Advertencia: No se pudo conectar a la base de datos en generateStaticParams. Omitiendo pre-generación estática de productos.",
+    );
     return [];
   }
 }
 
 // ─── SEO Metadata ────────────────────────────────────────────────────────
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.jdevoto.cl";
   try {
     const product = await getCachedProduct(slug);
-    const brandName = typeof product.brand === 'string'
-      ? product.brand
-      : (product.brand as any)?.name || '';
+    const brandName =
+      typeof product.brand === "string"
+        ? product.brand
+        : (product.brand as any)?.name || "";
 
     // Limpiar HTML y truncar a 155 chars para meta description
-    const rawDesc = product.description || '';
-    const cleanDesc = rawDesc.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-    const metaDesc = cleanDesc.length > 0
-      ? (cleanDesc.length > 155 ? cleanDesc.substring(0, 152) + '...' : cleanDesc)
-      : `Compra ${product.name}${brandName ? ` de ${brandName}` : ''} al mejor precio mayorista en J. Devoto.`;
+    const rawDesc = product.description || "";
+    const cleanDesc = rawDesc
+      .replace(/<[^>]*>/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const metaDesc =
+      cleanDesc.length > 0
+        ? cleanDesc.length > 155
+          ? cleanDesc.substring(0, 152) + "..."
+          : cleanDesc
+        : `Compra ${product.name}${brandName ? ` de ${brandName}` : ""} al mejor precio mayorista en J. Devoto.`;
 
     const canonicalUrl = `${baseUrl}/products/${product.slug}`;
     const ogImages = (product.images as any[]).map((img) => ({
       url: img.url,
       width: 800,
       height: 800,
-      alt: `${product.name}${brandName ? ` — ${brandName}` : ''}`,
+      alt: `${product.name}${brandName ? ` — ${brandName}` : ""}`,
     }));
 
     return {
-      title: `${product.name}${brandName ? ` | ${brandName}` : ''}`,
+      title: `${product.name}${brandName ? ` | ${brandName}` : ""}`,
       description: metaDesc,
       alternates: { canonical: canonicalUrl },
       robots: { index: true, follow: true },
       openGraph: {
-        title: `${product.name}${brandName ? ` — ${brandName}` : ''} | J. Devoto`,
+        title: `${product.name}${brandName ? ` — ${brandName}` : ""} | J. Devoto`,
         description: metaDesc,
         url: canonicalUrl,
-        type: 'website',
-        locale: 'es_CL',
-        siteName: 'J. Devoto',
+        type: "website",
+        locale: "es_CL",
+        siteName: "J. Devoto",
         images: ogImages,
       },
       twitter: {
-        card: 'summary_large_image',
-        title: `${product.name}${brandName ? ` | ${brandName}` : ''} | J. Devoto`,
+        card: "summary_large_image",
+        title: `${product.name}${brandName ? ` | ${brandName}` : ""} | J. Devoto`,
         description: metaDesc,
         images: ogImages.length > 0 ? [ogImages[0].url] : [],
       },
     };
   } catch {
-    return { title: 'Producto no encontrado', robots: { index: false } };
+    return { title: "Producto no encontrado", robots: { index: false } };
   }
 }
 
@@ -122,8 +136,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 export default async function DynamicProductPage(props: ProductPageProps) {
   const params = await props.params;
   const user = await getServerUser();
-  const isAdmin = user?.role === 'ADMIN';
-
+  const isAdmin = user?.role === "ADMIN";
 
   /**
    * CRITICAL PATH — UNA sola query a la DB.
@@ -145,27 +158,30 @@ export default async function DynamicProductPage(props: ProductPageProps) {
   // Si el usuario entró al producto usando su ID en lugar del slug en la URL,
   // redirigimos de forma limpia a su slug oficial para asegurar SEO.
   if (product.id === params.slug) {
-    const { redirect } = await import('next/navigation');
+    const { redirect } = await import("next/navigation");
     redirect(`/products/${product.slug}`);
   }
 
-  const primaryImage = (product.images.find((img: any) => img.isPrimary) || product.images[0]) as any;
-  const brandName = typeof product.brand === 'string'
-    ? product.brand
-    : (product.brand as any)?.name || '';
+  const primaryImage = (product.images.find((img: any) => img.isPrimary) ||
+    product.images[0]) as any;
+  const brandName =
+    typeof product.brand === "string"
+      ? product.brand
+      : (product.brand as any)?.name || "";
 
-  const hasDimensions = (Number(product.length) || 0) > 0 ||
+  const hasDimensions =
+    (Number(product.length) || 0) > 0 ||
     (Number(product.width) || 0) > 0 ||
     (Number(product.height) || 0) > 0 ||
     (Number(product.weight) || 0) > 0;
 
   // Limpiar HTML de description para JSON-LD
-  const cleanDescription = (product.description || '')
-    .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, ' ')
+  const cleanDescription = (product.description || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
     .trim();
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.jdevoto.cl";
   const canonicalUrl = `${baseUrl}/products/${product.slug}`;
 
   // Precio base con IVA para el JSON-LD (el BuyBox lo actualizará con precio B2B)
@@ -173,41 +189,55 @@ export default async function DynamicProductPage(props: ProductPageProps) {
 
   // JSON-LD: Producto
   const productJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+    "@context": "https://schema.org",
+    "@type": "Product",
     name: product.name,
     image: product.images.map((img: any) => img.url),
     description: cleanDescription,
     sku: product.sku,
     mpn: product.sku,
-    brand: { '@type': 'Brand', name: brandName || 'J. Devoto' },
+    brand: { "@type": "Brand", name: brandName || "J. Devoto" },
     category: (product.category as any)?.name,
     offers: {
-      '@type': 'Offer',
+      "@type": "Offer",
       url: canonicalUrl,
-      priceCurrency: 'CLP',
+      priceCurrency: "CLP",
       price: basePriceGross,
-      availability: product.stockQuantity > 0
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      seller: { '@type': 'Organization', name: 'Comercial J. Devoto' },
+      availability:
+        product.stockQuantity > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      seller: { "@type": "Organization", name: "Comercial J. Devoto" },
     },
   };
 
   // JSON-LD: Breadcrumb
   const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Inicio', item: baseUrl },
-      { '@type': 'ListItem', position: 2, name: 'Catálogo', item: `${baseUrl}/products` },
-      ...((product.category as any)?.name ? [{
-        '@type': 'ListItem',
-        position: 3,
-        name: (product.category as any).name,
-        item: `${baseUrl}/products?category=${(product.category as any).slug || ''}`,
-      }] : []),
-      { '@type': 'ListItem', position: (product.category as any)?.name ? 4 : 3, name: product.name },
+      { "@type": "ListItem", position: 1, name: "Inicio", item: baseUrl },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Catálogo",
+        item: `${baseUrl}/products`,
+      },
+      ...((product.category as any)?.name
+        ? [
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: (product.category as any).name,
+              item: `${baseUrl}/products?category=${(product.category as any).slug || ""}`,
+            },
+          ]
+        : []),
+      {
+        "@type": "ListItem",
+        position: (product.category as any)?.name ? 4 : 3,
+        name: product.name,
+      },
     ],
   };
 
@@ -226,23 +256,33 @@ export default async function DynamicProductPage(props: ProductPageProps) {
       <TrackProduct slug={product.slug} />
 
       <main className="flex-grow max-w-[1500px] mx-auto p-6 lg:px-12 pt-8 pb-24 w-full">
-
         {/* Navegación y Botón de Edición */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
           <nav className="flex items-center gap-2.5 text-xs font-bold text-zinc-400 uppercase tracking-widest overflow-hidden">
-            <Link 
-              href={product.category?.slug ? `/products?category=${product.category.slug}` : '/products'} 
+            <Link
+              href={
+                product.category?.slug
+                  ? `/products?category=${product.category.slug}`
+                  : "/products"
+              }
               className="flex items-center gap-1 text-blue-600 hover:text-blue-700 transition-colors font-black shrink-0"
             >
               <ChevronLeft className="h-4 w-4" />
-              <span>{(product.category as any)?.name || 'Catálogo General'}</span>
+              <span>
+                {(product.category as any)?.name || "Catálogo General"}
+              </span>
             </Link>
             <span className="text-zinc-300 shrink-0">/</span>
-            <span className="text-zinc-900 truncate font-black max-w-[150px] xs:max-w-none">{product.name}</span>
+            <span className="text-zinc-900 truncate font-black max-w-[150px] xs:max-w-none">
+              {product.name}
+            </span>
           </nav>
 
           {isAdmin && (
-            <Link href={`/dashboard/products/${product.id}/edit`} className="shrink-0">
+            <Link
+              href={`/dashboard/products/${product.id}/edit`}
+              className="shrink-0"
+            >
               <Button className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 transition-all shadow-md active:scale-95 hover:scale-[1.02]">
                 <Pencil className="h-3.5 w-3.5 text-white" />
                 Editar Producto
@@ -256,7 +296,10 @@ export default async function DynamicProductPage(props: ProductPageProps) {
           <div className="lg:col-span-9 space-y-8 lg:space-y-12">
             <div className="grid grid-cols-1 md:grid-cols-9 gap-8 lg:gap-12 items-start">
               {/* GALLERY (6 cols on md+) */}
-              <ProductGallery images={product.images as any} productName={product.name} />
+              <ProductGallery
+                images={product.images as any}
+                productName={product.name}
+              />
 
               {/* PRODUCT INFO (3 cols on md+) */}
               <div className="md:col-span-3 space-y-6 lg:space-y-8">
@@ -277,20 +320,36 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   <table className="w-full text-[16px] uppercase tracking-tight">
                     <tbody className="divide-y divide-zinc-50">
                       <tr className="group">
-                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">SKU</td>
-                        <td className="py-2.5 text-right text-zinc-950">{product.sku}</td>
+                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">
+                          SKU
+                        </td>
+                        <td className="py-2.5 text-right text-zinc-950">
+                          {product.sku}
+                        </td>
                       </tr>
                       <tr className="group">
-                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">Marca</td>
-                        <td className="py-2.5 text-right text-zinc-950">{brandName || '—'}</td>
+                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">
+                          Marca
+                        </td>
+                        <td className="py-2.5 text-right text-zinc-950">
+                          {brandName || "—"}
+                        </td>
                       </tr>
                       <tr className="group">
-                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">Unidad</td>
-                        <td className="py-2.5 text-right text-zinc-950">{product.unit}</td>
+                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">
+                          Unidad
+                        </td>
+                        <td className="py-2.5 text-right text-zinc-950">
+                          {product.unit}
+                        </td>
                       </tr>
                       <tr className="group">
-                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">Unidades Inner</td>
-                        <td className="py-2.5 text-right text-zinc-950">{product.inner ?? 1}</td>
+                        <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">
+                          Unidades Inner
+                        </td>
+                        <td className="py-2.5 text-right text-zinc-950">
+                          {product.inner ?? 1}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -301,13 +360,17 @@ export default async function DynamicProductPage(props: ProductPageProps) {
             {/* DESCRIPCIÓN DEL PRODUCTO */}
             <div className="pt-8 lg:pt-12 border-t border-zinc-100">
               <section className="max-w-4xl">
-                <h2 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-4 lg:mb-6">Descripción del producto</h2>
-                <div 
+                <h2 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight mb-4 lg:mb-6">
+                  Descripción del producto
+                </h2>
+                <div
                   className="text-lg sm:text-xl text-zinc-700 leading-relaxed space-y-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_a]:text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-xl [&_img]:my-4"
-                  dangerouslySetInnerHTML={{ 
-                    __html: (product.description || 'No hay descripción disponible.')
-                      .replace(/\\n/g, '<br />')
-                      .replace(/\n/g, '<br />')
+                  dangerouslySetInnerHTML={{
+                    __html: (
+                      product.description || "No hay descripción disponible."
+                    )
+                      .replace(/\\n/g, "<br />")
+                      .replace(/\n/g, "<br />"),
                   }}
                 />
               </section>
@@ -321,7 +384,9 @@ export default async function DynamicProductPage(props: ProductPageProps) {
 
               {/* MEDIOS DE PAGO */}
               <div className="p-6 sm:p-8 rounded-[36px] sm:rounded-[48px] border border-zinc-100 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.05)] space-y-6">
-                <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">Medios de pago</h3>
+                <h3 className="text-xl sm:text-2xl font-black text-zinc-950 tracking-tight">
+                  Medios de pago
+                </h3>
                 <div className="bg-[#00a650] p-4 rounded-xl flex items-center gap-3 text-white">
                   <Package className="h-6 w-6 shrink-0" />
                   <p className="text-sm sm:text-base font-bold leading-snug">
@@ -330,20 +395,32 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-xs sm:text-[13px] font-black text-zinc-500 uppercase tracking-widest mb-3">Crédito Directo</h4>
+                    <h4 className="text-xs sm:text-[13px] font-black text-zinc-500 uppercase tracking-widest mb-3">
+                      Crédito Directo
+                    </h4>
                     <div className="flex flex-wrap gap-1.5">
-                      {['Contado', '30 días', '60 días', '90 días'].map(term => (
-                        <div key={term} className="px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-100 text-xs sm:text-[13px] font-bold text-zinc-750">
-                          {term}
-                        </div>
-                      ))}
+                      {["Contado", "30 días", "60 días", "90 días"].map(
+                        (term) => (
+                          <div
+                            key={term}
+                            className="px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-100 text-xs sm:text-[13px] font-bold text-zinc-750"
+                          >
+                            {term}
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-[13px] font-black text-zinc-500 uppercase tracking-widest mb-3">Tarjetas de Crédito y Débito</h4>
+                    <h4 className="text-xs sm:text-[13px] font-black text-zinc-500 uppercase tracking-widest mb-3">
+                      Tarjetas de Crédito y Débito
+                    </h4>
                     <div className="flex flex-wrap gap-1.5">
-                      {['Visa', 'Mastercard', 'Mercado Pago', 'Transferencia'].map(method => (
-                        <div key={method} className="px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-100 text-xs sm:text-[13px] font-bold text-zinc-750">
+                      {["Mercado Pago", "Transferencia"].map((method) => (
+                        <div
+                          key={method}
+                          className="px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-100 text-xs sm:text-[13px] font-bold text-zinc-750"
+                        >
                           {method}
                         </div>
                       ))}
@@ -351,7 +428,12 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   </div>
                 </div>
                 <div className="pt-2 border-t border-zinc-50">
-                  <a href="#" className="text-sm sm:text-base font-bold text-blue-600 hover:underline">Conoce nuestros términos de crédito</a>
+                  <a
+                    href="#"
+                    className="text-sm sm:text-base font-bold text-blue-600 hover:underline"
+                  >
+                    Conoce nuestros términos de crédito
+                  </a>
                 </div>
               </div>
             </div>
@@ -364,26 +446,42 @@ export default async function DynamicProductPage(props: ProductPageProps) {
             <div className="bg-blue-600 text-white px-6 py-2.5 text-xl sm:text-2xl font-black uppercase tracking-widest w-fit rounded-lg shadow-lg shadow-blue-600/20">
               Más información del producto
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
               {/* Características */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b-2 border-zinc-100 pb-4">
-                  <h3 className="text-2xl font-black text-zinc-950 tracking-tight">Características y especificaciones</h3>
+                  <h3 className="text-2xl font-black text-zinc-950 tracking-tight">
+                    Características y especificaciones
+                  </h3>
                   <ChevronDown className="h-6 w-6 text-zinc-400" />
                 </div>
                 <table className="w-full text-base sm:text-lg">
                   <tbody className="divide-y divide-zinc-50">
-                    {product.specifications && Array.isArray(product.specifications) && product.specifications.length > 0 ? (
+                    {product.specifications &&
+                    Array.isArray(product.specifications) &&
+                    product.specifications.length > 0 ? (
                       product.specifications.map((spec: any, idx: number) => (
-                        <tr key={idx} className={idx % 2 === 0 ? 'bg-zinc-50/30' : ''}>
-                          <td className="py-4 px-4 font-bold text-zinc-900 w-1/2 uppercase text-xs sm:text-[13px] tracking-wider">{spec.label || spec.name}</td>
-                          <td className="py-4 px-4 text-zinc-700 font-medium">{spec.value}</td>
+                        <tr
+                          key={idx}
+                          className={idx % 2 === 0 ? "bg-zinc-50/30" : ""}
+                        >
+                          <td className="py-4 px-4 font-bold text-zinc-900 w-1/2 uppercase text-xs sm:text-[13px] tracking-wider">
+                            {spec.label || spec.name}
+                          </td>
+                          <td className="py-4 px-4 text-zinc-700 font-medium">
+                            {spec.value}
+                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td className="py-5 px-4 text-zinc-500 italic text-base sm:text-lg" colSpan={2}>No hay especificaciones disponibles.</td>
+                        <td
+                          className="py-5 px-4 text-zinc-500 italic text-base sm:text-lg"
+                          colSpan={2}
+                        >
+                          No hay especificaciones disponibles.
+                        </td>
                       </tr>
                     )}
                   </tbody>
@@ -393,23 +491,40 @@ export default async function DynamicProductPage(props: ProductPageProps) {
               {/* Detalles */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between border-b-2 border-zinc-100 pb-4">
-                  <h3 className="text-2xl font-black text-zinc-950 tracking-tight">Detalles del producto</h3>
+                  <h3 className="text-2xl font-black text-zinc-950 tracking-tight">
+                    Detalles del producto
+                  </h3>
                   <ChevronDown className="h-6 w-6 text-zinc-400" />
                 </div>
                 <div className="p-8 rounded-3xl bg-zinc-50 border border-zinc-100 text-base sm:text-lg text-zinc-700 space-y-6 font-medium">
                   {hasDimensions && (
                     <div className="flex justify-between items-center">
-                      <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">Dimensiones</span>
-                      <span className="text-zinc-950 font-bold">{Number(product.length) || '—'} x {Number(product.width) || '—'} x {Number(product.height) || '—'} cm; {Number(product.weight) || '—'} kg</span>
+                      <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">
+                        Dimensiones
+                      </span>
+                      <span className="text-zinc-950 font-bold">
+                        {Number(product.length) || "—"} x{" "}
+                        {Number(product.width) || "—"} x{" "}
+                        {Number(product.height) || "—"} cm;{" "}
+                        {Number(product.weight) || "—"} kg
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">Fabricante</span>
-                    <span className="text-zinc-950 font-bold">{brandName || '—'}</span>
+                    <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">
+                      Fabricante
+                    </span>
+                    <span className="text-zinc-950 font-bold">
+                      {brandName || "—"}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">SKU</span>
-                    <span className="text-zinc-950 font-mono font-black">{product.sku}</span>
+                    <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">
+                      SKU
+                    </span>
+                    <span className="text-zinc-950 font-mono font-black">
+                      {product.sku}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -434,11 +549,9 @@ export default async function DynamicProductPage(props: ProductPageProps) {
             currentProductId={product.id}
           />
         </Suspense>
-
       </main>
 
       <PublicFooter />
-
     </div>
   );
 }
@@ -448,7 +561,8 @@ export default async function DynamicProductPage(props: ProductPageProps) {
 // Usan companyId=null para no bloquear — precios base, no B2B.
 
 async function RelatedProductsSection({
-  categoryId, currentProductId,
+  categoryId,
+  currentProductId,
 }: {
   categoryId: string | null;
   currentProductId: string;
@@ -457,9 +571,11 @@ async function RelatedProductsSection({
   const isAuthenticated = !!user;
 
   const hideSetting = await prisma.storeSettings.findUnique({
-    where: { key: 'hideOutOfStock' },
+    where: { key: "hideOutOfStock" },
   });
-  const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
+  const hideOutOfStock = hideSetting
+    ? (hideSetting.value as boolean) === true
+    : false;
 
   const productSelect = {
     id: true,
@@ -482,31 +598,39 @@ async function RelatedProductsSection({
     },
   };
 
-  async function fetchEnrichedProducts(whereClause: any, limit: number): Promise<any[]> {
+  async function fetchEnrichedProducts(
+    whereClause: any,
+    limit: number,
+  ): Promise<any[]> {
     const products = await prisma.product.findMany({
       where: {
         ...whereClause,
         isActive: true,
         isDeleted: false,
-        ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {})
+        ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {}),
       },
       take: limit,
-      orderBy: [
-        { stockQuantity: "desc" },
-        { createdAt: "desc" }
-      ],
+      orderBy: [{ stockQuantity: "desc" }, { createdAt: "desc" }],
       select: productSelect,
     });
 
     if (products.length === 0) return [];
 
-    const enriched = await priceService.enrichProductsWithPrices(products as any, null);
-    return enriched.map((p: any) => serializeDecimal(p as Record<string, unknown>));
+    const enriched = await priceService.enrichProductsWithPrices(
+      products as any,
+      null,
+    );
+    return enriched.map((p: any) =>
+      serializeDecimal(p as Record<string, unknown>),
+    );
   }
 
   // 1. Fetch child category products
   const childProducts = categoryId
-    ? await fetchEnrichedProducts({ categoryId, id: { not: currentProductId } }, 8)
+    ? await fetchEnrichedProducts(
+        { categoryId, id: { not: currentProductId } },
+        8,
+      )
     : [];
 
   // Determine parent category
@@ -518,7 +642,7 @@ async function RelatedProductsSection({
   if (categoryId) {
     const currentCategory = await prisma.category.findUnique({
       where: { id: categoryId },
-      select: { id: true, name: true, parentId: true }
+      select: { id: true, name: true, parentId: true },
     });
 
     if (currentCategory) {
@@ -527,7 +651,7 @@ async function RelatedProductsSection({
         parentId = currentCategory.parentId;
         const parentCategory = await prisma.category.findUnique({
           where: { id: parentId },
-          select: { name: true }
+          select: { name: true },
         });
         parentName = parentCategory?.name || null;
       } else {
@@ -540,9 +664,9 @@ async function RelatedProductsSection({
   if (parentId) {
     const subcategories = await prisma.category.findMany({
       where: { parentId },
-      select: { id: true }
+      select: { id: true },
     });
-    parentCategoryIds = [parentId, ...subcategories.map(c => c.id)];
+    parentCategoryIds = [parentId, ...subcategories.map((c) => c.id)];
   } else if (categoryId) {
     parentCategoryIds = [categoryId];
   }
@@ -554,9 +678,13 @@ async function RelatedProductsSection({
     excludeIds.push(...childProducts.map((p: any) => p.id as string));
   }
 
-  const parentProducts = parentCategoryIds.length > 0
-    ? await fetchEnrichedProducts({ categoryId: { in: parentCategoryIds }, id: { notIn: excludeIds } }, 8)
-    : [];
+  const parentProducts =
+    parentCategoryIds.length > 0
+      ? await fetchEnrichedProducts(
+          { categoryId: { in: parentCategoryIds }, id: { notIn: excludeIds } },
+          8,
+        )
+      : [];
 
   if (parentProducts.length === 0 && childProducts.length === 0) return null;
 
@@ -564,13 +692,21 @@ async function RelatedProductsSection({
     <div className="mt-12 border-t border-zinc-100 pt-16 space-y-16">
       {/* 1. Direct Category (Child/Hijo) Slider - Only shown if it has >= 1 products */}
       {showChildSlider && (
-        <ProductSlider title={childName ? `Productos de ${childName}` : "Productos Relacionados"}>
+        <ProductSlider
+          title={
+            childName ? `Productos de ${childName}` : "Productos Relacionados"
+          }
+        >
           {childProducts.map((p: any, idx: number) => (
-            <div 
-              key={`${p.id}-${idx}`} 
+            <div
+              key={`${p.id}-${idx}`}
               className="w-[85vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
             >
-              <ProductCard product={p} variant="catalog" isAuthenticated={isAuthenticated} />
+              <ProductCard
+                product={p}
+                variant="catalog"
+                isAuthenticated={isAuthenticated}
+              />
             </div>
           ))}
         </ProductSlider>
@@ -580,11 +716,15 @@ async function RelatedProductsSection({
       {parentProducts.length > 0 && (
         <ProductSlider title={parentName || "Categoría Principal"}>
           {parentProducts.map((p: any, idx: number) => (
-            <div 
-              key={`${p.id}-${idx}`} 
+            <div
+              key={`${p.id}-${idx}`}
               className="w-[85vw] sm:w-[calc((100%-1rem)/2)] md:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)] shrink-0 snap-start"
             >
-              <ProductCard product={p} variant="catalog" isAuthenticated={isAuthenticated} />
+              <ProductCard
+                product={p}
+                variant="catalog"
+                isAuthenticated={isAuthenticated}
+              />
             </div>
           ))}
         </ProductSlider>
@@ -597,16 +737,22 @@ async function RelatedProductsSection({
 }
 
 async function BundleSuggestionSection({
-  product, primaryImageUrl,
+  product,
+  primaryImageUrl,
 }: {
   product: any;
   primaryImageUrl: string;
 }) {
   const cookieStore = await cookies();
-  const isAuthenticated = !!cookieStore.get('refresh_token')?.value;
+  const isAuthenticated = !!cookieStore.get("refresh_token")?.value;
   if (!isAuthenticated) return null;
 
-  const bundle = await getBundleSuggestionUseCase(product.categoryId, product.brandId, product.id, null);
+  const bundle = await getBundleSuggestionUseCase(
+    product.categoryId,
+    product.brandId,
+    product.id,
+    null,
+  );
   if (!bundle) return null;
 
   return (
@@ -615,17 +761,21 @@ async function BundleSuggestionSection({
       <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 max-w-6xl mx-auto relative z-10">
         <div className="flex flex-col gap-6 w-full lg:flex-1">
           <div className="flex flex-col gap-2 text-center lg:text-left">
-            <h2 className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight">Sugerencia de compra</h2>
-            <p className="text-xs sm:text-sm text-zinc-400 font-bold uppercase tracking-wider">Aumenta tu rentabilidad combinando estos productos</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight">
+              Sugerencia de compra
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-400 font-bold uppercase tracking-wider">
+              Aumenta tu rentabilidad combinando estos productos
+            </p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 justify-center lg:justify-start">
             <div className="flex items-center gap-4 sm:gap-6 justify-center shrink-0">
               {/* Producto Actual */}
               <div className="group relative shrink-0">
                 <div className="w-24 h-24 sm:w-36 sm:h-36 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden">
                   <Image
-                    src={primaryImageUrl || '/placeholder-product.png'}
+                    src={primaryImageUrl || "/placeholder-product.png"}
                     fill
                     sizes="144px"
                     className="object-contain p-4 mix-blend-multiply"
@@ -641,9 +791,15 @@ async function BundleSuggestionSection({
 
               {/* Producto Sugerido */}
               <div className="group relative shrink-0">
-                <Link href={`/products/${bundle.slug}`} className="block w-24 h-24 sm:w-36 sm:h-36 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden">
+                <Link
+                  href={`/products/${bundle.slug}`}
+                  className="block w-24 h-24 sm:w-36 sm:h-36 rounded-[24px] bg-white border border-zinc-100 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-500 relative overflow-hidden"
+                >
                   <Image
-                    src={(bundle.images as any)?.[0]?.url || '/placeholder-product.png'}
+                    src={
+                      (bundle.images as any)?.[0]?.url ||
+                      "/placeholder-product.png"
+                    }
                     fill
                     sizes="144px"
                     className="object-contain p-4 mix-blend-multiply"
@@ -655,10 +811,15 @@ async function BundleSuggestionSection({
                 </div>
               </div>
             </div>
-            
+
             <div className="flex flex-col gap-1 text-center sm:text-left max-w-sm">
-              <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Sugerido</div>
-              <Link href={`/products/${bundle.slug}`} className="text-sm sm:text-base font-black text-zinc-950 hover:text-blue-600 transition-colors line-clamp-2 uppercase leading-snug">
+              <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                Sugerido
+              </div>
+              <Link
+                href={`/products/${bundle.slug}`}
+                className="text-sm sm:text-base font-black text-zinc-950 hover:text-blue-600 transition-colors line-clamp-2 uppercase leading-snug"
+              >
                 {bundle.name}
               </Link>
             </div>

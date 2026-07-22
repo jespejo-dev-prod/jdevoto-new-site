@@ -60,7 +60,7 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
     <div className="space-y-6">
       {/* ─── CARD DE CATEGORÍAS (Estilo WordPress) ───────────────────────────── */}
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-4 shadow-xl">
-        <h3 className="text-[10px] font-bold text-white uppercase tracking-widest border-b border-zinc-800 pb-4 flex justify-between items-center">
+        <h3 className="text-xs font-bold text-white uppercase tracking-widest border-b border-zinc-800 pb-4 flex justify-between items-center">
           Categorías del producto
           {isLoading && <Loader2 className="h-3 w-3 animate-spin text-primary" />}
         </h3>
@@ -74,13 +74,13 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
               placeholder="Buscar categoría..."
               value={categorySearch}
               onChange={(e) => setCategorySearch(e.target.value)}
-              className="w-full h-9 pl-10 pr-4 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-white focus:outline-none focus:border-primary/50 placeholder-zinc-550 transition-colors"
+              className="w-full h-9 pl-10 pr-4 rounded-xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-primary/50 placeholder-zinc-550 transition-colors"
             />
           </div>
         )}
         
         {/* Contenedor con barra de desplazamiento personalizada */}
-        <div className="border border-zinc-800/80 rounded-xl bg-zinc-950/60 p-4 space-y-3.5 max-h-[280px] overflow-y-auto custom-scrollbar text-[11px] shadow-inner">
+        <div className="border border-zinc-800/80 rounded-xl bg-zinc-950/60 p-4 space-y-3.5 max-h-[280px] overflow-y-auto custom-scrollbar text-sm shadow-inner">
           {isLoading ? (
             <div className="text-zinc-500 text-center py-6 flex items-center justify-center gap-2">
               <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
@@ -151,7 +151,7 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
 
       {/* ─── CARD DE MARCA ─────────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-4 shadow-xl">
-        <h3 className="text-[10px] font-bold text-white uppercase tracking-widest border-b border-zinc-800 pb-4 flex justify-between items-center">
+        <h3 className="text-xs font-bold text-white uppercase tracking-widest border-b border-zinc-800 pb-4 flex justify-between items-center">
           Marca del producto
           {isLoading && <Loader2 className="h-3 w-3 animate-spin text-primary" />}
         </h3>
@@ -161,7 +161,7 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
             type="button"
             onClick={() => setIsOpenBrand(!isOpenBrand)}
             disabled={isLoading}
-            className="w-full h-10 px-4 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-white text-left focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50 flex items-center justify-between cursor-pointer"
+            className="w-full h-10 px-4 rounded-xl bg-zinc-950 border border-zinc-800 text-sm text-white text-left focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50 flex items-center justify-between cursor-pointer"
           >
             <span className={selectedBrand ? "text-white" : "text-zinc-500"}>
               {selectedBrand ? selectedBrand.name : "Seleccionar Marca..."}
@@ -180,7 +180,7 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
                     placeholder="Buscar marca..."
                     value={brandSearch}
                     onChange={(e) => setBrandSearch(e.target.value)}
-                    className="w-full h-8 pl-8 pr-3 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] text-white focus:outline-none focus:border-primary/50 placeholder-zinc-550"
+                    className="w-full h-8 pl-8 pr-3 rounded-lg bg-zinc-900 border border-zinc-800 text-sm text-white focus:outline-none focus:border-primary/50 placeholder-zinc-550"
                   />
                 </div>
                 <div className="overflow-y-auto flex-1 custom-scrollbar space-y-0.5">
@@ -191,7 +191,7 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
                       setIsOpenBrand(false);
                       setBrandSearch("");
                     }}
-                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] text-zinc-500 hover:bg-zinc-900 hover:text-white transition-colors"
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-sm text-zinc-500 hover:bg-zinc-900 hover:text-white transition-colors"
                   >
                     Ninguna marca
                   </button>
@@ -207,7 +207,7 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
                           setBrandSearch("");
                         }}
                         className={cn(
-                          "w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] transition-colors",
+                          "w-full text-left px-2.5 py-1.5 rounded-lg text-sm transition-colors",
                           brandId === b.id 
                             ? "bg-primary text-black font-bold" 
                             : "text-zinc-300 hover:bg-zinc-900 hover:text-white"
@@ -217,7 +217,7 @@ export function ClassificationCard({ categories, brands, isLoading }: Classifica
                       </button>
                     ))}
                   {filteredBrands.length === 0 && (
-                    <div className="text-zinc-500 text-center py-2 text-[10px]">No se encontraron marcas</div>
+                    <div className="text-zinc-500 text-center py-2 text-xs">No se encontraron marcas</div>
                   )}
                 </div>
               </div>

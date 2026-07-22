@@ -163,13 +163,17 @@ export default function OrderDetailPage() {
  Cliente / Facturación
  </div>
  <div className="space-y-1.5 mt-1">
- <p className="text-[15px] font-bold text-white">{order.company.razonSocial}</p>
- <p className="text-xs sm:text-[13px] text-zinc-300 font-semibold font-mono tracking-wide">{order.company.rut}</p>
+ <p className="text-[17px] font-bold text-white">{order.company.razonSocial}</p>
+ {order.company.rut && (
+   <div className="inline-flex mt-1.5 px-3 py-0.5 rounded-lg bg-primary/15 border border-primary/30 text-sm font-bold text-primary w-fit shadow-sm tracking-wide">
+     {order.company.rut}
+   </div>
+ )}
  {order.company.billingStreet && (
- <p className="text-xs sm:text-[13px] text-zinc-300 mt-2">{order.company.billingStreet} {order.company.billingNumber}</p>
+ <p className="text-sm text-zinc-300 mt-2">{order.company.billingStreet} {order.company.billingNumber}</p>
  )}
  {order.company.billingCommune && (
- <p className="text-xs sm:text-[13px] text-zinc-400 font-medium uppercase tracking-wide">{order.company.billingCommune}, {order.company.billingCity}</p>
+ <p className="text-sm text-zinc-400 font-medium uppercase tracking-wide">{order.company.billingCommune}, {order.company.billingCity}</p>
  )}
  </div>
  </div>
@@ -180,11 +184,11 @@ export default function OrderDetailPage() {
  Dirección de Envío
  </div>
  <div className="space-y-1.5 mt-1">
- <p className="text-[15px] font-bold text-white">Despacho B2B</p>
+ <p className="text-[17px] font-bold text-white">Despacho B2B</p>
  {order.shippingAddress ? (
  <>
- <p className="text-xs sm:text-[13px] text-zinc-300">{(order.shippingAddress as any).street} {(order.shippingAddress as any).number}</p>
- <p className="text-xs sm:text-[13px] text-zinc-400 font-medium uppercase tracking-wide">{(order.shippingAddress as any).comuna}, {(order.shippingAddress as any).region}</p>
+ <p className="text-sm text-zinc-300">{(order.shippingAddress as any).street} {(order.shippingAddress as any).number}</p>
+ <p className="text-sm text-zinc-400 font-medium uppercase tracking-wide">{(order.shippingAddress as any).comuna}, {(order.shippingAddress as any).region}</p>
  { (order.shippingAddress as any).details && (
  <p className="text-[11px] text-primary font-bold italic mt-2">"{(order.shippingAddress as any).details}"</p>
  )}
@@ -201,14 +205,14 @@ export default function OrderDetailPage() {
  Pago / Usuario
  </div>
  <div className="space-y-1.5 mt-1">
- <p className="text-[15px] font-bold text-white">{order.paymentStatus}</p>
+ <p className="text-[17px] font-bold text-white">{order.paymentStatus}</p>
  <div className="flex items-center gap-2 mt-2">
- <div className="h-6 w-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-primary">
+ <div className="h-6 w-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[11px] font-bold text-primary">
  {order.createdBy.firstName[0]}
  </div>
- <p className="text-xs sm:text-[13px] text-zinc-300 font-medium">{order.createdBy.firstName} {order.createdBy.lastName}</p>
+ <p className="text-sm text-zinc-300 font-medium">{order.createdBy.firstName} {order.createdBy.lastName}</p>
  </div>
- <p className="text-[11px] sm:text-xs text-zinc-400 font-mono mt-0.5 truncate">{order.createdBy.email}</p>
+ <p className="text-xs sm:text-sm text-zinc-400 font-mono mt-0.5 truncate">{order.createdBy.email}</p>
  </div>
  </div>
  </div>
@@ -225,23 +229,23 @@ export default function OrderDetailPage() {
  {/* Totals Summary */}
  <div className="flex justify-end">
  <div className="w-full md:w-80 bg-zinc-900/60 border border-zinc-800 rounded-3xl p-8 space-y-4 shadow-2xl">
- <div className="flex justify-between items-center text-sm text-zinc-300">
+ <div className="flex justify-between items-center text-base text-zinc-300">
  <span>Subtotal Neto</span>
  <span className="font-bold text-white">{formatCurrency(Number(order.subtotalNet))}</span>
  </div>
- <div className="flex justify-between items-center text-sm text-zinc-300">
+ <div className="flex justify-between items-center text-base text-zinc-300">
  <span>IVA (19%)</span>
  <span className="font-bold text-white">{formatCurrency(Number(order.taxAmount))}</span>
  </div>
  {Number(order.discountAmount) > 0 && (
- <div className="flex justify-between items-center text-sm text-emerald-400 font-medium">
+ <div className="flex justify-between items-center text-base text-emerald-400 font-medium">
  <span>Descuentos</span>
  <span className="font-black">-{formatCurrency(Number(order.discountAmount))}</span>
  </div>
  )}
  <div className="h-px bg-zinc-800 my-2" />
  <div className="flex justify-between items-center">
- <span className="text-[13px] font-bold text-zinc-300 uppercase tracking-wider">Total Bruto</span>
+ <span className="text-sm font-bold text-zinc-300 uppercase tracking-wider">Total Bruto</span>
  <span className="text-2xl sm:text-3xl font-black text-primary">{formatCurrency(Number(order.totalGross))}</span>
  </div>
  </div>
@@ -251,17 +255,17 @@ export default function OrderDetailPage() {
  {/* Sidebar Panel */}
  <div className="lg:col-span-3 space-y-6">
  <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-6 space-y-6 shadow-xl">
- <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-4">
+ <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-4">
  Acciones del Pedido
  </h4>
  
  {isAdmin ? (
  <div className="space-y-3">
- <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest px-1">Cambiar Estado</p>
+ <p className="text-xs text-zinc-500 uppercase font-bold tracking-widest px-1">Cambiar Estado</p>
  <select 
  value={order.status}
  onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
- className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
+ className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
  >
  {/* Estados principales */}
  <option value={OrderStatus.PENDING}>{STATUS_CONFIG[OrderStatus.PENDING]?.label ||"Pendiente"}</option>
@@ -280,9 +284,9 @@ export default function OrderDetailPage() {
  </div>
  ) : (
  <div className="space-y-3">
- <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest px-1">Estado del Pedido</p>
+ <p className="text-xs text-zinc-500 uppercase font-bold tracking-widest px-1">Estado del Pedido</p>
  <div className="w-full bg-zinc-950/40 border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-center">
- <OrderStatusBadge status={order.status} className="text-xs px-3 py-1" />
+ <OrderStatusBadge status={order.status} className="text-sm px-4 py-2" />
  </div>
  </div>
  )}
@@ -291,7 +295,7 @@ export default function OrderDetailPage() {
  <button 
  onClick={handleSendEmail}
  disabled={isSendingEmail}
- className="w-full py-3 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+ className="w-full py-3 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
  >
  {isSendingEmail && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
  Enviar por Email
@@ -300,7 +304,7 @@ export default function OrderDetailPage() {
  {order.status === OrderStatus.DRAFT ? (
  <button 
  onClick={handleDelete}
- className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+ className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
  >
  <Trash2 className="h-3.5 w-3.5" />
  Eliminar Borrador
@@ -308,7 +312,7 @@ export default function OrderDetailPage() {
  ) : (
  <button 
  onClick={() => handleStatusChange(OrderStatus.CANCELLED)}
- className="w-full py-3 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 text-red-500/60 hover:text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all"
+ className="w-full py-3 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 text-red-500/60 hover:text-red-500 rounded-xl text-xs font-bold uppercase tracking-widest transition-all"
  >
  Cancelar Pedido
  </button>

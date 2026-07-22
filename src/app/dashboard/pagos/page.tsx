@@ -150,20 +150,20 @@ export default function PagosDashboard() {
  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  <div>
  <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Proveedores de pago</h1>
- <p className="text-zinc-500 text-sm mt-1">Configura las opciones de pago que verán tus clientes durante el checkout.</p>
+ <p className="text-zinc-500 text-base mt-1">Configura las opciones de pago que verán tus clientes durante el checkout.</p>
  </div>
 
  <div className="flex gap-4 border-b border-zinc-200">
  <button 
  onClick={() => setActiveTab('bank')}
- className={`pb-3 px-2 text-sm font-bold border-b-2 transition-colors ${activeTab === 'bank' ? 'border-primary text-primary' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
+ className={`pb-3 px-2 text-base font-bold border-b-2 transition-colors ${activeTab === 'bank' ? 'border-primary text-primary' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
  >
  <Building2 className="w-4 h-4 inline-block mr-2" />
  Transferencia Bancaria
  </button>
  <button 
  onClick={() => setActiveTab('mp')}
- className={`pb-3 px-2 text-sm font-bold border-b-2 transition-colors ${activeTab === 'mp' ? 'border-blue-500 text-blue-500' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
+ className={`pb-3 px-2 text-base font-bold border-b-2 transition-colors ${activeTab === 'mp' ? 'border-blue-500 text-blue-500' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
  >
  <CreditCard className="w-4 h-4 inline-block mr-2" />
  Mercado Pago (Simulado)
@@ -174,44 +174,44 @@ export default function PagosDashboard() {
  <form onSubmit={bankForm.handleSubmit(onSaveBank)} className="space-y-8 bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
  <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
  <div>
- <h2 className="text-lg font-bold text-zinc-900">Transferencia bancaria directa</h2>
- <p className="text-sm text-zinc-500">Permite pagos directos a tus cuentas.</p>
+ <h2 className="text-xl font-bold text-zinc-900">Transferencia bancaria directa</h2>
+ <p className="text-base text-zinc-500">Permite pagos directos a tus cuentas.</p>
  </div>
  <label className="flex items-center gap-2 cursor-pointer">
  <input type="checkbox" {...bankForm.register('enabled')} className="rounded text-primary focus:ring-primary h-5 w-5 border-zinc-300" />
- <span className="font-bold text-sm text-zinc-900">Activar método</span>
+ <span className="font-bold text-base text-zinc-900">Activar método</span>
  </label>
  </div>
 
  <div className="space-y-6 max-w-3xl">
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-500 uppercase">Título</Label>
- <Input {...bankForm.register('title')} className="bg-zinc-50 border-zinc-200 text-zinc-900 font-medium" />
- <p className="text-xs text-zinc-400">Nombre del método de pago que verá el cliente.</p>
+ <Label className="text-sm font-bold text-zinc-500 uppercase">Título</Label>
+ <Input {...bankForm.register('title')} className="bg-zinc-50 border-zinc-200 text-base text-zinc-900 font-medium" />
+ <p className="text-sm text-zinc-400">Nombre del método de pago que verá el cliente.</p>
  </div>
 
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-500 uppercase">Descripción</Label>
- <Textarea {...bankForm.register('description')} className="bg-zinc-50 border-zinc-200 text-zinc-900 font-medium min-h-[80px]" />
- <p className="text-xs text-zinc-400">Descripción que verá el cliente al finalizar el pago.</p>
+ <Label className="text-sm font-bold text-zinc-500 uppercase">Descripción</Label>
+ <Textarea {...bankForm.register('description')} className="bg-zinc-50 border-zinc-200 text-base text-zinc-900 font-medium min-h-[80px]" />
+ <p className="text-sm text-zinc-400">Descripción que verá el cliente al finalizar el pago.</p>
  </div>
 
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-500 uppercase">Instrucciones</Label>
- <Textarea {...bankForm.register('instructions')} className="bg-zinc-50 border-zinc-200 text-zinc-900 font-medium min-h-[80px]" />
- <p className="text-xs text-zinc-400">Instrucciones que se agregarán a la página de agradecimiento.</p>
+ <Label className="text-sm font-bold text-zinc-500 uppercase">Instrucciones</Label>
+ <Textarea {...bankForm.register('instructions')} className="bg-zinc-50 border-zinc-200 text-base text-zinc-900 font-medium min-h-[80px]" />
+ <p className="text-sm text-zinc-400">Instrucciones que se agregarán a la página de agradecimiento.</p>
  </div>
  </div>
 
  <div className="space-y-4 pt-6 border-t border-zinc-100">
  <div>
- <h3 className="text-sm font-bold text-zinc-900">Detalles de la cuenta</h3>
- <p className="text-xs text-zinc-500">Configura los datos de tu cuenta bancaria.</p>
+ <h3 className="text-base font-bold text-zinc-900">Detalles de la cuenta</h3>
+ <p className="text-sm text-zinc-500">Configura los datos de tu cuenta bancaria.</p>
  </div>
 
  <div className="bg-zinc-50 border border-zinc-200 rounded-xl overflow-hidden">
  <table className="w-full text-sm text-left">
- <thead className="bg-zinc-100 text-xs uppercase text-zinc-500 font-bold border-b border-zinc-200">
+ <thead className="bg-zinc-100 text-sm uppercase text-zinc-500 font-bold border-b border-zinc-200">
  <tr>
  <th className="px-4 py-3">Nombre de la cuenta</th>
  <th className="px-4 py-3">Número de cuenta</th>
@@ -226,23 +226,23 @@ export default function PagosDashboard() {
  <tr key={field.id} className="border-b border-zinc-100 bg-white">
  <td className="px-4 py-2">
  {isEditing ? (
- <Input {...bankForm.register(`accounts.${index}.accountName`)} className="h-9 text-sm text-zinc-900 font-medium" placeholder="Ej: Mi Empresa SPA" />
+ <Input {...bankForm.register(`accounts.${index}.accountName`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Ej: Mi Empresa SPA" />
  ) : (
- <span className="text-sm font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.accountName`) || '-'}</span>
+ <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.accountName`) || '-'}</span>
  )}
  </td>
  <td className="px-4 py-2">
  {isEditing ? (
- <Input {...bankForm.register(`accounts.${index}.accountDetails`)} className="h-9 text-sm text-zinc-900 font-medium" placeholder="N° de cuenta" />
+ <Input {...bankForm.register(`accounts.${index}.accountDetails`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="N° de cuenta" />
  ) : (
- <span className="text-sm font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.accountDetails`) || '-'}</span>
+ <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.accountDetails`) || '-'}</span>
  )}
  </td>
  <td className="px-4 py-2">
  {isEditing ? (
- <Input {...bankForm.register(`accounts.${index}.bankName`)} className="h-9 text-sm text-zinc-900 font-medium" placeholder="Ej: Banco de Chile" />
+ <Input {...bankForm.register(`accounts.${index}.bankName`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Ej: Banco de Chile" />
  ) : (
- <span className="text-sm font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.bankName`) || '-'}</span>
+ <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.bankName`) || '-'}</span>
  )}
  </td>
  <td className="px-4 py-2 text-right">
@@ -275,7 +275,7 @@ export default function PagosDashboard() {
  })}
  {accountFields.length === 0 && (
  <tr>
- <td colSpan={4} className="px-4 py-8 text-center text-zinc-400 italic text-sm">
+ <td colSpan={4} className="px-4 py-8 text-center text-zinc-400 italic text-base">
  No hay cuentas configuradas.
  </td>
  </tr>
@@ -291,7 +291,7 @@ export default function PagosDashboard() {
  appendAccount({ accountName: '', accountDetails: '', bankName: '' });
  setEditingIndex(accountFields.length);
  }}
- className="text-xs font-bold text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"
+ className="text-sm font-bold text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"
  >
  <Plus className="w-3 h-3 mr-2" /> Agregar cuenta
  </Button>
@@ -312,31 +312,31 @@ export default function PagosDashboard() {
  <form onSubmit={mpForm.handleSubmit(onSaveMP)} className="space-y-8 bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
  <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
  <div className="flex items-center gap-4">
- <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white font-black text-xs">MP</div>
+ <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white font-black text-sm">MP</div>
  <div>
- <h2 className="text-lg font-bold text-zinc-900">Mercado Pago (Oficial)</h2>
- <p className="text-sm text-zinc-500">Acepta tarjetas de crédito, débito y dinero de cuenta Mercado Pago.</p>
+ <h2 className="text-xl font-bold text-zinc-900">Mercado Pago (Oficial)</h2>
+ <p className="text-base text-zinc-500">Acepta tarjetas de crédito, débito y dinero de cuenta Mercado Pago.</p>
  </div>
  </div>
  <label className="flex items-center gap-2 cursor-pointer">
  <input type="checkbox" {...mpForm.register('enabled')} className="rounded text-blue-500 focus:ring-blue-500 h-5 w-5 border-zinc-300" />
- <span className="font-bold text-sm text-zinc-900">Activar método</span>
+ <span className="font-bold text-base text-zinc-900">Activar método</span>
  </label>
  </div>
 
- <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 text-blue-800 text-sm">
+ <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 text-blue-800 text-base">
  <AlertCircle className="w-5 h-5 shrink-0" />
  <p>Esta es una simulación de la configuración de Mercado Pago para preparar el Checkout.</p>
  </div>
 
  <div className="space-y-6 max-w-xl">
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-500 uppercase">Public Key</Label>
- <Input {...mpForm.register('publicKey')} className="bg-zinc-50 border-zinc-200 text-zinc-900 font-mono text-sm" placeholder="TEST-..." />
+ <Label className="text-sm font-bold text-zinc-500 uppercase">Public Key</Label>
+ <Input {...mpForm.register('publicKey')} className="bg-zinc-50 border-zinc-200 text-base text-zinc-900 font-mono" placeholder="TEST-..." />
  </div>
  <div className="space-y-2">
- <Label className="text-xs font-bold text-zinc-500 uppercase">Access Token</Label>
- <Input {...mpForm.register('accessToken')} type="password" className="bg-zinc-50 border-zinc-200 text-zinc-900 font-mono text-sm" placeholder="TEST-..." />
+ <Label className="text-sm font-bold text-zinc-500 uppercase">Access Token</Label>
+ <Input {...mpForm.register('accessToken')} type="password" className="bg-zinc-50 border-zinc-200 text-base text-zinc-900 font-mono" placeholder="TEST-..." />
  </div>
  </div>
 

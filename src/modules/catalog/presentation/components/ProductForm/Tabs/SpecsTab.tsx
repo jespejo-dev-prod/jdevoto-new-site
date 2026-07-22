@@ -17,14 +17,14 @@ export function SpecsTab() {
       <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
         <div className="space-y-1">
           <h3 className="text-sm font-bold text-white">Ficha Técnica</h3>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">
+          <p className="text-xs text-zinc-500 uppercase tracking-widest">
             Especificaciones y atributos del producto
           </p>
         </div>
         <Button
           type="button"
           onClick={() => append({ name: "", value: "" })}
-          className="h-8 text-[9px] uppercase font-black bg-primary text-primary-foreground px-4"
+          className="h-8 text-xs uppercase font-black bg-primary text-primary-foreground px-4"
         >
           + Añadir Propiedad
         </Button>
@@ -37,14 +37,14 @@ export function SpecsTab() {
               <tr key={field.id} className="group hover:bg-zinc-800/30 transition-colors">
                 <td className="px-4 py-2 w-1/3">
                   <Input
-                    className="bg-transparent border-none focus-visible:ring-0 text-[11px] font-bold text-zinc-300 h-10"
+                    className="bg-transparent border-none focus-visible:ring-0 text-sm font-bold text-zinc-300 h-10"
                     placeholder="Ej: Material, Voltaje, Color..."
                     {...register(`specifications.${index}.name` as any)}
                   />
                 </td>
                 <td className="px-4 py-2 border-l border-zinc-800/50">
                   <Input
-                    className="bg-transparent border-none focus-visible:ring-0 text-[11px] text-white h-10"
+                    className="bg-transparent border-none focus-visible:ring-0 text-sm text-white h-10"
                     placeholder="Ej: Acero, 220V, Negro..."
                     {...register(`specifications.${index}.value` as any)}
                   />
@@ -78,7 +78,7 @@ export function SpecsTab() {
         type="button"
         onClick={() => append({ name: "", value: "" })}
         variant="ghost"
-        className="w-full border border-dashed border-zinc-800 text-[10px] font-bold text-zinc-600 hover:text-zinc-400 py-6"
+        className="w-full border border-dashed border-zinc-800 text-xs font-bold text-zinc-600 hover:text-zinc-400 py-6"
       >
         + Añadir otra fila a la ficha técnica
       </Button>

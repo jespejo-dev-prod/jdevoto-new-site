@@ -14,7 +14,7 @@ export function ShippingTab() {
       </div>
 
       <div className="space-y-2">
-        <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+        <Label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
           Dimensiones L x A x H (cm)
         </Label>
         <div className="grid grid-cols-3 gap-3">

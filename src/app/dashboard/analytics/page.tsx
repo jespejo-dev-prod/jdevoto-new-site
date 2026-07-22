@@ -124,13 +124,15 @@ export default function AnalyticsPage() {
           <div className="mt-6 flex items-center justify-around border-t border-zinc-800 pt-6">
             <div className="text-center">
               <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Venta Máxima</p>
-              <p className="text-xl font-black text-white">${Math.max(...dailySales.map((d: any) => d.total)).toLocaleString('es-CL')}</p>
+              <p className="text-xl font-black text-white">
+                ${dailySales.length > 0 ? Math.max(...dailySales.map((d: any) => d.total)).toLocaleString('es-CL') : '0'}
+              </p>
             </div>
             <div className="h-8 w-px bg-zinc-800" />
             <div className="text-center">
               <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Venta Promedio</p>
               <p className="text-xl font-black text-white">
-                ${Math.round(dailySales.reduce((a: any, b: any) => a + b.total, 0) / dailySales.length).toLocaleString('es-CL')}
+                ${dailySales.length > 0 ? Math.round(dailySales.reduce((a: any, b: any) => a + b.total, 0) / dailySales.length).toLocaleString('es-CL') : '0'}
               </p>
             </div>
           </div>

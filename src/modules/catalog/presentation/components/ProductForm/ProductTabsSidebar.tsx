@@ -49,7 +49,7 @@ export function ProductTabsSidebar({
           tabIndex={activeTab === t.id ? 0 : -1}
           onClick={() => onSelect(t.id)}
           className={cn(
-            "w-full flex items-center justify-between px-6 py-4 text-[11px] font-bold uppercase tracking-wider transition-all outline-none group",
+            "w-full flex items-center justify-between px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all outline-none group",
             activeTab === t.id
               ? "bg-zinc-900 text-primary border-l-4 border-primary"
               : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50"

@@ -4,9 +4,10 @@ import React, { useState, useEffect, useRef } from 'react';
 
 interface ScrollRevealProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-export function ScrollReveal({ children }: ScrollRevealProps) {
+export function ScrollReveal({ children, className = "min-h-[400px]" }: ScrollRevealProps) {
   const [hasMounted, setHasMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -29,7 +30,7 @@ export function ScrollReveal({ children }: ScrollRevealProps) {
   }, []);
 
   return (
-    <div ref={ref} className="min-h-[400px]">
+    <div ref={ref} className={className}>
       {hasMounted ? children : null}
     </div>
   );

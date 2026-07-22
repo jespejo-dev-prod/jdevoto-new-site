@@ -85,7 +85,7 @@ export const ProductCard = memo(function ProductCard({
             </span>
           )}
           <span className={cn(
-            "px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest w-fit border",
+            "px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest w-fit border",
             isDashboard 
               ? "bg-zinc-950/80 backdrop-blur-md border-white/10 text-white" 
               : "bg-white/90 backdrop-blur-sm border-zinc-200/50 text-zinc-500 shadow-sm"
@@ -128,13 +128,13 @@ export const ProductCard = memo(function ProductCard({
             <div className="flex items-center justify-between gap-2 mb-1.5 w-full">
               <p className={cn(
                 "font-black uppercase tracking-widest font-mono",
-                compact ? "text-[10px]" : "text-[16px]",
+                compact ? "text-[12px]" : "text-lg",
                 isDashboard ? "text-zinc-400" : "text-zinc-400"
               )}>
                 {product.brand?.name || 'SIN MARCA'}
               </p>
               {isDashboard && product.sku && (
-                <span className="text-xs font-mono font-black px-2.5 py-0.5 rounded border bg-primary/10 border-primary/20 text-primary shrink-0">
+                <span className="text-sm font-mono font-black px-2.5 py-0.5 rounded border bg-primary/10 border-primary/20 text-primary shrink-0">
                   SKU: {product.sku}
                 </span>
               )}
@@ -150,7 +150,7 @@ export const ProductCard = memo(function ProductCard({
             <h3 className={cn(
               "transition-colors",
               isDashboard 
-                ? "text-base font-bold leading-snug line-clamp-2 h-[48px] overflow-hidden text-white group-hover:text-primary" 
+                ? "text-[17px] font-bold leading-snug line-clamp-2 h-[52px] overflow-hidden text-white group-hover:text-primary" 
                 : (compact
                     ? "text-sm font-extrabold leading-snug line-clamp-2 h-[40px] overflow-hidden text-zinc-900 group-hover:text-primary"
                     : "text-lg sm:text-[19px] font-bold leading-snug line-clamp-2 h-[50px] sm:h-[54px] overflow-hidden text-zinc-900 group-hover:text-primary")
@@ -169,13 +169,13 @@ export const ProductCard = memo(function ProductCard({
           {isDashboard ? (
             <div className="flex items-center justify-between w-full">
               <div>
-                <p className="text-xs font-bold text-zinc-400 mb-1 uppercase">Precio Neto</p>
-                <p className="text-xl font-black text-white tracking-tight">
+                <p className="text-sm font-bold text-zinc-400 mb-1 uppercase">Precio Neto</p>
+                <p className="text-2xl font-black text-white tracking-tight">
                   ${Number(product.basePrice).toLocaleString('es-CL')}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs font-bold text-zinc-400 mb-1 uppercase text-right">Stock</p>
+                <p className="text-sm font-bold text-zinc-400 mb-1 uppercase text-right">Stock</p>
                 <StockBadge stock={product.stockQuantity} stockAlert={product.stockAlert} />
               </div>
             </div>

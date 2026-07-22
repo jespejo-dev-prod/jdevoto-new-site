@@ -35,7 +35,7 @@ export function TransactionTable() {
  })
  .catch(console.error)
  .finally(() => setLoading(false));
- }, [user]);
+ }, [user?.id]);
 
  const getStatusColor = (status: string) => {
  switch(status) {

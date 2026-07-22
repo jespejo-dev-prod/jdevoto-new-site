@@ -59,6 +59,17 @@ export function useCustomers(filters: string | {
     onError: (error: any) => toast.error(error.message || "Error al eliminar"),
   });
 
+  const unassignMutation = useMutation({
+    mutationFn: (id: string) => fetcher(`/api/customers/${id}/unassign`, { method: "PATCH" }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.invalidateQueries({ queryKey: ["sales-rep-operational-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
+      toast.success(data.message || "Cliente desvinculado de tu cartera");
+    },
+    onError: (error: any) => toast.error(error.message || "Error al desvincular"),
+  });
+
   const reactivateMutation = useMutation({
     mutationFn: (id: string) => fetcher(`/api/customers/${id}`, { method: "PATCH", body: JSON.stringify({ isActive: true }) }),
     onSuccess: () => {
@@ -83,6 +94,7 @@ export function useCustomers(filters: string | {
     meta,
     createCustomer: createMutation, 
     deleteCustomer: deleteMutation,
+    unassignCustomer: unassignMutation,
     reactivateCustomer: reactivateMutation 
   };
 }

@@ -65,13 +65,13 @@ export function NotificationBell() {
  </button>
 
  {isOpen && (
- <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden z-50">
- <div className="p-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50">
- <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-2">
- <Bell className="h-4 w-4 text-primary" />
+ <div className="absolute right-0 mt-2 w-96 sm:w-[28rem] bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden z-50">
+ <div className="p-5 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50">
+ <h3 className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+ <Bell className="h-5 w-5 text-primary" />
  Notificaciones
  {unreadCount > 0 && (
- <span className="bg-red-500/20 text-red-500 px-2 py-0.5 rounded-full text-[10px]">
+ <span className="bg-red-500/20 text-red-500 px-2.5 py-1 rounded-full text-xs">
  {unreadCount} nuevas
  </span>
  )}
@@ -79,39 +79,39 @@ export function NotificationBell() {
  {unreadCount > 0 && (
  <button 
  onClick={handleMarkAllAsRead}
- className="text-[10px] text-zinc-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 font-bold"
+ className="text-xs text-zinc-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 font-bold"
  >
- <Check className="h-3 w-3" />
+ <Check className="h-4 w-4" />
  Marcar leídas
  </button>
  )}
  </div>
 
- <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+ <div className="max-h-[450px] overflow-y-auto custom-scrollbar">
  {notifications.length === 0 ? (
- <div className="p-8 text-center text-zinc-500 text-xs flex flex-col items-center gap-2">
- <Bell className="h-6 w-6 opacity-20" />
+ <div className="p-10 text-center text-zinc-500 text-sm flex flex-col items-center gap-3">
+ <Bell className="h-8 w-8 opacity-20" />
  No tienes notificaciones
  </div>
  ) : (
  notifications.map((notification: any) => (
  <div 
  key={notification.id} 
- className={`p-4 border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors ${!notification.isRead ? 'bg-primary/5' : ''}`}
+ className={`p-5 border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors ${!notification.isRead ? 'bg-primary/5' : ''}`}
  >
- <div className="flex justify-between items-start mb-1 gap-2">
- <h4 className={`text-sm font-bold ${!notification.isRead ? 'text-white' : 'text-zinc-400'}`}>
+ <div className="flex justify-between items-start mb-1.5 gap-2">
+ <h4 className={`text-base font-bold ${!notification.isRead ? 'text-white' : 'text-zinc-400'}`}>
  {notification.title}
  </h4>
  {!notification.isRead && (
- <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0 mt-2"></span>
+ <span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1.5"></span>
  )}
  </div>
- <p className="text-xs text-zinc-500 mb-2 leading-relaxed">
+ <p className="text-sm text-zinc-500 mb-3 leading-relaxed">
  {notification.message}
  </p>
  <div className="flex items-center justify-between">
- <span className="text-[10px] text-zinc-600 font-medium">
+ <span className="text-xs text-zinc-600 font-medium">
  {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true, locale: es })}
  </span>
  {notification.link && (
@@ -121,9 +121,9 @@ export function NotificationBell() {
  if (!notification.isRead) markAsReadMutation.mutate([notification.id]);
  setIsOpen(false);
  }}
- className="text-[10px] text-primary hover:text-primary/80 font-bold uppercase tracking-widest flex items-center gap-1"
+ className="text-xs text-primary hover:text-primary/80 font-bold uppercase tracking-widest flex items-center gap-1.5"
  >
- Ver Detalle <ExternalLink className="h-3 w-3" />
+ Ver Detalle <ExternalLink className="h-4 w-4" />
  </Link>
  )}
  </div>

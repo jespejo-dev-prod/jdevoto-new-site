@@ -88,8 +88,8 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
   const defaultRegion = findMatchingRegionName(initialData?.region);
   const defaultComuna = findMatchingCommunaName(defaultRegion, initialData?.comuna);
 
-  const defaultShippingRegion = findMatchingRegionName(initialData?.shippingRegion) || 'METROPOLITANA DE SANTIAGO';
-  const defaultShippingCommune = findMatchingCommunaName(defaultShippingRegion, initialData?.shippingCommune) || 'PROVIDENCIA';
+  const defaultShippingRegion = findMatchingRegionName(initialData?.shippingRegion);
+  const defaultShippingCommune = findMatchingCommunaName(defaultShippingRegion, initialData?.shippingCommune);
 
   const defaultBillingRegion = findMatchingRegionName(initialData?.billingRegion);
   const defaultBillingCommune = findMatchingCommunaName(defaultBillingRegion, initialData?.billingCommune);
@@ -100,13 +100,13 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       rut: initialData?.rut || '',
       razonSocial: initialData?.razonSocial || '',
       nombreFantasia: initialData?.nombreFantasia || '',
-      giro: initialData?.giro || 'Venta de artículos electrónicos',
+      giro: initialData?.giro || '',
       direccion: initialData?.direccion || '',
       comuna: defaultComuna,
       ciudad: initialData?.ciudad || '',
       region: defaultRegion,
       telefono: initialData?.telefono || '',
-      email: initialData?.email || user?.email || '',
+      email: initialData?.email || '',
       website: initialData?.website || '',
       salesRepEmail: initialData?.salesRepEmail || '',
       defaultDiscount: Number(initialData?.defaultDiscount) || 0,
@@ -114,11 +114,11 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       paymentTerms: initialData?.paymentTerms ?? 30,
       paymentTermDiscount: Number(initialData?.paymentTermDiscount) || 0,
       
-      shippingStreet: initialData?.shippingStreet || 'Av. Providencia',
-      shippingNumber: initialData?.shippingNumber || '1234',
-      shippingApartment: initialData?.shippingApartment || 'Of 502',
+      shippingStreet: initialData?.shippingStreet || '',
+      shippingNumber: initialData?.shippingNumber || '',
+      shippingApartment: initialData?.shippingApartment || '',
       shippingCommune: defaultShippingCommune,
-      shippingCity: initialData?.shippingCity || 'Santiago',
+      shippingCity: initialData?.shippingCity || '',
       shippingRegion: defaultShippingRegion,
 
       billingStreet: initialData?.billingStreet || '',
@@ -127,7 +127,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       billingCommune: defaultBillingCommune,
       billingCity: initialData?.billingCity || '',
       billingRegion: defaultBillingRegion,
-      billingEmail: initialData?.billingEmail || user?.email || '',
+      billingEmail: initialData?.billingEmail || '',
     }
   });
 
@@ -136,8 +136,8 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       const reg = findMatchingRegionName(initialData.region);
       const com = findMatchingCommunaName(reg, initialData.comuna);
       
-      const sReg = findMatchingRegionName(initialData.shippingRegion) || 'METROPOLITANA DE SANTIAGO';
-      const sCom = findMatchingCommunaName(sReg, initialData.shippingCommune) || 'PROVIDENCIA';
+      const sReg = findMatchingRegionName(initialData.shippingRegion);
+      const sCom = findMatchingCommunaName(sReg, initialData.shippingCommune);
 
       const bReg = findMatchingRegionName(initialData.billingRegion);
       const bCom = findMatchingCommunaName(bReg, initialData.billingCommune);
@@ -146,13 +146,13 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
         rut: initialData.rut || '',
         razonSocial: initialData.razonSocial || '',
         nombreFantasia: initialData.nombreFantasia || '',
-        giro: initialData.giro || 'Venta de artículos electrónicos',
+        giro: initialData.giro || '',
         direccion: initialData.direccion || '',
         comuna: com,
         ciudad: initialData.ciudad || '',
         region: reg,
         telefono: initialData.telefono || '',
-        email: initialData.email || user?.email || '',
+        email: initialData.email || '',
         website: initialData.website || '',
         salesRepEmail: initialData.salesRepEmail || '',
         defaultDiscount: Number(initialData.defaultDiscount) || 0,
@@ -160,11 +160,11 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
         paymentTerms: initialData.paymentTerms ?? 30,
         paymentTermDiscount: Number(initialData.paymentTermDiscount) || 0,
         
-        shippingStreet: initialData.shippingStreet || 'Av. Providencia',
-        shippingNumber: initialData.shippingNumber || '1234',
-        shippingApartment: initialData.shippingApartment || 'Of 502',
+        shippingStreet: initialData.shippingStreet || '',
+        shippingNumber: initialData.shippingNumber || '',
+        shippingApartment: initialData.shippingApartment || '',
         shippingCommune: sCom,
-        shippingCity: initialData.shippingCity || 'Santiago',
+        shippingCity: initialData.shippingCity || '',
         shippingRegion: sReg,
 
         billingStreet: initialData.billingStreet || '',
@@ -173,7 +173,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
         billingCommune: bCom,
         billingCity: initialData.billingCity || '',
         billingRegion: bReg,
-        billingEmail: initialData.billingEmail || user?.email || '',
+        billingEmail: initialData.billingEmail || '',
       });
     }
   }, [initialData, reset, user]);
@@ -231,7 +231,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">RUT Empresa</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">RUT Empresa</label>
                 <input 
                   {...register('rut')}
                   disabled={!!initialData?.id}
@@ -245,7 +245,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Razón Social</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Razón Social</label>
                 <input 
                   {...register('razonSocial')}
                   className={cn(
@@ -258,7 +258,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Giro Comercial</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Giro Comercial</label>
                 <input 
                   {...register('giro')}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none transition-all"
@@ -276,20 +276,20 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               <div className="md:col-span-8 space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Calle</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Calle</label>
                 <input {...register('shippingStreet')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" />
               </div>
               <div className="md:col-span-2 space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Número</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Número</label>
                 <input {...register('shippingNumber')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" />
               </div>
               <div className="md:col-span-2 space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Depto/Ofi</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Depto/Ofi</label>
                 <input {...register('shippingApartment')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" />
               </div>
 
               <div className="md:col-span-4 space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Región</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Región</label>
                 <input 
                   type="text"
                   {...register('shippingRegion')} 
@@ -298,7 +298,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                 />
               </div>
               <div className="md:col-span-4 space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Comuna</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Comuna</label>
                 <input 
                   type="text"
                   {...register('shippingCommune')} 
@@ -307,7 +307,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                 />
               </div>
               <div className="md:col-span-4 space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Ciudad</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Ciudad</label>
                 <input {...register('shippingCity')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" />
               </div>
             </div>
@@ -321,7 +321,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2 md:col-span-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Email envío facturas (XML/PDF)</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Email envío facturas (XML/PDF)</label>
                 <input {...register('billingEmail')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" placeholder="facturacion@empresa.cl" />
               </div>
             </div>
@@ -339,7 +339,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Plazo de Pago</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Plazo de Pago</label>
                 <div className="relative">
                   <select 
                     {...register('paymentTerms', { valueAsNumber: true })}
@@ -354,7 +354,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
                 </div>
                 {isCustomerUser && (
-                  <p className="text-xs text-zinc-400 px-1 italic text-center mt-1">
+                  <p className="text-sm text-zinc-400 px-1 italic text-center mt-1">
                     Solo el administrador del sitio puede cambiar tu condición de pago.
                   </p>
                 )}
@@ -363,15 +363,15 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
               <div className="bg-zinc-950/60 rounded-2xl p-4 border border-primary/20 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                     <span className="text-[10px] font-bold text-zinc-500 uppercase">Dcto. por Pago</span>
-                     <span className="text-xs text-zinc-400 italic">Automático según plazo</span>
+                     <span className="text-sm font-bold text-zinc-500 uppercase">Dcto. por Pago</span>
+                     <span className="text-sm text-zinc-400 italic">Automático según plazo</span>
                   </div>
                   <div className="flex items-center gap-2">
                      <span className="text-2xl font-black text-primary">-{watch('paymentTermDiscount') || 0}%</span>
                   </div>
                 </div>
                 {watch('paymentTerms') === 0 && (
-                  <div className="border-t border-zinc-800/50 pt-2 text-[10px] text-zinc-400 leading-relaxed">
+                  <div className="border-t border-zinc-800/50 pt-2 text-xs text-zinc-400 leading-relaxed">
                     <span className="text-emerald-400 font-bold">Modo informativo:</span> 10% de descuento aplica al pagar con Transferencia o Mercado Pago.
                   </div>
                 )}
@@ -390,14 +390,14 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
               <p>
                 Los descuentos no se suman, se aplican de forma sucesiva.
               </p>
-              <p className="text-xs text-zinc-400 italic mt-1">
+              <p className="text-sm text-zinc-400 italic mt-1">
                 Ejemplo: 25% + 10% resulta en un 32,5% de descuento final.
               </p>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Límite de Crédito (CLP)</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Límite de Crédito (CLP)</label>
                 <div className="relative">
                   <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                   <input 
@@ -410,13 +410,13 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   <input type="hidden" {...register('creditLimit', { valueAsNumber: true })} />
                 </div>
                 {errors.creditLimit && <p className="text-red-400 text-[10px] font-bold px-1">{errors.creditLimit.message}</p>}
-                <p className="text-xs text-zinc-400 px-1 italic text-center mt-1">
+                <p className="text-sm text-zinc-400 px-1 italic text-center mt-1">
                   {isCustomerUser ? "Solo el administrador del sitio puede cambiar tu crédito." : "Crédito máximo autorizado para compras B2B."}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Descuento Base (%)</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Descuento Base (%)</label>
                 <div className="relative">
                   <input 
                     type="number"
@@ -428,13 +428,13 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   <div className="absolute right-6 top-1/2 -translate-y-1/2 text-primary font-bold text-xl">%</div>
                 </div>
                 {errors.defaultDiscount && <p className="text-red-400 text-[10px] font-bold px-1">{errors.defaultDiscount.message}</p>}
-                <p className="text-xs text-zinc-400 px-1 italic text-center mt-1">
+                <p className="text-sm text-zinc-400 px-1 italic text-center mt-1">
                   {isCustomerUser ? "Solo el administrador del sitio puede cambiar tu descuento." : "Descuento adicional fijo por cliente."}
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 space-y-2">
-                 <div className="flex justify-between text-[10px] font-bold text-zinc-500 uppercase">
+                 <div className="flex justify-between text-sm font-bold text-zinc-500 uppercase">
                     <span>Total Descuentos</span>
                     <span className="text-primary">{formattedTotalDiscount}%</span>
                  </div>
@@ -451,26 +451,26 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
 
             <div className="space-y-4">
                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Email Contacto</label>
+                  <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Email Contacto</label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                    <input {...register('email')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-xs" />
+                    <input {...register('email')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-base" />
                   </div>
                </div>
 
                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-1">Ejecutivo de Ventas (Email)</label>
+                  <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Ejecutivo de Ventas (Email)</label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                     <input 
                       {...register('salesRepEmail')} 
                       disabled={isCustomerUser}
                       placeholder="vendedor@tuempresa.cl"
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-xs disabled:opacity-50 disabled:cursor-not-allowed" 
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-base disabled:opacity-50 disabled:cursor-not-allowed" 
                     />
                   </div>
                   {errors.salesRepEmail && <p className="text-red-400 text-[10px] font-bold px-1">{errors.salesRepEmail.message}</p>}
-                  <p className="text-xs text-zinc-400 px-1 italic mt-1">
+                  <p className="text-sm text-zinc-400 px-1 italic mt-1">
                     {isCustomerUser ? "Solo un administrador interno puede cambiar tu ejecutivo." : "Email del vendedor (SALES_REP) activo."}
                   </p>
                </div>
@@ -490,7 +490,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                 <button
                   type="button"
                   onClick={onDelete}
-                  className="w-full bg-red-500/5 text-red-500/60 border border-red-500/10 h-14 rounded-2xl font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-3 text-[10px]"
+                  className="w-full bg-red-500/5 text-red-500/60 border border-red-500/10 h-14 rounded-2xl font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-3 text-sm"
                 >
                   <Trash2 className="h-4 w-4" />
                   {initialData?.isActive ? 'Desactivar Cliente' : 'Eliminar Definitivamente'}

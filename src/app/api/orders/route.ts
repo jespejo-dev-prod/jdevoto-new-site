@@ -31,8 +31,11 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   // ADMIN y SALES_REP pueden filtrar por cualquier empresa
   const companyContext =
     (user.role === UserRole.BUYER || user.role === UserRole.COMPANY_ADMIN) ? user.companyId ?? undefined : undefined;
+  
+  const salesRepContext =
+    (user.role === UserRole.SALES_REP) ? user.id : undefined;
 
-  const result = await orderService.listOrders(query, companyContext);
+  const result = await orderService.listOrders(query, companyContext, salesRepContext);
 
   return ok(result.data, 200, { pagination: result.meta });
 });

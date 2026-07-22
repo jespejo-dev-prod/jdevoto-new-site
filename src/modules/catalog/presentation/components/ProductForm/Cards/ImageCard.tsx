@@ -139,7 +139,7 @@ export function ImageCard() {
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-6 shadow-xl">
       <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <h3 className="text-[10px] font-bold text-white uppercase tracking-widest">
+        <h3 className="text-xs font-bold text-white uppercase tracking-widest">
           Imágenes ({fields.length}/4)
         </h3>
         {fields.length < 4 && (
@@ -147,7 +147,7 @@ export function ImageCard() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:text-blue-300 transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="text-xs font-bold text-blue-400 uppercase tracking-widest hover:text-blue-300 transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             {isUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
             Añadir
@@ -173,8 +173,8 @@ export function ImageCard() {
             <Upload className="w-6 h-6 text-zinc-500" />
           </div>
           <div className="text-center">
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Seleccionar Imágenes</p>
-            <p className="text-[9px] text-zinc-600 mt-1">Máximo 4 fotos. Hasta 10MB c/u.</p>
+            <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Seleccionar Imágenes</p>
+            <p className="text-xs text-zinc-600 mt-1">Máximo 4 fotos. Hasta 10MB c/u.</p>
           </div>
         </div>
       ) : (
@@ -207,7 +207,7 @@ export function ImageCard() {
       {isUploading && (
         <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 animate-pulse">
           <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
-          <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">
+          <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">
             Subiendo y optimizando...
           </span>
         </div>
@@ -267,7 +267,7 @@ function SortableImage({ id, url, isPrimary, onRemove, onMakePrimary }: any) {
           type="button"
           onClick={onMakePrimary}
           className={cn(
-            "w-full py-1.5 rounded-lg text-[8px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors",
+            "w-full py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors",
             isPrimary 
               ? "bg-blue-500 text-white" 
               : "bg-zinc-900/80 text-zinc-400 hover:bg-zinc-800 hover:text-white"
@@ -279,7 +279,7 @@ function SortableImage({ id, url, isPrimary, onRemove, onMakePrimary }: any) {
       </div>
 
       {isPrimary && !isDragging && (
-        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-blue-500 text-[8px] font-bold text-white uppercase tracking-tighter shadow-lg">
+        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-blue-500 text-[10px] font-bold text-white uppercase tracking-tighter shadow-lg">
           Principal
         </div>
       )}

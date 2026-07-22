@@ -8,7 +8,7 @@ import { z } from "zod";
 
 const CreateUserSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(7).regex(/[A-Z]/, "Debe contener al menos una mayúscula").regex(/[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/, "Debe contener al menos un número o símbolo"),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   role: z.nativeEnum(UserRole).default(UserRole.BUYER),
@@ -26,8 +26,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const skip = (page - 1) * limit;
 
   const baseWhere = user.role === UserRole.COMPANY_ADMIN 
-    ? { companyId: user.companyId } 
-    : {};
+    ? { companyId: user.companyId, isActive: true } 
+    : { isActive: true };
 
   const whereClause = {
     ...baseWhere,
@@ -52,7 +52,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       where: whereClause,
       include: {
         company: {
-          select: { razonSocial: true }
+          select: { razonSocial: true, rut: true }
         }
       },
       skip,
@@ -93,7 +93,25 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   });
 
   if (existing) {
-    return NextResponse.json({ error: "Email already exists" }, { status: 400 });
+    if (!existing.isActive) {
+      // Si existe pero está inactivo, lo "reactivamos" y sobreescribimos sus datos
+      const passwordHash = await bcrypt.hash(data.password, 10);
+      const reactivatedUser = await prisma.user.update({
+        where: { id: existing.id },
+        data: {
+          isActive: true,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          role: data.role,
+          // COMPANY_ADMIN hereda su propia empresa; ADMIN no tiene companyId propio
+          companyId: data.companyId ?? (currentUser.role === UserRole.COMPANY_ADMIN ? currentUser.companyId : null),
+          passwordHash,
+        }
+      });
+      const { passwordHash: _, ...userWithoutPassword } = reactivatedUser;
+      return created(userWithoutPassword);
+    }
+    return NextResponse.json({ error: "El correo electrónico ya se encuentra registrado" }, { status: 400 });
   }
 
   const passwordHash = await bcrypt.hash(data.password, 10);
@@ -105,7 +123,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       firstName: data.firstName,
       lastName: data.lastName,
       role: data.role,
-      companyId: data.companyId || currentUser.companyId,
+      // COMPANY_ADMIN hereda su propia empresa; ADMIN no tiene companyId propio
+      companyId: data.companyId ?? (currentUser.role === UserRole.COMPANY_ADMIN ? currentUser.companyId : null),
     }
   });
 

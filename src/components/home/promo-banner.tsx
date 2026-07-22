@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 export function PromoBanner() {
   return (
-    <section className="relative my-16 rounded-2xl overflow-hidden bg-gradient-to-r from-blue-50/50 via-white to-blue-50/20 text-zinc-900 border border-zinc-200/80 p-8 md:p-12 shadow-[0_4px_30px_rgba(0,0,0,0.01)]">
+    <section className="relative my-8 rounded-2xl overflow-hidden bg-gradient-to-r from-blue-50/50 via-white to-blue-50/20 text-zinc-900 border border-zinc-200/80 p-8 md:p-12 shadow-[0_4px_30px_rgba(0,0,0,0.01)]">
       {/* Decorative Blur Orbs - subtle and soft for light mode */}
       <div className="absolute top-0 right-1/4 w-64 h-64 bg-blue-200/10 rounded-full blur-[80px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-amber-200/5 rounded-full blur-[80px] pointer-events-none" />

@@ -372,7 +372,7 @@ export default function ImportStockPage() {
  </div>
  <button
  onClick={() => router.push('/dashboard/products/export')}
- className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-white font-bold text-xs transition-all shadow-md self-start sm:self-auto cursor-pointer"
+ className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 text-white font-bold text-sm transition-all shadow-md self-start sm:self-auto cursor-pointer"
  >
  <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
  Exportar Inventario
@@ -396,14 +396,14 @@ export default function ImportStockPage() {
  { num: 4, label: '¡Hecho!' }
  ].map((s) => (
  <div key={s.num} className="flex flex-col items-center">
- <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
+ <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
  step >= s.num 
  ? 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20 scale-110' 
  : 'bg-zinc-950 border-zinc-800 text-zinc-500'
  }`}>
  {step > s.num ? '✓' : s.num}
  </div>
- <span className={`text-[10px] uppercase font-bold tracking-wider mt-2 hidden sm:block ${
+ <span className={`text-xs uppercase font-bold tracking-wider mt-2 hidden sm:block ${
  step >= s.num ? 'text-zinc-200' : 'text-zinc-500'
  }`}>
  {s.label}
@@ -415,7 +415,7 @@ export default function ImportStockPage() {
 
  {/* Notificación de Error */}
  {error && (
- <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-3">
+ <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3">
  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
  <p className="font-medium">{error}</p>
  </div>
@@ -429,7 +429,7 @@ export default function ImportStockPage() {
  <div className="p-8 space-y-8">
  <div className="space-y-2">
  <h2 className="text-xl font-bold text-white">Importar productos desde un archivo CSV o Excel</h2>
- <p className="text-xs text-zinc-500">
+ <p className="text-sm text-zinc-500">
  Esta herramienta te permite actualizar rápidamente los niveles de inventario y los precios base de los productos existentes en tu catálogo a partir de archivos Excel (`.xlsx`, `.xls`) o archivos CSV de texto.
  </p>
  </div>
@@ -465,10 +465,10 @@ export default function ImportStockPage() {
  </div>
 
  <div className="space-y-1">
- <p className="text-sm font-semibold text-white">
+ <p className="text-base font-semibold text-white">
  {file ? file.name : 'Selecciona o arrastra tu planilla de productos'}
  </p>
- <p className="text-xs text-zinc-500">
+ <p className="text-sm text-zinc-500">
  {file ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` : 'Soporta archivos CSV, Excel (.xlsx, .xls) y TXT'}
  </p>
  </div>
@@ -484,10 +484,10 @@ export default function ImportStockPage() {
  className="w-4 h-4 mt-0.5 rounded border-zinc-800 bg-zinc-950 text-primary focus:ring-primary focus:ring-offset-zinc-900 focus:ring-2 accent-primary"
  />
  <div className="space-y-0.5">
- <p className="text-sm font-semibold text-zinc-200 group-hover:text-white transition-colors">
+ <p className="text-base font-semibold text-zinc-200 group-hover:text-white transition-colors">
  Actualizar productos existentes
  </p>
- <p className="text-xs text-zinc-500">
+ <p className="text-sm text-zinc-500">
  Los productos existentes que coincidan en SKU se actualizarán. Los productos en el archivo que no existan en el sistema se omitirán.
  </p>
  </div>
@@ -497,7 +497,7 @@ export default function ImportStockPage() {
  <div className="pt-2">
  <button 
  onClick={() => setShowAdvanced(!showAdvanced)}
- className="text-xs font-bold text-zinc-500 hover:text-zinc-300 transition-colors flex items-center gap-1.5"
+ className="text-sm font-bold text-zinc-500 hover:text-zinc-300 transition-colors flex items-center gap-1.5"
  >
  {showAdvanced ? 'Ocultar opciones avanzadas' : 'Mostrar opciones avanzadas'}
  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
@@ -505,11 +505,11 @@ export default function ImportStockPage() {
 
  {showAdvanced && (
  <div className="mt-4 p-4 rounded-2xl bg-zinc-950/40 border border-zinc-800/80 max-w-sm space-y-3">
- <label className="block text-xs font-semibold text-zinc-400">Delimitador CSV (Solo para archivos CSV)</label>
+ <label className="block text-sm font-semibold text-zinc-400">Delimitador CSV (Solo para archivos CSV)</label>
  <select 
  value={delimiterSelection}
  onChange={(e) => setDelimiterSelection(e.target.value as any)}
- className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-primary"
+ className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-medium text-white focus:outline-none focus:border-primary"
  >
  <option value="auto">Auto-detectar delimitador</option>
  <option value=",">Coma ( , )</option>
@@ -525,7 +525,7 @@ export default function ImportStockPage() {
  <button
  onClick={handleContinueStep1}
  disabled={!file}
- className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/95 text-primary-foreground disabled:opacity-50 disabled:hover:bg-primary font-bold text-xs transition-all shadow-lg shadow-primary/20"
+ className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/95 text-primary-foreground disabled:opacity-50 disabled:hover:bg-primary font-bold text-sm transition-all shadow-lg shadow-primary/20"
  >
  Continuar
  <ArrowRight className="w-4 h-4" />
@@ -539,7 +539,7 @@ export default function ImportStockPage() {
  <div className="p-8 space-y-8">
  <div className="space-y-2">
  <h2 className="text-xl font-bold text-white">Asignar campos a los productos</h2>
- <p className="text-xs text-zinc-500">
+ <p className="text-sm text-zinc-500">
  Selecciona los campos de tu archivo CSV/Excel para asignarlos a los campos correspondientes del catálogo (SKU, Inventario o Precio), o para ignorarlos durante la importación.
  </p>
  </div>
@@ -549,9 +549,9 @@ export default function ImportStockPage() {
  <table className="w-full text-left border-collapse">
  <thead>
  <tr className="border-b border-zinc-800 bg-zinc-900/40">
- <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-400">Nombre de la columna</th>
- <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-400">Ejemplo de valor</th>
- <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-zinc-400">Asignar al campo</th>
+ <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-zinc-400">Nombre de la columna</th>
+ <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-zinc-400">Ejemplo de valor</th>
+ <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-zinc-400">Asignar al campo</th>
  </tr>
  </thead>
  <tbody>
@@ -561,17 +561,17 @@ export default function ImportStockPage() {
  
  return (
  <tr key={header} className="border-b border-zinc-800/40 hover:bg-zinc-900/10">
- <td className="px-6 py-4 text-xs font-semibold text-zinc-200">
+ <td className="px-6 py-4 text-sm font-semibold text-zinc-200">
  {header}
  </td>
- <td className="px-6 py-4 text-xs font-medium text-zinc-500 italic">
+ <td className="px-6 py-4 text-sm font-medium text-zinc-500 italic">
  {sampleValue}
  </td>
  <td className="px-6 py-4">
  <select
  value={mapping}
  onChange={(e) => handleMappingChange(header, e.target.value)}
- className={`bg-zinc-900 border text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary w-52 transition-colors ${
+ className={`bg-zinc-900 border text-sm font-semibold rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary w-52 transition-colors ${
  mapping !== 'ignore' 
  ? 'border-primary/40 text-primary bg-primary/5' 
  : 'border-zinc-800 text-zinc-400'
@@ -594,14 +594,14 @@ export default function ImportStockPage() {
  <div className="flex justify-between items-center border-t border-zinc-800/60 pt-6">
  <button
  onClick={() => setStep(1)}
- className="px-5 py-2.5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900/30 font-semibold text-xs transition-colors"
+ className="px-5 py-2.5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900/30 font-semibold text-sm transition-colors"
  >
  Atrás
  </button>
  
  <button
  onClick={handleExecuteImporter}
- className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs transition-all shadow-lg shadow-primary/20"
+ className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-sm transition-all shadow-lg shadow-primary/20"
  >
  Ejecutar el importador
  <Play className="w-3.5 h-3.5" />
@@ -616,14 +616,14 @@ export default function ImportStockPage() {
  <div className="space-y-2 text-center max-w-md mx-auto">
  <RefreshCw className="w-8 h-8 text-primary animate-spin mx-auto mb-4" />
  <h2 className="text-xl font-bold text-white">Importando catálogo...</h2>
- <p className="text-xs text-zinc-500">
+ <p className="text-sm text-zinc-500">
  Por favor, no cierres esta pestaña. Estamos actualizando el stock y precios de tus productos en lotes de 200 filas.
  </p>
  </div>
 
  {/* Barra de progreso visual */}
  <div className="max-w-xl mx-auto space-y-2">
- <div className="flex justify-between text-xs font-bold text-zinc-400">
+ <div className="flex justify-between text-sm font-bold text-zinc-400">
  <span>Progreso de actualización</span>
  <span>{progress}%</span>
  </div>
@@ -633,7 +633,7 @@ export default function ImportStockPage() {
  style={{ width: `${progress}%` }}
  />
  </div>
- <p className="text-[10px] text-zinc-500 text-center font-semibold">
+ <p className="text-xs text-zinc-500 text-center font-semibold">
  Procesando lote {currentChunk} de {totalChunks}...
  </p>
  </div>
@@ -641,12 +641,12 @@ export default function ImportStockPage() {
  {/* Log en vivo para feedback de procesamiento */}
  <div className="border border-zinc-850 rounded-2xl overflow-hidden bg-zinc-950/60 max-w-xl mx-auto">
  <div className="px-4 py-2 border-b border-zinc-850 bg-zinc-900/50 flex items-center justify-between">
- <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Log de operaciones</span>
- <span className="text-[9px] font-semibold text-zinc-600 bg-zinc-900 px-2 py-0.5 rounded-full">
+ <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Log de operaciones</span>
+ <span className="text-[11px] font-semibold text-zinc-600 bg-zinc-900 px-2 py-0.5 rounded-full">
  {logMessages.length} eventos
  </span>
  </div>
- <div className="p-4 h-48 overflow-y-auto font-mono text-[10px] space-y-2 flex flex-col">
+ <div className="p-4 h-48 overflow-y-auto font-mono text-xs space-y-2 flex flex-col">
  {logMessages.map((msg, index) => (
  <div 
  key={index} 
@@ -681,22 +681,22 @@ export default function ImportStockPage() {
  </div>
  <div className="space-y-1">
  <h2 className="text-xl font-bold text-white">¡Importación completada!</h2>
- <p className="text-xs text-zinc-500">El catálogo se ha procesado. A continuación puedes ver el resumen de los cambios aplicados.</p>
+ <p className="text-sm text-zinc-500">El catálogo se ha procesado. A continuación puedes ver el resumen de los cambios aplicados.</p>
  </div>
  </div>
 
  {/* Caja de estadísticas */}
  <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto bg-zinc-950/20 border border-zinc-800 p-6 rounded-2xl">
  <div className="text-center space-y-1">
- <p className="text-[10px] uppercase font-bold tracking-wider text-zinc-500">Total Filas</p>
+ <p className="text-xs uppercase font-bold tracking-wider text-zinc-500">Total Filas</p>
  <p className="text-2xl font-black text-white">{rows.length}</p>
  </div>
  <div className="text-center space-y-1 border-x border-zinc-800/60">
- <p className="text-[10px] uppercase font-bold tracking-wider text-emerald-500">Actualizados</p>
+ <p className="text-xs uppercase font-bold tracking-wider text-emerald-500">Actualizados</p>
  <p className="text-2xl font-black text-emerald-400">{successUpdates.length}</p>
  </div>
  <div className="text-center space-y-1">
- <p className="text-[10px] uppercase font-bold tracking-wider text-red-500">Fallidos / Omitidos</p>
+ <p className="text-xs uppercase font-bold tracking-wider text-red-500">Fallidos / Omitidos</p>
  <p className="text-2xl font-black text-red-400">{failedUpdates.length}</p>
  </div>
  </div>
@@ -705,7 +705,7 @@ export default function ImportStockPage() {
  <div className="max-w-2xl mx-auto space-y-4">
  
  {/* Tabs */}
- <div className="flex border-b border-zinc-800 gap-4 text-xs font-bold pb-2">
+ <div className="flex border-b border-zinc-800 gap-4 text-sm font-bold pb-2">
  <button
  onClick={() => setResultsTab('success')}
  className={`pb-2 border-b-2 transition-all relative ${
@@ -732,12 +732,12 @@ export default function ImportStockPage() {
  {resultsTab === 'success' ? (
  <div className="border border-zinc-850 rounded-2xl overflow-hidden bg-zinc-950/10">
  {successUpdates.length === 0 ? (
- <div className="p-8 text-center text-zinc-500 text-xs italic">
+ <div className="p-8 text-center text-zinc-500 text-sm italic">
  Ningún producto fue actualizado con éxito en esta sesión.
  </div>
  ) : (
  <div className="max-h-64 overflow-y-auto">
- <table className="w-full text-left border-collapse text-xs">
+ <table className="w-full text-left border-collapse text-sm">
  <thead>
  <tr className="border-b border-zinc-800 bg-zinc-900/30">
  <th className="px-4 py-3 font-semibold text-zinc-400">SKU</th>
@@ -765,12 +765,12 @@ export default function ImportStockPage() {
  ) : (
  <div className="border border-zinc-850 rounded-2xl overflow-hidden bg-zinc-950/10">
  {failedUpdates.length === 0 ? (
- <div className="p-8 text-center text-zinc-500 text-xs italic">
+ <div className="p-8 text-center text-zinc-500 text-sm italic">
  No se registraron fallas en esta sesión.
  </div>
  ) : (
  <div className="max-h-64 overflow-y-auto">
- <table className="w-full text-left border-collapse text-xs">
+ <table className="w-full text-left border-collapse text-sm">
  <thead>
  <tr className="border-b border-zinc-800 bg-zinc-900/30">
  <th className="px-4 py-3 font-semibold text-zinc-400">SKU</th>
@@ -796,13 +796,13 @@ export default function ImportStockPage() {
  <div className="flex justify-center gap-4 border-t border-zinc-800/60 pt-6 max-w-2xl mx-auto">
  <button
  onClick={resetImporter}
- className="px-5 py-2.5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900/30 font-semibold text-xs transition-colors"
+ className="px-5 py-2.5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900/30 font-semibold text-sm transition-colors"
  >
  Importar otro archivo
  </button>
  <button
  onClick={() => router.push('/dashboard/products')}
- className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs transition-all shadow-lg shadow-primary/20"
+ className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-sm transition-all shadow-lg shadow-primary/20"
  >
  Ver Catálogo de Productos
  <ArrowRight className="w-4 h-4" />

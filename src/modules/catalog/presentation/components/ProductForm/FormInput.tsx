@@ -20,7 +20,7 @@ export function FormInput({ label, name, className, ...props }: FormInputProps) 
 
   return (
     <div className="space-y-2">
-      <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+      <Label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
         {label}
       </Label>
       <Input
@@ -33,7 +33,7 @@ export function FormInput({ label, name, className, ...props }: FormInputProps) 
         {...props}
       />
       {error && (
-        <span className="text-[9px] text-red-500 font-bold uppercase">
+        <span className="text-xs text-red-500 font-bold uppercase">
           {String(error.message || '')}
         </span>
       )}

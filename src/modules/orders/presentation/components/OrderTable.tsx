@@ -65,7 +65,7 @@ export function OrderTable({ orders }: OrderTableProps) {
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-x-auto shadow-xl">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="text-xs font-bold text-zinc-400 uppercase tracking-wider bg-zinc-950/60">
+          <tr className="text-sm font-bold text-zinc-400 uppercase tracking-wider bg-zinc-950/60">
             <th className="px-6 py-4 pl-8">Pedido</th>
             <th className="px-6 py-4">Fecha</th>
             <th className="px-6 py-4">Estado</th>
@@ -76,7 +76,7 @@ export function OrderTable({ orders }: OrderTableProps) {
         <tbody className="divide-y divide-zinc-800/50">
           {orders.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-6 py-12 text-center text-zinc-500 italic text-sm uppercase tracking-widest">
+              <td colSpan={5} className="px-6 py-12 text-center text-zinc-500 italic text-base uppercase tracking-widest">
                 No se encontraron pedidos.
               </td>
             </tr>
@@ -85,7 +85,7 @@ export function OrderTable({ orders }: OrderTableProps) {
               <tr 
                 key={order.id} 
                 onClick={() => router.push(`/dashboard/orders/${order.id}`)}
-                className="group hover:bg-zinc-800/20 transition-colors text-sm cursor-pointer"
+                className="group hover:bg-zinc-800/20 transition-colors text-base cursor-pointer"
               >
                 <td className="px-6 py-4 pl-8">
                   <div className="flex items-center gap-3">
@@ -93,13 +93,18 @@ export function OrderTable({ orders }: OrderTableProps) {
                       <Hash className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="font-bold text-white group-hover:text-primary transition-colors text-[15px]">
+                      <p className="font-bold text-white group-hover:text-primary transition-colors text-lg">
                         #{order.orderNumber.split('-').pop()}
                       </p>
-                      <div className="flex items-center gap-2 text-xs text-sky-400/90 font-medium mt-0.5">
-                        <Building2 className="h-3 w-3 text-sky-400/70" />
-                        <span className="truncate max-w-[150px]">{order.companyName}</span>
+                      <div className="flex items-center gap-2 text-base text-sky-400/90 font-medium mt-0.5">
+                        <Building2 className="h-4 w-4 text-sky-400/70" />
+                        <span className="truncate max-w-[200px]">{order.companyName}</span>
                       </div>
+                      {order.companyRut && (
+                        <div className="inline-flex mt-1.5 px-3 py-0.5 rounded-lg bg-primary/15 border border-primary/30 text-sm font-bold text-primary w-fit shadow-sm tracking-wide">
+                          {order.companyRut}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </td>
@@ -109,7 +114,7 @@ export function OrderTable({ orders }: OrderTableProps) {
                     <span className="text-zinc-300 capitalize font-medium">
                       {format(new Date(order.createdAt), "dd MMM, yyyy", { locale: es })}
                     </span>
-                    <span className="text-xs text-zinc-500 font-medium">
+                    <span className="text-sm text-zinc-500 font-medium">
                       {format(new Date(order.createdAt), "HH:mm 'hrs'")}
                     </span>
                   </div>
@@ -121,10 +126,10 @@ export function OrderTable({ orders }: OrderTableProps) {
 
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="font-bold text-white text-[15px]">
+                    <span className="font-bold text-white text-base">
                       {formatCurrency(order.totalGross)}
                     </span>
-                    <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider mt-0.5">
+                    <span className="text-sm text-zinc-400 font-bold uppercase tracking-wider mt-0.5">
                       {order.itemCount} ítems
                     </span>
                   </div>

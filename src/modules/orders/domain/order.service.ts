@@ -669,13 +669,15 @@ export class OrderService {
 
   async listOrders(
     query: GetOrdersQuery,
-    companyId?: string // Si viene del context del BUYER, filtra por su empresa
+    companyId?: string, // Si viene del context del BUYER, filtra por su empresa
+    salesRepId?: string // Si viene del context del SALES_REP, filtra por empresas de este vendedor
   ): Promise<PaginatedResult<OrderSummary>> {
     const { page, limit, status, paymentStatus, paymentMethod, from, to, search } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.OrderWhereInput = {
       ...(companyId ? { companyId } : query.companyId ? { companyId: query.companyId } : {}),
+      ...(salesRepId ? { company: { salesRepId } } : {}),
       ...(status ? { status } : {}),
       ...(paymentStatus ? { paymentStatus } : {}),
       ...(paymentMethod ? { paymentMethod } : {}),

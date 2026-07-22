@@ -56,7 +56,7 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
 
   return (
     <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-6 space-y-6 shadow-xl flex flex-col h-[600px]">
-      <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 border-b border-zinc-800 pb-4 shrink-0">
+      <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 border-b border-zinc-800 pb-4 shrink-0">
         <MessageSquare className="h-4 w-4 text-primary" />
         Comunicación y Facturas
       </h4>
@@ -70,23 +70,23 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500 space-y-2 opacity-50">
             <MessageSquare className="h-8 w-8" />
-            <p className="text-xs font-medium uppercase tracking-widest">No hay mensajes aún</p>
+            <p className="text-sm font-medium uppercase tracking-widest">No hay mensajes aún</p>
           </div>
         ) : (
           messages.map((msg: any) => (
             <div key={msg.id} className="bg-zinc-950/60 border border-zinc-800 rounded-2xl p-4 space-y-3">
               <div className="flex flex-col gap-1 mb-2">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase flex items-center gap-1.5">
+                <span className="text-xs font-bold text-zinc-500 uppercase flex items-center gap-1.5">
                   <UserIcon className="h-3 w-3" />
                   {msg.sender ? `${msg.sender.firstName} ${msg.sender.lastName} ${msg.sender.role === 'ADMIN' || msg.sender.role === 'SALES_REP' ? '(Soporte)' : '(Cliente)'}` : 'Mensaje del Sistema'}
                 </span>
-                <span className="text-[10px] text-zinc-600 pl-4">
+                <span className="text-xs text-zinc-600 pl-4">
                   {format(new Date(msg.createdAt), "dd MMM, HH:mm", { locale: es })}
                 </span>
               </div>
               
               {msg.message && (
-                <p className="text-sm text-zinc-300 whitespace-pre-wrap">{msg.message}</p>
+                <p className="text-base text-zinc-300 whitespace-pre-wrap">{msg.message}</p>
               )}
 
               {msg.attachmentUrl && (
@@ -101,7 +101,7 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
                       <div className="h-8 w-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
                         <FileText className="h-4 w-4 text-primary" />
                       </div>
-                      <span className="text-xs font-medium text-zinc-300 truncate">{msg.attachmentName}</span>
+                      <span className="text-sm font-medium text-zinc-300 truncate">{msg.attachmentName}</span>
                     </div>
                     <Download className="h-4 w-4 text-zinc-500 group-hover:text-primary transition-colors shrink-0" />
                   </a>
@@ -118,7 +118,7 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Escribe un mensaje..."
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-xs text-zinc-300 focus:border-primary/50 outline-none resize-none h-20 custom-scrollbar"
+          className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm text-zinc-300 focus:border-primary/50 outline-none resize-none h-20 custom-scrollbar"
         />
         
         <div className="flex flex-col gap-4">
@@ -137,13 +137,13 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
                   type="button"
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  className="h-10 border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-xl text-[10px] font-bold uppercase tracking-widest gap-2 shrink-0"
+                  className="h-10 border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-xl text-xs font-bold uppercase tracking-widest gap-2 shrink-0"
                 >
                   <Paperclip className="h-3.5 w-3.5" />
                   {file ? 'Cambiar Archivo' : 'Adjuntar Archivo'}
                 </Button>
                 {file && (
-                  <span className="text-xs text-zinc-400 truncate">
+                  <span className="text-sm text-zinc-400 truncate">
                     {file.name}
                   </span>
                 )}
@@ -160,7 +160,7 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
                     />
                     <CheckCircle2 className="h-3 w-3 text-zinc-950 absolute opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
                   </div>
-                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest group-hover:text-zinc-400 transition-colors">
+                  <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest group-hover:text-zinc-400 transition-colors">
                     Enviar notificación al correo
                   </span>
                 </label>
@@ -171,7 +171,7 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
           <Button
             type="submit"
             disabled={(!message.trim() && !file) || sendMessageMutation.isPending}
-            className="w-full h-12 bg-primary hover:bg-primary/90 text-black rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full h-12 bg-primary hover:bg-primary/90 text-black rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {sendMessageMutation.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

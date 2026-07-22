@@ -13,7 +13,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     throw new ForbiddenError("No tienes permisos para ver la analítica");
   }
 
-  const stats = await analyticsService.getDashboardStats();
+  const salesRepId = user.role === UserRole.SALES_REP ? user.id : undefined;
+  const stats = await analyticsService.getDashboardStats(salesRepId);
 
   return ok(stats);
 });

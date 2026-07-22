@@ -66,7 +66,17 @@ export function useApi() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error?.message || data.message || `Error ${response.status}`);
+          let errorMessage = data.message || `Error ${response.status}`;
+          if (typeof data.error === 'string') {
+            errorMessage = data.error;
+          } else if (data.error?.message) {
+            errorMessage = data.error.message;
+            if (data.error.code === 'VALIDATION_ERROR' && data.error.details) {
+              const details = Object.values(data.error.details).flat().join(", ");
+              if (details) errorMessage = details;
+            }
+          }
+          throw new Error(errorMessage);
         }
 
         // Si hay meta (paginación), devolver { data, meta } para que el hook tenga acceso a ambos

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -21,7 +21,8 @@ import {
  CreditCard,
  X,
  Sliders,
- Mail
+ Mail,
+ Briefcase
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
@@ -52,6 +53,7 @@ const mainItems = [
  { icon: Building2, label: 'Clientes', href: '/dashboard/customers' },
  { icon: Building2, label: 'Mi Empresa', href: '/dashboard/my-company' },
  { icon: Users, label: 'Equipo', href: '/dashboard/users' },
+ { icon: Briefcase, label: 'Vendedores', href: '/dashboard/vendedores' },
  { icon: CreditCard, label: 'Pagos', href: '/dashboard/pagos' },
  { icon: CreditCard, label: 'Cuenta Corriente', href: '/dashboard/cuenta-corriente' },
  { icon: Sliders, label: 'Slider Home', href: '/dashboard/slider' },
@@ -63,10 +65,25 @@ export function Sidebar() {
  const { user, logout } = useAuth();
  const { isSidebarOpen, setSidebarOpen } = useDashboard();
  
+ const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+
  // Close sidebar on mobile when navigating
  useEffect(() => {
  setSidebarOpen(false);
  }, [pathname, setSidebarOpen]);
+
+ useEffect(() => {
+   mainItems.forEach(item => {
+     if (item.subItems && pathname.startsWith(item.href)) {
+       setOpenMenus(prev => ({ ...prev, [item.label]: true }));
+     }
+   });
+ }, [pathname]);
+
+ const toggleMenu = (e: React.MouseEvent, label: string) => {
+   e.preventDefault();
+   setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
+ };
 
  const filteredMenuItems = menuItems.filter(item => {
  if (user?.role ==="BUYER" || user?.role ==="COMPANY_ADMIN") {
@@ -82,9 +99,9 @@ export function Sidebar() {
  if (user?.role ==="COMPANY_ADMIN") {
  return item.label ==="Pedidos" || item.label ==="Equipo" || item.label ==="Mi Empresa" || item.label ==="Cuenta Corriente";
  }
- // Cuenta Corriente visible para ADMIN y SALES_REP también
+ // Cuenta Corriente visible para ADMIN (BUYER y COMPANY_ADMIN tienen su logica arriba)
  if (item.label ==="Cuenta Corriente") {
- return user?.role ==="ADMIN" || user?.role ==="SALES_REP";
+   return user?.role ==="ADMIN";
  }
  // Slider Home solo para ADMIN
  if (item.label ==="Slider Home" && user?.role !=="ADMIN") return false;
@@ -95,9 +112,19 @@ export function Sidebar() {
  // My Company no es para ADMIN (ya está cubierto COMPANY_ADMIN arriba)
  if (item.label ==="Mi Empresa") return false;
  // Team solo para ADMIN o COMPANY_ADMIN
- if (item.label ==="Equipo" && user?.role !=="ADMIN") return false;
+ if (item.label === 'Equipo' && user?.role !== 'ADMIN') return false;
+ // Vendedores solo para ADMIN
+ if (item.label === 'Vendedores' && user?.role !== 'ADMIN') return false;
  // Emails Masivos solo para ADMIN
- if (item.label ==="Emails Masivos" && user?.role !=="ADMIN") return false;
+ if (item.label === 'Emails Masivos' && user?.role !== 'ADMIN') return false;
+
+  // SALES_REP no debe ver las siguientes pestañas
+  if (user?.role === 'SALES_REP') {
+    if (['Productos', 'Categorías', 'Marcas'].includes(item.label)) {
+      return false;
+    }
+  }
+
  return true;
  });
 
@@ -108,14 +135,14 @@ export function Sidebar() {
  <img 
  src="/home/devoto.png" 
  alt="JDevoto Logo" 
- className="h-10 w-auto"
+ className="h-12 w-auto"
  />
  </Link>
 
  <nav className="space-y-6">
  <div>
- <div className="px-3 mb-2 flex items-center justify-between">
- <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600">Menú Principal</span>
+ <div className="px-3 mb-3 flex items-center justify-between">
+ <span className="text-xs font-bold uppercase tracking-widest text-zinc-600">Menú Principal</span>
  </div>
  <ul className="space-y-1">
  {filteredMenuItems.map((item) => {
@@ -125,13 +152,13 @@ export function Sidebar() {
  <Link
  href={item.href}
  className={cn(
-"flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+"flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all",
  isActive 
  ?"bg-zinc-900 text-white shadow-sm" 
  :"text-zinc-500 hover:text-zinc-200 hover:bg-zinc-900/50"
  )}
  >
- <item.icon className={cn("h-4 w-4", isActive ?"text-primary" :"text-zinc-500")} />
+ <item.icon className={cn("h-5 w-5", isActive ?"text-primary" :"text-zinc-500")} />
  {item.label}
  </Link>
  </li>
@@ -141,35 +168,54 @@ export function Sidebar() {
  </div>
 
  <div>
- <div className="px-3 mb-2 flex items-center justify-between">
- <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600">Gestión</span>
+ <div className="px-3 mb-3 flex items-center justify-between">
+ <span className="text-xs font-bold uppercase tracking-widest text-zinc-600">Gestión</span>
  </div>
  <ul className="space-y-1">
- {filteredMainItems.map((item) => (
- <li key={item.label} className="space-y-1">
- <Link
- href={item.href}
+ {filteredMainItems.map((item) => {
+    const label = item.label === 'Clientes' && user?.role === 'SALES_REP' ? 'Mis Clientes' : item.label;
+    const isActive = pathname === item.href;
+    
+    return (
+    <li key={item.label} className="space-y-1">
+ {item.subItems ? (
+ <button
+ onClick={(e) => toggleMenu(e, item.label)}
  className={cn(
-"flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
- pathname === item.href 
+"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all",
+ pathname.startsWith(item.href)
  ?"bg-zinc-900 text-white" 
  :"text-zinc-500 hover:text-zinc-200 hover:bg-zinc-900/50"
  )}
  >
- <item.icon className="h-4 w-4" />
- <span className="flex-1">{item.label}</span>
- {item.subItems && <ChevronRight className={cn("h-3 w-3 transition-transform", pathname.startsWith(item.href) &&"rotate-90")} />}
+ <item.icon className="h-5 w-5 shrink-0" />
+  <span className="flex-1 text-left">{label}</span>
+ <ChevronRight className={cn("h-4 w-4 shrink-0 transition-transform", openMenus[item.label] &&"rotate-90")} />
+ </button>
+ ) : (
+ <Link
+ href={item.href}
+ className={cn(
+"flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all",
+ isActive 
+ ?"bg-zinc-900 text-white" 
+ :"text-zinc-500 hover:text-zinc-200 hover:bg-zinc-900/50"
+ )}
+ >
+ <item.icon className="h-5 w-5 shrink-0" />
+  <span className="flex-1 text-left">{label}</span>
  </Link>
+ )}
  
- {item.subItems && pathname.startsWith(item.href) && (
- <ul className="ml-9 space-y-1 border-l border-zinc-800 pl-4 py-1">
+ {item.subItems && openMenus[item.label] && (
+ <ul className="ml-9 space-y-1.5 border-l border-zinc-800 pl-4 py-2">
  {item.subItems.map((sub) => (
  <li key={sub.label}>
  <Link 
  href={sub.href}
  className={cn(
-"block py-1.5 text-xs font-medium transition-colors",
- pathname === sub.href ?"text-primary" :"text-zinc-600 hover:text-zinc-400"
+"block py-1 text-sm font-bold transition-colors",
+ pathname === sub.href ?"text-primary" :"text-zinc-500 hover:text-zinc-300"
  )}
  >
  {sub.label}
@@ -179,7 +225,8 @@ export function Sidebar() {
  </ul>
  )}
  </li>
- ))}
+ );
+ })}
  </ul>
  </div>
  </nav>
@@ -187,9 +234,9 @@ export function Sidebar() {
 
  <div className="mt-auto p-4 border-t border-zinc-800/50 bg-zinc-950/50 backdrop-blur-sm shrink-0">
  <div className="rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 p-4 text-center hidden xs:block">
- <p className="text-[11px] font-bold text-white mb-1">¿Necesitas ayuda?</p>
- <p className="text-[10px] text-zinc-500 mb-3">Agenda una llamada con nuestro equipo.</p>
- <button className="w-full py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white text-[10px] font-semibold transition-colors border border-zinc-700">
+ <p className="text-xs font-bold text-white mb-1">¿Necesitas ayuda?</p>
+ <p className="text-[11px] font-medium text-zinc-500 mb-3">Agenda una llamada con nuestro equipo.</p>
+ <button className="w-full py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold transition-colors border border-zinc-700">
  Agendar llamada
  </button>
  </div>

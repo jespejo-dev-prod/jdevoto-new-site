@@ -87,17 +87,17 @@ export default function EmailCampaignsPage() {
  {/* Header */}
  <div className="flex items-center justify-between">
  <div>
- <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
+ <h1 className="text-3xl font-bold text-zinc-100 flex items-center gap-2">
  <Mail className="h-6 w-6 text-primary" />
  Emails Masivos
  </h1>
- <p className="text-sm text-zinc-500 mt-1">
+ <p className="text-base text-zinc-500 mt-1">
  Crea y envía campañas de email a tus clientes
  </p>
  </div>
  <Link
  href="/dashboard/emails/nueva"
- className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+ className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl text-base font-bold hover:bg-primary/90 transition-colors"
  >
  <Plus className="h-4 w-4" />
  Nueva Campaña
@@ -115,9 +115,9 @@ export default function EmailCampaignsPage() {
  <div key={stat.label} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
  <div className="flex items-center gap-2 mb-2">
  <stat.icon className={`h-4 w-4 ${stat.color}`} />
- <span className="text-xs text-zinc-500">{stat.label}</span>
+ <span className="text-sm font-bold text-zinc-500">{stat.label}</span>
  </div>
- <p className="text-2xl font-bold text-zinc-100">{stat.value}</p>
+ <p className="text-3xl font-bold text-zinc-100">{stat.value}</p>
  </div>
  ))}
  </div>
@@ -125,7 +125,7 @@ export default function EmailCampaignsPage() {
  {/* Table */}
  <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
  <div className="px-6 py-4 border-b border-zinc-800">
- <h2 className="text-sm font-semibold text-zinc-200">Historial de campañas</h2>
+ <h2 className="text-base font-bold text-zinc-200">Historial de campañas</h2>
  </div>
 
  {loading ? (
@@ -145,9 +145,9 @@ export default function EmailCampaignsPage() {
  </div>
  ) : (
  <div className="overflow-x-auto">
- <table className="w-full text-sm">
+ <table className="w-full text-base">
  <thead>
- <tr className="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wide">
+ <tr className="border-b border-zinc-800 text-sm text-zinc-500 uppercase tracking-wide font-bold">
  <th className="text-left px-6 py-3 font-medium">Campaña</th>
  <th className="text-center px-4 py-3 font-medium">Estado</th>
  <th className="text-center px-4 py-3 font-medium">Enviados</th>
@@ -174,12 +174,12 @@ export default function EmailCampaignsPage() {
  onClick={() => router.push(`/dashboard/emails/${c.id}`)}
  >
  <td className="px-6 py-4">
- <p className="font-medium text-zinc-200 truncate max-w-[220px]">{c.title}</p>
- <p className="text-xs text-zinc-500 truncate max-w-[220px]">{c.subject}</p>
+ <p className="font-bold text-lg text-zinc-200 truncate max-w-[220px]">{c.title}</p>
+ <p className="text-sm text-zinc-500 truncate max-w-[220px]">{c.subject}</p>
  </td>
  <td className="px-4 py-4 text-center">
- <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}>
- <StatusIcon className={`h-3 w-3 ${c.status === 'SENDING' ? 'animate-spin' : ''}`} />
+ <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold ${status.color}`}>
+ <StatusIcon className={`h-4 w-4 ${c.status === 'SENDING' ? 'animate-spin' : ''}`} />
  {status.label}
  </span>
  </td>
@@ -187,18 +187,18 @@ export default function EmailCampaignsPage() {
  {c.totalSent.toLocaleString('es-CL')}
  </td>
  <td className="px-4 py-4 text-center">
- <span className="text-emerald-400 font-medium">{c.totalOpened.toLocaleString('es-CL')}</span>
+ <span className="text-emerald-400 font-bold text-lg">{c.totalOpened.toLocaleString('es-CL')}</span>
  {c.totalSent > 0 && (
- <span className="text-xs text-zinc-500 ml-1">({c.openRate}%)</span>
+ <span className="text-sm font-medium text-zinc-500 ml-1">({c.openRate}%)</span>
  )}
  </td>
  <td className="px-4 py-4 text-center">
- <span className="text-amber-400 font-medium">{c.totalClicked.toLocaleString('es-CL')}</span>
+ <span className="text-amber-400 font-bold text-lg">{c.totalClicked.toLocaleString('es-CL')}</span>
  {c.totalSent > 0 && (
- <span className="text-xs text-zinc-500 ml-1">({c.clickRate}%)</span>
+ <span className="text-sm font-medium text-zinc-500 ml-1">({c.clickRate}%)</span>
  )}
  </td>
- <td className="px-4 py-4 text-center text-zinc-500 text-xs">
+ <td className="px-4 py-4 text-center text-zinc-500 text-sm font-medium">
  {c.sentAt
  ? format(new Date(c.sentAt),"dd MMM yyyy HH:mm", { locale: es })
  : format(new Date(c.createdAt),"dd MMM yyyy", { locale: es })}

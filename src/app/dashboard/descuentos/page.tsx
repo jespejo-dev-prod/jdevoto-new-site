@@ -299,10 +299,10 @@ export default function DescuentosPage() {
  </div>
  <div>
  <h1 className="text-2xl font-black text-white tracking-tight">Descuentos</h1>
- <p className="text-sm text-zinc-500 font-medium">Gestiona promociones por categoría y/o marca</p>
+ <p className="text-base text-zinc-500 font-medium">Gestiona promociones por categoría y/o marca</p>
  </div>
  </div>
- <div className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest">
+ <div className="flex items-center gap-2 text-sm font-bold text-zinc-500 uppercase tracking-widest">
  <Layers className="h-4 w-4" />
  {promotions.length} activas
  </div>
@@ -324,7 +324,7 @@ export default function DescuentosPage() {
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
  {/* Tipo de Descuento */}
  <div className="space-y-2">
- <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Tipo de Descuento</Label>
+ <Label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Tipo de Descuento</Label>
  <select
  value={discountType}
  onChange={(e) => {
@@ -343,7 +343,7 @@ export default function DescuentosPage() {
  {/* Categoría */}
  {(discountType === 'CATEGORY' || discountType === 'COMBINED') && (
  <div className="space-y-2">
- <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Selecciona una Categoría</Label>
+ <Label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Selecciona una Categoría</Label>
  <select
  value={selectedCategoryId}
  onChange={(e) => setSelectedCategoryId(e.target.value)}
@@ -361,7 +361,7 @@ export default function DescuentosPage() {
  {/* Marca */}
  {(discountType === 'BRAND' || discountType === 'COMBINED') && (
  <div className="space-y-2">
- <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Selecciona una Marca</Label>
+ <Label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Selecciona una Marca</Label>
  <select
  value={selectedBrandId}
  onChange={(e) => setSelectedBrandId(e.target.value)}
@@ -378,7 +378,7 @@ export default function DescuentosPage() {
 
  {/* Porcentaje */}
  <div className="space-y-2">
- <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Porcentaje de Descuento (%)</Label>
+ <Label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Porcentaje de Descuento (%)</Label>
  <Input
  type="number"
  min="0.01"
@@ -394,7 +394,7 @@ export default function DescuentosPage() {
 
  {/* Duración / Expiración */}
  <div className="space-y-2">
- <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Duración / Expiración</Label>
+ <Label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Duración / Expiración</Label>
  <select
  value={durationMode}
  onChange={(e) => {
@@ -416,7 +416,7 @@ export default function DescuentosPage() {
  {/* Fecha personalizada */}
  {durationMode === 'CUSTOM' && (
  <div className="space-y-2">
- <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Fecha y hora límite</Label>
+ <Label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Fecha y hora límite</Label>
  <Input
  type="datetime-local"
  value={customValidTo}
@@ -430,7 +430,7 @@ export default function DescuentosPage() {
 
  {/* Nombre (opcional) */}
  <div className="space-y-2">
- <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Nombre de la Promoción (opcional)</Label>
+ <Label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Nombre de la Promoción (opcional)</Label>
  <Input
  placeholder="Ej: Especial Bosch Septiembre"
  value={promoName}
@@ -457,7 +457,7 @@ export default function DescuentosPage() {
 
  {/* Color Picker */}
  <div className="flex items-center gap-3">
- <Label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest whitespace-nowrap">
+ <Label className="text-xs font-black text-zinc-400 uppercase tracking-widest whitespace-nowrap">
  Color fuentes campaña:
  </Label>
  <div className="flex items-center gap-2">
@@ -467,7 +467,7 @@ export default function DescuentosPage() {
  onChange={(e) => setColor(e.target.value)}
  className="w-10 h-10 border-0 rounded-lg cursor-pointer bg-zinc-800 p-0.5"
  />
- <span className="text-xs font-mono font-bold text-zinc-500 uppercase">
+ <span className="text-sm font-mono font-bold text-zinc-500 uppercase">
  {color}
  </span>
  </div>
@@ -477,29 +477,29 @@ export default function DescuentosPage() {
  {/* Info Banner */}
  <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
  <AlertCircle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
- <div className="text-xs text-amber-300/80 font-medium leading-relaxed">
+ <div className="text-sm text-amber-300/80 font-medium leading-relaxed">
  <strong className="text-amber-300">Importante:</strong> Los descuentos promocionales <strong>no se acumulan</strong> con los descuentos de empresa (Dcto. Empresa) ni con los descuentos por método de pago (Dcto. Pago). Los productos con promociones aplicadas reciben solo el descuento promocional. La categoría <strong>Outlet</strong> está excluida de las promociones.
  </div>
  </div>
 
  <div className="flex gap-4">
- <Button
+ <button
  type="submit"
  disabled={submitting}
- className="h-12 px-8 bg-primary hover:bg-primary/90 text-zinc-950 font-black uppercase text-xs tracking-widest rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-primary/20"
+ className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
  >
  {submitting ? (
  <><Loader2 className="h-4 w-4 animate-spin mr-2" /> {editingId ? 'Actualizando...' : 'Creando...'}</>
  ) : (
  <>{editingId ? <Pencil className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />} {editingId ? 'Actualizar Descuento' : 'Crear Descuento'}</>
  )}
- </Button>
+ </button>
  {editingId && (
  <Button
  type="button"
  onClick={resetForm}
  variant="ghost"
- className="h-12 px-8 border border-zinc-700 text-white font-black uppercase text-xs tracking-widest rounded-xl transition-all active:scale-[0.98]"
+ className="h-12 px-8 border border-zinc-700 text-white font-black uppercase text-sm tracking-widest rounded-xl transition-all active:scale-[0.98]"
  >
  <X className="h-4 w-4 mr-2" /> Cancelar
  </Button>
@@ -511,27 +511,27 @@ export default function DescuentosPage() {
  <div className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 rounded-3xl overflow-hidden">
  <div className="px-8 py-6 border-b border-zinc-800 flex items-center justify-between">
  <h2 className="text-lg font-black text-white uppercase tracking-tight">Descuentos Actuales</h2>
- <span className="text-xs font-bold text-zinc-500">{promotions.length} registros</span>
+ <span className="text-sm font-bold text-zinc-500">{promotions.length} registros</span>
  </div>
 
  {promotions.length === 0 ? (
  <div className="px-8 py-16 text-center">
  <Ticket className="h-12 w-12 text-zinc-700 mx-auto mb-4" />
- <p className="text-sm text-zinc-500 font-medium">No hay descuentos registrados aún</p>
- <p className="text-xs text-zinc-600 mt-1">Crea tu primer descuento con el formulario de arriba</p>
+ <p className="text-base text-zinc-500 font-medium">No hay descuentos registrados aún</p>
+ <p className="text-sm text-zinc-600 mt-1">Crea tu primer descuento con el formulario de arriba</p>
  </div>
  ) : (
  <div className="overflow-x-auto">
  <table className="w-full text-sm">
  <thead>
  <tr className="border-b border-zinc-800">
- <th className="text-left px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Nombre</th>
- <th className="text-left px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Tipo</th>
- <th className="text-left px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Categoría</th>
- <th className="text-left px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Marca</th>
- <th className="text-center px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Descuento</th>
- <th className="text-left px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Vigencia</th>
- <th className="text-right px-6 py-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Acciones</th>
+ <th className="text-left px-6 py-4 text-xs font-black text-zinc-500 uppercase tracking-widest">Nombre</th>
+ <th className="text-left px-6 py-4 text-xs font-black text-zinc-500 uppercase tracking-widest">Tipo</th>
+ <th className="text-left px-6 py-4 text-xs font-black text-zinc-500 uppercase tracking-widest">Categoría</th>
+ <th className="text-left px-6 py-4 text-xs font-black text-zinc-500 uppercase tracking-widest">Marca</th>
+ <th className="text-center px-6 py-4 text-xs font-black text-zinc-500 uppercase tracking-widest">Descuento</th>
+ <th className="text-left px-6 py-4 text-xs font-black text-zinc-500 uppercase tracking-widest">Vigencia</th>
+ <th className="text-right px-6 py-4 text-xs font-black text-zinc-500 uppercase tracking-widest">Acciones</th>
  </tr>
  </thead>
  <tbody>
@@ -542,17 +542,17 @@ export default function DescuentosPage() {
  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
  <Ticket className="h-4 w-4 text-primary" />
  </div>
- <span className="font-bold text-white text-xs uppercase tracking-tight">{promo.name}</span>
+ <span className="font-bold text-white text-sm uppercase tracking-tight">{promo.name}</span>
  </div>
  </td>
  <td className="px-6 py-4">
- <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border ${getDiscountTypeBadgeColor(promo)}`}>
+ <span className={`px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider border ${getDiscountTypeBadgeColor(promo)}`}>
  {getDiscountTypeLabel(promo)}
  </span>
  </td>
  <td className="px-6 py-4">
  {promo.category ? (
- <span className="text-xs text-zinc-300 font-medium flex items-center gap-1.5">
+ <span className="text-sm text-zinc-300 font-medium flex items-center gap-1.5">
  <Tag className="h-3 w-3 text-blue-400" />
  {promo.category.name}
  </span>
@@ -562,7 +562,7 @@ export default function DescuentosPage() {
  </td>
  <td className="px-6 py-4">
  {promo.brand ? (
- <span className="text-xs text-zinc-300 font-medium flex items-center gap-1.5">
+ <span className="text-sm text-zinc-300 font-medium flex items-center gap-1.5">
  <Shield className="h-3 w-3 text-amber-400" />
  {promo.brand.name}
  </span>
@@ -571,7 +571,7 @@ export default function DescuentosPage() {
  )}
  </td>
  <td className="px-6 py-4 text-center">
- <span className="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-black border border-emerald-500/20">
+ <span className="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-sm font-black border border-emerald-500/20">
  {Number(promo.discount)}%
  </span>
  </td>
@@ -582,7 +582,7 @@ export default function DescuentosPage() {
  const to = new Date(promo.validTo);
  if (to.getFullYear() === 9999) {
  return (
- <span className="text-[11px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
+ <span className="text-xs text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
  Hasta agotar stock
  </span>
  );
@@ -590,7 +590,7 @@ export default function DescuentosPage() {
  const diffMs = to.getTime() - now.getTime();
  if (diffMs <= 0) {
  return (
- <span className="text-[10px] font-bold text-red-500 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-lg">
+ <span className="text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-lg">
  Expirado
  </span>
  );
@@ -598,7 +598,7 @@ export default function DescuentosPage() {
  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
  if (diffDays > 1) {
  return (
- <span className="text-[11px] text-amber-400 font-bold bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+ <span className="text-xs text-amber-400 font-bold bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
  Quedan {diffDays} días
  </span>
  );
@@ -607,13 +607,13 @@ export default function DescuentosPage() {
  const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
  const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
  return (
- <span className="text-[11px] text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 rounded-lg">
+ <span className="text-xs text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 rounded-lg">
  Quedan {diffHrs}h {diffMins}m
  </span>
  );
  })()
  ) : (
- <span className="text-[11px] text-zinc-400 font-bold bg-zinc-500/10 border border-zinc-500/20 px-2.5 py-1 rounded-lg">
+ <span className="text-xs text-zinc-400 font-bold bg-zinc-500/10 border border-zinc-500/20 px-2.5 py-1 rounded-lg">
  N/A (Sin expiración)
  </span>
  )}

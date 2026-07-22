@@ -22,17 +22,26 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     prisma.order.aggregate({
       where: {
         createdAt: { gte: thirtyDaysAgo },
-        status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] }
+        status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
+        ...(user.role === UserRole.SALES_REP ? { company: { salesRepId: user.id } } : {})
       },
       _sum: { totalGross: true },
       _count: { _all: true }
     }),
-    prisma.company.count({ where: { isActive: true } }),
+    prisma.company.count({ 
+      where: { 
+        isActive: true,
+        ...(user.role === UserRole.SALES_REP ? { salesRepId: user.id } : {})
+      } 
+    }),
     prisma.$queryRaw<Array<{ count: number }>>`
       SELECT COUNT(*)::int as count FROM products 
       WHERE "isActive" = true AND "isDeleted" = false AND "stockQuantity" <= "stockAlert"
     `,
     prisma.order.findMany({
+      where: {
+        ...(user.role === UserRole.SALES_REP ? { company: { salesRepId: user.id } } : {})
+      },
       orderBy: { createdAt: 'desc' },
       take: 5,
       include: {

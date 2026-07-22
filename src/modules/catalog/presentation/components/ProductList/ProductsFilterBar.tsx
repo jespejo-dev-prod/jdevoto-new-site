@@ -10,6 +10,9 @@ interface ProductsFilterBarProps {
   categoryId: string;
   onCategoryChange: (value: string) => void;
   categories: any[];
+  brandId?: string;
+  onBrandChange?: (value: string) => void;
+  brands?: any[];
   view: 'grid' | 'list';
   onViewChange: (view: 'grid' | 'list') => void;
   total?: number;
@@ -26,6 +29,9 @@ export function ProductsFilterBar({
   categoryId,
   onCategoryChange,
   categories,
+  brandId,
+  onBrandChange,
+  brands,
   view,
   onViewChange,
   total,
@@ -49,20 +55,20 @@ export function ProductsFilterBar({
     return () => clearTimeout(timer);
   }, [localSearch]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const hasActiveFilters = !!search || !!categoryId;
+  const hasActiveFilters = !!search || !!categoryId || !!brandId;
 
   const containerClasses = cn(
-    "flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl border backdrop-blur-sm shadow-sm",
+    "flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-3xl border backdrop-blur-sm shadow-sm",
     isDashboard ? "border-zinc-800 bg-zinc-900/40" : "border-zinc-100 bg-white"
   );
 
   const inputClasses = cn(
-    "w-full pl-10 pr-10 py-2 rounded-xl border text-sm transition-colors outline-none",
-    isDashboard ? "bg-zinc-950 border-zinc-800 text-white focus:border-primary/50 placeholder:text-zinc-600" : "bg-zinc-50 border-zinc-100 text-zinc-900 focus:border-primary placeholder:text-zinc-400"
+    "w-full pl-11 pr-11 py-3 rounded-2xl border text-base transition-colors outline-none",
+    isDashboard ? "bg-zinc-950 border-zinc-800 text-white focus:border-primary/50 placeholder:text-zinc-500" : "bg-zinc-50 border-zinc-100 text-zinc-900 focus:border-primary placeholder:text-zinc-400"
   );
 
   const selectClasses = cn(
-    "h-9 pl-3 pr-8 rounded-xl border text-xs transition-colors appearance-none cursor-pointer outline-none",
+    "h-12 pl-4 pr-10 rounded-2xl border text-sm font-bold transition-colors appearance-none cursor-pointer outline-none",
     isDashboard ? "bg-zinc-950 border-zinc-800 text-zinc-300 focus:border-primary/50" : "bg-zinc-50 border-zinc-100 text-zinc-700 focus:border-primary"
   );
 
@@ -71,7 +77,7 @@ export function ProductsFilterBar({
       <div className="flex flex-1 items-center gap-3 flex-wrap">
         {/* Búsqueda */}
         <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500 pointer-events-none" />
           <input
             id="product-search"
             type="text"
@@ -86,9 +92,9 @@ export function ProductsFilterBar({
                 setLocalSearch('');
                 onSearchChange('');
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -114,8 +120,29 @@ export function ProductsFilterBar({
               );
             })}
           </select>
-          <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500 pointer-events-none" />
+          <Filter className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
         </div>
+
+        {/* Selector de marca */}
+        {brands && onBrandChange && (
+          <div className="relative">
+            <select
+              id="product-brand-filter"
+              aria-label="Marca"
+              value={brandId || ''}
+              onChange={(e) => onBrandChange(e.target.value)}
+              className={selectClasses}
+            >
+              <option value="">Todas las marcas</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name.toUpperCase()}
+                </option>
+              ))}
+            </select>
+            <Filter className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
+          </div>
+        )}
 
         {/* Selector de cantidad por página (Límite) */}
         {!isDashboard && onLimitChange && (
@@ -143,17 +170,18 @@ export function ProductsFilterBar({
               setLocalSearch('');
               onSearchChange('');
               onCategoryChange('');
+              if (onBrandChange) onBrandChange('');
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold text-red-500 hover:bg-red-500/10 transition-all"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-red-500 hover:bg-red-500/10 transition-all"
           >
-            <X className="h-3 w-3" />
+            <X className="h-4 w-4" />
             Limpiar
           </button>
         )}
 
         {/* Total */}
         {total !== undefined && (
-          <span className={cn("text-[11px] font-bold uppercase tracking-wider", isDashboard ? "text-zinc-600" : "text-zinc-500")}>
+          <span className={cn("text-xs font-bold uppercase tracking-wider", isDashboard ? "text-zinc-600" : "text-zinc-500")}>
             {total} {total === 1 ? 'producto' : 'productos'}
           </span>
         )}

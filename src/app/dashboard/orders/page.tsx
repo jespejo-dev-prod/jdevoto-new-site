@@ -80,15 +80,15 @@ export default function OrdersPage() {
  <ShoppingBag className="h-8 w-8 text-primary" />
  Pedidos B2B
  </h1>
- <p className="text-zinc-500 mt-1 font-medium">
+ <p className="text-base text-zinc-500 mt-1 font-medium">
  Gestiona el ciclo de vida de las órdenes de tus clientes. 
- {meta && <span className="ml-2 text-primary/50 text-[10px] tracking-widest uppercase">Total DB: {meta.total}</span>}
+ {meta && <span className="ml-2 text-primary/50 text-xs tracking-widest uppercase">Total DB: {meta.total}</span>}
  </p>
  </div>
 
  <div className="flex items-center gap-3">
  <Link href="/dashboard/orders/new">
- <button className="flex items-center gap-2 px-5 py-2.5 bg-primary text-black rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+ <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
  <Plus className="h-4 w-4" />
  Nuevo Pedido
  </button>
@@ -105,7 +105,7 @@ export default function OrdersPage() {
  placeholder="Buscar por # de pedido o cliente..."
  value={searchTerm}
  onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
- className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-sm text-white focus:border-primary/50 outline-none transition-all"
+ className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-base text-white focus:border-primary/50 outline-none transition-all"
  />
  </div>
  
@@ -130,7 +130,7 @@ export default function OrdersPage() {
  {(searchTerm || fromDate || toDate) && (
  <button 
  onClick={() => { setSearchTerm(''); setFromDate(''); setToDate(''); setPage(1); }}
- className="px-4 h-12 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all"
+ className="px-4 h-12 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all"
  >
  Limpiar
  </button>
@@ -161,7 +161,7 @@ export default function OrdersPage() {
  <Icon className="h-4 w-4" />
  {tab.label}
  {isActive && meta && (
- <span className="ml-1 bg-primary/10 px-1.5 py-0.5 rounded-md text-xs">
+ <span className="ml-1 bg-primary/10 px-1.5 py-0.5 rounded-md text-sm">
  {meta.total}
  </span>
  )}
@@ -175,7 +175,7 @@ export default function OrdersPage() {
  {isLoading ? (
  <div className="flex flex-col items-center justify-center py-24 gap-4">
  <Loader2 className="h-10 w-10 text-primary animate-spin" />
- <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Consultando registros...</p>
+ <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Consultando registros...</p>
  </div>
  ) : (
  <div className="space-y-6">
@@ -184,7 +184,7 @@ export default function OrdersPage() {
  {/* Pagination */}
  {meta && meta.totalPages > 1 && (
  <div className="flex items-center justify-between pt-4">
- <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+ <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
  Mostrando página {meta.page} de {meta.totalPages} ({meta.total} pedidos)
  </p>
  <div className="flex gap-2">

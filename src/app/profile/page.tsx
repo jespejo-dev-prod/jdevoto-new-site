@@ -330,7 +330,7 @@ export default function ProfilePage() {
 
              <div className="bg-zinc-900/20 border border-zinc-900/60 p-4 rounded-[32px] space-y-1">
                 <SidebarItem id="account" icon={User} label="Mi Cuenta" />
-                {user.company && <SidebarItem id="company" icon={Building2} label="Datos de Empresa" />}
+                {user.company && user.role !== 'SALES_REP' && <SidebarItem id="company" icon={Building2} label="Datos de Empresa" />}
                 {user.company && <SidebarItem id="shipping" icon={MapPinned} label="Dirección Despacho" />}
                 <SidebarItem id="settings" icon={Settings} label="Seguridad" />
                 
@@ -430,7 +430,7 @@ export default function ProfilePage() {
              )}
 
               {/* PESTAÑA: DATOS DE EMPRESA */}
-              {activeTab === 'company' && user.company && (
+              {activeTab === 'company' && user.company && user.role !== 'SALES_REP' && (
                 <div className="space-y-8">
                    <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Datos de Empresa</h1>
                    

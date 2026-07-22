@@ -29,6 +29,7 @@ export interface DashboardProduct {
 export interface UseProductsParams {
   search?: string;
   categoryId?: string;
+  brandId?: string;
   page?: number;
   limit?: number;
   includeInactive?: boolean;
@@ -45,10 +46,10 @@ export interface ProductsResponse {
 export function useProducts(params: UseProductsParams = {}) {
   const { accessToken } = useAuth();
   const api = useApi(); // <- Usamos useApi
-  const { search, categoryId, page = 1, limit = 16, includeInactive = false, status = 'all' } = params;
+  const { search, categoryId, brandId, page = 1, limit = 16, includeInactive = false, status = 'all' } = params;
 
   return useQuery({
-    queryKey: ['dashboard-products', search, categoryId, page, limit, includeInactive, status],
+    queryKey: ['dashboard-products', search, categoryId, brandId, page, limit, includeInactive, status],
     queryFn: async (): Promise<ProductsResponse> => {
       const sp = new URLSearchParams();
       sp.set('page', String(page));
@@ -56,6 +57,7 @@ export function useProducts(params: UseProductsParams = {}) {
       sp.set('dashboard', 'true');          // ← Modo rápido: salta el motor de precios
       if (search)          sp.set('search', search);
       if (categoryId)      sp.set('categoryId', categoryId);
+      if (brandId)         sp.set('brandId', brandId);
       if (includeInactive) sp.set('includeInactive', 'true');
       if (status)          sp.set('status', status);
 

@@ -3,7 +3,7 @@ import { OrderStatus } from "@prisma/client";
 import { subDays, startOfDay, endOfDay, format } from "date-fns";
 
 export class AnalyticsService {
-  async getDashboardStats() {
+  async getDashboardStats(salesRepId?: string) {
     const now = new Date();
     const thirtyDaysAgo = subDays(now, 30);
     const prevThirtyDaysAgo = subDays(thirtyDaysAgo, 30);
@@ -19,7 +19,8 @@ export class AnalyticsService {
       prisma.order.aggregate({
         where: {
           createdAt: { gte: thirtyDaysAgo },
-          status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] }
+          status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
+          ...(salesRepId ? { company: { salesRepId } } : {})
         },
         _sum: { totalGross: true },
         _count: { _all: true }
@@ -27,12 +28,24 @@ export class AnalyticsService {
       prisma.order.aggregate({
         where: {
           createdAt: { gte: prevThirtyDaysAgo, lt: thirtyDaysAgo },
-          status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] }
+          status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
+          ...(salesRepId ? { company: { salesRepId } } : {})
         },
         _sum: { totalGross: true },
         _count: { _all: true }
       }),
-      prisma.$queryRaw<Array<{ date: string; total: number }>>`
+      salesRepId ? prisma.$queryRaw<Array<{ date: string; total: number }>>`
+        SELECT 
+          DATE_TRUNC('day', o."createdAt") as date,
+          SUM(o."totalGross")::float as total
+        FROM "orders" o
+        JOIN "companies" c ON c.id = o."companyId"
+        WHERE o."createdAt" >= ${thirtyDaysAgo}
+          AND o.status NOT IN ('CANCELLED', 'REJECTED')
+          AND c."salesRepId" = ${salesRepId}
+        GROUP BY 1
+        ORDER BY 1 ASC
+      ` : prisma.$queryRaw<Array<{ date: string; total: number }>>`
         SELECT 
           DATE_TRUNC('day', "createdAt") as date,
           SUM("totalGross")::float as total
@@ -45,7 +58,10 @@ export class AnalyticsService {
       prisma.order.groupBy({
         by: ['status'],
         _count: { _all: true },
-        where: { createdAt: { gte: thirtyDaysAgo } }
+        where: { 
+          createdAt: { gte: thirtyDaysAgo },
+          ...(salesRepId ? { company: { salesRepId } } : {})
+        }
       }),
       prisma.order.groupBy({
         by: ['companyId'],
@@ -53,7 +69,10 @@ export class AnalyticsService {
         _count: { _all: true },
         orderBy: { _sum: { totalGross: 'desc' } },
         take: 5,
-        where: { status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] } }
+        where: { 
+          status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
+          ...(salesRepId ? { company: { salesRepId } } : {})
+        }
       })
     ]);
 
@@ -61,7 +80,13 @@ export class AnalyticsService {
     const currentOrdersCount = Number(currentAggregation._count._all || 0);
 
     const prevRevenue = Number(prevAggregation._sum.totalGross || 0);
-    const revenueGrowth = prevRevenue === 0 ? 100 : ((currentRevenue - prevRevenue) / prevRevenue) * 100;
+    
+    let revenueGrowth = 0;
+    if (prevRevenue === 0) {
+      revenueGrowth = currentRevenue > 0 ? 100 : 0;
+    } else {
+      revenueGrowth = ((currentRevenue - prevRevenue) / prevRevenue) * 100;
+    }
 
     // 2. Obtener información de los clientes top
     const topCompanyIds = topCustomers.map(c => c.companyId);

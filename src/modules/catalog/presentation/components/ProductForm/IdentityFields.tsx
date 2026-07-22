@@ -23,7 +23,7 @@ export function ProductNameField({ slug }: { slug: string }) {
         className="bg-zinc-900/40 border-zinc-800 text-2xl font-bold text-white h-16 px-6 rounded-2xl focus:border-primary/50 transition-all" 
         {...register('name')} 
       />
-      <div className="flex items-center gap-4 px-4 py-1.5 rounded-lg bg-zinc-900/10 border border-zinc-800/50 w-fit text-[10px] font-bold">
+      <div className="flex items-center gap-4 px-4 py-1.5 rounded-lg bg-zinc-900/10 border border-zinc-800/50 w-fit text-xs font-bold">
         <span className="text-zinc-600 uppercase tracking-widest">Enlace:</span>
         <span className="text-primary">{slug || '...'}</span>
       </div>
@@ -120,7 +120,7 @@ export function ProductDescriptionField() {
 
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">
-      <div className="p-3 border-b border-zinc-800 bg-zinc-950/50 flex justify-between items-center px-5 text-[10px] font-bold text-zinc-600 uppercase tracking-widest animate-in fade-in duration-300">
+      <div className="p-3 border-b border-zinc-800 bg-zinc-950/50 flex justify-between items-center px-5 text-xs font-bold text-zinc-600 uppercase tracking-widest animate-in fade-in duration-300">
         <div className="flex items-center gap-4">
           <EditorToolbar activeTab={activeTab} onCommand={executeCommand} />
           
@@ -128,7 +128,7 @@ export function ProductDescriptionField() {
             type="button"
             disabled={isGenerating}
             onClick={handleGenerateDescription}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all font-bold uppercase text-[9px] disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all font-bold uppercase text-xs disabled:opacity-50"
             title="Autocompletar descripción del producto con Inteligencia Artificial"
           >
             {isGenerating ? (
@@ -145,7 +145,7 @@ export function ProductDescriptionField() {
             type="button"
             onClick={() => setActiveTab('visual')}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase transition-all",
+              "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold uppercase transition-all",
               activeTab === 'visual'
                 ? "bg-zinc-800 text-white shadow border border-zinc-700/30"
                 : "text-zinc-500 hover:text-zinc-355"
@@ -158,7 +158,7 @@ export function ProductDescriptionField() {
             type="button"
             onClick={() => setActiveTab('html')}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase transition-all",
+              "flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold uppercase transition-all",
               activeTab === 'html'
                 ? "bg-zinc-800 text-white shadow border border-zinc-700/30"
                 : "text-zinc-500 hover:text-zinc-355"
