@@ -7,6 +7,7 @@ import { extractUserFromRequest, requireRole } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 import { CategorySchema } from "@/validations/taxonomy.schemas";
 import { NotFoundError } from "@/lib/errors";
+import { revalidateTag } from "next/cache";
 
 export const GET = withApiHandler(async () => {
   const categories = await prisma.category.findMany({
@@ -33,6 +34,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
+  revalidateTag("categories");
   return created(category);
 });
 
@@ -96,6 +98,7 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
     await prisma.category.delete({ where: { id } });
   }
 
+  revalidateTag("categories");
   return noContent();
 });
 
@@ -119,5 +122,6 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
+  revalidateTag("categories");
   return ok(updated);
 });

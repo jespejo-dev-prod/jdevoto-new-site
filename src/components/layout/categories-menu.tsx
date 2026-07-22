@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, Grid, LayoutGrid, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import staticCategories from './categories.json';
 
-interface Category {
+export interface Category {
   id: string;
   name: string;
   slug: string;
@@ -16,10 +15,10 @@ interface Category {
 interface CategoriesMenuProps {
   onClose: () => void;
   topOffset?: string;
+  categories: Category[];
 }
 
-export function CategoriesMenu({ onClose, topOffset = '73px' }: CategoriesMenuProps) {
-  const categories = staticCategories as Category[];
+export function CategoriesMenu({ onClose, topOffset = '73px', categories }: CategoriesMenuProps) {
   
   const parentCategories = categories
     .filter((c) => !c.parentId)

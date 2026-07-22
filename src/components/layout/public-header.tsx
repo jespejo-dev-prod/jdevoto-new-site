@@ -1,16 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingCart, Heart, LogOut, ChevronDown, User, Search, MapPin, Check, Menu, X, Package, ShieldCheck, Clock, CheckCircle2, List, LogIn } from 'lucide-react';
+import { ShoppingCart, Heart, LogOut, User, Search, Menu, X, Package, LogIn } from 'lucide-react';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/auth-context';
 import { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 
-import { CategoriesMenu } from './categories-menu';
+import { CategoriesMenu, type Category } from './categories-menu';
 
 const FIREWORK_PARTICLES = [
   { dx: -32, dy: -32, color: 'bg-yellow-250' },
@@ -42,6 +41,19 @@ export function PublicHeader() {
   const { user, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [navCategories, setNavCategories] = useState<Category[]>([]);
+
+  // Cargar categorías dinámicamente desde la API
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.data)) {
+          setNavCategories(json.data);
+        }
+      })
+      .catch(() => {}); // Fail silently — menu stays empty if fetch fails
+  }, []);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const router = useRouter();
@@ -377,7 +389,7 @@ export function PublicHeader() {
             style={{ top: topOffset }}
             onClick={() => setIsCategoriesOpen(false)}
           />
-          <CategoriesMenu onClose={() => setIsCategoriesOpen(false)} topOffset={topOffset} />
+          <CategoriesMenu categories={navCategories} onClose={() => setIsCategoriesOpen(false)} topOffset={topOffset} />
         </>
       )}
 
