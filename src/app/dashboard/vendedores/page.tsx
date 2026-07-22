@@ -77,7 +77,6 @@ export default function VendedoresPage() {
             isLoading={isLoading} 
             onAssignCompany={assignCompany}
             onRemoveCompany={removeCompany}
-            onEdit={async (id, data) => await updateUser({ id, data })}
             onDelete={async (id) => {
               if (window.confirm("¿Estás seguro de eliminar a este vendedor?")) {
                 await deleteUser(id);

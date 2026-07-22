@@ -103,8 +103,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
           firstName: data.firstName,
           lastName: data.lastName,
           role: data.role,
-          // COMPANY_ADMIN hereda su propia empresa; ADMIN no tiene companyId propio
-          companyId: data.companyId ?? (currentUser.role === UserRole.COMPANY_ADMIN ? currentUser.companyId : null),
+          // COMPANY_ADMIN hereda su propia empresa; ADMIN usa su companyId por defecto si no se provee
+          companyId: data.companyId ?? currentUser.companyId,
           passwordHash,
         }
       });
@@ -123,8 +123,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       firstName: data.firstName,
       lastName: data.lastName,
       role: data.role,
-      // COMPANY_ADMIN hereda su propia empresa; ADMIN no tiene companyId propio
-      companyId: data.companyId ?? (currentUser.role === UserRole.COMPANY_ADMIN ? currentUser.companyId : null),
+      // COMPANY_ADMIN hereda su propia empresa; ADMIN usa su companyId por defecto si no se provee
+      companyId: data.companyId ?? currentUser.companyId,
     }
   });
 
