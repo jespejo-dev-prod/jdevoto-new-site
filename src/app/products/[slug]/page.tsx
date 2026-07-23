@@ -4,11 +4,10 @@ import { getProductDetailsUseCase } from "@/modules/catalog/application/getProdu
 import { getRelatedProductsUseCase } from "@/modules/catalog/application/getRelatedProducts.use-case";
 import { getBundleSuggestionUseCase } from "@/modules/catalog/application/getBundleSuggestion.use-case";
 import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 import { AdminEditButton } from "./AdminEditButton";
-import { getServerUser } from "@/lib/server-auth";
+
 import {
   ChevronRight,
   ChevronLeft,
@@ -547,8 +546,9 @@ async function RelatedProductsSection({
   categoryId: string | null;
   currentProductId: string;
 }) {
-  const user = await getServerUser();
-  const isAuthenticated = !!user;
+  // isAuthenticated se determina en el cliente (ProductCard tiene isAuthenticated=false por defecto).
+  // No usamos getServerUser() aquí para no introducir cookies() y romper ISR.
+  const isAuthenticated = false;
 
   const hideSetting = await prisma.storeSettings.findUnique({
     where: { key: "hideOutOfStock" },
@@ -723,9 +723,9 @@ async function BundleSuggestionSection({
   product: any;
   primaryImageUrl: string;
 }) {
-  const cookieStore = await cookies();
-  const isAuthenticated = !!cookieStore.get("refresh_token")?.value;
-  if (!isAuthenticated) return null;
+  // La verificación de auth se omite aquí para no usar cookies() y romper ISR.
+  // BundleAction es un Client Component que gestiona el carrito; si el usuario
+  // no está autenticado, el CartContext lo redirigirá al login al intentar agregar.
 
   const bundle = await getBundleSuggestionUseCase(
     product.categoryId,
