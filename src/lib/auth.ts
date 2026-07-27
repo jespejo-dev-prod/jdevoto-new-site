@@ -9,6 +9,7 @@ import { NextRequest } from "next/server";
 import { UnauthorizedError, ForbiddenError } from "@/lib/errors";
 import type { AuthenticatedUser, TokenPayload, RefreshTokenPayload } from "@/types/domain";
 import { UserRole } from "@prisma/client";
+import { randomUUID } from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || JWT_SECRET;
@@ -27,7 +28,11 @@ export function signAccessToken(payload: Omit<TokenPayload, "iat" | "exp">): str
 }
 
 export function signRefreshToken(userId: string): string {
-  return jwt.sign({ sub: userId, type: "refresh" }, JWT_REFRESH_SECRET, { expiresIn: "1d" } as jwt.SignOptions);
+  return jwt.sign(
+    { sub: userId, type: "refresh", jti: randomUUID() }, 
+    JWT_REFRESH_SECRET, 
+    { expiresIn: "1d" } as jwt.SignOptions
+  );
 }
 
 // ============================================================

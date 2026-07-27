@@ -77,7 +77,7 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                   {u.company ? (
                     <div className="flex flex-col">
                       <span className="text-base font-semibold text-zinc-300">{u.company.razonSocial}</span>
-                      <span className="text-sm text-zinc-500 font-mono mt-0.5">{u.company.rut}</span>
+                      <span className="text-base text-sky-400/90 font-medium mt-0.5">{u.company.rut}</span>
                     </div>
                   ) : (
                     <span className="text-sm text-zinc-600 italic">Sin empresa / Staff</span>
@@ -98,13 +98,12 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                     >
                       <Key className="w-4 h-4" />
                     </button>
-                    <Link href={`/dashboard/users/${u.id}`}>
-                      <button 
-                        className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors opacity-50 group-hover:opacity-100"
-                        title="Editar miembro"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
+                    <Link 
+                      href={`/dashboard/users/${u.id}`}
+                      className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors opacity-50 group-hover:opacity-100"
+                      title="Editar miembro"
+                    >
+                      <Pencil className="w-4 h-4" />
                     </Link>
                     <button 
                       onClick={() => {

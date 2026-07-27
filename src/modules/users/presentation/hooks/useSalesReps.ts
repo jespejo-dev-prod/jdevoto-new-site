@@ -70,14 +70,18 @@ export function useSalesReps(filters: {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return del(`/api/users/${id}`);
+      // En lugar de borrar la cuenta, degradamos al usuario a comprador normal
+      return fetcher(`/api/users/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ role: "BUYER" }),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sales-reps"] });
-      toast.success("Vendedor eliminado");
+      toast.success("Vendedor removido (su cuenta ahora es de Comprador)");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al eliminar vendedor");
+      toast.error(error.message || "Error al remover vendedor");
     },
   });
 

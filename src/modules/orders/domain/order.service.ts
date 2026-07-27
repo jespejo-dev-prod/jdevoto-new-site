@@ -393,6 +393,13 @@ export class OrderService {
           ...(internalNotes ? { internalNotes } : {}),
           ...timestampFields,
         },
+        include: {
+          items: {
+            include: { product: true }
+          },
+          company: true,
+          createdBy: true
+        }
       });
 
       // Si se cancela o rechaza, liberar reserva de stock y crédito
@@ -419,8 +426,7 @@ export class OrderService {
         const { sendOrderShippedEmail } = await import('@/lib/email');
         let customerEmail = (updated.billingAddress as any)?.email;
         if (!customerEmail) {
-          const user = await prisma.user.findUnique({ where: { id: updated.createdById }, select: { email: true } });
-          customerEmail = user?.email || "ventas@tutiendab2b.cl";
+          customerEmail = (updated as any).createdBy?.email || "ventas@tutiendab2b.cl";
         }
         await sendOrderShippedEmail(updated, customerEmail);
       } catch (err) {
@@ -431,8 +437,7 @@ export class OrderService {
         const { sendOrderStatusUpdateEmail } = await import('@/lib/email');
         let customerEmail = (updated.billingAddress as any)?.email;
         if (!customerEmail) {
-          const user = await prisma.user.findUnique({ where: { id: updated.createdById }, select: { email: true } });
-          customerEmail = user?.email || "ventas@tutiendab2b.cl";
+          customerEmail = (updated as any).createdBy?.email || "ventas@tutiendab2b.cl";
         }
         await sendOrderStatusUpdateEmail(updated, customerEmail);
       } catch (err) {

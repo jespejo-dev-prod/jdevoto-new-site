@@ -44,7 +44,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     },
   });
 
-  if (!storedToken) {
+  if (!storedToken || !storedToken.user || !storedToken.user.isActive) {
     cookieStore.set("refresh_token", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -52,7 +52,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       path: "/",
       maxAge: 0,
     });
-    throw new UnauthorizedError("Invalid refresh token");
+    throw new UnauthorizedError("Invalid refresh token or inactive user");
   }
 
   // ⚠️ ALERTA DE SEGURIDAD: Detección de Reutilización

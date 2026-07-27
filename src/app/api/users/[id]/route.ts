@@ -90,6 +90,18 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     data: updateData,
   });
 
+  if (data.role !== undefined && data.role !== targetUser.role) {
+    const roleName = 
+      data.role === 'ADMIN' ? 'Administrador' :
+      data.role === 'COMPANY_ADMIN' ? 'Administrador de Empresa' :
+      data.role === 'SALES_REP' ? 'Vendedor' : 'Comprador';
+      
+    const { sendUserUpdatedAdminNotification } = await import("@/lib/email");
+    sendUserUpdatedAdminNotification(updatedUser.email, roleName, false).catch(err => {
+      console.error("Error enviando notificación de actualización al admin", err);
+    });
+  }
+
   const { passwordHash: _, ...userWithoutPassword } = updatedUser;
   return ok(userWithoutPassword);
 });
@@ -123,6 +135,16 @@ export const DELETE = withApiHandler(async (req: NextRequest, { params }: RouteC
       data: { isActive: false },
     });
   }
+
+  const roleName = 
+    targetUser.role === 'ADMIN' ? 'Administrador' :
+    targetUser.role === 'COMPANY_ADMIN' ? 'Administrador de Empresa' :
+    targetUser.role === 'SALES_REP' ? 'Vendedor' : 'Comprador';
+
+  const { sendUserDeletedAdminNotification } = await import("@/lib/email");
+  sendUserDeletedAdminNotification(targetUser.email, roleName).catch(err => {
+    console.error("Error enviando notificación de eliminación de usuario", err);
+  });
 
   return ok({ success: true, message: "Usuario eliminado correctamente" });
 });

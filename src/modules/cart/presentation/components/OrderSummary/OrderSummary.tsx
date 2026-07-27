@@ -132,17 +132,41 @@ export function OrderSummary() {
           </div>
         )}
 
-        {isEmpty || finalNet < 100000 ? (
-          <Button disabled className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-sm rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
-            Proceder al Checkout <ChevronRight className="h-5 w-5 text-zinc-500" />
-          </Button>
-        ) : (
-          <Link href="/checkout">
-            <Button className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-sm rounded-2xl shadow-xl hover:bg-zinc-800 transition-all flex items-center justify-center gap-3">
-              Proceder al Checkout <ChevronRight className="h-5 w-5 text-primary" />
-            </Button>
-          </Link>
-        )}
+        {(() => {
+          const invalidItems = items.filter(item => item.inner && item.inner > 1 && item.quantity % item.inner !== 0);
+          
+          if (!isEmpty && invalidItems.length > 0) {
+            return (
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-bold uppercase tracking-wider space-y-1.5 animate-in fade-in zoom-in">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">⚠️</span> Múltiplos inválidos
+                </div>
+                <p className="font-semibold text-rose-700 tracking-normal leading-relaxed normal-case">
+                  Hay {invalidItems.length === 1 ? '1 producto que no cumple' : `${invalidItems.length} productos que no cumplen`} con su empaque mínimo. Por favor ajusta las cantidades antes de continuar.
+                </p>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
+        {(() => {
+          const hasInvalidItems = items.some(item => item.inner && item.inner > 1 && item.quantity % item.inner !== 0);
+          if (isEmpty || finalNet < 100000 || hasInvalidItems) {
+            return (
+              <Button disabled className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-sm rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
+                Proceder al Checkout <ChevronRight className="h-5 w-5 text-zinc-500" />
+              </Button>
+            );
+          }
+          return (
+            <Link href="/checkout">
+              <Button className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-sm rounded-2xl shadow-xl hover:bg-zinc-800 transition-all flex items-center justify-center gap-3">
+                Proceder al Checkout <ChevronRight className="h-5 w-5 text-primary" />
+              </Button>
+            </Link>
+          );
+        })()}
         <div className="flex items-center justify-center gap-4 pt-4 grayscale opacity-40">
           <CreditCard className="h-6 w-6" />
           <ShieldCheck className="h-6 w-6" />

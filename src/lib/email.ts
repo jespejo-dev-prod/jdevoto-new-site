@@ -97,22 +97,54 @@ function getStatusConfig(status: string) {
   };
 }
 
+let cachedBankConfig: any = null;
+let bankConfigLastFetch = 0;
+const BANK_CONFIG_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getBankTransferConfig() {
+  if (cachedBankConfig && (Date.now() - bankConfigLastFetch) < BANK_CONFIG_TTL) {
+    return cachedBankConfig;
+  }
+  const { prisma } = await import('@/lib/client');
+  const config = await prisma.storeSettings.findUnique({ where: { key: 'bank_transfer_config' } });
+  cachedBankConfig = config;
+  bankConfigLastFetch = Date.now();
+  return config;
+}
+
 export async function sendOrderEmail(order: any, customerEmail: string) {
   try {
     const transporter = await getTransporter();
 
-    const htmlContent = generateOrderHtml(order, customerEmail);
+    let bankConfig = null;
+    if (order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER') {
+      const setting = await getBankTransferConfig();
+      if (setting && setting.value) {
+        bankConfig = setting.value as any;
+      }
+    }
+
+    const htmlContent = generateOrderHtml(order, customerEmail, bankConfig, false);
     const statusConfig = getStatusConfig(order.status);
     const shortOrderNumber = order.orderNumber.split('-').pop();
     const subject = `${statusConfig.subject}: #${shortOrderNumber}`;
 
     const info = await transporter.sendMail({
-      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
+      from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
-      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject,
       html: htmlContent,
     });
+
+    if (process.env.ADMIN_NOTIFICATION_EMAIL) {
+      const adminHtmlContent = generateOrderHtml(order, customerEmail, null, true);
+      await transporter.sendMail({
+        from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
+        to: process.env.ADMIN_NOTIFICATION_EMAIL,
+        subject: `Nuevo Pedido Ingresado: #${shortOrderNumber}`,
+        html: adminHtmlContent,
+      });
+    }
 
     console.log("==========================================");
     console.log(`📧 Correo enviado exitosamente a ${customerEmail}`);
@@ -128,7 +160,7 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
   }
 }
 
-function generateOrderHtml(order: any, customerEmail: string) {
+function generateOrderHtml(order: any, customerEmail: string, bankConfig: any = null, isAdmin: boolean = false) {
   const formatMoney = (val: number) => 
     `$${Math.round(Number(val)).toLocaleString('es-CL')}`;
 
@@ -172,7 +204,15 @@ function generateOrderHtml(order: any, customerEmail: string) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-  const statusConfig = getStatusConfig(order.status);
+  const baseStatusConfig = getStatusConfig(order.status);
+  const statusConfig = isAdmin ? {
+    title: "¡Nuevo Pedido Ingresado!",
+    description: `El cliente ${company.razonSocial || creatorName || customerEmail} ha ingresado un nuevo pedido en la plataforma.`,
+    color: baseStatusConfig.color,
+    label: baseStatusConfig.label,
+    subject: "Nuevo Pedido",
+  } : baseStatusConfig;
+  
   const shortOrderNumber = order.orderNumber.split('-').pop();
 
   const rawDate = order.createdAt ? new Date(order.createdAt) : new Date();
@@ -312,6 +352,24 @@ function generateOrderHtml(order: any, customerEmail: string) {
                     Ver Pedido #${shortOrderNumber}
                   </a>
                 </div>
+
+                <!-- Bank Transfer Details Card -->
+                ${((order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER') && bankConfig?.accounts?.length > 0) ? `
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 25px; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  <h3 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 700; color: #1e3a8a;">Datos para transferencia bancaria</h3>
+                  ${(bankConfig.instructions || bankConfig.description) ? `<p style="margin: 0 0 15px 0; color: #475569;">${bankConfig.instructions || bankConfig.description}</p>` : ''}
+                  
+                  ${bankConfig.accounts.map((acc: any) => `
+                    <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 10px;">
+                      ${acc.bankName ? `<div style="margin-bottom: 4px;"><strong>Banco:</strong> ${acc.bankName}</div>` : ''}
+                      ${acc.accountDetails ? `<div style="margin-bottom: 4px;"><strong>Cuenta:</strong> ${acc.accountDetails}</div>` : ''}
+                      ${acc.accountName ? `<div style="margin-bottom: 4px;"><strong>Titular:</strong> ${acc.accountName}</div>` : ''}
+                      ${acc.rut ? `<div style="margin-bottom: 4px;"><strong>RUT:</strong> ${acc.rut}</div>` : ''}
+                      ${acc.email ? `<div style="margin-bottom: 4px;"><strong>Correo:</strong> ${acc.email}</div>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+                ` : ''}
 
                 <!-- Shipping Address Card -->
                 ${shipping.street ? `
@@ -495,7 +553,15 @@ export async function sendOrderShippedEmail(order: any, customerEmail: string) {
   try {
     const transporter = await getTransporter();
 
-    const htmlContent = generateOrderHtml(order, customerEmail);
+    let bankConfig = null;
+    if (order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER') {
+      const setting = await getBankTransferConfig();
+      if (setting && setting.value) {
+        bankConfig = setting.value as any;
+      }
+    }
+
+    const htmlContent = generateOrderHtml(order, customerEmail, bankConfig);
     const statusConfig = getStatusConfig(order.status);
     const subject = `Tu pedido #${order.orderNumber.split('-').pop()} ha sido enviado 🚚`;
 
@@ -537,9 +603,9 @@ export async function sendNotificationEmail(email: string, title: string, messag
     </head>
     <body style="background-color: #f9fafb; padding: 20px;">
       <div class="container">
-        <h2 style="color: #1e40af; margin-top: 0;">${title}</h2>
-        <p>${message}</p>
-        ${link ? `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${link}" style="display: inline-block; background-color: #1e40af; color: #ffffff !important; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px;">Ver en la plataforma</a>` : ''}
+        <h2 style="color: #1e40af; margin-top: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${title}</h2>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333333;">${message}</p>
+        ${link ? `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}${link}" style="display: inline-block; background-color: #1e40af; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Ver en la plataforma</a>` : ''}
       </div>
     </body>
     </html>
@@ -548,7 +614,6 @@ export async function sendNotificationEmail(email: string, title: string, messag
     const info = await transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'notificaciones@jdevoto.cl'}>`,
       to: email,
-      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject: title,
       html: htmlContent,
     });
@@ -571,7 +636,15 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
   try {
     const transporter = await getTransporter();
 
-    const htmlContent = generateOrderHtml(order, customerEmail);
+    let bankConfig = null;
+    if (order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER') {
+      const setting = await getBankTransferConfig();
+      if (setting && setting.value) {
+        bankConfig = setting.value as any;
+      }
+    }
+
+    const htmlContent = generateOrderHtml(order, customerEmail, bankConfig);
     const statusConfig = getStatusConfig(order.status);
     const subject = `Actualización de estado pedido #${order.orderNumber.split('-').pop()} -> ${statusConfig.label}`;
 
@@ -724,6 +797,268 @@ export async function sendWishlistEmail(items: any[], recipientEmails: string, u
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Error enviando correo de lista de deseos:", error);
+    return { success: false, error };
+  }
+}
+
+export async function sendUserDeletedAdminNotification(email: string, role: string) {
+  try {
+    const transporter = await getTransporter();
+    
+    if (process.env.ADMIN_NOTIFICATION_EMAIL) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const logoUrl = `${appUrl}/logo-svg.png`;
+      const adminHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; width: 100%; padding: 20px 0;">
+          <tr><td align="center">
+            <table cellpadding="0" cellspacing="0" border="0" width="600" style="width: 600px; max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; overflow: hidden;">
+              <tr><td style="padding: 35px 40px 20px 40px; border-bottom: 1px solid #f1f5f9;">
+                <img src="${logoUrl}" alt="Jdevoto.cl" height="60" style="display: block; border: 0; height: 60px; width: auto;" />
+              </td></tr>
+              <tr><td style="padding: 30px 40px 40px 40px;">
+                <p style="font-size: 14px; font-weight: 700; color: #ef4444; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Notificación del Sistema</p>
+                <h1 style="font-size: 26px; font-weight: 800; color: #1e293b; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Usuario eliminado</h1>
+                <p style="color: #475569; margin: 0 0 24px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Se ha eliminado (o desactivado) un usuario en la plataforma B2B con los siguientes datos:</p>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0; margin-bottom: 28px;">
+                  <tr><td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Email</span><br/>
+                    <span style="font-size: 15px; font-weight: 600; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${email}</span>
+                  </td></tr>
+                  <tr><td style="padding: 16px 20px;">
+                    <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Rol Eliminado</span><br/>
+                    <span style="font-size: 15px; font-weight: 600; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${role}</span>
+                  </td></tr>
+                </table>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td>
+                      <table border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                          <td align="center" style="border-radius: 8px;" bgcolor="#1e3a8a">
+                            <a href="${appUrl}/dashboard/users" target="_blank" style="font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff !important; text-decoration: none; border-radius: 8px; padding: 12px 28px; border: 1px solid #1e3a8a; display: inline-block; font-weight: 700;">Ver Gestión de Equipo</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td></tr>
+              <tr><td style="padding: 20px 40px; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
+                <p style="font-size: 12px; color: #94a3b8; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Este es un correo automático de Jdevoto.cl. Solo tú (administrador) lo recibes.</p>
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+      </body>
+      </html>
+      `;
+      await transporter.sendMail({
+        from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
+        to: process.env.ADMIN_NOTIFICATION_EMAIL,
+        subject: `Usuario eliminado: ${email} (${role})`,
+        html: adminHtml,
+      });
+    }
+  } catch (error) {
+    console.error("Error enviando notificación de eliminación a admin:", error);
+  }
+}
+
+export async function sendUserUpdatedAdminNotification(email: string, role: string, isReactivated: boolean = false) {
+  try {
+    const transporter = await getTransporter();
+    
+    if (process.env.ADMIN_NOTIFICATION_EMAIL) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const logoUrl = `${appUrl}/logo-svg.png`;
+      const title = isReactivated ? "Usuario reactivado" : "Rol actualizado";
+      const description = isReactivated 
+        ? "Un usuario previamente desactivado ha sido reactivado en la plataforma B2B:"
+        : "Se ha actualizado el rol de un usuario en la plataforma B2B:";
+        
+      const adminHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; width: 100%; padding: 20px 0;">
+          <tr><td align="center">
+            <table cellpadding="0" cellspacing="0" border="0" width="600" style="width: 600px; max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; overflow: hidden;">
+              <tr><td style="padding: 35px 40px 20px 40px; border-bottom: 1px solid #f1f5f9;">
+                <img src="${logoUrl}" alt="Jdevoto.cl" height="60" style="display: block; border: 0; height: 60px; width: auto;" />
+              </td></tr>
+              <tr><td style="padding: 30px 40px 40px 40px;">
+                <p style="font-size: 14px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Notificación del Sistema</p>
+                <h1 style="font-size: 26px; font-weight: 800; color: #1e293b; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${title}</h1>
+                <p style="color: #475569; margin: 0 0 24px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${description}</p>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0; margin-bottom: 28px;">
+                  <tr><td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Email</span><br/>
+                    <span style="font-size: 15px; font-weight: 600; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${email}</span>
+                  </td></tr>
+                  <tr><td style="padding: 16px 20px;">
+                    <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Rol Asignado</span><br/>
+                    <span style="font-size: 15px; font-weight: 600; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${role}</span>
+                  </td></tr>
+                </table>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td>
+                      <table border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                          <td align="center" style="border-radius: 8px;" bgcolor="#1e3a8a">
+                            <a href="${appUrl}/dashboard/users" target="_blank" style="font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff !important; text-decoration: none; border-radius: 8px; padding: 12px 28px; border: 1px solid #1e3a8a; display: inline-block; font-weight: 700;">Ver Gestión de Equipo</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td></tr>
+              <tr><td style="padding: 20px 40px; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
+                <p style="font-size: 12px; color: #94a3b8; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Este es un correo automático de Jdevoto.cl. Solo tú (administrador) lo recibes.</p>
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+      </body>
+      </html>
+      `;
+      await transporter.sendMail({
+        from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
+        to: process.env.ADMIN_NOTIFICATION_EMAIL,
+        subject: `${title}: ${email} (${role})`,
+        html: adminHtml,
+      });
+    }
+  } catch (error) {
+    console.error("Error enviando notificación de actualización a admin:", error);
+  }
+}
+
+
+export async function sendSetupPasswordEmail(email: string, token: string, roleName: string) {
+  try {
+    const transporter = await getTransporter();
+    
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; }
+      </style>
+    </head>
+    <body style="background-color: #f9fafb; padding: 40px 0;">
+      <div class="container">
+        <h2 style="color: #1e40af; margin-top: 0;">¡Bienvenido a Jdevoto.cl!</h2>
+        <p>Hola,</p>
+        <p>Se ha creado una cuenta para ti en nuestra plataforma B2B con el rol de <strong>${roleName}</strong>.</p>
+        <p>Para comenzar a utilizarla, por favor crea tu contraseña haciendo clic en el siguiente enlace:</p>
+        
+        <div style="text-align: center;">
+          <a href="${resetUrl}" style="display: inline-block; background-color: #1e40af; color: #ffffff !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; margin-bottom: 20px;">Crear mi contraseña</a>
+        </div>
+        
+        <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+          Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:<br>
+          <a href="${resetUrl}" style="color: #2563eb; word-break: break-all;">${resetUrl}</a>
+        </p>
+
+        <p style="font-size: 12px; color: #9ca3af; margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          Este enlace expirará en 1 hora.
+        </p>
+      </div>
+    </body>
+    </html>
+    `;
+
+    const info = await transporter.sendMail({
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
+      to: email,
+      subject: 'Crea tu contraseña - Jdevoto.cl',
+      html: htmlContent,
+    });
+
+    // Notificar al admin con un correo propio y con estilo
+    if (process.env.ADMIN_NOTIFICATION_EMAIL) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const logoUrl = `${appUrl}/logo-svg.png`;
+      const adminHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 20px; -webkit-font-smoothing: antialiased;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; width: 100%; padding: 20px 0;">
+          <tr><td align="center">
+            <table cellpadding="0" cellspacing="0" border="0" width="600" style="width: 600px; max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; text-align: left; overflow: hidden;">
+              <tr><td style="padding: 35px 40px 20px 40px; border-bottom: 1px solid #f1f5f9;">
+                <img src="${logoUrl}" alt="Jdevoto.cl" height="60" style="display: block; border: 0; height: 60px; width: auto;" />
+              </td></tr>
+              <tr><td style="padding: 30px 40px 40px 40px;">
+                <p style="font-size: 14px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Notificación del Sistema</p>
+                <h1 style="font-size: 26px; font-weight: 800; color: #1e293b; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Nuevo usuario creado</h1>
+                <p style="color: #475569; margin: 0 0 24px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Se ha creado un nuevo usuario en la plataforma B2B con los siguientes datos:</p>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0; margin-bottom: 28px;">
+                  <tr><td style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+                    <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Email</span><br/>
+                    <span style="font-size: 15px; font-weight: 600; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${email}</span>
+                  </td></tr>
+                  <tr><td style="padding: 16px 20px;">
+                    <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Rol Asignado</span><br/>
+                    <span style="font-size: 15px; font-weight: 600; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${roleName}</span>
+                  </td></tr>
+                </table>
+                <p style="color: #475569; margin: 0 0 24px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Se le envió al usuario un enlace para que cree su contraseña (válido por 1 hora).</p>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td>
+                      <table border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                          <td align="center" style="border-radius: 8px;" bgcolor="#1e3a8a">
+                            <a href="${appUrl}/dashboard/users" target="_blank" style="font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff !important; text-decoration: none; border-radius: 8px; padding: 12px 28px; border: 1px solid #1e3a8a; display: inline-block; font-weight: 700;">Ver Gestión de Equipo</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td></tr>
+              <tr><td style="padding: 20px 40px; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
+                <p style="font-size: 12px; color: #94a3b8; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">Este es un correo automático de Jdevoto.cl. Solo tú (administrador) lo recibes.</p>
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+      </body>
+      </html>
+      `;
+      await transporter.sendMail({
+        from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
+        to: process.env.ADMIN_NOTIFICATION_EMAIL,
+        subject: `Nuevo usuario creado: ${email} (${roleName})`,
+        html: adminHtml,
+      });
+    }
+
+    console.log("==========================================");
+    console.log(`📧 Enlace de configuración de contraseña enviado a ${email}`);
+    if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_HOST) {
+      console.log("👀 Preview URL:", nodemailer.getTestMessageUrl(info));
+    }
+    console.log("==========================================");
+
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error enviando correo de configuración de contraseña:", error);
     return { success: false, error };
   }
 }

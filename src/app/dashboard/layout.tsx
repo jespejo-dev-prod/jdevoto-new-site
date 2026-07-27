@@ -30,20 +30,21 @@ export default function DashboardLayout({
  const [isSidebarOpen, setSidebarOpen] = useState(false);
  const router = useRouter();
 
- useEffect(() => {
- if (!loading && !isAuthenticated) {
- router.replace('/login');
- }
- }, [loading, isAuthenticated, router]);
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [loading, isAuthenticated, router]);
 
- // Mientras verifica auth, muestra pantalla en negro (sin flash)
- if (loading || !isAuthenticated) {
- return (
- <div className="flex items-center justify-center min-h-screen bg-zinc-950">
- <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
- </div>
- );
- }
+  // Mientras verifica auth, muestra pantalla en negro (sin flash)
+  if (loading || !isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-zinc-950 flex-col gap-4">
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-zinc-500 text-sm">{loading ? 'Cargando sesión...' : 'Redirigiendo al login...'}</p>
+      </div>
+    );
+  }
 
  return (
  <QueryProvider>

@@ -6,6 +6,7 @@ export function useUsers(filters: {
   page?: number;
   limit?: number;
   search?: string;
+  role?: string;
 } = {}) {
   const { get, post, delete: del, fetcher } = useApi();
   const queryClient = useQueryClient();
@@ -14,6 +15,7 @@ export function useUsers(filters: {
   if (filters.page) queryParams.set("page", filters.page.toString());
   if (filters.limit) queryParams.set("limit", filters.limit.toString());
   if (filters.search) queryParams.set("search", filters.search);
+  if (filters.role) queryParams.set("role", filters.role);
 
   const query = useQuery<any>({
     queryKey: ["users", filters],

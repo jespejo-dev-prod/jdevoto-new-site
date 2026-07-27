@@ -72,13 +72,15 @@ export function Sidebar() {
  setSidebarOpen(false);
  }, [pathname, setSidebarOpen]);
 
- useEffect(() => {
-   mainItems.forEach(item => {
-     if (item.subItems && pathname.startsWith(item.href)) {
-       setOpenMenus(prev => ({ ...prev, [item.label]: true }));
-     }
-   });
- }, [pathname]);
+  useEffect(() => {
+    const newOpenMenus: Record<string, boolean> = {};
+    mainItems.forEach(item => {
+      if (item.subItems && pathname.startsWith(item.href)) {
+        newOpenMenus[item.label] = true;
+      }
+    });
+    setOpenMenus(newOpenMenus);
+  }, [pathname]);
 
  const toggleMenu = (e: React.MouseEvent, label: string) => {
    e.preventDefault();
@@ -174,7 +176,7 @@ export function Sidebar() {
  <ul className="space-y-1">
  {filteredMainItems.map((item) => {
     const label = item.label === 'Clientes' && user?.role === 'SALES_REP' ? 'Mis Clientes' : item.label;
-    const isActive = pathname === item.href;
+    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
     
     return (
     <li key={item.label} className="space-y-1">

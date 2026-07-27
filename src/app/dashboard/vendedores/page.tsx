@@ -78,7 +78,7 @@ export default function VendedoresPage() {
             onAssignCompany={assignCompany}
             onRemoveCompany={removeCompany}
             onDelete={async (id) => {
-              if (window.confirm("¿Estás seguro de eliminar a este vendedor?")) {
+              if (window.confirm("¿Estás seguro de remover a este usuario del equipo de ventas? (Su cuenta pasará a ser de Comprador normal).")) {
                 await deleteUser(id);
               }
             }}

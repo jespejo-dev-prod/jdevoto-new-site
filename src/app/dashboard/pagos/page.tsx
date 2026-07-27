@@ -16,6 +16,8 @@ type BankAccount = {
  accountName: string;
  accountDetails: string;
  bankName: string;
+ rut?: string;
+ email?: string;
 };
 
 type BankTransferConfig = {
@@ -94,13 +96,23 @@ export default function PagosDashboard() {
  }, [bankForm, mpForm, accessToken]);
 
  const onSaveBank = async (data: BankTransferConfig) => {
- // Limpiar cuentas vacías antes de guardar
- const cleanedData = {
- ...data,
- accounts: data.accounts.filter(acc => 
- (acc.accountName && acc.accountName.trim() !== '')
- )
- };
+  const hasInvalidAccount = data.accounts.some(acc => 
+  (!acc.accountName || acc.accountName.trim() === '') && 
+  (acc.bankName?.trim() || acc.accountDetails?.trim() || acc.rut?.trim() || acc.email?.trim())
+  );
+
+  if (hasInvalidAccount) {
+  toast.error('Todas las cuentas deben tener un nombre de cuenta');
+  return;
+  }
+
+  // Limpiar cuentas vacías antes de guardar
+  const cleanedData = {
+  ...data,
+  accounts: data.accounts.filter(acc => 
+  (acc.accountName && acc.accountName.trim() !== '')
+  )
+  };
  
  setSaving(true);
  try {
@@ -213,9 +225,11 @@ export default function PagosDashboard() {
  <table className="w-full text-sm text-left">
  <thead className="bg-zinc-100 text-sm uppercase text-zinc-500 font-bold border-b border-zinc-200">
  <tr>
- <th className="px-4 py-3">Nombre de la cuenta</th>
- <th className="px-4 py-3">Número de cuenta</th>
- <th className="px-4 py-3">Nombre del banco</th>
+ <th className="px-4 py-3">Titular</th>
+ <th className="px-4 py-3">RUT</th>
+ <th className="px-4 py-3">Correo</th>
+ <th className="px-4 py-3">Banco</th>
+ <th className="px-4 py-3">N° Cuenta</th>
  <th className="px-4 py-3 w-16"></th>
  </tr>
  </thead>
@@ -226,9 +240,30 @@ export default function PagosDashboard() {
  <tr key={field.id} className="border-b border-zinc-100 bg-white">
  <td className="px-4 py-2">
  {isEditing ? (
- <Input {...bankForm.register(`accounts.${index}.accountName`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Ej: Mi Empresa SPA" />
+ <Input {...bankForm.register(`accounts.${index}.accountName`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Titular" />
  ) : (
  <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.accountName`) || '-'}</span>
+ )}
+ </td>
+ <td className="px-4 py-2">
+ {isEditing ? (
+ <Input {...bankForm.register(`accounts.${index}.rut`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="RUT" />
+ ) : (
+ <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.rut`) || '-'}</span>
+ )}
+ </td>
+ <td className="px-4 py-2">
+ {isEditing ? (
+ <Input {...bankForm.register(`accounts.${index}.email`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Correo" />
+ ) : (
+ <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.email`) || '-'}</span>
+ )}
+ </td>
+ <td className="px-4 py-2">
+ {isEditing ? (
+ <Input {...bankForm.register(`accounts.${index}.bankName`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Banco" />
+ ) : (
+ <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.bankName`) || '-'}</span>
  )}
  </td>
  <td className="px-4 py-2">
@@ -238,19 +273,12 @@ export default function PagosDashboard() {
  <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.accountDetails`) || '-'}</span>
  )}
  </td>
- <td className="px-4 py-2">
- {isEditing ? (
- <Input {...bankForm.register(`accounts.${index}.bankName`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Ej: Banco de Chile" />
- ) : (
- <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.bankName`) || '-'}</span>
- )}
- </td>
  <td className="px-4 py-2 text-right">
  <div className="flex items-center justify-end gap-1">
  {isEditing ? (
  <button type="button" onClick={() => {
  const currentAcc = bankForm.getValues(`accounts.${index}`);
- if (!currentAcc.bankName?.trim() && !currentAcc.accountDetails?.trim() && !currentAcc.accountName?.trim()) {
+ if (!currentAcc.bankName?.trim() && !currentAcc.accountDetails?.trim() && !currentAcc.accountName?.trim() && !currentAcc.rut?.trim() && !currentAcc.email?.trim()) {
  removeAccount(index);
  }
  setEditingIndex(null);
@@ -288,7 +316,7 @@ export default function PagosDashboard() {
  variant="outline" 
  size="sm" 
  onClick={() => {
- appendAccount({ accountName: '', accountDetails: '', bankName: '' });
+ appendAccount({ accountName: '', accountDetails: '', bankName: '', rut: '', email: '' });
  setEditingIndex(accountFields.length);
  }}
  className="text-sm font-bold text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"

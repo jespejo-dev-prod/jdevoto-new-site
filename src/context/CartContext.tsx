@@ -132,6 +132,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
           if (!needsUpdate) return item;
 
+          const safeInner = inner || 1;
+          const safeMin = minOrderQty || 1;
+          let safeQuantity = item.quantity;
+          
+          if (safeQuantity % safeInner !== 0) {
+            safeQuantity = Math.max(safeMin, Math.round(safeQuantity / safeInner) * safeInner);
+          }
+
           changed = true;
           return {
             ...item,
@@ -140,9 +148,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             discountAmount: originalPrice - finalPrice,
             discountPercent: discountPct,
             priceSource,
+            quantity: safeQuantity,
             stockQuantity,
             minOrderQty,
-            inner,
+            inner: safeInner,
             brandName,
             categoryName,
             validTo,
@@ -216,11 +225,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       if (existingItem) {
         // Si el producto ya está en el carrito: suma la cantidad y actualiza precios
+        const safeInner = product.inner || existingItem.inner || 1;
+        const safeMin = product.minOrderQty || existingItem.minOrderQty || 1;
+        let newQuantity = existingItem.quantity + quantity;
+        
+        if (newQuantity % safeInner !== 0) {
+          newQuantity = Math.max(safeMin, Math.round(newQuantity / safeInner) * safeInner);
+        }
+
         return prevItems.map(item =>
           item.id === product.id
             ? {
               ...item,
-              quantity: item.quantity + quantity,
+              quantity: newQuantity,
               slug: product.slug || item.slug, // Actualiza slug si faltaba
               price: finalPrice,
               originalPrice: originalPrice,
@@ -235,6 +252,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         );
       }
 
+      const safeInner = product.inner || 1;
+      const safeMin = product.minOrderQty || 1;
+      let safeQuantity = quantity;
+      
+      if (safeQuantity % safeInner !== 0) {
+        safeQuantity = Math.max(safeMin, Math.round(safeQuantity / safeInner) * safeInner);
+      }
+
       // Producto nuevo: agrega al final del carrito
       const newItem: CartItem = {
         id: product.id,
@@ -246,10 +271,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         discountAmount: originalPrice - finalPrice,
         discountPercent: discountPct,
         priceSource: priceSource,
-        quantity: quantity,
+        quantity: safeQuantity,
         image: image,
-        minOrderQty: product.minOrderQty || 1,
-        inner: product.inner || 1,
+        minOrderQty: safeMin,
+        inner: safeInner,
         stockQuantity: product.stockQuantity || 0,
         brandName: brandName,
         categoryName: categoryName,
@@ -273,9 +298,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
    * Usado por el stepper de cantidad en la página /cart.
    */
   const updateQuantity = (productId: string, quantity: number) => {
-    setItems(prevItems => prevItems.map(item =>
-      item.id === productId ? { ...item, quantity } : item
-    ));
+    setItems(prevItems => prevItems.map(item => {
+      if (item.id === productId) {
+        const safeInner = item.inner || 1;
+        const safeMin = item.minOrderQty || 1;
+        let safeQuantity = quantity;
+        
+        if (safeQuantity % safeInner !== 0) {
+          safeQuantity = Math.max(safeMin, Math.round(safeQuantity / safeInner) * safeInner);
+        }
+        
+        return { ...item, quantity: safeQuantity };
+      }
+      return item;
+    }));
   };
 
   /** clearCart — Vacía el carrito por completo. Llamado tras checkout exitoso. */

@@ -109,16 +109,16 @@ export default function CheckoutPage() {
   const [mpConfig, setMpConfig] = useState<any>(null);
 
   const [isVerifyingAddress, setIsVerifyingAddress] = useState(false);
-  const [addressValidationError, setAddressValidationError] = useState<string | null>(null);
+  const [addressWarning, setAddressWarning] = useState<string | null>(null);
 
   const validateAddress = async (streetVal: string, comunaVal: string, regionVal: string) => {
     if (!streetVal.trim() || !comunaVal || !regionVal) {
-      setAddressValidationError(null);
+      setAddressWarning(null);
       return;
     }
     
     setIsVerifyingAddress(true);
-    setAddressValidationError(null);
+    setAddressWarning(null);
     
     try {
       // Clean up common Chilean address suffixes (e.g. Of 502, Depto 101, Piso 3, Local 4) that fail geocoding
@@ -151,14 +151,14 @@ export default function CheckoutPage() {
       
       const data = await res.json();
       if (data.length === 0) {
-        setAddressValidationError("La calle y número ingresados no parecen existir en esta comuna y región. Por favor, verifícalos.");
+        setAddressWarning("No pudimos verificar esta dirección. Puedes continuar de todas formas.");
       } else {
-        setAddressValidationError(null);
+        setAddressWarning(null);
       }
     } catch (err) {
       console.error("Address validation error:", err);
       // Do not block the purchase if the OpenStreetMap API fails or times out
-      setAddressValidationError(null);
+      setAddressWarning(null);
     } finally {
       setIsVerifyingAddress(false);
     }
@@ -171,7 +171,7 @@ export default function CheckoutPage() {
       }, 800);
       return () => clearTimeout(delayDebounceFn);
     } else {
-      setAddressValidationError(null);
+      setAddressWarning(null);
     }
   }, [shippingStreet, comuna, region]);
 
@@ -349,7 +349,7 @@ export default function CheckoutPage() {
   );
 
   const isFormValid = termsAccepted && region && comuna && shippingStreet.trim() !== '' &&
-    !addressValidationError && !isVerifyingAddress &&
+    !isVerifyingAddress &&
     (billingType === 'factura' ? (razonSocial && rutEmpresa) : true) && 
     hasEnoughCredit && isCourierValid;
 
@@ -488,6 +488,8 @@ export default function CheckoutPage() {
                           {acc.bankName && <p className="flex justify-between"><span className="text-zinc-500">Banco</span> <span className="font-bold text-zinc-900">{acc.bankName}</span></p>}
                           {acc.accountDetails && <p className="flex justify-between"><span className="text-zinc-500">Cuenta</span> <span className="font-bold text-zinc-900">{acc.accountDetails}</span></p>}
                           {acc.accountName && <p className="flex justify-between"><span className="text-zinc-500">Titular</span> <span className="font-bold text-zinc-900">{acc.accountName}</span></p>}
+                          {acc.rut && <p className="flex justify-between"><span className="text-zinc-500">RUT</span> <span className="font-bold text-zinc-900">{acc.rut}</span></p>}
+                          {acc.email && <p className="flex justify-between"><span className="text-zinc-500">Correo</span> <span className="font-bold text-zinc-900">{acc.email}</span></p>}
                         </div>
                       ))}
                     </div>
@@ -693,9 +695,9 @@ export default function CheckoutPage() {
                                   🔍 Verificando existencia de la dirección...
                                </p>
                             )}
-                            {addressValidationError && (
-                               <p className="text-[10px] text-red-500 font-semibold uppercase tracking-wider pt-1 px-1">
-                                  ❌ {addressValidationError}
+                            {addressWarning && (
+                               <p className="text-[10px] text-amber-500 font-semibold uppercase tracking-wider pt-1 px-1">
+                                  ⚠️ {addressWarning}
                                </p>
                             )}
                         </div>
@@ -885,7 +887,7 @@ export default function CheckoutPage() {
                     
                     <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'credit_b2b' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
                        <div className="flex items-center gap-4">
-                          <input type="radio" name="payment" checked={paymentMethod === 'credit_b2b'} onChange={() => setPaymentMethod('credit_b2b')} className="hidden" />
+                          <input type="radio" name="payment" checked={paymentMethod === 'credit_b2b'} onChange={() => { setPaymentMethod('credit_b2b'); localStorage.setItem('jdevoto_payment_method', 'credit_b2b'); }} className="hidden" />
                           <Wallet className={`h-6 w-6 ${paymentMethod === 'credit_b2b' ? 'text-primary' : 'text-zinc-400'}`} />
                           <div className="flex flex-col">
                              <span className="text-sm sm:text-base font-bold text-zinc-900">Crédito Directo B2B {creditB2bDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">-{creditB2bDiscountPercent}% OFF</span>}</span>
@@ -898,7 +900,7 @@ export default function CheckoutPage() {
                     {mpConfig ? (
                        <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'mercadopago' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
                           <div className="flex items-center gap-4">
-                             <input type="radio" name="payment" checked={paymentMethod === 'mercadopago'} onChange={() => setPaymentMethod('mercadopago')} className="hidden" />
+                             <input type="radio" name="payment" checked={paymentMethod === 'mercadopago'} onChange={() => { setPaymentMethod('mercadopago'); localStorage.setItem('jdevoto_payment_method', 'mercadopago'); }} className="hidden" />
                              <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">MP</div>
                              <div className="flex flex-col">
                                 <span className="text-sm sm:text-base font-bold text-zinc-900">Mercado Pago {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
@@ -910,7 +912,7 @@ export default function CheckoutPage() {
                      ) : (
                        <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'webpay' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
                           <div className="flex items-center gap-4">
-                             <input type="radio" name="payment" checked={paymentMethod === 'webpay'} onChange={() => setPaymentMethod('webpay')} className="hidden" />
+                             <input type="radio" name="payment" checked={paymentMethod === 'webpay'} onChange={() => { setPaymentMethod('webpay'); localStorage.setItem('jdevoto_payment_method', 'webpay'); }} className="hidden" />
                              <div className="relative h-7 w-7 shrink-0 flex items-center justify-center rounded-lg bg-sky-50 border border-sky-200 shadow-sm">
                                 <span className="text-[9px] font-bold text-sky-600 italic tracking-tighter">MP</span>
                              </div>
@@ -925,7 +927,7 @@ export default function CheckoutPage() {
 
                     <label className={`p-6 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${paymentMethod === 'transfer' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
                        <div className="flex items-center gap-4">
-                          <input type="radio" name="payment" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} className="hidden" />
+                          <input type="radio" name="payment" checked={paymentMethod === 'transfer'} onChange={() => { setPaymentMethod('transfer'); localStorage.setItem('jdevoto_payment_method', 'transfer'); }} className="hidden" />
                           <Building2 className={`h-6 w-6 ${paymentMethod === 'transfer' ? 'text-primary' : 'text-zinc-400'}`} />
                           <div className="flex flex-col">
                              <span className="text-sm sm:text-base font-bold text-zinc-900">{bankConfig?.title || 'Transferencia Electrónica'} {cardTransferDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2.5 py-0.5 rounded-full">-{cardTransferDiscountPercent}% OFF</span>}</span>
