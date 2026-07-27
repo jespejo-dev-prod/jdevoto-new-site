@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 import { AdminEditButton } from "./AdminEditButton";
+import { AuthRender } from "@/components/auth/auth-render";
 
 import {
   ChevronRight,
@@ -516,10 +517,12 @@ export default async function DynamicProductPage(props: ProductPageProps) {
           Usan companyId=null → precios base. No bloquean el render principal.
         */}
         <Suspense fallback={null}>
-          <BundleSuggestionSection
-            product={product}
-            primaryImageUrl={primaryImage?.url}
-          />
+          <AuthRender>
+            <BundleSuggestionSection
+              product={product}
+              primaryImageUrl={primaryImage?.url}
+            />
+          </AuthRender>
         </Suspense>
 
         <Suspense fallback={null}>
