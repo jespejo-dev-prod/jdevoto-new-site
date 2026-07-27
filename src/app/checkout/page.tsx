@@ -129,7 +129,7 @@ export default function CheckoutPage() {
 
       // If street becomes empty after cleaning (e.g., user wrote only "Oficina 502"), skip geocoding
       if (!cleanStreetVal) {
-        setAddressValidationError(null);
+        setAddressWarning(null);
         setIsVerifyingAddress(false);
         return;
       }
@@ -1082,8 +1082,8 @@ export default function CheckoutPage() {
                         ? `Límite de crédito insuficiente (Disponible: $${availableCredit.toLocaleString('es-CL')}). Por favor, elige otro medio de pago.` 
                         : (isVerifyingAddress
                            ? "Verificando dirección de despacho..."
-                           : (addressValidationError
-                              ? "La dirección de despacho es inválida. Por favor, corrígela."
+                           : (addressWarning
+                              ? addressWarning
                               : (!isCourierValid
                                  ? "Por favor, selecciona o escribe el courier para el flete por pagar."
                                  : "Completa tu dirección, datos de facturación y acepta los términos para continuar.")))}
