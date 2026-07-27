@@ -25,8 +25,10 @@ import { cn } from '@/lib/utils';
 const TABS = [
  { id: '', label: 'Todas', icon: ShoppingBag },
  { id: OrderStatus.DRAFT, label: 'Borradores', icon: LayoutGrid },
+ { id: OrderStatus.PENDING, label: 'Pendientes', icon: Clock },
  { id: OrderStatus.CONFIRMED, label: 'Confirmados', icon: CheckCircle2 },
  { id: OrderStatus.SHIPPED, label: 'Enviados', icon: Truck },
+ { id: OrderStatus.DELIVERED, label: 'Entregados', icon: CheckCircle2 },
  { id: OrderStatus.CANCELLED, label: 'Cancelados', icon: XCircle },
  { id: OrderStatus.REJECTED, label: 'Rechazados', icon: XCircle },
 ];

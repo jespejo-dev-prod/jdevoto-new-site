@@ -316,9 +316,9 @@ export class OrderService {
       return newOrder;
     });
 
-    // Enviar correo si el pedido fue creado con éxito y no es un borrador ni requiere pago online pendiente
+    // Enviar correo si el pedido fue creado con éxito y no requiere pago online pendiente
     const isOnlinePayment = order.paymentMethod === 'webpay' || order.paymentMethod === 'mercadopago';
-    if (order.status !== OrderStatus.DRAFT && !isOnlinePayment) {
+    if (!isOnlinePayment) {
       try {
         const { sendOrderEmail } = await import('@/lib/email');
         let customerEmail = (order.billingAddress as any)?.email;
