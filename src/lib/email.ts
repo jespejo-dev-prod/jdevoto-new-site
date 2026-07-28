@@ -1254,22 +1254,22 @@ export async function sendAnalyticsPurgeEmail(csvContent: string) {
   const transporter = await getTransporter();
   
   const mailOptions = {
-    from: "J. Devoto Sistema" <>,
+    from: `"J. Devoto Sistema" <${process.env.SMTP_FROM || 'no-reply@jdevoto.cl'}>`,
     to: adminEmail,
-    subject: '?? Respaldo de AnalÌticas - Purgado Autom·tico',
-    html: \
+    subject: 'üìä Respaldo de Anal√≠ticas - Purgado Autom√°tico',
+    html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Respaldo de AnalÌticas</h2>
+        <h2>Respaldo de Anal√≠ticas</h2>
         <p>Hola Administrador,</p>
-        <p>Adjunto encontrar·s el archivo CSV con las analÌticas transaccionales de los ˙ltimos dÌas.</p>
+        <p>Adjunto encontrar√°s el archivo CSV con las anal√≠ticas transaccionales de los √∫ltimos d√≠as.</p>
         <p>Los datos han sido purgados de la base de datos de Neon exitosamente para liberar espacio.</p>
         <br>
         <p>Saludos,<br>Sistema Comercial J. Devoto</p>
       </div>
-    \,
+    `,
     attachments: [
       {
-        filename: \nalytics-backup-\.csv\,
+        filename: `analytics-backup-${new Date().toISOString().split('T')[0]}.csv`,
         content: csvContent,
         contentType: 'text/csv'
       }
@@ -1278,14 +1278,14 @@ export async function sendAnalyticsPurgeEmail(csvContent: string) {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('?? Backup de analÌticas enviado:', info.messageId);
+    console.log('üìß Backup de anal√≠ticas enviado:', info.messageId);
     if (info.messageId && info.messageId.includes('@')) {
       // Ethereal url if it's test
-      console.log('?? URL de Ethereal (si aplica):', nodemailer.getTestMessageUrl(info));
+      console.log('üîó URL de Ethereal (si aplica):', nodemailer.getTestMessageUrl(info));
     }
     return true;
   } catch (error) {
-    console.error('? Error enviando backup de analÌticas:', error);
+    console.error('‚ùå Error enviando backup de anal√≠ticas:', error);
     return false;
   }
 }
