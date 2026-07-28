@@ -4,6 +4,8 @@ import { Database } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
+export const dynamic = 'force-dynamic';
+
 export default async function RawDataPage() {
   // Fetch only the latest 100 events to avoid overwhelming the UI
   const transactionalEvents = [
