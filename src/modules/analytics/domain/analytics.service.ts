@@ -3,10 +3,37 @@ import { OrderStatus } from "@prisma/client";
 import { subDays, startOfDay, endOfDay, format } from "date-fns";
 
 export class AnalyticsService {
-  async getDashboardStats(salesRepId?: string) {
+  async getDashboardStats(
+    salesRepId?: string, 
+    period: '30d' | '60d' | '90d' | '120d' | 'all' | 'custom' = '30d',
+    customStartDate?: string,
+    customEndDate?: string
+  ) {
     const now = new Date();
-    const thirtyDaysAgo = subDays(now, 30);
-    const prevThirtyDaysAgo = subDays(thirtyDaysAgo, 30);
+    let startDateObj: Date | undefined = undefined;
+    let endDateObj: Date | undefined = undefined;
+    let prevStartDateObj: Date | undefined = undefined;
+    let prevEndDateObj: Date | undefined = undefined;
+
+    if (period !== 'all') {
+      if (period === 'custom' && customStartDate && customEndDate) {
+        startDateObj = startOfDay(new Date(customStartDate));
+        endDateObj = endOfDay(new Date(customEndDate));
+        const diffTime = endDateObj.getTime() - startDateObj.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        prevEndDateObj = subDays(startDateObj, 1);
+        prevStartDateObj = subDays(startDateObj, diffDays + 1);
+      } else {
+        const days = parseInt(period.replace('d', '')) || 30;
+        startDateObj = subDays(now, days);
+        endDateObj = now;
+        prevEndDateObj = subDays(startDateObj, 1);
+        prevStartDateObj = subDays(startDateObj, days + 1);
+      }
+    }
+
+    const dateFilter = startDateObj && endDateObj ? { gte: startDateObj, lte: endDateObj } : undefined;
+    const prevDateFilter = prevStartDateObj && prevEndDateObj ? { gte: prevStartDateObj, lte: prevEndDateObj } : undefined;
 
     // 1. Ejecutar todas las consultas independientes en paralelo
     const [
@@ -18,29 +45,29 @@ export class AnalyticsService {
     ] = await Promise.all([
       prisma.order.aggregate({
         where: {
-          createdAt: { gte: thirtyDaysAgo },
+          ...(dateFilter ? { createdAt: dateFilter } : {}),
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
           ...(salesRepId ? { company: { salesRepId } } : {})
         },
         _sum: { totalGross: true },
         _count: { _all: true }
       }),
-      prisma.order.aggregate({
+      prevDateFilter ? prisma.order.aggregate({
         where: {
-          createdAt: { gte: prevThirtyDaysAgo, lt: thirtyDaysAgo },
+          createdAt: prevDateFilter,
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
           ...(salesRepId ? { company: { salesRepId } } : {})
         },
         _sum: { totalGross: true },
         _count: { _all: true }
-      }),
+      }) : Promise.resolve({ _sum: { totalGross: 0 }, _count: { _all: 0 } }),
       salesRepId ? prisma.$queryRaw<Array<{ date: string; total: number }>>`
         SELECT 
           DATE_TRUNC('day', o."createdAt") as date,
           SUM(o."totalGross")::float as total
         FROM "orders" o
         JOIN "companies" c ON c.id = o."companyId"
-        WHERE o."createdAt" >= ${thirtyDaysAgo}
+        WHERE (${period} = 'all' OR (o."createdAt" >= ${startDateObj || new Date(0)} AND o."createdAt" <= ${endDateObj || new Date()}))
           AND o.status NOT IN ('CANCELLED', 'REJECTED')
           AND c."salesRepId" = ${salesRepId}
         GROUP BY 1
@@ -50,7 +77,7 @@ export class AnalyticsService {
           DATE_TRUNC('day', "createdAt") as date,
           SUM("totalGross")::float as total
         FROM "orders"
-        WHERE "createdAt" >= ${thirtyDaysAgo}
+        WHERE (${period} = 'all' OR ("createdAt" >= ${startDateObj || new Date(0)} AND "createdAt" <= ${endDateObj || new Date()}))
           AND status NOT IN ('CANCELLED', 'REJECTED')
         GROUP BY 1
         ORDER BY 1 ASC
@@ -59,7 +86,7 @@ export class AnalyticsService {
         by: ['status'],
         _count: { _all: true },
         where: { 
-          createdAt: { gte: thirtyDaysAgo },
+          ...(dateFilter ? { createdAt: dateFilter } : {}),
           ...(salesRepId ? { company: { salesRepId } } : {})
         }
       }),
@@ -71,6 +98,7 @@ export class AnalyticsService {
         take: 5,
         where: { 
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
+          ...(dateFilter ? { createdAt: dateFilter } : {}),
           ...(salesRepId ? { company: { salesRepId } } : {})
         }
       })

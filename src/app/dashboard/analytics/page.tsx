@@ -11,10 +11,25 @@ import {
 } from 'lucide-react';
 import { STATUS_CONFIG } from '@/modules/orders/presentation/components/OrderStatusBadge';
 
-const COLORS = ['#D4FF00', '#27272a', '#3f3f46', '#52525b', '#71717a'];
+const STATUS_COLORS: Record<string, string> = {
+  CONFIRMED: '#D4FF00', // Destacado principal
+  PENDING: '#facc15',   // Amarillo
+  SHIPPED: '#60a5fa',   // Azul
+  DELIVERED: '#4ade80', // Verde
+  CANCELLED: '#f87171', // Rojo
+  REJECTED: '#f43f5e',  // Rojo oscuro
+  DRAFT: '#a1a1aa'      // Gris
+};
+
+import { useState } from 'react';
 
 export default function AnalyticsPage() {
-  const { data: stats, isLoading } = useAnalytics();
+  const [period, setPeriod] = useState<'30d' | '60d' | '90d' | '120d' | 'all' | 'custom'>('all');
+  const [inputStartDate, setInputStartDate] = useState('');
+  const [inputEndDate, setInputEndDate] = useState('');
+  const [appliedStartDate, setAppliedStartDate] = useState('');
+  const [appliedEndDate, setAppliedEndDate] = useState('');
+  const { data: stats, isLoading } = useAnalytics(period, appliedStartDate, appliedEndDate);
 
   if (isLoading) {
     return (
@@ -31,7 +46,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
             <TrendingUp className="h-8 w-8 text-primary" />
@@ -39,9 +54,61 @@ export default function AnalyticsPage() {
           </h1>
           <p className="text-zinc-500 mt-1 font-medium">Visualiza el rendimiento de tus ventas en tiempo real.</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-          <Calendar className="h-4 w-4" />
-          Últimos 30 días
+        <div className="flex flex-col xl:flex-row xl:items-center gap-3">
+          <div className="flex items-center gap-2 bg-zinc-900/40 p-2.5 rounded-xl border border-zinc-800 w-fit">
+            <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest px-2">Rango:</span>
+            <input 
+              type="date" 
+              max={new Date().toISOString().split('T')[0]}
+              value={inputStartDate} 
+              onChange={(e) => setInputStartDate(e.target.value)} 
+              className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-primary/50"
+            />
+            <span className="text-zinc-500 text-sm font-medium px-1">hasta</span>
+            <input 
+              type="date" 
+              max={new Date().toISOString().split('T')[0]}
+              value={inputEndDate} 
+              onChange={(e) => setInputEndDate(e.target.value)} 
+              className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-primary/50"
+            />
+            <button
+              onClick={() => {
+                setAppliedStartDate(inputStartDate);
+                setAppliedEndDate(inputEndDate);
+                setPeriod('custom');
+              }}
+              disabled={!inputStartDate || !inputEndDate}
+              className="ml-1 px-4 py-1.5 bg-primary text-black text-sm font-bold rounded-lg disabled:opacity-50 hover:bg-primary/90 transition-colors"
+            >
+              Filtrar
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-2xl focus-within:border-primary/50 transition-colors w-fit">
+            <Calendar className="h-5 w-5 text-zinc-400" />
+            <select 
+              value={period === 'custom' ? '' : period}
+              onChange={(e) => {
+                const val = e.target.value as any;
+                if (val) {
+                  setPeriod(val);
+                  setInputStartDate('');
+                  setInputEndDate('');
+                  setAppliedStartDate('');
+                  setAppliedEndDate('');
+                }
+              }}
+              className="bg-transparent border-none text-xs font-bold uppercase tracking-widest text-zinc-300 focus:outline-none cursor-pointer"
+            >
+              <option value="" disabled className="hidden">Seleccionar...</option>
+              <option value="all" className="bg-zinc-900">Histórico Global</option>
+              <option value="30d" className="bg-zinc-900">Últimos 30 días</option>
+              <option value="60d" className="bg-zinc-900">Últimos 60 días</option>
+              <option value="90d" className="bg-zinc-900">Últimos 90 días</option>
+              <option value="120d" className="bg-zinc-900">Últimos 120 días</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -92,17 +159,18 @@ export default function AnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis 
                   dataKey="date" 
-                  stroke="#52525b" 
-                  fontSize={10} 
+                  stroke="#a1a1aa" 
+                  fontSize={12} 
                   tickLine={false} 
                   axisLine={false} 
                 />
                 <YAxis 
-                  stroke="#52525b" 
-                  fontSize={10} 
+                  stroke="#a1a1aa" 
+                  fontSize={12} 
                   tickLine={false} 
                   axisLine={false}
-                  tickFormatter={(val) => `$${val / 1000}k`}
+                  width={100}
+                  tickFormatter={(val) => `$${Math.round(val).toLocaleString('es-CL')}`}
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '16px' }}
@@ -155,7 +223,7 @@ export default function AnalyticsPage() {
                   nameKey="status"
                 >
                   {statusDistribution.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.status] || '#71717a'} />
                   ))}
                 </Pie>
                 <Tooltip 
@@ -171,12 +239,12 @@ export default function AnalyticsPage() {
             {statusDistribution.map((s: any, idx: number) => (
               <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-zinc-950/50 border border-zinc-800/50">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
-                  <span className="text-[9px] font-bold uppercase tracking-tight text-zinc-500">
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: STATUS_COLORS[s.status] || '#71717a' }} />
+                  <span className="text-xs font-bold uppercase tracking-tight text-zinc-500">
                     {STATUS_CONFIG[s.status as keyof typeof STATUS_CONFIG]?.label || s.status}
                   </span>
                 </div>
-                <span className="text-[10px] font-black text-white">{s.count}</span>
+                <span className="text-base font-black text-white">{s.count}</span>
               </div>
             ))}
           </div>
@@ -200,12 +268,12 @@ export default function AnalyticsPage() {
                     {idx + 1}
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white group-hover:text-primary transition-colors">{customer.name}</p>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{customer.orders} Pedidos realizados</p>
+                    <p className="text-base font-bold text-white group-hover:text-primary transition-colors">{customer.name}</p>
+                    <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">{customer.orders} Pedidos realizados</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-black text-white">${customer.revenue.toLocaleString('es-CL')}</p>
+                  <p className="text-base font-black text-white">${Math.round(customer.revenue).toLocaleString('es-CL')}</p>
                 </div>
               </div>
             ))}
@@ -252,7 +320,7 @@ function StatCard({ title, value, trend, icon: Icon, prefix = '', suffix = '' }:
         )}
       </div>
       <div>
-        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{title}</p>
+        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{title}</p>
         <p className="text-2xl font-black text-white mt-1 truncate">{formattedValue}</p>
       </div>
     </div>

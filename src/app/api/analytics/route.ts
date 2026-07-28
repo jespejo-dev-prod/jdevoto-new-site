@@ -13,8 +13,13 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     throw new ForbiddenError("No tienes permisos para ver la analítica");
   }
 
+  const url = new URL(req.url);
+  const period = (url.searchParams.get("period") as '30d' | '60d' | '90d' | '120d' | 'all' | 'custom') || 'all';
+  const startDate = url.searchParams.get("startDate") || undefined;
+  const endDate = url.searchParams.get("endDate") || undefined;
+
   const salesRepId = user.role === UserRole.SALES_REP ? user.id : undefined;
-  const stats = await analyticsService.getDashboardStats(salesRepId);
+  const stats = await analyticsService.getDashboardStats(salesRepId, period, startDate, endDate);
 
   return ok(stats);
 });
