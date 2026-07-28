@@ -1248,3 +1248,44 @@ function generateWishlistHtml(items: any[], userDetails: any) {
   `;
 }
 
+
+export async function sendAnalyticsPurgeEmail(csvContent: string) {
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'jespejo@jdevoto.cl';
+  const transporter = await getTransporter();
+  
+  const mailOptions = {
+    from: "J. Devoto Sistema" <>,
+    to: adminEmail,
+    subject: '?? Respaldo de Analíticas - Purgado Automático',
+    html: \
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Respaldo de Analíticas</h2>
+        <p>Hola Administrador,</p>
+        <p>Adjunto encontrarás el archivo CSV con las analíticas transaccionales de los últimos días.</p>
+        <p>Los datos han sido purgados de la base de datos de Neon exitosamente para liberar espacio.</p>
+        <br>
+        <p>Saludos,<br>Sistema Comercial J. Devoto</p>
+      </div>
+    \,
+    attachments: [
+      {
+        filename: \nalytics-backup-\.csv\,
+        content: csvContent,
+        contentType: 'text/csv'
+      }
+    ]
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('?? Backup de analíticas enviado:', info.messageId);
+    if (info.messageId && info.messageId.includes('@')) {
+      // Ethereal url if it's test
+      console.log('?? URL de Ethereal (si aplica):', nodemailer.getTestMessageUrl(info));
+    }
+    return true;
+  } catch (error) {
+    console.error('? Error enviando backup de analíticas:', error);
+    return false;
+  }
+}

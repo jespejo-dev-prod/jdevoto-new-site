@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/aggregate-analytics",
       "schedule": "0 4 * * 0"
+    },
+    {
+      "path": "/api/cron/purge-analytics",
+      "schedule": "0 5 * * 0"
     }
   ]
 }
