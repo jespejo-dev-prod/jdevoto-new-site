@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, Grid, LayoutGrid, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTrackingContext } from '@/components/providers/TrackingProvider';
 
 export interface Category {
   id: string;
@@ -19,6 +20,7 @@ interface CategoriesMenuProps {
 }
 
 export function CategoriesMenu({ onClose, topOffset = '73px', categories }: CategoriesMenuProps) {
+  const { trackCategoryView } = useTrackingContext();
   
   const parentCategories = categories
     .filter((c) => !c.parentId)
@@ -70,6 +72,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                   href={`/products?category=${parent.slug}`}
                   onMouseEnter={() => setActiveParentId(parent.id)}
                   onClick={() => {
+                    trackCategoryView(parent.id, parent.name);
                     setActiveParentId(parent.id);
                     onClose();
                   }}
@@ -103,7 +106,10 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                 <div>
                   <Link 
                     href={`/products?category=${activeParent.slug}`}
-                    onClick={onClose}
+                    onClick={() => {
+                      trackCategoryView(activeParent.id, activeParent.name);
+                      onClose();
+                    }}
                     className="hover:underline"
                   >
                     <h3 className="text-base font-black text-zinc-900 uppercase tracking-tight">
@@ -114,7 +120,10 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                 
                 <Link
                   href={`/products?category=${activeParent.slug}`}
-                  onClick={onClose}
+                  onClick={() => {
+                    trackCategoryView(activeParent.id, activeParent.name);
+                    onClose();
+                  }}
                   className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-700 bg-zinc-100 hover:bg-zinc-200 transition-colors px-3 py-1.5 rounded-md"
                 >
                   <LayoutGrid className="h-3 w-3" /> Ver Todo
@@ -128,7 +137,10 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                       <Link
                         key={child.id}
                         href={`/products?category=${activeParent.slug}&subcategories=${child.slug}`}
-                        onClick={onClose}
+                        onClick={() => {
+                          trackCategoryView(child.id, displayName);
+                          onClose();
+                        }}
                         className="group flex items-center justify-between py-0.5 text-left"
                       >
                         <span className="text-[13px] font-semibold text-zinc-500 group-hover:text-zinc-950 group-hover:underline uppercase tracking-tight leading-snug">
@@ -189,7 +201,10 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                   <div className="pl-3 pr-2 py-2 space-y-2.5 bg-zinc-50/70 rounded-2xl mb-2 animate-in fade-in slide-in-from-top-1 duration-200 flex flex-col">
                     <Link
                       href={`/products?category=${parent.slug}`}
-                      onClick={onClose}
+                      onClick={() => {
+                        trackCategoryView(parent.id, parent.name);
+                        onClose();
+                      }}
                       className="text-[10.5px] font-black text-blue-600 hover:text-blue-700 uppercase tracking-widest py-1 flex items-center gap-1.5"
                     >
                       <LayoutGrid className="h-3.5 w-3.5" /> Ver Todo en {parent.name}
@@ -200,7 +215,10 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                         <Link
                           key={child.id}
                           href={`/products?category=${parent.slug}&subcategories=${child.slug}`}
-                          onClick={onClose}
+                          onClick={() => {
+                            trackCategoryView(child.id, displayName);
+                            onClose();
+                          }}
                           className="text-[12.5px] font-bold text-zinc-500 hover:text-zinc-900 py-1 uppercase tracking-tight"
                         >
                           {displayName}

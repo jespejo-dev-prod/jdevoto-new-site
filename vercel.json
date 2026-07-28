@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/cleanup-drafts",
       "schedule": "0 3 1 * *"
+    },
+    {
+      "path": "/api/cron/aggregate-analytics",
+      "schedule": "0 4 * * 0"
     }
   ]
 }

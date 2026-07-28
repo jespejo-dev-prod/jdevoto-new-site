@@ -22,6 +22,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 import { useState } from 'react';
+import { useAuth } from '@/context/auth-context';
 
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState<'30d' | '60d' | '90d' | '120d' | 'all' | 'custom'>('all');
@@ -30,6 +31,7 @@ export default function AnalyticsPage() {
   const [appliedStartDate, setAppliedStartDate] = useState('');
   const [appliedEndDate, setAppliedEndDate] = useState('');
   const { data: stats, isLoading } = useAnalytics(period, appliedStartDate, appliedEndDate);
+  const { accessToken } = useAuth();
 
   if (isLoading) {
     return (
@@ -52,7 +54,9 @@ export default function AnalyticsPage() {
             <TrendingUp className="h-8 w-8 text-primary" />
             Analítica de Negocio
           </h1>
-          <p className="text-zinc-500 mt-1 font-medium">Visualiza el rendimiento de tus ventas en tiempo real.</p>
+          <div className="flex items-center gap-4 mt-1">
+            <p className="text-zinc-500 font-medium">Visualiza el rendimiento de tus ventas en tiempo real.</p>
+          </div>
         </div>
         <div className="flex flex-col xl:flex-row xl:items-center gap-3">
           <div className="flex items-center gap-2 bg-zinc-900/40 p-2.5 rounded-xl border border-zinc-800 w-fit">

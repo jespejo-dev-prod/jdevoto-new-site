@@ -436,6 +436,39 @@ model EmailCampaignRecipient {
   @@map("email_campaign_recipients")
 }
 
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  sessionId String
+  userId    String?
+  eventType String
+  eventData Json?    @default("{}")
+  pageUrl   String
+  referrer  String?
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([eventType, createdAt])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
+
+model AnalyticsDailyStat {
+  id         String   @id @default(cuid())
+  date       DateTime @db.Date
+  metricType String
+  metricKey  String
+  metricValue Int     @default(0)
+  metadata   Json?    @default("{}")
+
+  @@unique([date, metricType, metricKey])
+  @@index([date])
+  @@index([metricType, date])
+  @@map("analytics_daily_stats")
+}
+
 enum UserRole {
   ADMIN
   SALES_REP

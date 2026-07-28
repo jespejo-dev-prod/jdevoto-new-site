@@ -30,11 +30,18 @@ import { useDashboard } from '@/app/dashboard/layout';
 
 const menuItems = [
  { icon: Home, label: 'Inicio', href: '/dashboard' },
- { icon: BarChart3, label: 'Estadísticas', href: '/dashboard/analytics' },
 ];
 
 const mainItems = [
- { icon: BarChart3, label: 'Estadísticas', href: '/dashboard/analytics' },
+ { 
+ icon: BarChart3, 
+ label: 'Estadísticas', 
+ href: '/dashboard/analytics',
+ subItems: [
+ { label: 'Resumen', href: '/dashboard/analytics' },
+ { label: 'Exportar Data (CSV)', href: '/dashboard/analytics/raw' }
+ ]
+ },
  { 
  icon: Package, 
  label: 'Productos', 

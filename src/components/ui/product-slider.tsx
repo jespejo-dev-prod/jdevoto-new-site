@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Flame } from 'lucide-react';
 import Link from 'next/link';
+import { useTrackingContext } from '@/components/providers/TrackingProvider';
 
 interface ProductSliderProps {
   title: string;
@@ -25,6 +26,7 @@ export function ProductSlider({
   prioritizeLcp = false,
   children,
 }: ProductSliderProps) {
+  const { trackPromotionClick } = useTrackingContext();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Lógica de arrastre con mouse para usuarios de escritorio
@@ -148,6 +150,7 @@ export function ProductSlider({
                 {linkHref && (
                   <Link 
                     href={linkHref}
+                    onClick={() => trackPromotionClick(title, linkHref)}
                     className="text-[11px] font-extrabold uppercase tracking-widest px-4 py-2 rounded-full border-2 hover:bg-black/5 transition-all mt-3 mb-2 md:mt-2 md:mb-0 flex items-center justify-center gap-1.5 w-fit"
                     style={{ 
                       color: campaignColor || '#dc2626', 

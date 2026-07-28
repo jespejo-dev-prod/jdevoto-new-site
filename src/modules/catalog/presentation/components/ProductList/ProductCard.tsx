@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { memo } from 'react';
@@ -6,6 +8,8 @@ import { StockBadge } from './StockBadge';
 import { AddToCartAction } from '../AddToCartAction/AddToCartAction';
 import { ProductActions } from './ProductActions';
 import { cn } from '@/lib/utils';
+import { useTrackingContext } from '@/components/providers/TrackingProvider';
+import { useAuth } from '@/context/auth-context';
 
 interface ProductCardProps {
   product: any;
@@ -25,8 +29,14 @@ export const ProductCard = memo(function ProductCard({
   isDeleting,
   priority = false,
   compact = false,
-  isAuthenticated = false,
+  isAuthenticated: serverIsAuthenticated = false,
 }: ProductCardProps) {
+  const { trackProductClick, trackPromotionProductClick } = useTrackingContext();
+  const { isAuthenticated: clientIsAuthenticated } = useAuth();
+  
+  // Use client auth if available, fallback to server prop
+  const isAuthenticated = clientIsAuthenticated || serverIsAuthenticated;
+  
   const isDashboard = variant === 'dashboard';
   const primaryImage = product.images?.[0] ?? null;
   const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500&auto=format&fit=crop&q=60';
@@ -56,6 +66,14 @@ export const ProductCard = memo(function ProductCard({
       {/* Overlay Link - Hace que toda la card sea clickeable */}
       <Link 
         href={linkHref} 
+        onClick={() => {
+          if (!isDashboard) {
+            trackProductClick(product.id, product.sku);
+            if (discountPercent > 0) {
+              trackPromotionProductClick?.(product.id, product.sku, discountPercent);
+            }
+          }
+        }}
         className="absolute inset-0 z-[5]"
         aria-label={isDashboard ? `Editar ${product.name}` : `Ver ${product.name}`}
       />

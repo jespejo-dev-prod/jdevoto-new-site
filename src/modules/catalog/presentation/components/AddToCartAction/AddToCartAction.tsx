@@ -7,6 +7,7 @@ import { QuantitySelector } from '@/components/ui/quantity-selector';
 import { useCart } from '@/context/CartContext';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useTrackingContext } from '@/components/providers/TrackingProvider';
 
 interface AddToCartActionProps {
   product: any;
@@ -24,6 +25,7 @@ export function AddToCartAction({
   onQuantityChange
 }: AddToCartActionProps) {
   const { addItem } = useCart();
+  const { trackAddToCart } = useTrackingContext();
   const minQty = product.inner || 1;
   const hasEnoughStock = (product.stockQuantity ?? 0) >= minQty;
 
@@ -44,6 +46,19 @@ export function AddToCartAction({
     }
     
     addItem(product, quantity);
+    
+    // Extraer datos de promoción si los tiene
+    const discountPercent = product.price?.discountPercent || 0;
+    const priceSource = product.price?.priceSource || 'BASE_PRICE';
+    
+    trackAddToCart(
+      product.id, 
+      product.sku, 
+      quantity, 
+      product.price?.unitNetPrice || product.basePrice || 0,
+      discountPercent,
+      priceSource
+    );
     toast.success(`${quantity} unidades añadidas al carrito`, {
       description: product.name,
       icon: <ShoppingCartIcon className="h-4 w-4" />,

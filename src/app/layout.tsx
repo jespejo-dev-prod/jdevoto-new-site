@@ -9,6 +9,8 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { CookieBanner } from "@/components/layout/cookie-banner";
 import { Roboto } from "next/font/google";
+import { TrackingProvider } from "@/components/providers/TrackingProvider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700", "900"],
@@ -120,7 +122,9 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
-                {children}
+                <TrackingProvider>
+                  {children}
+                </TrackingProvider>
                 <ClientToaster position="bottom-right" richColors closeButton />
                 <WhatsAppButton />
                 <CookieBanner />
@@ -128,6 +132,7 @@ export default function RootLayout({
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX"} />
       </body>
     </html>
   );

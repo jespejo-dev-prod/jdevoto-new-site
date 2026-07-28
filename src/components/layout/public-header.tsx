@@ -8,6 +8,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/auth-context';
 import { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTrackingContext } from '@/components/providers/TrackingProvider';
 
 import { CategoriesMenu, type Category } from './categories-menu';
 
@@ -39,6 +40,7 @@ export function PublicHeader() {
   const { items = [], itemCount, subtotal = 0 } = useCart();
   const { itemCount: wishlistCount } = useWishlist();
   const { user, logout } = useAuth();
+  const { trackSearch } = useTrackingContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [navCategories, setNavCategories] = useState<Category[]>([]);
@@ -87,6 +89,7 @@ export function PublicHeader() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
+      trackSearch(searchTerm.trim(), 0);
       router.push(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
       setIsMobileMenuOpen(false);
     }
