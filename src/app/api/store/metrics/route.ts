@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    const ipAddress = req.headers.get("x-forwarded-for") || req.ip || null;
+    const ipAddress = req.headers.get("x-forwarded-for") || null;
     const userAgent = req.headers.get("user-agent") || null;
     const userId = req.headers.get("x-user-id") || null;
 
