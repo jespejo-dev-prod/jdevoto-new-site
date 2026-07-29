@@ -2,6 +2,7 @@ import { prisma } from "@/lib/client";
 import { NextRequest } from "next/server";
 
 import { fileLogger } from "./file-logger";
+import { notifyAdminAction } from "./admin-notifications";
 
 export type AuditAction = 
   | "LOGIN_SUCCESS"
@@ -17,6 +18,19 @@ export type AuditAction =
   | "PRODUCT_CREATED"
   | "PRODUCT_UPDATED"
   | "PRODUCT_DELETED"
+  | "CATEGORY_CREATED"
+  | "CATEGORY_UPDATED"
+  | "CATEGORY_DELETED"
+  | "BRAND_CREATED"
+  | "BRAND_UPDATED"
+  | "BRAND_DELETED"
+  | "COMPANY_CREATED"
+  | "COMPANY_UPDATED"
+  | "COMPANY_DELETED"
+  | "PAYMENT_METHOD_CREATED"
+  | "PAYMENT_METHOD_UPDATED"
+  | "PAYMENT_METHOD_DELETED"
+  | "SETTINGS_UPDATED"
   | "2FA_FAILED"
   | "LOGIN_SUCCESS_2FA";
 
@@ -56,6 +70,9 @@ export function logAuditAction(options: AuditLogOptions) {
           ipAddress,
         }
       });
+
+      // 3. Notificar al Admin si aplica
+      await notifyAdminAction(options.action, options.userId, options.details);
     } catch (error) {
       // Usamos console.error para no fallar el flujo
       console.error("[AUDIT_LOG_ERROR] Fallo al registrar auditoría:", error);
