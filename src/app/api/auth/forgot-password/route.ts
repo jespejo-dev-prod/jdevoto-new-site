@@ -6,7 +6,6 @@ import { AppError } from "@/lib/errors";
 import crypto from "crypto";
 
 export const POST = withApiHandler(async (req: NextRequest) => {
-  try {
     const body = await req.json();
     const email = body.email?.trim().toLowerCase();
 
@@ -50,7 +49,4 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     }
 
     return ok({ message: "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación." });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ success: false, message: error.message || String(error), stack: error.stack }), { status: 500 });
-  }
 });
