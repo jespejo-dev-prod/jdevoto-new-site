@@ -32,7 +32,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const isValid = verifyTOTP(code, (user as any).twoFactorSecret);
   if (!isValid) {
     // Log failed audit action for security tracking
-    logAuditAction({
+    await logAuditAction({
       action: '2FA_FAILED',
       userId: user.id,
       details: { email: user.email, reason: 'Código de 2FA incorrecto o expirado' },
@@ -70,7 +70,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     maxAge: 60 * 60 * 24, // 1 día en segundos
   });
 
-  logAuditAction({
+  await logAuditAction({
     action: 'LOGIN_SUCCESS_2FA',
     userId: user.id,
     details: { email: user.email, name: `${user.firstName} ${user.lastName}`.trim() },

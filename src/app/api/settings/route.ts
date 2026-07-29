@@ -43,7 +43,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     create: { key, value },
   });
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "SETTINGS_UPDATED",
     entity: "StoreSettings",

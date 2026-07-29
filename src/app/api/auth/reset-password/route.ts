@@ -56,7 +56,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     where: { id: resetToken.id }
   });
 
-  logAuditAction({
+  await logAuditAction({
     action: "PASSWORD_RESET_COMPLETED",
     userId: user?.id,
     details: { email: resetToken.email },

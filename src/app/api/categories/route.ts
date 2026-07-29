@@ -57,7 +57,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
 
   revalidateTag("categories", { expire: 0 });
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "CATEGORY_CREATED",
     entity: "Category",
@@ -131,7 +131,7 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
 
   revalidateTag("categories", { expire: 0 });
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "CATEGORY_DELETED",
     entity: "Category",
@@ -164,7 +164,7 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
 
   revalidateTag("categories", { expire: 0 });
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "CATEGORY_UPDATED",
     entity: "Category",

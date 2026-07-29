@@ -194,7 +194,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     maxAge: 60 * 60 * 24 * 30, // 30 días
   });
 
-  logAuditAction({
+  await logAuditAction({
     action: "USER_REGISTERED",
     userId: user.id,
     details: { email: user.email, companyId: company.id, name: `${user.firstName} ${user.lastName}` },

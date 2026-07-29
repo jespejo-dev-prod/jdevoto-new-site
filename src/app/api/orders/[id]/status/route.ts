@@ -38,7 +38,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
 
   const updated = await orderService.updateOrderStatus(id, status, internalNotes);
 
-  logAuditAction({
+  await logAuditAction({
     action: "ORDER_STATUS_CHANGED",
     userId: user.id,
     entity: "Order",

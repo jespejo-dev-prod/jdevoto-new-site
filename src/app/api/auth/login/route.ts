@@ -65,7 +65,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     }
     loginAttempts.set(ip, current);
 
-    logAuditAction({
+    await logAuditAction({
       action: "LOGIN_FAILED",
       details: { email: input.email, reason: err.message },
       req,
@@ -102,7 +102,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     maxAge: 60 * 60 * 24, // 1 día en segundos
   });
 
-  logAuditAction({
+  await logAuditAction({
     action: "LOGIN_SUCCESS",
     userId: result.user.id,
     details: { email: result.user.email, name: `${result.user.firstName} ${result.user.lastName}`.trim() },

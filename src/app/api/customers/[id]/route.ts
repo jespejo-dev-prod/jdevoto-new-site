@@ -114,7 +114,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     },
   });
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "COMPANY_UPDATED",
     entity: "Company",
@@ -181,7 +181,7 @@ export const DELETE = withApiHandler(async (req: NextRequest, { params }: RouteC
 
       await prisma.company.delete({ where: { id } });
       
-      logAuditAction({
+      await logAuditAction({
         userId: user.id,
         action: "COMPANY_DELETED",
         entity: "Company",

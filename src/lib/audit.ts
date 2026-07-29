@@ -47,35 +47,32 @@ interface AuditLogOptions {
  * Registra una acción en el AuditLog de la base de datos de manera asíncrona
  * (No interrumpe el flujo principal si falla)
  */
-export function logAuditAction(options: AuditLogOptions) {
-  // Ejecutamos en background sin await
-  setTimeout(async () => {
-    try {
-      let ipAddress = undefined;
-      if (options.req) {
-        ipAddress = options.req.headers.get("x-forwarded-for") || undefined;
-      }
-
-      // 1. Guardar en Archivo Local
-      fileLogger.audit(options.action, options.userId, ipAddress, options.details);
-
-      // 2. Guardar en Base de Datos
-      await prisma.auditLog.create({
-        data: {
-          userId: options.userId,
-          action: options.action,
-          entity: options.entity,
-          entityId: options.entityId,
-          details: options.details ? JSON.stringify(options.details) : null,
-          ipAddress,
-        }
-      });
-
-      // 3. Notificar al Admin si aplica
-      await notifyAdminAction(options.action, options.userId, options.details);
-    } catch (error) {
-      // Usamos console.error para no fallar el flujo
-      console.error("[AUDIT_LOG_ERROR] Fallo al registrar auditoría:", error);
+export async function logAuditAction(options: AuditLogOptions) {
+  try {
+    let ipAddress = undefined;
+    if (options.req) {
+      ipAddress = options.req.headers.get("x-forwarded-for") || undefined;
     }
-  }, 0);
+
+    // 1. Guardar en Archivo Local
+    fileLogger.audit(options.action, options.userId, ipAddress, options.details);
+
+    // 2. Guardar en Base de Datos
+    await prisma.auditLog.create({
+      data: {
+        userId: options.userId,
+        action: options.action,
+        entity: options.entity,
+        entityId: options.entityId,
+        details: options.details ? JSON.stringify(options.details) : null,
+        ipAddress,
+      }
+    });
+
+    // 3. Notificar al Admin si aplica
+    await notifyAdminAction(options.action, options.userId, options.details);
+  } catch (error) {
+    // Usamos console.error para no fallar el flujo
+    console.error("[AUDIT_LOG_ERROR] Fallo al registrar auditoría:", error);
+  }
 }

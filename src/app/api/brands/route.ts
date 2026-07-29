@@ -27,7 +27,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "BRAND_CREATED",
     entity: "Brand",
@@ -52,7 +52,7 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
   if (existing) {
     await prisma.brand.delete({ where: { id } });
     
-    logAuditAction({
+    await logAuditAction({
       userId: user.id,
       action: "BRAND_DELETED",
       entity: "Brand",
@@ -84,7 +84,7 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "BRAND_UPDATED",
     entity: "Brand",

@@ -174,7 +174,7 @@ export const POST = withApiHandler(async (
     }
   }
 
-  logAuditAction({
+  await logAuditAction({
     action: "ORDER_UPDATED",
     userId: user.id,
     entity: "Order",

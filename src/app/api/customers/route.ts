@@ -127,7 +127,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     },
   });
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "COMPANY_CREATED",
     entity: "Company",

@@ -274,7 +274,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
 
   const product = await createProductUseCase(data, user);
 
-  logAuditAction({
+  await logAuditAction({
     userId: user.id,
     action: "PRODUCT_CREATED",
     entity: "Product",

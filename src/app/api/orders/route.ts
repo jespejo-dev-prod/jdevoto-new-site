@@ -116,7 +116,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     billingAddress: data.billingAddress as Record<string, unknown> | undefined,
   });
 
-  logAuditAction({
+  await logAuditAction({
     action: "ORDER_CREATED",
     userId: user.id,
     entity: "Order",
