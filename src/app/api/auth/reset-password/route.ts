@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { withApiHandler, ok } from "@/lib/api-handler";
 import { prisma } from "@/lib/client";
 import { logAuditAction } from "@/lib/audit";
+import { sendNotificationEmail } from "@/lib/email";
 import { BusinessRuleError } from "@/lib/errors";
 import bcrypt from "bcryptjs";
 
@@ -61,6 +62,16 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     details: { email: resetToken.email },
     req,
   });
+
+  // Notify Admin
+  if (process.env.ADMIN_NOTIFICATION_EMAIL) {
+    await sendNotificationEmail(
+      process.env.ADMIN_NOTIFICATION_EMAIL,
+      "Contraseña Restablecida - Jdevoto.cl",
+      `El usuario con correo ${resetToken.email} ha restablecido su contraseña exitosamente.`,
+      "/dashboard/users"
+    ).catch(e => console.error("Failed to send admin notification for password reset:", e));
+  }
 
   return ok({ message: "Contraseña actualizada exitosamente." });
 });
