@@ -4,19 +4,9 @@ import { AuditAction } from "./audit";
 
 // Map of actions to human-readable strings
 const ACTION_MAP: Partial<Record<AuditAction, { title: string; template: (userName: string, details?: any) => string; link?: string }>> = {
-  ORDER_CREATED: {
-    title: "Nuevo Pedido Creado",
-    template: (name, details) => `El usuario ${name} ha creado el pedido #${details?.orderNumber || "Desconocido"}.`,
-    link: "/dashboard/orders"
-  },
   ORDER_UPDATED: {
     title: "Pedido Actualizado",
     template: (name, details) => `El usuario ${name} ha actualizado un pedido.`,
-    link: "/dashboard/orders"
-  },
-  ORDER_STATUS_CHANGED: {
-    title: "Estado de Pedido Modificado",
-    template: (name, details) => `El usuario ${name} ha cambiado el estado de un pedido.`,
     link: "/dashboard/orders"
   },
   USER_REGISTERED: {
