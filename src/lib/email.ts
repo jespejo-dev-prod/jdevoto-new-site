@@ -129,22 +129,30 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
     const shortOrderNumber = order.orderNumber.split('-').pop();
     const subject = `${statusConfig.subject}: #${shortOrderNumber}`;
 
-    const info = await transporter.sendMail({
+    const promises = [];
+    const infoPromise = transporter.sendMail({
       from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       subject,
       html: htmlContent,
     });
+    promises.push(infoPromise);
 
     if (process.env.ADMIN_NOTIFICATION_EMAIL) {
       const adminHtmlContent = generateOrderHtml(order, customerEmail, null, true);
-      await transporter.sendMail({
-        from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
-        to: process.env.ADMIN_NOTIFICATION_EMAIL,
-        subject: `Nuevo Pedido Ingresado: #${shortOrderNumber}`,
-        html: adminHtmlContent,
-      });
+      promises.push(
+        transporter.sendMail({
+          from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
+          to: process.env.ADMIN_NOTIFICATION_EMAIL.trim(),
+          subject: `Nuevo Pedido Ingresado: #${shortOrderNumber}`,
+          html: adminHtmlContent,
+        })
+      );
+    } else {
+      console.log('⚠️ ADMIN_NOTIFICATION_EMAIL no está definido en Vercel');
     }
+
+    const [info] = await Promise.all(promises);
 
     console.log("==========================================");
     console.log(`📧 Correo enviado exitosamente a ${customerEmail}`);
