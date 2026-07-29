@@ -63,15 +63,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     req,
   });
 
-  // Notify Admin
-  if (process.env.ADMIN_NOTIFICATION_EMAIL) {
-    await sendNotificationEmail(
-      process.env.ADMIN_NOTIFICATION_EMAIL,
-      "Contraseña Restablecida - Jdevoto.cl",
-      `El usuario con correo ${resetToken.email} ha restablecido su contraseña exitosamente.`,
-      "/dashboard/users"
-    ).catch(e => console.error("Failed to send admin notification for password reset:", e));
-  }
+  // The centralized notification system inside logAuditAction will handle the admin email
 
   return ok({ message: "Contraseña actualizada exitosamente." });
 });
