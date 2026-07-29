@@ -153,6 +153,18 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       }
 
       const { passwordHash: _, ...userWithoutPassword } = reactivatedUser;
+      
+      // Auto-assign company if SALES_REP and company has no sales rep
+      if (reactivatedUser.role === 'SALES_REP') {
+        const company = await prisma.company.findUnique({ where: { id: reactivatedUser.companyId } });
+        if (company && !company.salesRepId) {
+          await prisma.company.update({
+            where: { id: company.id },
+            data: { salesRepId: reactivatedUser.id }
+          });
+        }
+      }
+
       return created(userWithoutPassword);
     } else {
       // El usuario existe y está activo.
@@ -206,6 +218,18 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       });
 
       const { passwordHash: _, ...userWithoutPassword } = updatedUser;
+      
+      // Auto-assign company if SALES_REP and company has no sales rep
+      if (updatedUser.role === 'SALES_REP') {
+        const company = await prisma.company.findUnique({ where: { id: updatedUser.companyId } });
+        if (company && !company.salesRepId) {
+          await prisma.company.update({
+            where: { id: company.id },
+            data: { salesRepId: updatedUser.id }
+          });
+        }
+      }
+
       return ok(userWithoutPassword);
     }
   }
@@ -255,5 +279,17 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   }
 
   const { passwordHash: _, ...userWithoutPassword } = newUser;
+  
+  // Auto-assign company if SALES_REP and company has no sales rep
+  if (newUser.role === 'SALES_REP') {
+    const company = await prisma.company.findUnique({ where: { id: newUser.companyId } });
+    if (company && !company.salesRepId) {
+      await prisma.company.update({
+        where: { id: company.id },
+        data: { salesRepId: newUser.id }
+      });
+    }
+  }
+
   return created(userWithoutPassword);
 });

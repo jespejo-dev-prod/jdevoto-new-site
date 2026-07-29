@@ -180,46 +180,6 @@ export default function CuentaCorrientePage() {
  }
  };
 
- // Adjust Credit Modal state
- const [editingCompany, setEditingCompany] = useState<any>(null);
- const [newCreditLimit, setNewCreditLimit] = useState<string>('');
- const [newCreditUsed, setNewCreditUsed] = useState<string>('');
- const [isSavingCredit, setIsSavingCredit] = useState(false);
-
- const handleOpenEdit = (comp: any) => {
- setEditingCompany(comp);
- setNewCreditLimit(Math.round(Number(comp.creditLimit || 0)).toString());
- setNewCreditUsed(Math.round(Number(comp.creditUsed || 0)).toString());
- };
-
- const handleSaveCredit = async () => {
- if (!editingCompany) return;
- setIsSavingCredit(true);
- try {
- const res = await fetch(`/api/customers/${editingCompany.id}`, {
- method: 'PATCH',
- headers: {
- 'Content-Type': 'application/json',
- 'Authorization': `Bearer ${accessToken}`
- },
- body: JSON.stringify({
- creditLimit: Math.round(parseFloat(newCreditLimit)) || 0,
- creditUsed: Math.round(parseFloat(newCreditUsed)) || 0
- })
- });
- if (!res.ok) throw new Error('Error al actualizar crédito');
- 
- toast.success(`Línea de crédito de ${editingCompany.razonSocial} actualizada correctamente.`);
- setEditingCompany(null);
- queryClient.invalidateQueries({ queryKey: ["customer"] });
- queryClient.invalidateQueries({ queryKey: ["customers"] });
- } catch (err: any) {
- toast.error(err.message || 'Error al actualizar crédito.');
- } finally {
- setIsSavingCredit(false);
- }
- };
-
  return (
  <RoleGuard allowedRoles={[UserRole.COMPANY_ADMIN, UserRole.BUYER, UserRole.ADMIN]}>
  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
@@ -246,52 +206,6 @@ export default function CuentaCorrientePage() {
  </div>
  )}
 
- {/* Admin view company selector dropdown */}
- {isAdmin && (
- <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-zinc-900/40 border border-zinc-800 rounded-2xl p-4 shadow-sm">
- <div className="flex items-center gap-2">
-  <span className="text-zinc-500 font-bold uppercase tracking-wider text-xs select-none">Buscar:</span>
-  <input
-  type="text"
-  placeholder="RUT o Nombre..."
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-  className="bg-zinc-950 text-zinc-100 border border-zinc-850 rounded-xl px-3 py-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-medium text-sm w-56 transition-all"
-  />
- </div>
-
- {selectorCustomers && (
- <div className="flex items-center gap-2">
-  <span className="text-zinc-500 font-bold uppercase tracking-wider text-xs select-none">Seleccionar:</span>
-  <div className="relative">
-  <select
-  key={selectedCompanyId || 'empty'}
-  value={selectedCompanyId}
-  onChange={(e) => setSelectedCompanyId(e.target.value)}
-  className="appearance-none bg-zinc-950 text-zinc-100 border border-zinc-850 hover:border-zinc-750 rounded-xl pl-9 pr-10 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-bold cursor-pointer text-sm transition-all shadow-lg min-w-[220px]"
-  >
- <option value="ALL" className="bg-zinc-950 text-zinc-100 font-bold">
- Todas las empresas
- </option>
- {displayCustomers.map((c: any) => (
- <option key={c.id} value={c.id} className="bg-zinc-950 text-zinc-100">
- {c.razonSocial} {c.rut ? `(${c.rut})` : ''}
- </option>
- ))}
- </select>
- <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
- <Building className="w-3.5 h-3.5" />
- </div>
- <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
- <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
- <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
- </svg>
- </div>
- </div>
- </div>
- )}
- </div>
- )}
  </div>
 
  {/* Stats Cards */}
@@ -379,6 +293,53 @@ export default function CuentaCorrientePage() {
  )}
  </div>
  </div>
+
+ {/* Admin view company selector dropdown */}
+ {isAdmin && (
+ <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 bg-zinc-900/40 border border-zinc-800 rounded-2xl p-4 shadow-sm mb-4">
+ <div className="flex items-center gap-2">
+  <span className="text-zinc-500 font-bold uppercase tracking-wider text-xs select-none">Buscar:</span>
+  <input
+  type="text"
+  placeholder="RUT o Nombre..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  className="bg-zinc-950 text-zinc-100 border border-zinc-850 rounded-xl px-3 py-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none font-medium text-sm w-56 transition-all"
+  />
+ </div>
+
+ {selectorCustomers && (
+ <div className="flex items-center gap-2">
+  <span className="text-zinc-500 font-bold uppercase tracking-wider text-xs select-none">Seleccionar:</span>
+  <div className="relative">
+  <select
+  key={selectedCompanyId || 'empty'}
+  value={selectedCompanyId}
+  onChange={(e) => setSelectedCompanyId(e.target.value)}
+  className="appearance-none bg-zinc-950 text-zinc-100 border border-zinc-850 hover:border-zinc-750 rounded-xl pl-9 pr-10 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-bold cursor-pointer text-sm transition-all shadow-lg min-w-[220px]"
+  >
+ <option value="ALL" className="bg-zinc-950 text-zinc-100 font-bold">
+ Todas las empresas
+ </option>
+ {displayCustomers.map((c: any) => (
+ <option key={c.id} value={c.id} className="bg-zinc-950 text-zinc-100">
+ {c.razonSocial} {c.rut ? `(${c.rut})` : ''}
+ </option>
+ ))}
+ </select>
+ <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+ <Building className="w-3.5 h-3.5" />
+ </div>
+ <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
+ <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+ <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+ </svg>
+ </div>
+ </div>
+ </div>
+ )}
+ </div>
+ )}
 
  {/* Admin Tab Bar */}
  {isAdmin && (
@@ -611,12 +572,12 @@ export default function CuentaCorrientePage() {
  ${cAvailable.toLocaleString('es-CL')}
  </td>
  <td className="p-5 py-6 text-right">
- <button
- onClick={() => handleOpenEdit(c)}
+ <Link
+ href={`/dashboard/cuenta-corriente/${c.id}`}
  className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 text-white text-sm font-bold transition-all inline-flex items-center gap-1.5 shadow-sm select-none"
  >
  Asignar Crédito
- </button>
+ </Link>
  </td>
  </tr>
  );
@@ -657,66 +618,6 @@ export default function CuentaCorrientePage() {
  </div>
  )}
 
- {/* Adjust Credit Modal */}
- {editingCompany && (
- <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
- <div 
- className="fixed inset-0 bg-black/70 backdrop-blur-sm"
- onClick={() => setEditingCompany(null)}
- />
- <div className="bg-zinc-950 border border-zinc-850 rounded-3xl p-8 max-w-xl w-full shadow-2xl relative z-10 text-left space-y-6">
- <div className="space-y-1">
- <h3 className="text-2xl font-bold text-white tracking-tight">Asignar / Ajustar Crédito B2B</h3>
- <p className="text-lg text-zinc-450 font-semibold truncate">{editingCompany.razonSocial}</p>
- {editingCompany.rut && (
- <p className="text-sm text-zinc-600 font-bold uppercase tracking-wider">{editingCompany.rut}</p>
- )}
- </div>
-
- <div className="space-y-4">
- {/* Credit Limit Input */}
- <div className="space-y-1.5">
- <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest block">Cupo Autorizado ($ CLP)</label>
- <input
- type="number"
- value={newCreditLimit}
- onChange={(e) => setNewCreditLimit(e.target.value)}
- className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg text-white focus:ring-1 focus:ring-primary focus:border-primary outline-none font-bold"
- />
- </div>
-
- {/* Credit Used Input */}
- <div className="space-y-1.5">
- <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest block">Crédito Utilizado / Deuda ($ CLP)</label>
- <input
- type="number"
- value={newCreditUsed}
- onChange={(e) => setNewCreditUsed(e.target.value)}
- className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-lg text-white focus:ring-1 focus:ring-primary focus:border-primary outline-none font-bold"
- />
- </div>
- </div>
-
- <div className="flex gap-3 pt-4">
- <button
- onClick={() => setEditingCompany(null)}
- disabled={isSavingCredit}
- className="flex-1 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white text-base font-bold transition-all disabled:opacity-50"
- >
- Cancelar
- </button>
- <button
- onClick={handleSaveCredit}
- disabled={isSavingCredit}
- className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-95 text-base font-bold transition-all shadow-lg shadow-primary/10 flex items-center justify-center gap-2 disabled:opacity-50"
- >
- {isSavingCredit && <Loader2 className="w-5 h-5 animate-spin" />}
- Guardar Cambios
- </button>
- </div>
- </div>
- </div>
- )}
  </div>
  </RoleGuard>
  );

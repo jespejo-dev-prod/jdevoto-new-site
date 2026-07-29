@@ -51,7 +51,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
 
   // Estados del Pedido
   const [orderStatus, setOrderStatus] = useState<OrderStatus>(
-    isClient ? OrderStatus.PENDING : (initialData?.status || OrderStatus.CONFIRMED)
+    isClient ? OrderStatus.PENDING : (initialData?.status || OrderStatus.PENDING)
   );
   
   const [creationDate, setCreationDate] = useState(
@@ -1325,9 +1325,13 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl h-12 px-4 text-base text-white focus:border-primary/50 outline-none appearance-none cursor-pointer font-bold"
                   >
                     <option value={OrderStatus.PENDING}>Pendiente</option>
-                    <option value={OrderStatus.CONFIRMED}>Confirmado</option>
-                    <option value={OrderStatus.SHIPPED}>Enviado</option>
-                    <option value={OrderStatus.DELIVERED}>Entregado</option>
+                    {!!initialData && (
+                      <>
+                        <option value={OrderStatus.CONFIRMED}>Confirmado</option>
+                        <option value={OrderStatus.SHIPPED}>Enviado</option>
+                        <option value={OrderStatus.DELIVERED}>Entregado</option>
+                      </>
+                    )}
                     <option disabled>────────────────────</option>
                     <option value={OrderStatus.DRAFT}>Borrador</option>
                     <option value={OrderStatus.REJECTED}>Rechazado</option>

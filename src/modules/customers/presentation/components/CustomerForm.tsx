@@ -127,7 +127,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       billingCommune: defaultBillingCommune,
       billingCity: initialData?.billingCity || '',
       billingRegion: defaultBillingRegion,
-      billingEmail: initialData?.billingEmail || '',
+      billingEmail: initialData?.billingEmail || initialData?.email || '',
     }
   });
 
@@ -173,7 +173,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
         billingCommune: bCom,
         billingCity: initialData.billingCity || '',
         billingRegion: bReg,
-        billingEmail: initialData.billingEmail || '',
+        billingEmail: initialData.billingEmail || initialData.email || '',
       });
     }
   }, [initialData, reset, user]);
@@ -265,6 +265,44 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   placeholder="Venta de artículos electrónicos..."
                 />
               </div>
+
+              <div className="space-y-2 md:col-span-2 mt-2 border-t border-zinc-800 pt-6">
+                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Dirección Tributaria / Legal</h4>
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                  <div className="md:col-span-12 space-y-2">
+                    <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Calle y Número</label>
+                    <input 
+                      {...register('direccion')} 
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
+                      placeholder="Ej: Av. Apoquindo 4501"
+                    />
+                  </div>
+                  <div className="md:col-span-4 space-y-2">
+                    <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Región</label>
+                    <input 
+                      {...register('region')} 
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
+                      placeholder="Ej: Metropolitana de Santiago"
+                    />
+                  </div>
+                  <div className="md:col-span-4 space-y-2">
+                    <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Comuna</label>
+                    <input 
+                      {...register('comuna')} 
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
+                      placeholder="Ej: Las Condes"
+                    />
+                  </div>
+                  <div className="md:col-span-4 space-y-2">
+                    <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Ciudad</label>
+                    <input 
+                      {...register('ciudad')} 
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
+                      placeholder="Ej: Santiago"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -321,7 +359,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Email envío facturas (XML/PDF)</label>
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Email envío facturas</label>
                 <input {...register('billingEmail')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" placeholder="facturacion@empresa.cl" />
               </div>
             </div>

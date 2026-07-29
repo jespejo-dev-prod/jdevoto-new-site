@@ -25,7 +25,7 @@ model Company {
   website             String?
   creditLimit         Decimal            @default(0) @db.Decimal(15, 2)
   creditUsed          Decimal            @default(0) @db.Decimal(15, 2)
-  paymentTerms        Int                @default(30)
+  paymentTerms        Int                @default(0)
   defaultDiscount     Decimal            @default(0) @db.Decimal(5, 2)
   isActive            Boolean            @default(true)
   createdAt           DateTime           @default(now())

@@ -89,6 +89,21 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     }
   }
 
+  // Aplicar restricción para SALES_REP: solo pueden crear pedidos para clientes en su cartera
+  if (user.role === UserRole.SALES_REP) {
+    const { prisma } = await import("@/lib/client");
+    const targetCompany = await prisma.company.findUnique({
+      where: { id: data.companyId },
+      select: { salesRepId: true }
+    });
+
+    if (targetCompany?.salesRepId !== user.id) {
+      throw new ForbiddenError(
+        "No puedes crear pedidos para clientes que no están en tu cartera"
+      );
+    }
+  }
+
   const order = await orderService.createOrder({
     companyId: data.companyId,
     createdById: user.id,

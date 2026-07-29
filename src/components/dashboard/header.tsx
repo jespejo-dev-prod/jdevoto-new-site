@@ -173,11 +173,16 @@ export function DashboardHeader() {
 
   {isUserDropdownOpen && (
   <div className="absolute right-0 top-full mt-2 w-72 rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl p-5 flex flex-col gap-2 z-50 text-left">
-  <div className="px-4 py-3 border-b border-zinc-900 mb-2">
+  <div className="px-4 py-3 border-b border-zinc-900 mb-2 flex flex-col gap-1">
   <p className="text-base font-bold text-white truncate">
   {user?.firstName} {user?.lastName}
   </p>
   <p className="text-sm font-medium text-zinc-500 truncate">{user?.email}</p>
+  {user?.role && (
+    <span className="inline-block mt-1 px-2 py-0.5 bg-zinc-800/80 text-zinc-400 text-[10px] font-bold rounded-md uppercase tracking-wider w-fit">
+      {user.role === 'ADMIN' ? 'Administrador' : user.role === 'COMPANY_ADMIN' ? 'Admin de Empresa' : user.role === 'SALES_REP' ? 'Vendedor' : user.role === 'BUYER' ? 'Comprador' : user.role}
+    </span>
+  )}
   </div>
   
   <Link

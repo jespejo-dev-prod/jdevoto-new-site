@@ -134,7 +134,15 @@ export function Sidebar() {
     }
   }
 
- return true;
+  return true;
+ }).map(item => {
+  if (user?.role === 'SALES_REP' && item.label === 'Estadísticas') {
+    return {
+      ...item,
+      subItems: item.subItems?.filter(sub => sub.label !== 'Exportar Data (CSV)')
+    };
+  }
+  return item;
  });
 
  const sidebarContent = (
