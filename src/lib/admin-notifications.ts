@@ -129,10 +129,10 @@ export async function notifyAdminAction(action: AuditAction, userId?: string, de
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { name: true, email: true, role: true }
+        select: { firstName: true, lastName: true, email: true, role: true }
       });
       if (user) {
-        userName = `${user.name || user.email}`;
+        userName = `${user.firstName} ${user.lastName}`;
         userRole = `[${user.role}] `;
       }
     } catch (error) {
