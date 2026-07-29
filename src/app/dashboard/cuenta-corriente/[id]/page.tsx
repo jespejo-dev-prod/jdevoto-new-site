@@ -132,7 +132,7 @@ export default function AsignarCreditoPage() {
                 </div>
                 <div>
                   <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Teléfono</p>
-                  <p className="text-sm text-zinc-300 font-medium truncate">{company.phone || 'No registrado'}</p>
+                  <p className="text-sm text-zinc-300 font-medium truncate">{company.telefono || 'No registrado'}</p>
                 </div>
               </div>
             </div>
