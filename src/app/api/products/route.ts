@@ -21,6 +21,7 @@ import {
 } from "@/validations/product.schemas";
 import { UserRole } from "@prisma/client";
 import { createProductUseCase } from "@/modules/catalog/application/createProduct.use-case";
+import { logAuditAction } from "@/lib/audit";
 
 // ============================================================
 // GET /api/products
@@ -272,6 +273,15 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const data = CreateProductSchema.parse(body);
 
   const product = await createProductUseCase(data, user);
+
+  logAuditAction({
+    userId: user.id,
+    action: "PRODUCT_CREATED",
+    entity: "Product",
+    entityId: product.id,
+    details: { name: product.name, sku: product.sku },
+    req,
+  });
 
   return created(product);
 });

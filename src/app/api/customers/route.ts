@@ -5,6 +5,7 @@ import { extractUserFromRequest, requireRole } from "@/lib/auth";
 import { Prisma, UserRole } from "@prisma/client";
 import { RegisterCompanySchema } from "@/validations/company.schemas";
 import { BusinessRuleError } from "@/lib/errors";
+import { logAuditAction } from "@/lib/audit";
 
 export const GET = withApiHandler(async (req: NextRequest) => {
   const user = extractUserFromRequest(req);
@@ -124,6 +125,15 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       ...companyData,
       salesRepId,
     },
+  });
+
+  logAuditAction({
+    userId: user.id,
+    action: "COMPANY_CREATED",
+    entity: "Company",
+    entityId: customer.id,
+    details: { razonSocial: customer.razonSocial, rut: customer.rut },
+    req,
   });
 
   return created(customer);

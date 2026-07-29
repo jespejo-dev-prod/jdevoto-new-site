@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/client';
 import { withApiHandler } from '@/lib/api-handler';
 import { extractUserFromRequest } from '@/lib/auth';
+import { logAuditAction } from '@/lib/audit';
 
 export const GET = withApiHandler(async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
@@ -40,6 +41,15 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     where: { key },
     update: { value },
     create: { key, value },
+  });
+
+  logAuditAction({
+    userId: user.id,
+    action: "SETTINGS_UPDATED",
+    entity: "StoreSettings",
+    entityId: key,
+    details: { key, value },
+    req,
   });
 
   return NextResponse.json({ success: true, setting }, { status: 200 });

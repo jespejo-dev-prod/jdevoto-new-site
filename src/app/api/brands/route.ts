@@ -7,6 +7,7 @@ import { extractUserFromRequest, requireRole } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 import { BrandSchema } from "@/validations/taxonomy.schemas";
 import { NotFoundError } from "@/lib/errors";
+import { logAuditAction } from "@/lib/audit";
 
 export const GET = withApiHandler(async () => {
   const brands = await prisma.brand.findMany({
@@ -26,6 +27,15 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
+  logAuditAction({
+    userId: user.id,
+    action: "BRAND_CREATED",
+    entity: "Brand",
+    entityId: brand.id,
+    details: { name: brand.name },
+    req,
+  });
+
   return created(brand);
 });
 
@@ -41,6 +51,14 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
   const existing = await prisma.brand.findUnique({ where: { id } });
   if (existing) {
     await prisma.brand.delete({ where: { id } });
+    
+    logAuditAction({
+      userId: user.id,
+      action: "BRAND_DELETED",
+      entity: "Brand",
+      entityId: id,
+      req,
+    });
   }
 
   return noContent();
@@ -64,6 +82,15 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
   const updated = await prisma.brand.update({
     where: { id },
     data,
+  });
+
+  logAuditAction({
+    userId: user.id,
+    action: "BRAND_UPDATED",
+    entity: "Brand",
+    entityId: id,
+    details: { changes: Object.keys(data) },
+    req,
   });
 
   return ok(updated);

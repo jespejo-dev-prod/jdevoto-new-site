@@ -5,6 +5,7 @@ import { extractUserFromRequest, requireRole } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 import { UpdateCompanySchema } from "@/validations/company.schemas";
 import { NotFoundError, ForbiddenError, BusinessRuleError } from "@/lib/errors";
+import { logAuditAction } from "@/lib/audit";
 
 export const GET = withApiHandler(async (req: NextRequest, { params }: RouteContext<{ id: string }>) => {
   const user = extractUserFromRequest(req);
@@ -113,6 +114,15 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     },
   });
 
+  logAuditAction({
+    userId: user.id,
+    action: "COMPANY_UPDATED",
+    entity: "Company",
+    entityId: id,
+    details: { changes: Object.keys(companyData), salesRepUpdated: salesRepId !== undefined },
+    req,
+  });
+
   return ok(updated);
 });
 
@@ -170,6 +180,16 @@ export const DELETE = withApiHandler(async (req: NextRequest, { params }: RouteC
       }
 
       await prisma.company.delete({ where: { id } });
+      
+      logAuditAction({
+        userId: user.id,
+        action: "COMPANY_DELETED",
+        entity: "Company",
+        entityId: id,
+        details: { softDelete: false },
+        req,
+      });
+
       return ok({ message: "Cliente eliminado definitivamente del sistema." });
     } catch (error: any) {
       // Manejo de errores de integridad referencial (P2003 de Prisma o 23001/23503 de Postgres)

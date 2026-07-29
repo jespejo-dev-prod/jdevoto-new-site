@@ -8,6 +8,7 @@ import { UserRole } from "@prisma/client";
 import { CategorySchema } from "@/validations/taxonomy.schemas";
 import { NotFoundError } from "@/lib/errors";
 import { revalidateTag } from "next/cache";
+import { logAuditAction } from "@/lib/audit";
 
 import { unstable_cache } from "next/cache";
 import { NextResponse } from "next/server";
@@ -55,6 +56,16 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   });
 
   revalidateTag("categories", { expire: 0 });
+
+  logAuditAction({
+    userId: user.id,
+    action: "CATEGORY_CREATED",
+    entity: "Category",
+    entityId: category.id,
+    details: { name: category.name },
+    req,
+  });
+
   return created(category);
 });
 
@@ -119,6 +130,15 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
   }
 
   revalidateTag("categories", { expire: 0 });
+
+  logAuditAction({
+    userId: user.id,
+    action: "CATEGORY_DELETED",
+    entity: "Category",
+    entityId: id,
+    req,
+  });
+
   return noContent();
 });
 
@@ -143,5 +163,15 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
   });
 
   revalidateTag("categories", { expire: 0 });
+
+  logAuditAction({
+    userId: user.id,
+    action: "CATEGORY_UPDATED",
+    entity: "Category",
+    entityId: id,
+    details: { changes: Object.keys(data) },
+    req,
+  });
+
   return ok(updated);
 });
