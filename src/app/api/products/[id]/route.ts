@@ -16,6 +16,7 @@ import { UpdateProductSchema } from "@/validations/product.schemas";
 import { NotFoundError } from "@/lib/errors";
 import { UserRole } from "@prisma/client";
 import { serializeDecimal } from "@/lib/utils";
+import { logAuditAction } from "@/lib/audit";
 
 // ============================================================
 // GET /api/products/:id
@@ -119,6 +120,15 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     },
   });
 
+  await logAuditAction({
+    userId: user.id,
+    action: "PRODUCT_UPDATED",
+    entity: "Product",
+    entityId: id,
+    details: { productName: updated.name, basePrice, stockQuantity: scalarFields.stockQuantity },
+    req,
+  });
+
   return ok(serializeDecimal(updated));
 });
 
@@ -142,6 +152,15 @@ export const DELETE = withApiHandler(async (req: NextRequest, ctx: RouteContext)
       isActive: false,
       isDeleted: true 
     },
+  });
+
+  await logAuditAction({
+    userId: user.id,
+    action: "PRODUCT_DELETED",
+    entity: "Product",
+    entityId: id,
+    details: { productName: existing.name },
+    req,
   });
 
   return ok({ message: "Producto enviado a la papelera correctamente" });

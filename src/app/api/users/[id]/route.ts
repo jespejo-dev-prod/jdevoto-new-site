@@ -5,6 +5,7 @@ import { prisma } from "@/lib/client";
 import { UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { logAuditAction } from "@/lib/audit";
 
 const UpdateUserSchema = z.object({
   email: z.string().email().optional(),
@@ -102,6 +103,15 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     });
   }
 
+  await logAuditAction({
+    userId: currentUser.id,
+    action: "USER_UPDATED",
+    entity: "User",
+    entityId: updatedUser.id,
+    details: { targetEmail: updatedUser.email, changes: Object.keys(updateData) },
+    req,
+  });
+
   const { passwordHash: _, ...userWithoutPassword } = updatedUser;
   return ok(userWithoutPassword);
 });
@@ -144,6 +154,15 @@ export const DELETE = withApiHandler(async (req: NextRequest, { params }: RouteC
   const { sendUserDeletedAdminNotification } = await import("@/lib/email");
   sendUserDeletedAdminNotification(targetUser.email, roleName).catch(err => {
     console.error("Error enviando notificación de eliminación de usuario", err);
+  });
+
+  await logAuditAction({
+    userId: currentUser.id,
+    action: "USER_UPDATED",
+    entity: "User",
+    entityId: id,
+    details: { targetEmail: targetUser.email, action: "DELETED/DEACTIVATED" },
+    req,
   });
 
   return ok({ success: true, message: "Usuario eliminado correctamente" });
