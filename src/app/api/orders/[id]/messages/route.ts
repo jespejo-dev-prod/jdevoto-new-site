@@ -59,23 +59,33 @@ export const POST = withApiHandler(async (
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Asegurar que el directorio uploads/invoices existe
-    const uploadDir = join(process.cwd(), "public", "uploads", "invoices");
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-      // Ignorar si ya existe
+    // Configurar cloudinary
+    const { v2: cloudinary } = await import('cloudinary');
+    if (!process.env.CLOUDINARY_URL && process.env.CLOUDINARY_CLOUD_NAME) {
+      cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      });
     }
 
-    // Nombre único para el archivo
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const originalName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, ""); // Limpiar nombre
-    const finalFilename = `${uniqueSuffix}-${originalName}`;
-    attachmentPath = join(uploadDir, finalFilename);
+    // Subir a Cloudinary usando upload_stream
+    const uploadResult: any = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'jdevoto_invoices',
+          resource_type: 'auto',
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(buffer);
+    });
 
-    await writeFile(attachmentPath, buffer);
-
-    attachmentUrl = `/uploads/invoices/${finalFilename}`;
+    attachmentUrl = uploadResult.secure_url;
+    attachmentPath = uploadResult.secure_url; // nodemailer will fetch it from this URL
     attachmentName = file.name;
   }
 
