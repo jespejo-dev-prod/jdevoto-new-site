@@ -39,6 +39,11 @@ const ACTION_MAP: Partial<Record<AuditAction, { title: string; template: (userNa
     template: (name, details) => `El usuario ${name} ha eliminado un producto.`,
     link: "/dashboard/products"
   },
+  CATALOG_IMPORTED: {
+    title: "Actualización Masiva de Catálogo",
+    template: (name, details) => `El usuario ${name} ha realizado una importación masiva de stock y precios. Se actualizaron ${details?.successCount || 0} productos exitosamente.`,
+    link: "/dashboard/products"
+  },
   CATEGORY_CREATED: {
     title: "Nueva Categoría Creada",
     template: (name, details) => `El usuario ${name} ha creado una nueva categoría.`,

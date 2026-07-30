@@ -4,6 +4,7 @@ import { extractUserFromRequest, requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/client";
 import { UserRole, Prisma } from "@prisma/client";
 import { z } from "zod";
+import { logAuditAction } from "@/lib/audit";
 
 // Esquema para validar cada elemento a actualizar (se permite stock negativo si la BD/negocio lo maneja)
 const ImportStockItemSchema = z.object({
@@ -150,6 +151,20 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       sku: p.sku, // Retornamos el SKU final de la BD
       stock: originalUpdate?.stock !== undefined && originalUpdate?.stock !== null ? Number(p.stockQuantity) : null,
       price: originalUpdate?.price !== undefined && originalUpdate?.price !== null ? Number(p.basePrice) : null,
+    });
+  }
+
+  // 8. Registrar evento de auditoría
+  if (updatedProducts.length > 0) {
+    await logAuditAction({
+      userId: user.id,
+      action: "CATALOG_IMPORTED",
+      entity: "Catalog",
+      details: {
+        successCount: updatedProducts.length,
+        failuresCount: failuresList.length,
+      },
+      req,
     });
   }
 
