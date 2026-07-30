@@ -6,11 +6,12 @@ import { extractUserFromRequest, requireRole } from "@/lib/auth";
 
 export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) => {
   const user = extractUserFromRequest(req);
-  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP]);
-
   const { id } = await ctx.params;
+  const body = await req.json().catch(() => ({}));
+  const newPaymentMethod = body.paymentMethod;
 
   let wasAlreadyPaid = false;
+  let isTransferOnly = newPaymentMethod === 'transfer';
 
   const updatedOrder = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
@@ -21,20 +22,35 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       throw new Error("Pedido no encontrado");
     }
 
-    if (order.paymentStatus === PaymentStatus.PAID) {
+    // Role check: Admin/Sales Rep or owner company
+    const isAdmin = user.role === UserRole.ADMIN || user.role === UserRole.SALES_REP;
+    if (!isAdmin && order.companyId !== user.companyId) {
+      throw new Error("No tienes permisos para pagar este pedido");
+    }
+
+    if (order.paymentStatus === PaymentStatus.PAID && !isTransferOnly) {
       wasAlreadyPaid = true;
       return order;
+    }
+
+    if (isTransferOnly) {
+      return await tx.order.update({
+        where: { id },
+        data: { paymentMethod: 'transfer' },
+      });
     }
 
     const updated = await tx.order.update({
       where: { id },
       data: {
+        paymentMethod: newPaymentMethod || order.paymentMethod,
         paymentStatus: PaymentStatus.PAID,
         status: OrderStatus.CONFIRMED,
       },
     });
 
-    if (order.paymentMethod === 'credit_b2b') {
+    const finalPaymentMethod = newPaymentMethod || order.paymentMethod;
+    if (finalPaymentMethod === 'credit_b2b') {
       await tx.company.update({
         where: { id: order.companyId },
         data: {

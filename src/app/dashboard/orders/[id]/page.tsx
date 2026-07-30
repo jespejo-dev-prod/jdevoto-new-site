@@ -44,33 +44,38 @@ export default function OrderDetailPage() {
  const [isPaying, setIsPaying] = useState(false);
  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
- const handlePayment = async (method: string) => {
-   setIsProcessingPayment(true);
-   const toastId = toast.loading("Procesando pago...");
-   try {
-     if (method === 'mercadopago') {
-       const prefRes = await fetcher(`/api/orders/${id}/checkout-preference?context=invoice`, { method: 'POST' });
-       if (prefRes.success && prefRes.data?.initPoint) {
-         window.location.href = prefRes.data.initPoint;
-       } else {
-         toast.error("Error al iniciar pago con Mercado Pago", { id: toastId });
-       }
-     } else if (method === 'credit_b2b') {
-       // Just update order status and payment method
-       // But wait, the API PATCH requires ADMIN/SALES_REP! So a normal BUYER would fail here if we just PATCH the order.
-       // The user requested a button to pay. If they are a normal BUYER and they choose "transferencia", they just need instructions.
-       // However, to actually confirm it, they might not have permission.
-       // For now, I'll allow them to redirect to MercadoPago, but for Transferencia and Credit B2B, I'll show the instructions.
-       toast.success("Pago procesado localmente (Simulación). En producción requiere API endpoint.", { id: toastId });
-     } else {
-       toast.info("Por favor transfiere el monto y envía el comprobante a pagos@jdevoto.cl", { id: toastId });
-     }
-   } catch (err: any) {
-     toast.error(err.message || "Error al procesar pago", { id: toastId });
-   } finally {
-     setIsProcessingPayment(false);
-   }
- };
+  const handlePayment = async (method: string) => {
+    setIsProcessingPayment(true);
+    const toastId = toast.loading("Procesando pago...");
+    try {
+      if (method === 'mercadopago') {
+        const prefRes = await fetcher(`/api/orders/${id}/checkout-preference?context=invoice`, { method: 'POST' });
+        if (prefRes.success && prefRes.data?.initPoint) {
+          window.location.href = prefRes.data.initPoint;
+        } else {
+          toast.error("Error al iniciar pago con Mercado Pago", { id: toastId });
+        }
+      } else if (method === 'credit_b2b') {
+        await fetcher(`/api/orders/${id}/pay`, { 
+          method: 'PATCH', 
+          body: JSON.stringify({ paymentMethod: 'credit_b2b' }) 
+        });
+        toast.success("Pago con Crédito B2B procesado correctamente", { id: toastId });
+        window.location.reload();
+      } else if (method === 'transfer') {
+        await fetcher(`/api/orders/${id}/pay`, { 
+          method: 'PATCH', 
+          body: JSON.stringify({ paymentMethod: 'transfer' }) 
+        });
+        toast.success("Te hemos enviado un correo con los datos para la transferencia", { id: toastId });
+        window.location.reload();
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error al procesar pago", { id: toastId });
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
  const handleSendEmail = async () => {
  setIsSendingEmail(true);
@@ -249,8 +254,67 @@ export default function OrderDetailPage() {
  </div>
  </div>
 
+  {/* Opciones de Pago (Solo PENDIENTE) */}
+  {order.status === OrderStatus.PENDING && (
+    <div className="bg-zinc-900/60 border border-zinc-800 rounded-3xl p-6 shadow-xl space-y-4 relative overflow-hidden">
+      {/* Decorative gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50" />
+      
+      <div className="relative z-10 flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-white flex items-center gap-3">
+          <CreditCard className="h-5 w-5 text-primary" />
+          Opciones de Pago
+        </h3>
+        {!isPaying && (
+          <button 
+            onClick={() => setIsPaying(true)}
+            className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-black rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg transition-all shadow-primary/20"
+          >
+            Pagar Pedido
+          </button>
+        )}
+      </div>
+
+      {isPaying && (
+        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-zinc-800">
+          <button 
+            onClick={() => handlePayment('mercadopago')} 
+            disabled={isProcessingPayment} 
+            className="w-full py-4 bg-[#009EE3] hover:bg-[#009EE3]/90 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
+          >
+            Mercado Pago
+          </button>
+          <button 
+            onClick={() => handlePayment('transfer')} 
+            disabled={isProcessingPayment} 
+            className="w-full py-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
+          >
+            <Building2 className="h-4 w-4" /> Transferencia
+          </button>
+          <button 
+            onClick={() => handlePayment('credit_b2b')} 
+            disabled={isProcessingPayment} 
+            className="w-full py-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/20 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 transition-transform active:scale-95"
+          >
+            <Wallet className="h-4 w-4" /> Crédito B2B
+          </button>
+          
+          <div className="col-span-1 sm:col-span-3 flex justify-end mt-2">
+            <button 
+              onClick={() => setIsPaying(false)} 
+              disabled={isProcessingPayment} 
+              className="text-xs text-zinc-400 hover:text-white font-bold uppercase tracking-wider px-4 py-2"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+
  {/* Items Table */}
- <div className="space-y-4">
+ <div className="space-y-4 mt-8">
  <h3 className="text-lg font-bold text-white flex items-center gap-3">
  <FileText className="h-5 w-5 text-primary" />
  Ítems del Pedido ({order.items.length})
@@ -324,33 +388,6 @@ export default function OrderDetailPage() {
  )}
 
  <div className="space-y-3 pt-4">
- {order.status === OrderStatus.PENDING && !isPaying && (
-   <button 
-     onClick={() => setIsPaying(true)}
-     className="w-full py-3 bg-primary hover:bg-primary/90 text-black rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg transition-all flex items-center justify-center gap-2"
-   >
-     <CreditCard className="h-4 w-4" /> Pagar Pedido
-   </button>
- )}
-
- {isPaying && (
-   <div className="space-y-3 border border-zinc-800 rounded-2xl p-4 bg-zinc-950/50">
-     <p className="text-xs text-zinc-400 uppercase font-bold text-center mb-2">Selecciona Método</p>
-     <button onClick={() => handlePayment('mercadopago')} disabled={isProcessingPayment} className="w-full py-2.5 bg-[#009EE3] hover:bg-[#009EE3]/90 text-white rounded-lg text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50">
-       Mercado Pago
-     </button>
-     <button onClick={() => handlePayment('transfer')} disabled={isProcessingPayment} className="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50">
-       <Building2 className="h-3.5 w-3.5" /> Transferencia
-     </button>
-     <button onClick={() => handlePayment('credit_b2b')} disabled={isProcessingPayment} className="w-full py-2.5 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50">
-       <Wallet className="h-3.5 w-3.5" /> Crédito B2B
-     </button>
-     <button onClick={() => setIsPaying(false)} disabled={isProcessingPayment} className="w-full py-1 mt-2 text-[10px] text-zinc-500 hover:text-zinc-300 font-bold uppercase tracking-wider">
-       Cancelar
-     </button>
-   </div>
- )}
-
  <button 
  onClick={handleSendEmail}
  disabled={isSendingEmail}

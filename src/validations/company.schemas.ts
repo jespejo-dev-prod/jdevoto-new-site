@@ -171,7 +171,7 @@ export const BaseCompanySchema = z.object({
 // Esquema para REGISTRO (Creación) - Aquí SÍ aplicamos los valores por defecto.
 export const RegisterCompanySchema = BaseCompanySchema.extend({
   pais: z.string().length(2).default("CL"),
-  paymentTerms: z.number().int().default(30),
+  paymentTerms: z.number().int().default(0),
   paymentTermDiscount: z.number().default(0),
   defaultDiscount: z.number().default(0),
   creditLimit: z.number().default(0),
