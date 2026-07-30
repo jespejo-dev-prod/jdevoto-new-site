@@ -28,16 +28,36 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       throw new Error("No tienes permisos para pagar este pedido");
     }
 
-    if (order.paymentStatus === PaymentStatus.PAID && !isTransferOnly) {
+    if (order.paymentStatus === PaymentStatus.PAID && !isTransferOnly && newPaymentMethod !== 'credit_b2b') {
       wasAlreadyPaid = true;
       return order;
     }
 
     if (isTransferOnly) {
+      if (order.paymentMethod === 'credit_b2b') {
+        await tx.company.update({
+          where: { id: order.companyId },
+          data: { creditUsed: { decrement: Number(order.totalGross) } }
+        });
+      }
       return await tx.order.update({
         where: { id },
         data: { paymentMethod: 'transfer' },
       });
+    }
+
+    if (newPaymentMethod === 'credit_b2b') {
+      if (order.paymentMethod !== 'credit_b2b') {
+        await tx.company.update({
+          where: { id: order.companyId },
+          data: { creditUsed: { increment: Number(order.totalGross) } }
+        });
+        return await tx.order.update({
+          where: { id },
+          data: { paymentMethod: 'credit_b2b' },
+        });
+      }
+      return order;
     }
 
     const updated = await tx.order.update({
@@ -49,8 +69,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       },
     });
 
-    const finalPaymentMethod = newPaymentMethod || order.paymentMethod;
-    if (finalPaymentMethod === 'credit_b2b') {
+    if (order.paymentMethod === 'credit_b2b') {
       await tx.company.update({
         where: { id: order.companyId },
         data: {
