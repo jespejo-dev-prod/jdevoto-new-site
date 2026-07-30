@@ -45,6 +45,7 @@ export default function CuentaCorrientePage() {
  // Search state for Admin
  const [searchTerm, setSearchTerm] = useState('');
  const [debouncedSearch, setDebouncedSearch] = useState('');
+ const [showOnlyWithDebt, setShowOnlyWithDebt] = useState(false);
 
  // Pagination state for customers tab (10 items per page)
  const [customerPage, setCustomerPage] = useState(1);
@@ -67,7 +68,7 @@ export default function CuentaCorrientePage() {
  // 2. Query for the paginated customer list in Tab 2 (limit 10)
  const { data: tableCustomersList, meta: customersMeta, isLoading: isLoadingCustomers } = useCustomers(
  isAdmin && activeTab === 'customers' 
- ? { limit: 10, page: customerPage, search: debouncedSearch } 
+ ? { limit: 10, page: customerPage, search: debouncedSearch, hasDebt: showOnlyWithDebt } 
  : { limit: 1, enabled: false }
  );
  const tableCustomers = (tableCustomersList || []).filter((c: any) => c.razonSocial && c.razonSocial.trim() !== '');
@@ -523,6 +524,20 @@ export default function CuentaCorrientePage() {
  {/* TAB 2: Clientes y Líneas de Crédito (Only Admins) */}
  {isAdmin && activeTab === 'customers' && (
  <div className="space-y-4">
+  <div className="flex items-center justify-end px-2">
+      <label className="flex items-center gap-2 cursor-pointer select-none">
+        <input 
+          type="checkbox" 
+          checked={showOnlyWithDebt} 
+          onChange={(e) => {
+            setShowOnlyWithDebt(e.target.checked);
+            setCustomerPage(1);
+          }}
+          className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-primary focus:ring-primary focus:ring-offset-zinc-950 transition-all cursor-pointer"
+        />
+        <span className="text-sm font-bold text-zinc-400">Mostrar solo clientes con deuda</span>
+      </label>
+    </div>
  {isLoadingCustomers ? (
  <div className="flex flex-col items-center justify-center py-24 gap-4">
  <Loader2 className="w-8 h-8 text-primary animate-spin" />

@@ -9,6 +9,7 @@ export function useCustomers(filters: string | {
   limit?: number;
   search?: string;
   enabled?: boolean;
+  hasDebt?: boolean;
 } = {}) {
   const { fetcher } = useApi();
   const queryClient = useQueryClient();
@@ -18,6 +19,7 @@ export function useCustomers(filters: string | {
   let limit = 10;
   let search = "";
   let enabled = true;
+  let hasDebt = false;
   if (typeof filters === "string") {
     search = filters;
     // Si es búsqueda clásica, podemos usar un límite mayor para autocompletado (por ejemplo, 50)
@@ -27,15 +29,17 @@ export function useCustomers(filters: string | {
     limit = filters.limit ?? 10;
     search = filters.search ?? "";
     enabled = filters.enabled ?? true;
+    hasDebt = filters.hasDebt ?? false;
   }
 
   const queryParams = new URLSearchParams();
   if (page) queryParams.set("page", page.toString());
   if (limit) queryParams.set("limit", limit.toString());
   if (search) queryParams.set("search", search);
+  if (hasDebt) queryParams.set("hasDebt", "true");
 
   const query = useQuery<any>({
-    queryKey: ["customers", { page, limit, search }],
+    queryKey: ["customers", { page, limit, search, hasDebt }],
     queryFn: () => fetcher(`/api/customers?${queryParams.toString()}`),
     enabled,
   });

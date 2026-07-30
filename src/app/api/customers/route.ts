@@ -39,11 +39,16 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   ];
 
   const unassigned = searchParams.get("unassigned") === "true";
+  const hasDebt = searchParams.get("hasDebt") === "true";
 
   if (unassigned) {
     andConditions.push({ salesRepId: null });
   } else if (user.role === UserRole.SALES_REP) {
     andConditions.push({ salesRepId: user.id });
+  }
+
+  if (hasDebt) {
+    andConditions.push({ creditUsed: { not: 0 } });
   }
 
   const whereClause: Prisma.CompanyWhereInput = { AND: andConditions };
