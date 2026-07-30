@@ -8,6 +8,7 @@ import { UserRole } from "@prisma/client";
 import { BrandSchema } from "@/validations/taxonomy.schemas";
 import { NotFoundError } from "@/lib/errors";
 import { logAuditAction } from "@/lib/audit";
+import { revalidateTag } from "next/cache";
 
 export const GET = withApiHandler(async () => {
   const brands = await prisma.brand.findMany({
@@ -26,6 +27,9 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const brand = await prisma.brand.create({
     data,
   });
+
+  revalidateTag("brands");
+  revalidateTag("products"); // Invalidate products just in case
 
   await logAuditAction({
     userId: user.id,
@@ -52,6 +56,9 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
   if (existing) {
     await prisma.brand.delete({ where: { id } });
     
+    revalidateTag("brands");
+    revalidateTag("products");
+
     await logAuditAction({
       userId: user.id,
       action: "BRAND_DELETED",
@@ -83,6 +90,9 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
     where: { id },
     data,
   });
+
+  revalidateTag("brands");
+  revalidateTag("products");
 
   await logAuditAction({
     userId: user.id,

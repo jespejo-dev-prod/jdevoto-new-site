@@ -10,37 +10,23 @@ import { NotFoundError } from "@/lib/errors";
 import { revalidateTag } from "next/cache";
 import { logAuditAction } from "@/lib/audit";
 
-import { unstable_cache } from "next/cache";
 import { NextResponse } from "next/server";
 
-const getCachedCategories = unstable_cache(
-  async () => {
-    return await prisma.category.findMany({
-      orderBy: { name: "asc" },
-      include: {
-        parent: {
-          select: {
-            name: true,
-          },
+export const GET = async () => {
+  const categories = await prisma.category.findMany({
+    orderBy: { name: "asc" },
+    include: {
+      parent: {
+        select: {
+          name: true,
         },
       },
-    });
-  },
-  ['api-categories-list'],
-  { tags: ['categories'], revalidate: 31536000 } // Caché persistente hasta que se invalide
-);
-
-export const GET = async () => {
-  const categories = await getCachedCategories();
+    },
+  });
   
-  // Usamos NextResponse directo para agregar headers de caché en el navegador
   return NextResponse.json({
     success: true,
     data: categories
-  }, {
-    headers: {
-      'Cache-Control': 'public, s-maxage=31536000, stale-while-revalidate=59'
-    }
   });
 };
 
@@ -55,7 +41,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
-  revalidateTag("categories", { expire: 0 });
+  revalidateTag("categories");
 
   await logAuditAction({
     userId: user.id,
@@ -129,7 +115,7 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
     await prisma.category.delete({ where: { id } });
   }
 
-  revalidateTag("categories", { expire: 0 });
+  revalidateTag("categories");
 
   await logAuditAction({
     userId: user.id,
@@ -162,7 +148,7 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
-  revalidateTag("categories", { expire: 0 });
+  revalidateTag("categories");
 
   await logAuditAction({
     userId: user.id,
