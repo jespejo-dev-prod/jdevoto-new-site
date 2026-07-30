@@ -129,14 +129,21 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
     const shortOrderNumber = order.orderNumber.split('-').pop();
     const subject = `${statusConfig.subject}: #${shortOrderNumber}`;
 
-    const promises = [];
-    const infoPromise = transporter.sendMail({
-      from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
-      to: customerEmail,
-      subject,
-      html: htmlContent,
-    });
-    promises.push(infoPromise);
+    // Add CCs
+    const ccEmails = new Set<string>();
+    if (order.company?.email && order.company.email !== customerEmail) ccEmails.add(order.company.email);
+    if (order.company?.billingEmail && order.company.billingEmail !== customerEmail) ccEmails.add(order.company.billingEmail);
+    if (order.salesRep?.email && order.salesRep.email !== customerEmail) ccEmails.add(order.salesRep.email);
+
+    const promises = [
+      transporter.sendMail({
+        from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
+        to: customerEmail,
+        cc: Array.from(ccEmails),
+        subject,
+        html: htmlContent,
+      }),
+    ];
 
     if (process.env.ADMIN_NOTIFICATION_EMAIL) {
       const adminHtmlContent = generateOrderHtml(order, customerEmail, null, true);
@@ -680,10 +687,17 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
     const shortOrderNumber = order.orderNumber.split('-').pop();
     const subject = `Actualización de estado pedido #${shortOrderNumber} -> ${statusConfig.label}`;
 
+    // Add CCs
+    const ccEmails = new Set<string>();
+    if (order.company?.email && order.company.email !== customerEmail) ccEmails.add(order.company.email);
+    if (order.company?.billingEmail && order.company.billingEmail !== customerEmail) ccEmails.add(order.company.billingEmail);
+    if (order.salesRep?.email && order.salesRep.email !== customerEmail) ccEmails.add(order.salesRep.email);
+
     const promises = [];
     promises.push(transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
+      cc: Array.from(ccEmails),
       subject,
       html: htmlContent,
     }));

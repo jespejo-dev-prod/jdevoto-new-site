@@ -288,7 +288,7 @@ export class OrderService {
           items: {
             include: { product: { select: { sku: true, name: true } } },
           },
-          company: { select: { razonSocial: true, rut: true, telefono: true, giro: true } },
+          company: { select: { razonSocial: true, rut: true, telefono: true, giro: true, email: true, billingEmail: true } },
           createdBy: { select: { phone: true, firstName: true, lastName: true, email: true } },
           salesRep: { select: { email: true, firstName: true, lastName: true, phone: true } },
         },
