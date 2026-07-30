@@ -50,8 +50,8 @@ const ProductRow = memo(function ProductRow({
   const [isSaving, setIsSaving] = useState(false);
   const [editForm, setEditForm] = useState({
     categoryId: product.category?.id || '',
-    basePrice: product.basePrice || 0,
-    stockQuantity: product.stockQuantity || 0
+    basePrice: product.basePrice?.toString() || '0',
+    stockQuantity: product.stockQuantity?.toString() || '0'
   });
 
   const linkHref = isDashboard 
@@ -289,7 +289,7 @@ const ProductRow = memo(function ProductRow({
                   type="number"
                   min="0"
                   value={editForm.basePrice}
-                  onChange={(e) => setEditForm({ ...editForm, basePrice: Number(e.target.value) })}
+                  onChange={(e) => setEditForm({ ...editForm, basePrice: e.target.value })}
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-zinc-300 focus:border-primary/50 outline-none transition-colors"
                 />
               </div>
@@ -300,7 +300,7 @@ const ProductRow = memo(function ProductRow({
                   type="number"
                   min="0"
                   value={editForm.stockQuantity}
-                  onChange={(e) => setEditForm({ ...editForm, stockQuantity: Number(e.target.value) })}
+                  onChange={(e) => setEditForm({ ...editForm, stockQuantity: e.target.value })}
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-zinc-300 focus:border-primary/50 outline-none transition-colors"
                 />
               </div>
