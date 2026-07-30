@@ -178,7 +178,7 @@ export default function PagosDashboard() {
  className={`pb-3 px-2 text-base font-bold border-b-2 transition-colors ${activeTab === 'mp' ? 'border-blue-500 text-blue-500' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
  >
  <CreditCard className="w-4 h-4 inline-block mr-2" />
- Mercado Pago (Simulado)
+ Mercado Pago
  </button>
  </div>
 
@@ -354,7 +354,7 @@ export default function PagosDashboard() {
 
  <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 text-blue-800 text-base">
  <AlertCircle className="w-5 h-5 shrink-0" />
- <p>Esta es una simulación de la configuración de Mercado Pago para preparar el Checkout.</p>
+ <p>Ingresa tus credenciales de Producción o Sandbox (Pruebas) obtenidas desde tu cuenta de Mercado Pago Developers.</p>
  </div>
 
  <div className="space-y-6 max-w-xl">
