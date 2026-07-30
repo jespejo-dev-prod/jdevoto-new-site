@@ -28,8 +28,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
-  revalidateTag("brands");
-  revalidateTag("products"); // Invalidate products just in case
+  revalidateTag("brands", { expire: 0 });
+  revalidateTag("products", { expire: 0 }); // Invalidate products just in case
 
   await logAuditAction({
     userId: user.id,
@@ -56,8 +56,8 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
   if (existing) {
     await prisma.brand.delete({ where: { id } });
     
-    revalidateTag("brands");
-    revalidateTag("products");
+    revalidateTag("brands", { expire: 0 });
+    revalidateTag("products", { expire: 0 });
 
     await logAuditAction({
       userId: user.id,
@@ -91,8 +91,8 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
     data,
   });
 
-  revalidateTag("brands");
-  revalidateTag("products");
+  revalidateTag("brands", { expire: 0 });
+  revalidateTag("products", { expire: 0 });
 
   await logAuditAction({
     userId: user.id,
