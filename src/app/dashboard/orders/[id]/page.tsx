@@ -50,8 +50,8 @@ export default function OrderDetailPage() {
     try {
       if (method === 'mercadopago') {
         const prefRes = await fetcher(`/api/orders/${id}/checkout-preference?context=invoice`, { method: 'POST' });
-        if (prefRes.success && prefRes.data?.initPoint) {
-          window.location.href = prefRes.data.initPoint;
+        if (prefRes?.initPoint) {
+          window.location.href = prefRes.initPoint;
         } else {
           toast.error("Error al iniciar pago con Mercado Pago", { id: toastId });
         }
