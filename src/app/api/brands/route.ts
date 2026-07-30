@@ -64,6 +64,7 @@ export const DELETE = withApiHandler(async (req: NextRequest) => {
       action: "BRAND_DELETED",
       entity: "Brand",
       entityId: id,
+      details: { name: existing.name },
       req,
     });
   }
@@ -99,7 +100,7 @@ export const PATCH = withApiHandler(async (req: NextRequest) => {
     action: "BRAND_UPDATED",
     entity: "Brand",
     entityId: id,
-    details: { changes: Object.keys(data) },
+    details: { name: updated.name, changes: Object.keys(data) },
     req,
   });
 

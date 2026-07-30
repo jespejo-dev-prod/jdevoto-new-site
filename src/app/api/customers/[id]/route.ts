@@ -119,7 +119,14 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     action: "COMPANY_UPDATED",
     entity: "Company",
     entityId: id,
-    details: { changes: Object.keys(companyData), salesRepUpdated: salesRepId !== undefined },
+    details: {
+      razonSocial: updated.razonSocial,
+      rut: updated.rut,
+      changes: Object.keys(companyData),
+      salesRepUpdated: salesRepId !== undefined,
+      creditLimit: companyData.creditLimit,
+      defaultDiscount: companyData.defaultDiscount,
+    },
     req,
   });
 
@@ -148,6 +155,14 @@ export const DELETE = withApiHandler(async (req: NextRequest, { params }: RouteC
         where: { id },
         data: { isActive: false }
       });
+      await logAuditAction({
+        userId: user.id,
+        action: "COMPANY_DELETED",
+        entity: "Company",
+        entityId: id,
+        details: { softDelete: true, reason: "Tiene pedidos", razonSocial: customer.razonSocial, rut: customer.rut },
+        req,
+      });
       return ok({ message: "Cliente con pedidos: Desactivado correctamente para preservar historial." });
     }
 
@@ -158,11 +173,27 @@ export const DELETE = withApiHandler(async (req: NextRequest, { params }: RouteC
         where: { id },
         data: { isActive: false }
       });
+      await logAuditAction({
+        userId: user.id,
+        action: "COMPANY_DELETED",
+        entity: "Company",
+        entityId: id,
+        details: { softDelete: true, reason: "Tiene usuarios", razonSocial: customer.razonSocial, rut: customer.rut },
+        req,
+      });
       return ok({ message: "Cliente con usuarios vinculados: Desactivado correctamente." });
     }
 
     // Si es nuevo sin nada, podemos borrarlo de una
     await prisma.company.delete({ where: { id } });
+    await logAuditAction({
+      userId: user.id,
+      action: "COMPANY_DELETED",
+      entity: "Company",
+      entityId: id,
+      details: { softDelete: false, reason: "Sin actividad", razonSocial: customer.razonSocial, rut: customer.rut },
+      req,
+    });
     return ok({ message: "Cliente sin actividad: Eliminado definitivamente." });
   } else {
     // YA ESTÁ INACTIVO: Intentamos borrado físico

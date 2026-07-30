@@ -132,7 +132,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     action: "COMPANY_CREATED",
     entity: "Company",
     entityId: customer.id,
-    details: { razonSocial: customer.razonSocial, rut: customer.rut },
+    details: { razonSocial: customer.razonSocial, rut: customer.rut, email: customer.email, salesRepEmail: salesRepEmail || null },
     req,
   });
 

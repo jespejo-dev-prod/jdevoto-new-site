@@ -111,7 +111,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       salesRepEmail: initialData?.salesRepEmail || '',
       defaultDiscount: Number(initialData?.defaultDiscount) || 0,
       creditLimit: Number(initialData?.creditLimit) || 0,
-      paymentTerms: initialData?.paymentTerms ?? 30,
+      paymentTerms: initialData?.paymentTerms ?? 0,
       paymentTermDiscount: Number(initialData?.paymentTermDiscount) || 0,
       
       shippingStreet: initialData?.shippingStreet || '',
@@ -157,7 +157,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
         salesRepEmail: initialData.salesRepEmail || '',
         defaultDiscount: Number(initialData.defaultDiscount) || 0,
         creditLimit: Number(initialData.creditLimit) || 0,
-        paymentTerms: initialData.paymentTerms ?? 30,
+        paymentTerms: initialData.paymentTerms ?? 0,
         paymentTermDiscount: Number(initialData.paymentTermDiscount) || 0,
         
         shippingStreet: initialData.shippingStreet || '',

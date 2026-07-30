@@ -12,6 +12,7 @@ import { prisma } from "@/lib/client";
 import { ForbiddenError, ValidationError } from "@/lib/errors";
 import { z } from "zod";
 import { revalidateTag } from "next/cache";
+import { logAuditAction } from "@/lib/audit";
 
 // ─── Schemas ────────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ export const GET = withApiHandler(async () => {
 // ─── POST ───────────────────────────────────────────────────────────────────────
 
 export const POST = withApiHandler(async (req) => {
-  await requireAdmin();
+  const user = await requireAdmin();
 
   const body = await req.json();
   const data = createPromotionSchema.parse(body);
@@ -103,13 +104,22 @@ export const POST = withApiHandler(async (req) => {
 
   revalidateTag("promotions", { expire: 0 });
 
+  await logAuditAction({
+    userId: user.id,
+    action: "PROMOTION_CREATED",
+    entity: "Promotion",
+    entityId: promotion.id,
+    details: { name: promotion.name, discount: promotion.discount, categoryName: promotion.category?.name, brandName: promotion.brand?.name },
+    req,
+  });
+
   return created(promotion);
 });
 
 // ─── DELETE ─────────────────────────────────────────────────────────────────────
 
 export const DELETE = withApiHandler(async (req) => {
-  await requireAdmin();
+  const user = await requireAdmin();
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
@@ -118,9 +128,20 @@ export const DELETE = withApiHandler(async (req) => {
     throw new ValidationError("El parámetro 'id' es obligatorio");
   }
 
+  const existing = await prisma.promotion.findUnique({ where: { id }, select: { name: true } });
+
   await prisma.promotion.delete({ where: { id } });
 
   revalidateTag("promotions", { expire: 0 });
+
+  await logAuditAction({
+    userId: user.id,
+    action: "PROMOTION_DELETED",
+    entity: "Promotion",
+    entityId: id,
+    details: { name: existing?.name },
+    req,
+  });
 
   return noContent();
 });
@@ -128,7 +149,7 @@ export const DELETE = withApiHandler(async (req) => {
 // ─── PUT ────────────────────────────────────────────────────────────────────────
 
 export const PUT = withApiHandler(async (req) => {
-  await requireAdmin();
+  const user = await requireAdmin();
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
@@ -173,6 +194,15 @@ export const PUT = withApiHandler(async (req) => {
   });
 
   revalidateTag("promotions", { expire: 0 });
+
+  await logAuditAction({
+    userId: user.id,
+    action: "PROMOTION_UPDATED",
+    entity: "Promotion",
+    entityId: id,
+    details: { name: promotion.name, changes: Object.keys(data) },
+    req,
+  });
 
   return ok(promotion);
 });
