@@ -96,15 +96,15 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       });
 
       if (populatedOrder) {
-        const { sendOrderEmail } = await import("@/lib/email");
+        const { sendOrderStatusUpdateEmail } = await import("@/lib/email");
         let customerEmail = (populatedOrder.billingAddress as any)?.email;
         if (!customerEmail) {
           customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
         }
-        await sendOrderEmail(populatedOrder, customerEmail);
+        await sendOrderStatusUpdateEmail(populatedOrder, customerEmail);
       }
     } catch (emailErr) {
-      console.error("Error al enviar correo tras pago simulado:", emailErr);
+      console.error("Error al enviar correo tras pago:", emailErr);
     }
   }
 

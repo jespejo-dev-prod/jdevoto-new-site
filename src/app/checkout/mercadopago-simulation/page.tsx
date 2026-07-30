@@ -210,7 +210,8 @@ export default function MercadoPagoSimulationPage() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`
-        }
+        },
+        body: JSON.stringify({ paymentMethod: 'mercadopago' })
       });
 
       if (!res.ok) {
