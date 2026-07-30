@@ -222,8 +222,8 @@ export default function MercadoPagoSimulationPage() {
       await new Promise(r => setTimeout(r, 1500));
       
       if (payInvoice) {
-        toast.success('Pago procesado con éxito. Su cupo ha sido liberado.');
-        router.push('/dashboard/cuenta-corriente');
+        toast.success('Pago procesado con éxito.');
+        router.push(`/dashboard/orders/${orderId}`);
       } else {
         // Redirect back to checkout success
         router.push(`/checkout?success=true&orderId=${orderId}`);
