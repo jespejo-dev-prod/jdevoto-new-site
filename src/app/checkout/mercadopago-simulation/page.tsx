@@ -73,7 +73,7 @@ export default function MercadoPagoSimulationPage() {
         return res.json();
       })
       .then(data => {
-        setOrder(data);
+        setOrder(data.success ? data.data : data);
         setIsLoadingOrder(false);
       })
       .catch(err => {
