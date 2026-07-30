@@ -168,7 +168,7 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
   }
 }
 
-function generateOrderHtml(order: any, customerEmail: string, bankConfig: any = null, isAdmin: boolean = false) {
+function generateOrderHtml(order: any, customerEmail: string, bankConfig: any = null, isAdmin: boolean = false, adminTitleOverride?: string, adminDescOverride?: string) {
   const formatMoney = (val: number) => 
     `$${Math.round(Number(val)).toLocaleString('es-CL')}`;
 
@@ -213,15 +213,16 @@ function generateOrderHtml(order: any, customerEmail: string, bankConfig: any = 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   const baseStatusConfig = getStatusConfig(order.status);
+  const shortOrderNumber = order.orderNumber.split('-').pop();
+
   const statusConfig = isAdmin ? {
-    title: "¡Nuevo Pedido Ingresado!",
-    description: `El cliente ${company.razonSocial || creatorName || customerEmail} ha ingresado un nuevo pedido en la plataforma.`,
+    title: adminTitleOverride || "¡Nuevo Pedido Ingresado!",
+    description: adminDescOverride || `El cliente ${company.razonSocial || creatorName || customerEmail} ha ingresado un nuevo pedido en la plataforma.`,
     color: baseStatusConfig.color,
     label: baseStatusConfig.label,
-    subject: "Nuevo Pedido",
+    subject: "Notificación de Pedido",
   } : baseStatusConfig;
   
-  const shortOrderNumber = order.orderNumber.split('-').pop();
 
   const rawDate = order.createdAt ? new Date(order.createdAt) : new Date();
   const day = rawDate.getDate();
@@ -571,15 +572,37 @@ export async function sendOrderShippedEmail(order: any, customerEmail: string) {
 
     const htmlContent = generateOrderHtml(order, customerEmail, bankConfig);
     const statusConfig = getStatusConfig(order.status);
-    const subject = `Tu pedido #${order.orderNumber.split('-').pop()} ha sido enviado 🚚`;
+    const shortOrderNumber = order.orderNumber.split('-').pop();
+    const subject = `Tu pedido #${shortOrderNumber} ha sido enviado 🚚`;
 
-    const info = await transporter.sendMail({
+    const promises = [];
+    promises.push(transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'despachos@jdevoto.cl'}>`,
       to: customerEmail,
-      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject,
       html: htmlContent,
-    });
+    }));
+
+    if (process.env.ADMIN_NOTIFICATION_EMAIL) {
+      const adminHtmlContent = generateOrderHtml(
+        order, 
+        customerEmail, 
+        bankConfig, 
+        true, 
+        `Pedido Enviado 🚚 (Admin)`, 
+        `El pedido #${shortOrderNumber} del cliente ha sido despachado exitosamente.`
+      );
+      promises.push(
+        transporter.sendMail({
+          from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'despachos@jdevoto.cl'}>`,
+          to: process.env.ADMIN_NOTIFICATION_EMAIL.trim(),
+          subject: `Despacho de Pedido: #${shortOrderNumber}`,
+          html: adminHtmlContent,
+        })
+      );
+    }
+
+    const [info] = await Promise.all(promises);
 
     console.log("==========================================");
     console.log(`📧 Correo de despacho enviado a ${customerEmail}`);
@@ -654,15 +677,37 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
 
     const htmlContent = generateOrderHtml(order, customerEmail, bankConfig);
     const statusConfig = getStatusConfig(order.status);
-    const subject = `Actualización de estado pedido #${order.orderNumber.split('-').pop()} -> ${statusConfig.label}`;
+    const shortOrderNumber = order.orderNumber.split('-').pop();
+    const subject = `Actualización de estado pedido #${shortOrderNumber} -> ${statusConfig.label}`;
 
-    const info = await transporter.sendMail({
+    const promises = [];
+    promises.push(transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
-      ...(process.env.ADMIN_NOTIFICATION_EMAIL ? { bcc: process.env.ADMIN_NOTIFICATION_EMAIL } : {}),
       subject,
       html: htmlContent,
-    });
+    }));
+
+    if (process.env.ADMIN_NOTIFICATION_EMAIL) {
+      const adminHtmlContent = generateOrderHtml(
+        order, 
+        customerEmail, 
+        bankConfig, 
+        true, 
+        `Pedido Actualizado (Admin)`, 
+        `El pedido #${shortOrderNumber} del cliente ha cambiado a estado: ${statusConfig.label}.`
+      );
+      promises.push(
+        transporter.sendMail({
+          from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
+          to: process.env.ADMIN_NOTIFICATION_EMAIL.trim(),
+          subject: `Actualización de Pedido: #${shortOrderNumber} -> ${statusConfig.label}`,
+          html: adminHtmlContent,
+        })
+      );
+    }
+
+    const [info] = await Promise.all(promises);
 
     console.log("==========================================");
     console.log(`📧 Correo de cambio de estado enviado a ${customerEmail}`);
