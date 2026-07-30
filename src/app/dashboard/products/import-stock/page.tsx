@@ -329,6 +329,18 @@ export default function ImportStockPage() {
  // Guardar resultados finales y pasar al paso 4
  setSuccessUpdates(localSuccesses);
  setFailedUpdates(localFailures);
+ // Notificar al admin una sola vez al finalizar
+ if (localSuccesses.length > 0) {
+ try {
+ await api.post('/api/products/import-stock/notify', {
+ successCount: localSuccesses.length,
+ failuresCount: localFailures.length,
+ });
+ } catch (err) {
+ console.error("Error al notificar importación", err);
+ }
+ }
+
  setResultsTab(localSuccesses.length > 0 ? 'success' : 'failed');
  setStep(4);
  };

@@ -154,20 +154,6 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     });
   }
 
-  // 8. Registrar evento de auditoría
-  if (updatedProducts.length > 0) {
-    await logAuditAction({
-      userId: user.id,
-      action: "CATALOG_IMPORTED",
-      entity: "Catalog",
-      details: {
-        successCount: updatedProducts.length,
-        failuresCount: failuresList.length,
-      },
-      req,
-    });
-  }
-
   return ok({
     successes: successList,
     failures: failuresList,
