@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/client";
 import { NextRequest } from "next/server";
 
-import { fileLogger } from "./file-logger";
+
 import { notifyAdminAction } from "./admin-notifications";
 
 export type AuditAction = 
@@ -58,10 +58,7 @@ export async function logAuditAction(options: AuditLogOptions) {
       ipAddress = options.req.headers.get("x-forwarded-for") || undefined;
     }
 
-    // 1. Guardar en Archivo Local
-    fileLogger.audit(options.action, options.userId, ipAddress, options.details);
-
-    // 2. Guardar en Base de Datos
+    // Guardar en Base de Datos
     await prisma.auditLog.create({
       data: {
         userId: options.userId,

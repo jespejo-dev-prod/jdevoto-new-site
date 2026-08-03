@@ -20,7 +20,6 @@ export default defineConfig({
         'src/generated/**',
         'src/**/*.d.ts',
         'src/lib/client.ts',
-        'src/lib/file-logger.ts',
       ],
     },
   },
