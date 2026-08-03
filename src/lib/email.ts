@@ -134,6 +134,7 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
     if (order.company?.email && order.company.email !== customerEmail) ccEmails.add(order.company.email);
     if (order.company?.billingEmail && order.company.billingEmail !== customerEmail) ccEmails.add(order.company.billingEmail);
     if (order.salesRep?.email && order.salesRep.email !== customerEmail) ccEmails.add(order.salesRep.email);
+    if (order.createdBy?.email && order.createdBy.email !== customerEmail) ccEmails.add(order.createdBy.email);
 
     const promises = [
       transporter.sendMail({
@@ -582,10 +583,18 @@ export async function sendOrderShippedEmail(order: any, customerEmail: string) {
     const shortOrderNumber = order.orderNumber.split('-').pop();
     const subject = `Tu pedido #${shortOrderNumber} ha sido enviado 🚚`;
 
+    // Add CCs
+    const ccEmails = new Set<string>();
+    if (order.company?.email && order.company.email !== customerEmail) ccEmails.add(order.company.email);
+    if (order.company?.billingEmail && order.company.billingEmail !== customerEmail) ccEmails.add(order.company.billingEmail);
+    if (order.salesRep?.email && order.salesRep.email !== customerEmail) ccEmails.add(order.salesRep.email);
+    if (order.createdBy?.email && order.createdBy.email !== customerEmail) ccEmails.add(order.createdBy.email);
+
     const promises = [];
     promises.push(transporter.sendMail({
       from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'despachos@jdevoto.cl'}>`,
       to: customerEmail,
+      cc: Array.from(ccEmails),
       subject,
       html: htmlContent,
     }));
@@ -692,6 +701,7 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
     if (order.company?.email && order.company.email !== customerEmail) ccEmails.add(order.company.email);
     if (order.company?.billingEmail && order.company.billingEmail !== customerEmail) ccEmails.add(order.company.billingEmail);
     if (order.salesRep?.email && order.salesRep.email !== customerEmail) ccEmails.add(order.salesRep.email);
+    if (order.createdBy?.email && order.createdBy.email !== customerEmail) ccEmails.add(order.createdBy.email);
 
     const promises = [];
     promises.push(transporter.sendMail({

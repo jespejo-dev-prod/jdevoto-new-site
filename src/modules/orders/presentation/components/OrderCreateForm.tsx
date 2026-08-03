@@ -469,8 +469,13 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     if (!selectedCustomer) return toast.error("Selecciona un cliente");
     if (items.length === 0) return toast.error("Agrega al menos un producto al carrito");
 
+    if (totals.baseNet < 100000) {
+      return toast.error(`El subtotal neto debe ser de al menos $100.000. Te faltan $${(100000 - totals.baseNet).toLocaleString('es-CL')} netos.`);
+    }
+
     // Validar que la fecha no esté en el pasado
-    const selected = new Date(creationDate);
+    const [year, month, day] = creationDate.split('-');
+    const selected = new Date(Number(year), Number(month) - 1, Number(day));
     const today = new Date();
     today.setHours(0,0,0,0);
     selected.setHours(0,0,0,0);
@@ -726,7 +731,12 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                   }}
                   onChange={(e) => {
                     const val = e.target.value;
-                    const selected = new Date(val);
+                    if (!val) {
+                      setCreationDate('');
+                      return;
+                    }
+                    const [year, month, day] = val.split('-');
+                    const selected = new Date(Number(year), Number(month) - 1, Number(day));
                     const today = new Date();
                     today.setHours(0,0,0,0);
                     selected.setHours(0,0,0,0);

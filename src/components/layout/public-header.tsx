@@ -33,11 +33,8 @@ const FIREWORK_BURSTS = [
   { left: '78%', top: '60%', delay: '0.45s', scale: 'scale-[0.7] opacity-55' },
 ];
 
-
-
-
 export function PublicHeader() {
-  const { items = [], itemCount, subtotal = 0 } = useCart();
+  const { items = [], itemCount, subtotal = 0, selectedClientForOrder } = useCart();
   const { itemCount: wishlistCount } = useWishlist();
   const { user, logout } = useAuth();
   const { trackSearch } = useTrackingContext();
@@ -101,8 +98,8 @@ export function PublicHeader() {
   const topOffset = showProgressBar 
     ? (isMobile ? '190px' : '123px')
     : (isMobile ? '144px' : '77px');
-
-  const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
+  const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
+  const companyDiscountPercent = effectiveCompany?.defaultDiscount ? Number(effectiveCompany.defaultDiscount) : 0;
   const excludedSubtotal = items
     .filter(item => item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET')
     .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
@@ -191,8 +188,40 @@ export function PublicHeader() {
           )}
 
           <div className="hidden md:flex flex-col text-right">
-            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Empresa</span>
-            <span className="text-sm font-black text-white uppercase tracking-wide">{user?.company?.razonSocial || 'Invitado'}</span>
+            {user ? (
+              <>
+                <span className="text-sm font-black text-white uppercase tracking-wide">
+                  {user.firstName} {user.lastName}
+                </span>
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center justify-end">
+                  {user.role === 'SALES_REP' ? (
+                    effectiveCompany ? (
+                      <>
+                        <span className="text-primary mr-1">CLIENTE:</span>
+                        {effectiveCompany.razonSocial}
+                        {effectiveCompany.rut && (
+                          <span className="text-primary ml-1">| RUT: {effectiveCompany.rut}</span>
+                        )}
+                      </>
+                    ) : (
+                      "VENDEDOR"
+                    )
+                  ) : (
+                    <>
+                      {effectiveCompany?.razonSocial || "Empresa"} 
+                      {effectiveCompany?.rut && (
+                        <span className="text-primary ml-1">| RUT: {effectiveCompany.rut}</span>
+                      )}
+                    </>
+                  )}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-sm font-black text-white uppercase tracking-wide">Invitado</span>
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Empresa</span>
+              </>
+            )}
           </div>
 
           {/* Menú de usuario con Dropdown */}
@@ -429,8 +458,15 @@ export function PublicHeader() {
 
             {user && (
               <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-850 flex flex-col gap-1">
-                <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Empresa</span>
-                <span className="text-xs font-bold text-white tracking-tighter uppercase">{user?.company?.razonSocial || 'Invitado'}</span>
+                <span className="text-sm font-black text-white uppercase tracking-wide">
+                  {user.firstName} {user.lastName}
+                </span>
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                  {user.company?.razonSocial} 
+                  {user.company?.rut && (
+                    <span className="text-primary ml-1">| RUT: {user.company.rut}</span>
+                  )}
+                </span>
               </div>
             )}
 

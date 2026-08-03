@@ -45,6 +45,8 @@ interface CartContextType {
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   syncPrices: () => Promise<void>;
+  selectedClientForOrder: any | null;
+  setClientForOrder: (client: any) => void;
   itemCount: number;    // Total de unidades (suma de quantities)
   subtotal: number;     // Suma de price × quantity (ya es precio neto)
   totalSavings: number; // Suma de descuentos aplicados
@@ -60,7 +62,31 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
  */
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [selectedClientForOrder, setClientForOrder] = useState<any>(null);
   const { accessToken } = useAuth();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedClient = localStorage.getItem('jdevoto_selected_client');
+        if (savedClient) {
+          setClientForOrder(JSON.parse(savedClient));
+        }
+      } catch (err) {
+        console.error("Error loading selected client from localStorage:", err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (selectedClientForOrder) {
+        localStorage.setItem('jdevoto_selected_client', JSON.stringify(selectedClientForOrder));
+      } else {
+        localStorage.removeItem('jdevoto_selected_client');
+      }
+    }
+  }, [selectedClientForOrder]);
 
   /**
    * Sincroniza los precios y stock del carrito con la base de datos en tiempo real.
@@ -335,6 +361,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       updateQuantity,
       clearCart,
       syncPrices,
+      selectedClientForOrder,
+      setClientForOrder,
       itemCount,
       subtotal,
       totalSavings

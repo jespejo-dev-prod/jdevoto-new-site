@@ -18,6 +18,9 @@ vi.mock('@/lib/client', () => ({
       update: vi.fn(),
       delete: vi.fn(),
     },
+    auditLog: {
+      create: vi.fn(),
+    },
   },
 }));
 
@@ -25,6 +28,10 @@ vi.mock('@/lib/client', () => ({
 vi.mock('@/lib/auth', () => ({
   extractUserFromRequest: vi.fn(),
   requireRole: vi.fn(),
+}));
+
+vi.mock('@/lib/admin-notifications', () => ({
+  notifyAdminAction: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock bcrypt

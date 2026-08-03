@@ -12,10 +12,11 @@ interface CartItemProps {
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { updateQuantity, removeItem } = useCart();
+  const { updateQuantity, removeItem, selectedClientForOrder } = useCart();
   const { user } = useAuth();
 
-  const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
+  const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
+  const companyDiscountPercent = effectiveCompany?.defaultDiscount ? Number(effectiveCompany.defaultDiscount) : 0;
   const isExcluded = item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET';
   const companyDiscount = isExcluded ? 0 : companyDiscountPercent;
 

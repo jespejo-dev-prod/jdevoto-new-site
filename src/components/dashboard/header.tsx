@@ -177,6 +177,9 @@ export function DashboardHeader() {
   <p className="text-base font-bold text-white truncate">
   {user?.firstName} {user?.lastName}
   </p>
+  {user?.company?.razonSocial && user?.role !== 'SALES_REP' && user?.role !== 'ADMIN' && (
+    <p className="text-sm font-medium text-zinc-400 truncate">{user.company.razonSocial}</p>
+  )}
   <p className="text-sm font-medium text-zinc-500 truncate">{user?.email}</p>
   {user?.role && (
     <span className="inline-block mt-1 px-2 py-0.5 bg-zinc-800/80 text-zinc-400 text-[10px] font-bold rounded-md uppercase tracking-wider w-fit">

@@ -91,11 +91,18 @@ export function SalesRepDashboard() {
             <h3 className="text-xl font-bold text-white mb-2">Realizar Pedido</h3>
             <p className="text-sm text-zinc-400">Ir al catálogo para realizar pedidos a nombre de tus clientes asignados.</p>
           </div>
-          <Link href="/products" className="w-full">
-            <button className="w-full py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-90 text-sm font-bold transition-all shadow-lg shadow-primary/20">
-              Ir al Catálogo
-            </button>
-          </Link>
+          <div className="w-full flex flex-col gap-3">
+            <Link href="/dashboard/orders/new" className="w-full">
+              <button className="w-full py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-90 text-sm font-bold transition-all shadow-lg shadow-primary/20">
+                Realizar Pedido
+              </button>
+            </Link>
+            <Link href="/products" className="w-full">
+              <button className="w-full py-3 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700 text-sm font-bold transition-all">
+                Ir al Catálogo
+              </button>
+            </Link>
+          </div>
         </div>
 
         {/* Añadir Cliente */}

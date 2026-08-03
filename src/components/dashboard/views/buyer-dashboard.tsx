@@ -29,12 +29,19 @@ export function BuyerDashboard() {
             <h3 className="text-xl font-bold text-white mb-2">¿Listo para hacer un nuevo pedido?</h3>
             <p className="text-sm text-zinc-400">Explora nuestro catálogo B2B y aprovecha los precios exclusivos para tu empresa.</p>
           </div>
-          <Link href="/products">
-            <button className="px-8 py-4 rounded-xl bg-primary text-primary-foreground hover:opacity-90 text-sm font-bold transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5" />
-              Ir al Catálogo
-            </button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/dashboard/orders/new">
+              <button className="w-full sm:w-auto px-8 py-4 rounded-xl bg-primary text-primary-foreground hover:opacity-90 text-sm font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                <ShoppingCart className="w-5 h-5" />
+                Realizar Pedido
+              </button>
+            </Link>
+            <Link href="/products">
+              <button className="w-full sm:w-auto px-8 py-4 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700 text-sm font-bold transition-all flex items-center justify-center gap-2">
+                Ir al Catálogo
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
 

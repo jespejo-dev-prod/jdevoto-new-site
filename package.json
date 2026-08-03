@@ -9,7 +9,9 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ci": "vitest run --reporter=verbose"
   },
   "prisma": {},
   "browserslist": [
@@ -73,6 +75,7 @@
     "@types/react": "^19",
     "@types/swagger-ui-react": "^5.18.0",
     "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "^4.1.10",
     "autoprefixer": "^10.5.0",
     "cross-env": "^10.1.0",
     "csv-parse": "^7.0.1",

@@ -56,7 +56,8 @@ export default async function CartPage() {
   }));
 
   // Fetch the last 3 completed/processing or any past orders for the B2B company
-  const recentOrdersRaw = companyId ? await prisma.order.findMany({
+  const isSalesRep = user?.role === 'SALES_REP';
+  const recentOrdersRaw = (companyId && !isSalesRep) ? await prisma.order.findMany({
     where: { companyId },
     take: 3,
     orderBy: { createdAt: 'desc' },

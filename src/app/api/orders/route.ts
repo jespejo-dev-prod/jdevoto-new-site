@@ -52,6 +52,11 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const body = await req.json();
   const data = CreateOrderSchema.parse(body);
 
+  // Validar campos de dirección (street, region, comuna)
+  if (!data.shippingAddress?.street || !data.shippingAddress?.region || !data.shippingAddress?.comuna) {
+    throw new ValidationError("La dirección de envío es incompleta. Falta calle/número, región o comuna.");
+  }
+
   // Validar consistencia de Región y Comuna de Chile para despacho
   if (data.shippingAddress?.region && data.shippingAddress?.comuna) {
     const { CHILE_REGIONS } = await import("@/lib/chile-data");

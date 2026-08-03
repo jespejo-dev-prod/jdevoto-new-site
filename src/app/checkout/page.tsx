@@ -22,7 +22,7 @@ import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, clearCart, syncPrices } = useCart();
+  const { items, subtotal, clearCart, syncPrices, selectedClientForOrder } = useCart();
   const { user, accessToken, refresh } = useAuth();
 
   // Sync cart prices when visiting checkout to discard any expired promotions
@@ -30,8 +30,10 @@ export default function CheckoutPage() {
     syncPrices();
   }, [syncPrices]);
 
-  const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
-  const paymentTermsDays = user?.company?.paymentTerms ?? 30;
+  const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
+
+  const companyDiscountPercent = effectiveCompany?.defaultDiscount ? Number(effectiveCompany.defaultDiscount) : 0;
+  const paymentTermsDays = effectiveCompany?.paymentTerms ?? 30;
 
   const excludedSubtotal = items
     .filter(item => item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET')
@@ -338,8 +340,8 @@ export default function CheckoutPage() {
   // 7. Grand Total
   const grandTotal = Math.round(finalNet + finalIva + shippingCost);
 
-  const creditLimit = user?.company?.creditLimit ? Number(user.company.creditLimit) : 0;
-  const creditUsed = user?.company?.creditUsed ? Number(user.company.creditUsed) : 0;
+  const creditLimit = effectiveCompany?.creditLimit ? Number(effectiveCompany.creditLimit) : 0;
+  const creditUsed = effectiveCompany?.creditUsed ? Number(effectiveCompany.creditUsed) : 0;
   const availableCredit = creditLimit - creditUsed;
   const hasEnoughCredit = paymentMethod !== 'credit_b2b' || grandTotal <= availableCredit;
 
@@ -347,16 +349,18 @@ export default function CheckoutPage() {
   const isCourierValid = shippingMethod === 'free' || (
     selectedCourier && (selectedCourier !== 'otro' || customCourier.trim() !== '')
   );
+  
+  const isClientSelected = true;
 
   const isFormValid = termsAccepted && region && comuna && shippingStreet.trim() !== '' &&
     !isVerifyingAddress &&
     (billingType === 'factura' ? (razonSocial && rutEmpresa) : true) && 
-    hasEnoughCredit && isCourierValid;
+    hasEnoughCredit && isCourierValid && isClientSelected;
 
   const handleProcessOrder = async () => {
-    const activeCompanyId = user?.companyId || user?.company?.id;
+    const activeCompanyId = effectiveCompany?.id || user?.companyId;
     if (!activeCompanyId) {
-      toast.error('Error: No tienes una empresa asignada para hacer pedidos.');
+      toast.error('Error: No tienes una empresa/cliente asignado para hacer pedidos.');
       return;
     }
     
@@ -539,7 +543,7 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
            
             <div className="lg:col-span-8 space-y-10">
-
+            
               {/* SECCIÓN 1: FACTURACIÓN */}
               <section className="bg-white p-8 lg:p-10 rounded-[40px] border border-zinc-200 shadow-sm space-y-8 relative overflow-hidden">
                  <div className="absolute top-0 left-0 w-2 h-full bg-blue-500" />

@@ -8,5 +8,20 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './test/setup.ts',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'text-summary', 'html'],
+      include: [
+        'src/modules/**',
+        'src/lib/**',
+        'src/validations/**',
+      ],
+      exclude: [
+        'src/generated/**',
+        'src/**/*.d.ts',
+        'src/lib/client.ts',
+        'src/lib/file-logger.ts',
+      ],
+    },
   },
 });

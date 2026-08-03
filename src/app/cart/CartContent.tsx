@@ -5,25 +5,72 @@ import { ArrowLeft, ShoppingBag, History, RotateCcw, Loader2 } from 'lucide-reac
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/auth-context';
+import { useCustomers } from '@/modules/customers/presentation/hooks/useCustomers';
 import { CartItem } from '@/modules/cart/presentation/components/CartItem/CartItem';
 import { OrderSummary } from '@/modules/cart/presentation/components/OrderSummary/OrderSummary';
 import { useApi } from '@/shared/infrastructure/api/use-api';
 import { toast } from 'sonner';
 import { PromoCountdownBanner } from '@/components/cart/PromoCountdownBanner';
+import { Building2, Search, Plus, Trash2 } from 'lucide-react';
 
 interface CartContentProps {
   recentOrders?: any[];
 }
 
 export function CartContent({ recentOrders = [] }: CartContentProps) {
-  const { items, itemCount, clearCart, addItem, syncPrices } = useCart();
+  const { items, itemCount, clearCart, addItem, syncPrices, selectedClientForOrder, setClientForOrder } = useCart();
+  const { user } = useAuth();
   const { fetcher } = useApi();
   const [isRepeating, setIsRepeating] = useState<string | null>(null);
+
+  // Buscador de clientes para vendedores
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [debouncedCustomerSearch, setDebouncedCustomerSearch] = useState('');
+  
+  const { customers = [], isLoading: loadingCustomers } = useCustomers({ search: debouncedCustomerSearch, limit: 5 });
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedCustomerSearch(customerSearch);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [customerSearch]);
 
   // Sync prices when visiting the cart page
   useEffect(() => {
     syncPrices();
   }, [syncPrices]);
+
+  // Dynamically fetch orders for the selected client if SALES_REP
+  useEffect(() => {
+    let active = true;
+    if (user?.role === 'SALES_REP') {
+      if (selectedClientForOrder) {
+        fetcher(`/api/orders?page=1&limit=3&companyId=${selectedClientForOrder.id}`)
+          .then((res) => {
+            if (!active) return;
+            const fetchedData = res && res.data ? res.data : (Array.isArray(res) ? res : []);
+            setOrders(fetchedData.map((o: any) => ({
+              id: o.id,
+              orderNumber: o.orderNumber,
+              totalGross: Number(o.totalGross),
+              createdAt: o.createdAt,
+              status: o.status,
+              itemCount: o.itemCount || o._count?.items || 0
+            })));
+            setHasMore(fetchedData.length >= 3);
+          })
+          .catch(err => console.error(err));
+      } else {
+        if (active) {
+          setOrders([]);
+          setHasMore(false);
+        }
+      }
+    }
+    return () => { active = false; };
+  }, [user?.role, selectedClientForOrder?.id, fetcher]);
 
   // State for dynamic orders listing in CartContent
   const [orders, setOrders] = useState<any[]>(recentOrders);
@@ -66,8 +113,11 @@ export function CartContent({ recentOrders = [] }: CartContentProps) {
     if (isLoadingMore) return;
     setIsLoadingMore(true);
     try {
-      // Pedimos las órdenes (página 1, límite 50) para traer todas las órdenes anteriores de la empresa
-      const res = await fetcher('/api/orders?page=1&limit=50');
+      const companyQuery = (user?.role === 'SALES_REP' && selectedClientForOrder) 
+        ? `&companyId=${selectedClientForOrder.id}` 
+        : '';
+        
+      const res = await fetcher(`/api/orders?page=1&limit=50${companyQuery}`);
       
       const fetchedData = res && res.data ? res.data : (Array.isArray(res) ? res : []);
       
@@ -79,7 +129,7 @@ export function CartContent({ recentOrders = [] }: CartContentProps) {
           totalGross: Number(o.totalGross),
           createdAt: o.createdAt,
           status: o.status,
-          itemCount: o.itemCount
+          itemCount: o.itemCount || o._count?.items || 0
         }));
 
         // Filtrar duplicados
@@ -127,14 +177,87 @@ export function CartContent({ recentOrders = [] }: CartContentProps) {
         <PromoCountdownBanner />
       </div>
 
-      <h1 className="text-2xl sm:text-3xl font-black text-zinc-950 mb-10 flex items-baseline gap-4">
+      <h1 className="text-2xl sm:text-3xl font-black text-zinc-950 mb-6 flex items-baseline gap-4">
         Carrito de Compras <span className="text-xs sm:text-sm font-semibold text-zinc-400 uppercase tracking-wider">({itemCount} artículos)</span>
       </h1>
+
+
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         
         {/* LISTA DE PRODUCTOS EN EL CARRITO */}
         <div className="lg:col-span-8 space-y-6">
+          {user?.role === 'SALES_REP' && (
+            <div className="mb-4 w-full p-5 rounded-[24px] bg-indigo-50 border-2 border-indigo-200 shadow-sm relative overflow-visible">
+              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                <Building2 className="w-24 h-24" />
+              </div>
+              <div className="relative z-10">
+                <label className="text-sm font-black text-indigo-900 uppercase tracking-widest flex items-center gap-2 mb-3">
+                  <Building2 className="h-5 w-5" /> Cliente Objetivo para este pedido
+                </label>
+                <p className="text-xs text-indigo-700 font-semibold mb-4 opacity-80">
+                  * El carrito ajustará automáticamente los descuentos según el cliente seleccionado.
+                </p>
+                <div className="relative">
+                  {!selectedClientForOrder ? (
+                    <>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-indigo-400" />
+                        <input 
+                          type="text"
+                          placeholder="Buscar cliente por RUT o Razón Social..."
+                          value={customerSearch}
+                          onChange={(e) => setCustomerSearch(e.target.value)}
+                          className="w-full h-12 rounded-xl border border-indigo-200 pl-10 pr-4 text-base font-semibold text-zinc-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all bg-white shadow-inner"
+                        />
+                      </div>
+                      {customerSearch.length > 1 && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-200 rounded-xl overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto">
+                          {loadingCustomers ? (
+                            <div className="p-4 text-center"><Loader2 className="h-5 w-5 animate-spin mx-auto text-indigo-400" /></div>
+                          ) : customers.length > 0 ? (
+                            customers.map((c: any) => (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => { setClientForOrder(c); setCustomerSearch(''); }}
+                                className="w-full px-5 py-4 flex items-center gap-3 hover:bg-indigo-50 text-left border-b border-zinc-100 last:border-none transition-colors group"
+                              >
+                                <div className="min-w-0 flex-1 py-0.5">
+                                  <p className="text-base font-bold text-zinc-900 truncate">{c.razonSocial}</p>
+                                  {c.rut && <p className="text-sm font-semibold text-zinc-500 mt-0.5">{c.rut}</p>}
+                                </div>
+                                <Plus className="h-5 w-5 text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </button>
+                            ))
+                           ) : customerSearch.length > 2 && (
+                            <div className="p-4 text-center text-sm text-zinc-500 uppercase font-bold tracking-widest">No se encontraron clientes</div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-between bg-white border border-indigo-200 rounded-xl p-4 shadow-sm">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-base font-bold text-zinc-900 truncate">{selectedClientForOrder.razonSocial}</p>
+                        {selectedClientForOrder.rut && <p className="text-sm font-semibold text-indigo-500 mt-0.5">{selectedClientForOrder.rut}</p>}
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={() => setClientForOrder(null)}
+                        className="p-2.5 hover:bg-red-50 text-zinc-400 hover:text-red-500 rounded-lg transition-colors ml-2 flex items-center gap-2"
+                      >
+                        <span className="text-xs font-bold uppercase tracking-widest">Cambiar</span>
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {items.length > 0 ? (
             items.map((item) => (
               <CartItem key={item.id} item={item} />

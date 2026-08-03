@@ -58,6 +58,11 @@ const RegisterSchema = z.object({
     .max(100, "El descuento no puede superar el 100%")
     .default(0),
 
+  calleNumero: z.string().min(3, "La calle y número es obligatoria"),
+  region: z.string().min(3, "La región es obligatoria"),
+  comuna: z.string().min(3, "La comuna es obligatoria"),
+  ciudad: z.string().min(3, "La ciudad es obligatoria"),
+
   // --- Datos del Usuario Administrador ---
   email: z.string().email("Email inválido"),
 
@@ -148,6 +153,14 @@ export const POST = withApiHandler(async (req: NextRequest) => {
         defaultDiscount: data.defaultDiscount,
         paymentTerms: 0,
         paymentTermDiscount: 0,
+        billingStreet: data.calleNumero,
+        billingRegion: data.region,
+        billingCommune: data.comuna,
+        billingCity: data.ciudad,
+        shippingStreet: data.calleNumero,
+        shippingRegion: data.region,
+        shippingCommune: data.comuna,
+        shippingCity: data.ciudad,
       },
     });
 

@@ -12,6 +12,9 @@ vi.mock('@/lib/client', () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    auditLog: {
+      create: vi.fn(),
+    },
   },
 }));
 
@@ -19,6 +22,10 @@ vi.mock('@/lib/client', () => ({
 vi.mock('@/lib/auth', () => ({
   extractUserFromRequest: vi.fn(),
   requireRole: vi.fn(),
+}));
+
+vi.mock('@/lib/admin-notifications', () => ({
+  notifyAdminAction: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe('Modificación de Crédito Manual - API Cliente B2B', () => {

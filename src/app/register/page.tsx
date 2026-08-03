@@ -195,20 +195,79 @@ export default function RegisterPage() {
                   />
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-zinc-300">
-                  Correo del Administrador
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@empresa.cl"
-                  disabled={isSubmitting}
-                  {...register("email")}
-                  className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                />
+              <div className="pt-4 border-t border-zinc-800 space-y-4">
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest text-left mb-4">
+                  Dirección
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="calleNumero" className="text-zinc-300">
+                    CALLE Y NÚMERO
+                  </Label>
+                  <Input
+                    id="calleNumero"
+                    placeholder="Ej: Av. Apoquindo 4501"
+                    disabled={isSubmitting}
+                    {...register("calleNumero")}
+                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.calleNumero ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="region" className="text-zinc-300">
+                      REGIÓN
+                    </Label>
+                    <Input
+                      id="region"
+                      placeholder="Ej: Metropolitana de Santiago"
+                      disabled={isSubmitting}
+                      {...register("region")}
+                      className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.region ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="comuna" className="text-zinc-300">
+                      COMUNA
+                    </Label>
+                    <Input
+                      id="comuna"
+                      placeholder="Ej: Las Condes"
+                      disabled={isSubmitting}
+                      {...register("comuna")}
+                      className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.comuna ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ciudad" className="text-zinc-300">
+                      CIUDAD
+                    </Label>
+                    <Input
+                      id="ciudad"
+                      placeholder="Ej: Santiago"
+                      disabled={isSubmitting}
+                      {...register("ciudad")}
+                      className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.ciudad ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    />
+                  </div>
+                </div>
               </div>
+
+              <div className="pt-4 border-t border-zinc-800 space-y-4 mt-6">
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest text-left mb-4">
+                  DATOS DEL ADMINISTRADOR
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-zinc-300">
+                    Correo del Administrador
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@empresa.cl"
+                    disabled={isSubmitting}
+                    {...register("email")}
+                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  />
+                </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-zinc-300">
@@ -283,6 +342,7 @@ export default function RegisterPage() {
                     El resultado es incorrecto. Por favor vuelve a intentarlo.
                   </p>
                 )}
+              </div>
               </div>
 
               <Button

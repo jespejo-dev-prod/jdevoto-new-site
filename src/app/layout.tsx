@@ -11,6 +11,7 @@ import { CookieBanner } from "@/components/layout/cookie-banner";
 import { Roboto } from "next/font/google";
 import { TrackingProvider } from "@/components/providers/TrackingProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { QueryProvider } from "@/providers/query-provider";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700", "900"],
@@ -118,20 +119,22 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
-        <ThemeProvider>
-          <AuthProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <TrackingProvider>
-                  {children}
-                </TrackingProvider>
-                <ClientToaster position="bottom-right" richColors closeButton />
-                <WhatsAppButton />
-                <CookieBanner />
-              </WishlistProvider>
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <CartProvider>
+                <WishlistProvider>
+                  <TrackingProvider>
+                    {children}
+                  </TrackingProvider>
+                  <ClientToaster position="bottom-right" richColors closeButton />
+                  <WhatsAppButton />
+                  <CookieBanner />
+                </WishlistProvider>
+              </CartProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </QueryProvider>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX"} />
       </body>
     </html>

@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, CreditCard, ShieldCheck, Truck, ChevronDown } from 'lucide-react';
+import { ChevronRight, CreditCard, ShieldCheck, Truck, ChevronDown, Search, Loader2, Building2, Trash2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/auth-context';
+import { useCustomers } from '@/modules/customers/presentation/hooks/useCustomers';
+import { cn } from '@/lib/utils';
 
 export function OrderSummary() {
-  const { items, subtotal = 0 } = useCart();
+  const { items, subtotal = 0, selectedClientForOrder } = useCart();
   const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState<string>('webpay');
 
@@ -21,7 +23,8 @@ export function OrderSummary() {
     }
   }, []);
 
-  const paymentTermsDays = user?.company?.paymentTerms ?? 30;
+  const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
+  const paymentTermsDays = effectiveCompany?.paymentTerms ?? 30;
 
   const creditDiscountPercent = React.useMemo(() => {
     if (paymentTermsDays === 90) return 0;
@@ -54,7 +57,7 @@ export function OrderSummary() {
   const nonExcludedBaseNet = Math.round(nonExcludedSubtotal);
   const totalBaseNet = excludedBaseNet + nonExcludedBaseNet;
 
-  const companyDiscountPercent = user?.company?.defaultDiscount ? Number(user.company.defaultDiscount) : 0;
+  const companyDiscountPercent = effectiveCompany?.defaultDiscount ? Number(effectiveCompany.defaultDiscount) : 0;
   const companyDiscountAmount = Math.round(nonExcludedBaseNet * (companyDiscountPercent / 100));
   const netAfterCompanyDiscount = nonExcludedBaseNet - companyDiscountAmount;
   const finalNet = excludedBaseNet + netAfterCompanyDiscount;
@@ -69,6 +72,9 @@ export function OrderSummary() {
   return (
     <div className="bg-white p-6 sm:p-8 rounded-[24px] sm:rounded-[40px] border-2 border-zinc-100 shadow-xl space-y-8 sticky top-28">
       <h2 className="text-lg sm:text-xl font-bold text-zinc-900 uppercase tracking-wider">Resumen de Orden</h2>
+      
+
+
       
       <div className="space-y-4 text-sm sm:text-base">
         {/* Selector de Medio de Pago */}
@@ -152,6 +158,7 @@ export function OrderSummary() {
 
         {(() => {
           const hasInvalidItems = items.some(item => item.inner && item.inner > 1 && item.quantity % item.inner !== 0);
+          
           if (isEmpty || finalNet < 100000 || hasInvalidItems) {
             return (
               <Button disabled className="w-full h-14 bg-zinc-950 text-white font-black uppercase text-sm rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">

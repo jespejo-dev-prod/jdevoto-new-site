@@ -74,7 +74,9 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                   </span>
                 </td>
                 <td className="p-4">
-                  {u.company ? (
+                  {(u.role === 'SALES_REP' || u.role === 'ADMIN') ? (
+                    <span className="text-sm text-zinc-500 italic font-medium tracking-wide">Multicliente</span>
+                  ) : u.company ? (
                     <div className="flex flex-col">
                       <span className="text-base font-semibold text-zinc-300">{u.company.razonSocial}</span>
                       <span className="text-base text-sky-400/90 font-medium mt-0.5">{u.company.rut}</span>

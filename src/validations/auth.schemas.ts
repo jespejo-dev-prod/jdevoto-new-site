@@ -44,6 +44,12 @@ export const FullRegisterSchema = z.object({
   telefono: z.string().regex(/^\+?56\d{9}$/, "Teléfono chileno inválido (+569XXXXXXXX)"),
   giro: z.string().min(3, "El giro debe tener al menos 3 caracteres"),
   
+  // Dirección
+  calleNumero: z.string().min(3, "La calle y número es obligatoria"),
+  region: z.string().min(3, "La región es obligatoria"),
+  comuna: z.string().min(3, "La comuna es obligatoria"),
+  ciudad: z.string().min(3, "La ciudad es obligatoria"),
+  
   // Usuario Administrador
   email: z.string().email("Email inválido"),
   password: z
