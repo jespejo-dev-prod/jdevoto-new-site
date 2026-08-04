@@ -58,6 +58,8 @@ next-env.d.ts
 *.xlsx
 *.csv
 *.sql
+# Exception: Prisma migrations must be tracked in git for migrate deploy to work
+!prisma/migrations/**/*.sql
 *.zip
 *.rar
 /excel_users
