@@ -78,7 +78,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
   if (data.firstName !== undefined) updateData.firstName = data.firstName;
   if (data.lastName !== undefined) updateData.lastName = data.lastName;
   if (data.role !== undefined) updateData.role = data.role;
-  if (data.companyId !== undefined) updateData.companyId = data.companyId;
+  if (data.companyId !== undefined) updateData.companyId = data.companyId === "" ? null : data.companyId;
 
   if (data.email !== undefined) {
     const emailLower = data.email.toLowerCase();
