@@ -17,8 +17,8 @@ export const RegisterUserSchema = z.object({
   lastName: z.string().min(1).max(100),
   phone: z.string().optional(),
   role: z.nativeEnum(UserRole).default(UserRole.BUYER),
-  // companyId es OBLIGATORIO — todo usuario debe pertenecer a una empresa
-  companyId: z.string().cuid("companyId debe ser un CUID válido"),
+  // companyId es OBLIGATORIO para clientes y vendedores, pero OPCIONAL para ADMIN
+  companyId: z.string().cuid("companyId debe ser un CUID válido").optional().nullable(),
 });
 
 export type RegisterUserDto = z.infer<typeof RegisterUserSchema>;

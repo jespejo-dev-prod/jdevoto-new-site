@@ -23,10 +23,36 @@ export async function loginUseCase({ email, password }: LoginInput) {
     throw new UnauthorizedError("Credenciales inválidas");
   }
 
-  // 2. Verificar contraseña
+  // 2. Verificar si la cuenta está bloqueada
+  if (user.lockedUntil && user.lockedUntil > new Date()) {
+    const remainingMinutes = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+    throw new UnauthorizedError(`Cuenta bloqueada por múltiples intentos fallidos. Intenta de nuevo en ${remainingMinutes} minutos.`);
+  }
+
+  // 3. Verificar contraseña
   const isValidPassword = await bcrypt.compare(password, user.passwordHash);
   if (!isValidPassword) {
+    // Incrementar intentos fallidos
+    const newAttempts = (user.failedLoginAttempts || 0) + 1;
+    const lockDurationMs = 15 * 60 * 1000; // 15 minutos
+    
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        failedLoginAttempts: newAttempts,
+        lockedUntil: newAttempts >= 5 ? new Date(Date.now() + lockDurationMs) : null
+      }
+    });
+
     throw new UnauthorizedError("Credenciales inválidas");
+  }
+
+  // Si el login es exitoso y tenía intentos fallidos previos, resetearlos
+  if (user.failedLoginAttempts > 0) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { failedLoginAttempts: 0, lockedUntil: null }
+    });
   }
 
   // 3. Si requiere 2FA, detener login y pedir código

@@ -3,15 +3,18 @@
 import { useCustomer } from '@/modules/customers/presentation/hooks/useCustomers';
 import { CustomerForm } from '@/modules/customers/presentation/components/CustomerForm';
 import { useParams, useRouter } from 'next/navigation';
-import { ChevronLeft, Loader2, User, Building2, Key, LogOut } from 'lucide-react';
+import { ChevronLeft, Loader2, User, Building2, Key, LogOut, Unlink } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApi } from '@/shared/infrastructure/api/use-api';
+import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 
 export default function CustomerDetailPage() {
  const { id } = useParams<{ id: string }>();
  const router = useRouter();
  const { fetcher } = useApi();
+ const { user } = useAuth();
+ const isAdmin = user?.role === 'ADMIN';
  const { 
  data: customer, 
  isLoading, 
@@ -37,6 +40,21 @@ export default function CustomerDetailPage() {
  toast.info("Sesiones cerradas con éxito.");
  } catch (err: any) {
  toast.error(err.message ||"Error al cerrar sesiones");
+ }
+ };
+
+ const handleUnlinkUser = async (userId: string, name: string) => {
+ if (!confirm(`¿Estás seguro de que quieres desvincular al usuario ${name} de esta empresa?`)) return;
+ try {
+ await fetcher(`/api/users/${userId}`, { 
+   method: 'PATCH', 
+   body: JSON.stringify({ companyId: null }) 
+ });
+ toast.success("Usuario desvinculado con éxito.");
+ // Recargar la página para que desaparezca de la lista
+ window.location.reload();
+ } catch (err: any) {
+ toast.error(err.message ||"Error al desvincular usuario");
  }
  };
 
@@ -112,7 +130,7 @@ export default function CustomerDetailPage() {
  />
  
  {/* Listado de usuarios asociados (Opcional, pero útil para completar la vista) */}
- {customer.users && customer.users.length > 0 && (
+ {isAdmin && customer.users && customer.users.length > 0 && (
  <div className="bg-zinc-900/20 border border-zinc-800 rounded-3xl p-8 space-y-6 mt-12">
  <h3 className="text-xl font-bold text-white flex items-center gap-3">
  <User className="h-5 w-5 text-primary" />
@@ -134,7 +152,7 @@ export default function CustomerDetailPage() {
  </div>
  </div>
 
- <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-zinc-900">
+ <div className="grid grid-cols-3 gap-2.5 pt-3 border-t border-zinc-900">
  <button 
  onClick={() => handleResetPassword(u.id, u.email)}
  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-zinc-800"
@@ -147,8 +165,19 @@ export default function CustomerDetailPage() {
  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-red-500/5 hover:bg-red-500/10 text-red-500/60 hover:text-red-500 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-red-500/10"
  >
  <LogOut className="h-3 w-3" />
- Cerrar Sesión
+ Cerrar
  </button>
+ {(u.role === 'ADMIN' || u.role === 'SALES_REP') ? (
+   <button 
+     onClick={() => handleUnlinkUser(u.id, u.firstName)}
+     className="flex items-center justify-center gap-2 py-2.5 px-3 bg-orange-500/5 hover:bg-orange-500/10 text-orange-500/60 hover:text-orange-500 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-orange-500/10"
+   >
+     <Unlink className="h-3 w-3" />
+     Desvincular
+   </button>
+ ) : (
+   <div />
+ )}
  </div>
  </div>
  ))}

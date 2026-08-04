@@ -24,7 +24,8 @@ import {
  Printer,
  Trash2,
  Pencil,
- Wallet
+ Wallet,
+ AlertCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -43,9 +44,11 @@ export default function OrderDetailPage() {
  const [isSendingEmail, setIsSendingEmail] = useState(false);
  const [isPaying, setIsPaying] = useState(false);
  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+ const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const handlePayment = async (method: string) => {
     setIsProcessingPayment(true);
+    setPaymentError(null);
     const toastId = toast.loading("Procesando pago...");
     try {
       if (method === 'mercadopago') {
@@ -71,7 +74,8 @@ export default function OrderDetailPage() {
         window.location.reload();
       }
     } catch (err: any) {
-      toast.error(err.message || "Error al procesar pago", { id: toastId });
+      toast.error("Error al procesar pago", { id: toastId });
+      setPaymentError(err.message || "Error al procesar pago");
     } finally {
       setIsProcessingPayment(false);
     }
@@ -308,6 +312,13 @@ export default function OrderDetailPage() {
               Cancelar
             </button>
           </div>
+        </div>
+      )}
+
+      {paymentError && (
+        <div className="relative z-10 mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-200 font-medium">{paymentError}</p>
         </div>
       )}
     </div>

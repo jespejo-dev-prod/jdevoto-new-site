@@ -6,6 +6,9 @@ import { Prisma, UserRole } from "@prisma/client";
 import { RegisterCompanySchema } from "@/validations/company.schemas";
 import { BusinessRuleError } from "@/lib/errors";
 import { logAuditAction } from "@/lib/audit";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { sendNewUserPasswordEmail, sendNewCustomerAdminNotification, sendSetupPasswordEmail } from "@/lib/email";
 
 export const GET = withApiHandler(async (req: NextRequest) => {
   const user = extractUserFromRequest(req);
@@ -101,18 +104,44 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP]);
 
   const body = await req.json();
-  const { salesRepEmail, ...companyData } = RegisterCompanySchema.parse(body);
+  const { salesRepEmail, initialPassword, ...companyData } = RegisterCompanySchema.parse(body);
 
+  // 1. Verificaciones de duplicidad
+  const existingCompany = await prisma.company.findUnique({
+    where: { rut: companyData.rut }
+  });
+
+  if (existingCompany) {
+    throw new BusinessRuleError(
+      `El RUT ${companyData.rut} ya se encuentra registrado en el sistema.`,
+      "DUPLICATE_COMPANY"
+    );
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: companyData.email.toLowerCase() }
+  });
+
+  if (existingUser) {
+    throw new BusinessRuleError(
+      `El correo electrónico ${companyData.email} ya está en uso por otro usuario.`,
+      "DUPLICATE_USER"
+    );
+  }
+
+  // 2. Determinar el Vendedor
   let salesRepId: string | null = null;
+  let sellerName = "Administrador";
   
   if (user.role === UserRole.SALES_REP) {
     // Si es vendedor, se asigna a sí mismo automáticamente
     salesRepId = user.id;
+    sellerName = `${user.firstName} ${user.lastName}`.trim();
   } else if (salesRepEmail) {
     // Si es admin, puede asignar mediante email
     const salesRep = await prisma.user.findFirst({
       where: { email: salesRepEmail, role: UserRole.SALES_REP, isActive: true },
-      select: { id: true }
+      select: { id: true, firstName: true, lastName: true }
     });
     
     if (!salesRep) {
@@ -123,23 +152,78 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     }
     
     salesRepId = salesRep.id;
+    sellerName = `${salesRep.firstName} ${salesRep.lastName}`.trim();
   }
 
-  const customer = await prisma.company.create({
-    data: {
-      ...companyData,
-      salesRepId,
-    },
+  // 3. Crear Empresa y Usuario en Transacción
+  const isPasswordProvided = !!initialPassword;
+  const rawPassword = isPasswordProvided ? initialPassword : crypto.randomBytes(32).toString("hex");
+  const hashedPassword = await bcrypt.hash(rawPassword, 10);
+  const resetToken = isPasswordProvided ? null : crypto.randomBytes(32).toString("hex");
+
+  const result = await prisma.$transaction(async (tx) => {
+    const customer = await tx.company.create({
+      data: {
+        ...companyData,
+        salesRepId,
+      },
+    });
+
+    const newUser = await tx.user.create({
+      data: {
+        email: companyData.email.toLowerCase(),
+        passwordHash: hashedPassword,
+        firstName: companyData.razonSocial.substring(0, 50),
+        lastName: "",
+        role: UserRole.BUYER,
+        companyId: customer.id,
+        isActive: true,
+      }
+    });
+
+    if (!isPasswordProvided && resetToken) {
+      await tx.passwordResetToken.create({
+        data: {
+          email: newUser.email,
+          token: resetToken,
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 horas
+        }
+      });
+    }
+
+    return { customer, newUser };
   });
+
+  // 4. Enviar correos en segundo plano (sin bloquear la respuesta)
+  if (isPasswordProvided) {
+    sendNewUserPasswordEmail(
+      result.newUser.email, 
+      initialPassword, 
+      result.customer.razonSocial
+    ).catch(err => console.error("Error enviando email de password:", err));
+  } else {
+    sendSetupPasswordEmail(
+      result.newUser.email,
+      resetToken as string,
+      "Cliente B2B"
+    ).catch(err => console.error("Error enviando email de setup password:", err));
+  }
+
+  sendNewCustomerAdminNotification(
+    sellerName, 
+    result.customer.razonSocial, 
+    result.customer.rut, 
+    result.newUser.email
+  ).catch(err => console.error("Error enviando email a admin:", err));
 
   await logAuditAction({
     userId: user.id,
     action: "COMPANY_CREATED",
     entity: "Company",
-    entityId: customer.id,
-    details: { razonSocial: customer.razonSocial, rut: customer.rut, email: customer.email, salesRepEmail: salesRepEmail || null },
+    entityId: result.customer.id,
+    details: { razonSocial: result.customer.razonSocial, rut: result.customer.rut, email: result.customer.email, salesRepEmail: salesRepEmail || null },
     req,
   });
 
-  return created(customer);
+  return created(result.customer);
 });

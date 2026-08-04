@@ -1366,3 +1366,101 @@ export async function sendAnalyticsPurgeEmail(csvContent: string) {
     return false;
   }
 }
+
+export async function sendNewUserPasswordEmail(email: string, rawPassword: string, companyName: string) {
+  try {
+    const transporter = await getTransporter();
+    
+    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login`;
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb; }
+      </style>
+    </head>
+    <body style="background-color: #f9fafb; padding: 40px 0;">
+      <div class="container">
+        <h2 style="color: #1e40af; margin-top: 0;">¡Bienvenido a Jdevoto.cl!</h2>
+        <p>Hola,</p>
+        <p>Se ha creado una cuenta para tu empresa <strong>${companyName}</strong> en nuestra plataforma B2B.</p>
+        <p>Tus credenciales de acceso son las siguientes:</p>
+        
+        <div style="background-color: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0;">
+          <p style="margin: 0 0 5px 0;"><strong>Usuario:</strong> ${email}</p>
+          <p style="margin: 0;"><strong>Contraseña:</strong> <span style="font-family: monospace; font-size: 16px;">${rawPassword}</span></p>
+        </div>
+        
+        <div style="text-align: center;">
+          <a href="${loginUrl}" style="display: inline-block; background-color: #1e40af; color: #ffffff !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px; margin-bottom: 20px;">Iniciar Sesión</a>
+        </div>
+        
+        <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">
+          Por razones de seguridad, te recomendamos iniciar sesión y cambiar esta contraseña desde la configuración de tu cuenta.
+        </p>
+      </div>
+    </body>
+    </html>
+    `;
+
+    const info = await transporter.sendMail({
+      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
+      to: email,
+      subject: 'Tus credenciales de acceso B2B - Jdevoto.cl',
+      html: htmlContent,
+    });
+
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error enviando credenciales a nuevo usuario:", error);
+    return { success: false, error };
+  }
+}
+
+export async function sendNewCustomerAdminNotification(sellerName: string, companyName: string, companyRut: string, userEmail: string) {
+  try {
+    const transporter = await getTransporter();
+    
+    if (process.env.ADMIN_NOTIFICATION_EMAIL) {
+      const adminHtml = `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; background-color: #f8fafc; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <h2 style="color: #1e3a8a; margin-top: 0;">Nuevo Cliente B2B Registrado</h2>
+          <p>El vendedor <strong>${sellerName}</strong> acaba de registrar un nuevo cliente en la plataforma.</p>
+          
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr>
+              <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; width: 30%;">Razón Social:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${companyName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">RUT:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${companyRut}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Usuario Asociado:</td>
+              <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${userEmail}</td>
+            </tr>
+          </table>
+        </div>
+      </body>
+      </html>
+      `;
+
+      await transporter.sendMail({
+        from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'soporte@jdevoto.cl'}>`,
+        to: process.env.ADMIN_NOTIFICATION_EMAIL,
+        subject: `Nuevo Cliente Registrado: ${companyName}`,
+        html: adminHtml,
+      });
+    }
+  } catch (error) {
+    console.error("Error enviando notificación a admin de nuevo cliente:", error);
+  }
+}

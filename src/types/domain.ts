@@ -144,8 +144,8 @@ export interface AuthenticatedUser {
   id: string;
   email: string;
   role: UserRole;
-  // Siempre string — todo usuario está obligatoriamente vinculado a una empresa
-  companyId: string;
+  // Opcional: los administradores no necesitan empresa
+  companyId?: string | null;
   firstName: string;
   lastName: string;
   phone?: string | null;
@@ -174,7 +174,7 @@ export interface TokenPayload {
   sub: string;        // userId
   email: string;
   role: UserRole;
-  companyId: string;  // Siempre string, no nulo
+  companyId?: string | null;  // Opcional para ADMIN
   iat?: number;
   exp?: number;
 }

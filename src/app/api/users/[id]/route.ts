@@ -13,6 +13,7 @@ const UpdateUserSchema = z.object({
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
   role: z.nativeEnum(UserRole).optional(),
+  companyId: z.string().nullable().optional(),
 });
 
 export const GET = withApiHandler(async (req: NextRequest, { params }: RouteContext<{ id: string }>) => {
@@ -67,6 +68,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
   if (data.firstName !== undefined) updateData.firstName = data.firstName;
   if (data.lastName !== undefined) updateData.lastName = data.lastName;
   if (data.role !== undefined) updateData.role = data.role;
+  if (data.companyId !== undefined) updateData.companyId = data.companyId;
 
   if (data.email !== undefined) {
     const emailLower = data.email.toLowerCase();

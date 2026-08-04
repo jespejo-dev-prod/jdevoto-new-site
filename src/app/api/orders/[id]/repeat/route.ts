@@ -10,7 +10,8 @@ import { withApiHandler, ok, RouteContext } from "@/lib/api-handler";
 import { extractUserFromRequest } from "@/lib/auth";
 import { priceService } from "@/modules/pricing/domain/price.service";
 import { NotFoundError, ForbiddenError, BusinessRuleError } from "@/lib/errors";
-import { UserRole } from "@prisma/client";
+import { UserRole, OrderStatus } from "@prisma/client";
+import { orderService } from "@/modules/orders/domain/order.service";
 
 export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext<{ id: string }>) => {
   const user = extractUserFromRequest(req);
@@ -79,6 +80,30 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext<{ 
 
   if (itemsToLoad.length === 0) {
     throw new BusinessRuleError("Todos los productos del pedido anterior no cuentan con stock disponible en este momento.", "OUT_OF_STOCK_PRODUCTS");
+  }
+
+  const directCheckout = req.nextUrl.searchParams.get("directCheckout") === "true";
+  
+  if (directCheckout) {
+    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SALES_REP) {
+      throw new ForbiddenError("No tienes permiso para clonar un pedido directamente");
+    }
+
+    const newOrder = await orderService.createOrder({
+      companyId: order.companyId,
+      createdById: user.id,
+      items: itemsToLoad.map(item => ({
+        productId: item!.product.id,
+        quantity: item!.quantity
+      })),
+      notes: `Pedido clonado a partir de ${order.orderNumber}${order.notes ? `\n\nNotas originales: ${order.notes}` : ''}`,
+      status: OrderStatus.PENDING,
+      paymentMethod: order.paymentMethod || "Transferencia",
+      shippingAddress: (order.shippingAddress as Record<string, unknown>) || undefined,
+      billingAddress: (order.billingAddress as Record<string, unknown>) || undefined,
+    });
+
+    return ok({ isDirect: true, orderId: newOrder.id, orderNumber: newOrder.orderNumber });
   }
 
   return ok(itemsToLoad);

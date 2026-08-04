@@ -11,6 +11,8 @@ import { useApi } from "@/shared/infrastructure/api/use-api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/auth-context";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface OrderTableProps {
   orders: OrderSummary[];
@@ -20,7 +22,11 @@ export function OrderTable({ orders }: OrderTableProps) {
   const { addItem, clearCart, items } = useCart();
   const { fetcher } = useApi();
   const router = useRouter();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [repeatingId, setRepeatingId] = useState<string | null>(null);
+
+  const isSellerOrAdmin = user?.role === 'SALES_REP' || user?.role === 'ADMIN';
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-CL', {
@@ -32,17 +38,30 @@ export function OrderTable({ orders }: OrderTableProps) {
   const handleRepeatOrder = async (orderId: string, orderNumber: string) => {
     if (repeatingId) return;
 
-    if (items.length > 0) {
-      if (!confirm(`¿Estás seguro de que deseas repetir el pedido ${orderNumber}? Esto vaciará los productos que tienes en tu carrito actualmente.`)) {
+    if (isSellerOrAdmin) {
+      if (!confirm(`¿Estás seguro de que deseas clonar y generar inmediatamente un nuevo pedido basado en el pedido ${orderNumber}?`)) {
         return;
+      }
+    } else {
+      if (items.length > 0) {
+        if (!confirm(`¿Estás seguro de que deseas repetir el pedido ${orderNumber}? Esto vaciará los productos que tienes en tu carrito actualmente.`)) {
+          return;
+        }
       }
     }
 
     setRepeatingId(orderId);
     try {
-      const response = await fetcher(`/api/orders/${orderId}/repeat`, { method: "POST" });
+      const endpoint = isSellerOrAdmin 
+        ? `/api/orders/${orderId}/repeat?directCheckout=true` 
+        : `/api/orders/${orderId}/repeat`;
+        
+      const response = await fetcher(endpoint, { method: "POST" });
       
-      if (response && Array.isArray(response)) {
+      if (response && response.isDirect) {
+        toast.success(`¡Pedido clonado y generado exitosamente bajo el número ${response.orderNumber}!`);
+        queryClient.invalidateQueries({ queryKey: ["orders"] });
+      } else if (response && Array.isArray(response)) {
         clearCart(); // Vaciar carrito actual
         
         // Agregar los ítems del pedido anterior con precios B2B actuales al carrito

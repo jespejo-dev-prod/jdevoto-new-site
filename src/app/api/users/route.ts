@@ -91,7 +91,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       return NextResponse.json({ error: "No tienes permisos para crear este tipo de rol" }, { status: 403 });
     }
     // Forzar siempre el companyId del COMPANY_ADMIN
-    data.companyId = currentUser.companyId;
+    data.companyId = currentUser.companyId || undefined;
   }
 
   const existing = await prisma.user.findUnique({
@@ -114,7 +114,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
           lastName: data.lastName,
           role: data.role,
           // COMPANY_ADMIN hereda su propia empresa; ADMIN usa su companyId por defecto si no se provee
-          companyId: data.companyId ?? currentUser.companyId,
+          companyId: data.companyId || currentUser.companyId || undefined,
           passwordHash,
         }
       });
@@ -155,9 +155,9 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       const { passwordHash: _, ...userWithoutPassword } = reactivatedUser;
       
       // Auto-assign company if SALES_REP and company has no sales rep
-      if (reactivatedUser.role === 'SALES_REP') {
+      if (reactivatedUser.companyId) {
         const company = await prisma.company.findUnique({ where: { id: reactivatedUser.companyId } });
-        if (company && !company.salesRepId) {
+        if (company && !company.salesRepId && reactivatedUser.role === 'SALES_REP') {
           await prisma.company.update({
             where: { id: company.id },
             data: { salesRepId: reactivatedUser.id }
@@ -220,7 +220,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       const { passwordHash: _, ...userWithoutPassword } = updatedUser;
       
       // Auto-assign company if SALES_REP and company has no sales rep
-      if (updatedUser.role === 'SALES_REP') {
+      if (updatedUser.companyId && updatedUser.role === 'SALES_REP') {
         const company = await prisma.company.findUnique({ where: { id: updatedUser.companyId } });
         if (company && !company.salesRepId) {
           await prisma.company.update({
@@ -246,7 +246,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       lastName: data.lastName,
       role: data.role,
       // COMPANY_ADMIN hereda su propia empresa; ADMIN usa su companyId por defecto si no se provee
-      companyId: data.companyId ?? currentUser.companyId,
+      companyId: data.companyId || currentUser.companyId || undefined,
     }
   });
 
@@ -281,7 +281,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const { passwordHash: _, ...userWithoutPassword } = newUser;
   
   // Auto-assign company if SALES_REP and company has no sales rep
-  if (newUser.role === 'SALES_REP') {
+  if (newUser.companyId && newUser.role === 'SALES_REP') {
     const company = await prisma.company.findUnique({ where: { id: newUser.companyId } });
     if (company && !company.salesRepId) {
       await prisma.company.update({

@@ -16,10 +16,11 @@ import {
   Save,
   Trash2,
   AlertCircle,
-  ChevronDown,
   Loader2,
   Clock,
-  RotateCcw
+  RotateCcw,
+  Key,
+  ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CHILE_REGIONS } from '@/lib/chile-data';
@@ -60,6 +61,7 @@ const findMatchingCommunaName = (regionName: string | undefined, comunaName: str
 export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, onActivate, isActivating }: CustomerFormProps) {
   const { user } = useAuth();
   const isCustomerUser = user?.role === 'COMPANY_ADMIN' || user?.role === 'BUYER';
+  const canEditCommercialTerms = user?.role === 'ADMIN';
 
   const [creditLimitDisplay, setCreditLimitDisplay] = useState('');
 
@@ -109,6 +111,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       email: initialData?.email || '',
       website: initialData?.website || '',
       salesRepEmail: initialData?.salesRepEmail || '',
+      initialPassword: '',
       defaultDiscount: Number(initialData?.defaultDiscount) || 0,
       creditLimit: Number(initialData?.creditLimit) || 0,
       paymentTerms: initialData?.paymentTerms ?? 0,
@@ -308,6 +311,46 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
 
           <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 space-y-6 shadow-2xl">
             <h3 className="text-lg font-bold text-white flex items-center gap-3">
+              <Mail className="h-5 w-5 text-primary" />
+              Datos de Acceso y Contacto
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Email Contacto (Usuario)</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                    <input {...register('email')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-base" />
+                  </div>
+                  {errors.email && <p className="text-red-400 text-[10px] font-bold px-1">{errors.email.message}</p>}
+               </div>
+
+               {!initialData?.id && (
+                 <div className="space-y-2">
+                    <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Contraseña de Acceso (Opcional)</label>
+                    <div className="relative">
+                      <Key className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                      <input 
+                        {...register('initialPassword')} 
+                        type="password"
+                        placeholder="Mínimo 6 caracteres (Opcional)"
+                        className={cn(
+                          "w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-base",
+                          errors.initialPassword && "border-red-500/50"
+                        )} 
+                      />
+                    </div>
+                    {errors.initialPassword && <p className="text-red-400 text-[10px] font-bold px-1">{errors.initialPassword.message as string}</p>}
+                    <p className="text-sm text-zinc-400 px-1 italic mt-1">
+                      Si la dejas en blanco, se enviará un enlace al cliente para crearla.
+                    </p>
+                 </div>
+               )}
+            </div>
+          </div>
+
+          <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 space-y-6 shadow-2xl">
+            <h3 className="text-lg font-bold text-white flex items-center gap-3">
               <Truck className="h-5 w-5 text-primary" />
               Dirección de Envío / Despacho
             </h3>
@@ -442,14 +485,14 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     type="text"
                     value={creditLimitDisplay}
                     onChange={handleCreditLimitChange}
-                    disabled={isCustomerUser}
+                    disabled={!canEditCommercialTerms}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-14 pl-12 pr-6 text-xl font-bold text-emerald-500 focus:border-emerald-500 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   <input type="hidden" {...register('creditLimit', { valueAsNumber: true })} />
                 </div>
                 {errors.creditLimit && <p className="text-red-400 text-[10px] font-bold px-1">{errors.creditLimit.message}</p>}
                 <p className="text-sm text-zinc-400 px-1 italic text-center mt-1">
-                  {isCustomerUser ? "Solo el administrador del sitio puede cambiar tu crédito." : "Crédito máximo autorizado para compras B2B."}
+                  {!canEditCommercialTerms ? "Solo el administrador del sitio puede cambiar el crédito." : "Crédito máximo autorizado para compras B2B."}
                 </p>
               </div>
 
@@ -460,14 +503,14 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     type="number"
                     step="0.01"
                     {...register('defaultDiscount', { valueAsNumber: true })}
-                    disabled={isCustomerUser}
+                    disabled={!canEditCommercialTerms}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-14 px-6 text-xl font-bold text-primary focus:border-primary outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   <div className="absolute right-6 top-1/2 -translate-y-1/2 text-primary font-bold text-xl">%</div>
                 </div>
                 {errors.defaultDiscount && <p className="text-red-400 text-[10px] font-bold px-1">{errors.defaultDiscount.message}</p>}
                 <p className="text-sm text-zinc-400 px-1 italic text-center mt-1">
-                  {isCustomerUser ? "Solo el administrador del sitio puede cambiar tu descuento." : "Descuento adicional fijo por cliente."}
+                  {!canEditCommercialTerms ? "Solo el administrador del sitio puede cambiar el descuento." : "Descuento adicional fijo por cliente."}
                 </p>
               </div>
 
@@ -488,30 +531,23 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
             <div className="h-px bg-zinc-800" />
 
             <div className="space-y-4">
-               <div className="space-y-2">
-                  <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Email Contacto</label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                    <input {...register('email')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-base" />
-                  </div>
-               </div>
-
-               <div className="space-y-2">
-                  <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Ejecutivo de Ventas (Email)</label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                    <input 
-                      {...register('salesRepEmail')} 
-                      disabled={isCustomerUser}
-                      placeholder="vendedor@tuempresa.cl"
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-base disabled:opacity-50 disabled:cursor-not-allowed" 
-                    />
-                  </div>
-                  {errors.salesRepEmail && <p className="text-red-400 text-[10px] font-bold px-1">{errors.salesRepEmail.message}</p>}
-                  <p className="text-sm text-zinc-400 px-1 italic mt-1">
-                    {isCustomerUser ? "Solo un administrador interno puede cambiar tu ejecutivo." : "Email del vendedor (SALES_REP) activo."}
-                  </p>
-               </div>
+               {canEditCommercialTerms && (
+                 <div className="space-y-2">
+                    <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Ejecutivo de Ventas (Email)</label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                      <input 
+                        {...register('salesRepEmail')} 
+                        placeholder="vendedor@tuempresa.cl"
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-base" 
+                      />
+                    </div>
+                    {errors.salesRepEmail && <p className="text-red-400 text-[10px] font-bold px-1">{errors.salesRepEmail.message}</p>}
+                    <p className="text-sm text-zinc-400 px-1 italic mt-1">
+                      Email del vendedor activo.
+                    </p>
+                 </div>
+               )}
             </div>
 
             <div className="space-y-3 pt-6">

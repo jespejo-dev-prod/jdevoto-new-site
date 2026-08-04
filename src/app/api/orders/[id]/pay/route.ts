@@ -3,6 +3,7 @@ import { withApiHandler, ok, RouteContext } from "@/lib/api-handler";
 import { prisma } from "@/lib/client";
 import { OrderStatus, PaymentStatus, UserRole } from "@prisma/client";
 import { extractUserFromRequest, requireRole } from "@/lib/auth";
+import { ValidationError } from "@/lib/errors";
 
 export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) => {
   const user = extractUserFromRequest(req);
@@ -19,13 +20,13 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     });
 
     if (!order) {
-      throw new Error("Pedido no encontrado");
+      throw new ValidationError("Pedido no encontrado");
     }
 
     // Role check: Admin/Sales Rep or owner company
     const isAdmin = user.role === UserRole.ADMIN || user.role === UserRole.SALES_REP;
     if (!isAdmin && order.companyId !== user.companyId) {
-      throw new Error("No tienes permisos para pagar este pedido");
+      throw new ValidationError("No tienes permisos para pagar este pedido");
     }
 
     if (order.paymentStatus === PaymentStatus.PAID && !isTransferOnly && newPaymentMethod !== 'credit_b2b') {
@@ -33,54 +34,63 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       return order;
     }
 
-    if (isTransferOnly) {
-      if (order.paymentMethod === 'credit_b2b') {
-        await tx.company.update({
-          where: { id: order.companyId },
-          data: { creditUsed: { decrement: Number(order.totalGross) } }
-        });
+    const oldPaymentMethod = order.paymentMethod;
+    const isCreditB2B = newPaymentMethod === 'credit_b2b';
+    const wasCreditB2B = oldPaymentMethod === 'credit_b2b';
+
+    // Validación y ajuste de crédito B2B
+    if (isCreditB2B && !wasCreditB2B) {
+      const company = await tx.company.findUnique({ where: { id: order.companyId } });
+      if (!company) throw new ValidationError("Empresa no encontrada");
+      
+      let availableCredit = Number(company.creditLimit || 0) - Number(company.creditUsed || 0);
+      if (availableCredit < 0) availableCredit = 0;
+      
+      if (availableCredit < Number(order.totalGross)) {
+        throw new ValidationError(
+          `Crédito B2B insuficiente. Disponible: $${availableCredit.toLocaleString("es-CL")} - Requerido: $${Number(order.totalGross).toLocaleString("es-CL")}`
+        );
       }
-      return await tx.order.update({
-        where: { id },
-        data: { paymentMethod: 'transfer' },
+      
+      await tx.company.update({
+        where: { id: order.companyId },
+        data: { creditUsed: { increment: Number(order.totalGross) } }
+      });
+    } else if (!isCreditB2B && wasCreditB2B) {
+      // Liberar crédito si cambia de B2B a otro método
+      await tx.company.update({
+        where: { id: order.companyId },
+        data: { creditUsed: { decrement: Number(order.totalGross) } }
       });
     }
 
-    if (newPaymentMethod === 'credit_b2b') {
-      if (order.paymentMethod !== 'credit_b2b') {
-        await tx.company.update({
-          where: { id: order.companyId },
-          data: { creditUsed: { increment: Number(order.totalGross) } }
-        });
-        return await tx.order.update({
-          where: { id },
-          data: { paymentMethod: 'credit_b2b' },
-        });
-      }
-      return order;
+    if (isTransferOnly) {
+      return await tx.order.update({
+        where: { id },
+        data: { paymentMethod: 'transfer' }, // Transfer stays PENDING until admin approves
+      });
     }
 
-    const updated = await tx.order.update({
-      where: { id },
-      data: {
-        paymentMethod: newPaymentMethod || order.paymentMethod,
-        paymentStatus: PaymentStatus.PAID,
-        status: OrderStatus.CONFIRMED,
-      },
-    });
-
-    if (order.paymentMethod === 'credit_b2b') {
-      await tx.company.update({
-        where: { id: order.companyId },
-        data: {
-          creditUsed: {
-            decrement: Number(order.totalGross),
-          },
+    if (isCreditB2B) {
+      return await tx.order.update({
+        where: { id },
+        data: { 
+          paymentMethod: 'credit_b2b',
+          status: OrderStatus.CONFIRMED, // B2B orders are auto-confirmed
+          // En compras B2B el pago en sí queda pendiente hasta la fecha de vencimiento (30/60/90 días)
         },
       });
     }
 
-    return updated;
+    // Para Webpay/MercadoPago (cuando el webhook llama a esta ruta)
+    return await tx.order.update({
+      where: { id },
+      data: {
+        paymentMethod: newPaymentMethod || oldPaymentMethod,
+        paymentStatus: PaymentStatus.PAID,
+        status: OrderStatus.CONFIRMED,
+      },
+    });
   });
 
   // Enviar correo de confirmación de pago

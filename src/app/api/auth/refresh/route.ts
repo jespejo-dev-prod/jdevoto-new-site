@@ -95,13 +95,14 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     throw new UnauthorizedError("Expired refresh token");
   }
 
-  // 1. Revocar el token usado actualmente (rotación)
+  // 1. En lugar de rotar el refresh token en CADA recarga de página (lo que causa race conditions
+  // con múltiples pestañas o React Strict Mode), simplemente extendemos su vigencia (Rolling Session).
   await prisma.refreshToken.update({
     where: { id: storedToken.id },
-    data: { revoked: true },
+    data: { expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) },
   });
 
-  // 2. Generar nuevos tokens
+  // 2. Generar SOLO nuevo access token
   const newAccessToken = signAccessToken({
     sub: storedToken.user.id,
     email: storedToken.user.email,
@@ -109,20 +110,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     companyId: storedToken.user.companyId,
   });
 
-  const newRefreshToken = signRefreshToken(storedToken.user.id);
-
-  // 3. Registrar el nuevo refresh token en la base de datos (vigencia de 1 día)
-  await prisma.refreshToken.create({
-    data: {
-      token: newRefreshToken,
-      userId: storedToken.user.id,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 horas
-      revoked: false,
-    },
-  });
-
-  // 4. Escribir el nuevo refresh token en la cookie httpOnly
-  cookieStore.set("refresh_token", newRefreshToken, {
+  // 3. Escribir la cookie con el MISMO refresh token pero nueva expiración
+  cookieStore.set("refresh_token", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",

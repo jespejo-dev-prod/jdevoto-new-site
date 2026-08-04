@@ -130,17 +130,21 @@ export const BaseCompanySchema = z.object({
     .min(3, "La razón social debe tener al menos 3 caracteres")
     .max(255),
 
-  giro: z.string().max(255).optional().or(z.literal("")),
+  giro: z.string().min(1, "El giro comercial es obligatorio").max(255),
 
   // Datos opcionales
   nombreFantasia: z.string().max(255).optional(),
-  direccion: z.string().max(500).optional(),
-  comuna: z.string().max(100).optional(),
-  ciudad: z.string().max(100).optional(),
-  region: z.string().max(100).optional(),
+  
+  // Dirección Tributaria / Legal (Obligatorios)
+  direccion: z.string().min(1, "La dirección es obligatoria").max(500),
+  comuna: z.string().min(1, "La comuna es obligatoria").max(100),
+  ciudad: z.string().min(1, "La ciudad es obligatoria").max(100),
+  region: z.string().min(1, "La región es obligatoria").max(100),
   pais: z.string().length(2, "Código de país ISO 2 letras (ej: CL)").optional(),
-  telefono: z.string().max(20).optional().or(z.literal("")),
-  email: z.string().email("Email de contacto inválido").optional().or(z.literal("")),
+  
+  // Contacto (Obligatorios)
+  telefono: z.string().min(1, "El teléfono es obligatorio").max(20),
+  email: z.string().email("Email de contacto inválido"),
   website: z.string().url("URL del sitio web inválida").optional().or(z.literal("")),
   salesRepEmail: z.string().email("Email de vendedor inválido").optional().nullable().or(z.literal("")),
 
@@ -176,6 +180,7 @@ export const RegisterCompanySchema = BaseCompanySchema.extend({
   defaultDiscount: z.number().default(0),
   creditLimit: z.number().default(0),
   isActive: z.boolean().default(true),
+  initialPassword: z.string().min(6, "La contraseña debe tener al menos 6 caracteres").optional().or(z.literal("")),
 });
 
 export type RegisterCompanyDto = z.infer<typeof RegisterCompanySchema>;

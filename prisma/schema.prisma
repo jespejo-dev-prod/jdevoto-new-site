@@ -65,10 +65,12 @@ model User {
   phone              String?
   role               UserRole                 @default(BUYER)
   isActive           Boolean                  @default(true)
-  companyId          String
+  companyId          String?
   createdAt          DateTime                 @default(now())
   updatedAt          DateTime                 @updatedAt
   twoFactorSecret    String?
+  failedLoginAttempts Int                  @default(0)
+  lockedUntil        DateTime?
   emailUnsubscribed  Boolean                  @default(false)
   auditLogs          AuditLog[]
   assignedCompanies  Company[]                @relation("CompanySalesRep")
@@ -78,7 +80,7 @@ model User {
   orders             Order[]                  @relation("CreatedByUser")
   attributedOrders   Order[]                  @relation("OrderSalesRep")
   refreshTokens      RefreshToken[]
-  company            Company                  @relation(fields: [companyId], references: [id])
+  company            Company?                 @relation(fields: [companyId], references: [id])
 
   @@index([email])
   @@index([companyId])
