@@ -144,8 +144,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
   const targetCompanyId = user
     ? user.role === UserRole.BUYER
-      ? user.companyId
-      : (req.nextUrl.searchParams.get("companyId") || user.companyId || undefined)
+      ? (user.companyId ?? null)
+      : (req.nextUrl.searchParams.get("companyId") || user.companyId || null)
     : null;
 
   let productsWithPrices: any[];

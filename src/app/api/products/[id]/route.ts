@@ -37,8 +37,8 @@ export const GET = withApiHandler(async (req: NextRequest, ctx: RouteContext) =>
   if (!product) throw new NotFoundError("Producto", id);
 
   const targetCompanyId = user.role === UserRole.BUYER 
-    ? user.companyId 
-    : (req.nextUrl.searchParams.get("companyId") || user.companyId || undefined);
+    ? (user.companyId ?? null)
+    : (req.nextUrl.searchParams.get("companyId") || user.companyId || null);
 
   const price = await priceService.getPriceForProduct(product.id, targetCompanyId);
 
