@@ -176,6 +176,9 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
                   <option value="COMPANY_ADMIN">Admin de Empresa (Company Admin)</option>
                   <option value="SALES_REP">Vendedor (Sales Rep)</option>
                   <option value="ADMIN">Administrador (Sistema)</option>
+                  {user?.role === 'SUPER_ADMIN' && (
+                    <option value="SUPER_ADMIN">Super Administrador</option>
+                  )}
                 </>
               )}
             </select>

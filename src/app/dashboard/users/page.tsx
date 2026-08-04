@@ -7,8 +7,10 @@ import { RoleGuard } from "@/components/auth/role-guard";
 import { UserRole } from "@prisma/client";
 import { useUsers } from "@/modules/users/presentation/hooks/useUsers";
 import { UserTable } from "@/modules/users/presentation/components/UserTable";
+import { useAuth } from "@/context/auth-context";
 
 export default function UsersPage() {
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,6 +77,7 @@ export default function UsersPage() {
               className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-base text-zinc-400 focus:border-primary/50 outline-none transition-all cursor-pointer appearance-none"
             >
               <option value="">Todos los Roles</option>
+              {user?.role === 'SUPER_ADMIN' && <option value="SUPER_ADMIN">Super Admin</option>}
               <option value={UserRole.ADMIN}>Administrador</option>
               <option value={UserRole.COMPANY_ADMIN}>Admin de Empresa</option>
               <option value={UserRole.SALES_REP}>Vendedor</option>

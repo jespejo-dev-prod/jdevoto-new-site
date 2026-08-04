@@ -108,24 +108,27 @@ export function Sidebar() {
  if (user?.role ==="COMPANY_ADMIN") {
  return item.label ==="Pedidos" || item.label ==="Equipo" || item.label ==="Mi Empresa" || item.label ==="Cuenta Corriente";
  }
- // Cuenta Corriente visible para ADMIN (BUYER y COMPANY_ADMIN tienen su logica arriba)
+ 
+ const isAdminOrSuper = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+
+ // Cuenta Corriente visible para ADMIN y SUPER_ADMIN (BUYER y COMPANY_ADMIN tienen su logica arriba)
  if (item.label ==="Cuenta Corriente") {
-   return user?.role ==="ADMIN";
+   return isAdminOrSuper;
  }
- // Slider Home solo para ADMIN
- if (item.label ==="Slider Home" && user?.role !=="ADMIN") return false;
- // Descuentos solo para ADMIN
- if (item.label ==="Descuentos" && user?.role !=="ADMIN") return false;
- // Pagos solo para ADMIN
- if (item.label ==="Pagos" && user?.role !=="ADMIN") return false;
- // My Company no es para ADMIN (ya está cubierto COMPANY_ADMIN arriba)
+ // Slider Home solo para ADMIN/SUPER_ADMIN
+ if (item.label ==="Slider Home" && !isAdminOrSuper) return false;
+ // Descuentos solo para ADMIN/SUPER_ADMIN
+ if (item.label ==="Descuentos" && !isAdminOrSuper) return false;
+ // Pagos solo para ADMIN/SUPER_ADMIN
+ if (item.label ==="Pagos" && !isAdminOrSuper) return false;
+ // My Company no es para ADMIN/SUPER_ADMIN (ya está cubierto COMPANY_ADMIN arriba)
  if (item.label ==="Mi Empresa") return false;
- // Team solo para ADMIN o COMPANY_ADMIN
- if (item.label === 'Equipo' && user?.role !== 'ADMIN') return false;
- // Vendedores solo para ADMIN
- if (item.label === 'Vendedores' && user?.role !== 'ADMIN') return false;
- // Emails Masivos solo para ADMIN
- if (item.label === 'Emails Masivos' && user?.role !== 'ADMIN') return false;
+ // Team solo para ADMIN/SUPER_ADMIN o COMPANY_ADMIN
+ if (item.label === 'Equipo' && !isAdminOrSuper) return false;
+ // Vendedores solo para ADMIN/SUPER_ADMIN
+ if (item.label === 'Vendedores' && !isAdminOrSuper) return false;
+ // Emails Masivos solo para ADMIN/SUPER_ADMIN
+ if (item.label === 'Emails Masivos' && !isAdminOrSuper) return false;
 
   // SALES_REP no debe ver las siguientes pestañas
   if (user?.role === 'SALES_REP') {

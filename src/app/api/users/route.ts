@@ -87,11 +87,18 @@ export const POST = withApiHandler(async (req: NextRequest) => {
 
   // Validación de COMPANY_ADMIN
   if (currentUser.role === UserRole.COMPANY_ADMIN) {
-    if (data.role === UserRole.ADMIN || data.role === UserRole.COMPANY_ADMIN) {
+    if (data.role === UserRole.ADMIN || data.role === UserRole.COMPANY_ADMIN || data.role === 'SUPER_ADMIN') {
       return NextResponse.json({ error: "No tienes permisos para crear este tipo de rol" }, { status: 403 });
     }
     // Forzar siempre el companyId del COMPANY_ADMIN
     data.companyId = currentUser.companyId || undefined;
+  }
+
+  // Validación de ADMIN
+  if (currentUser.role === UserRole.ADMIN) {
+    if (data.role === UserRole.ADMIN || data.role === 'SUPER_ADMIN') {
+      return NextResponse.json({ error: "Solo un Super Administrador puede crear usuarios con este rol" }, { status: 403 });
+    }
   }
 
   const existing = await prisma.user.findUnique({

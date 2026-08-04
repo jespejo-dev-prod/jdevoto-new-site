@@ -2,6 +2,7 @@ import { Mail, CheckCircle2, Trash2, Loader2, Pencil, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
 
 interface UserTableProps {
   users: any[];
@@ -12,6 +13,8 @@ interface UserTableProps {
 
 export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserTableProps) {
   const router = useRouter();
+  const { user: currentUser } = useAuth();
+  
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-x-auto shadow-2xl">
       <table className="w-full text-left border-collapse">
@@ -93,31 +96,42 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                 </td>
                 <td className="p-4 pr-8" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center gap-1">
-                    <button 
-                      onClick={() => onResetPassword(u.id)}
-                      className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-yellow-500 transition-colors opacity-50 group-hover:opacity-100"
-                      title="Restablecer contraseña"
-                    >
-                      <Key className="w-4 h-4" />
-                    </button>
-                    <Link 
-                      href={`/dashboard/users/${u.id}`}
-                      className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors opacity-50 group-hover:opacity-100"
-                      title="Editar miembro"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Link>
-                    <button 
-                      onClick={() => {
-                        if (window.confirm("¿Estás seguro de que deseas eliminar este miembro del equipo?")) {
-                          onDelete(u.id);
-                        }
-                      }}
-                      className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100"
-                      title="Eliminar miembro"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {/* Botón de Reset Password */}
+                    {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && (
+                      <button 
+                        onClick={() => onResetPassword(u.id)}
+                        className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-yellow-500 transition-colors opacity-50 group-hover:opacity-100"
+                        title="Restablecer contraseña"
+                      >
+                        <Key className="w-4 h-4" />
+                      </button>
+                    )}
+                    
+                    {/* Botón de Editar */}
+                    {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && (
+                      <Link 
+                        href={`/dashboard/users/${u.id}`}
+                        className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors opacity-50 group-hover:opacity-100"
+                        title="Editar miembro"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Link>
+                    )}
+
+                    {/* Botón de Eliminar */}
+                    {u.email !== 'jespejo@jdevoto.cl' && u.role !== 'SUPER_ADMIN' && !(currentUser?.role === 'ADMIN' && u.role === 'ADMIN') && (
+                      <button 
+                        onClick={() => {
+                          if (window.confirm("¿Estás seguro de que deseas eliminar este miembro del equipo?")) {
+                            onDelete(u.id);
+                          }
+                        }}
+                        className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100"
+                        title="Eliminar miembro"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

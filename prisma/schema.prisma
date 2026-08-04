@@ -472,6 +472,7 @@ model AnalyticsDailyStat {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
   SALES_REP
   BUYER

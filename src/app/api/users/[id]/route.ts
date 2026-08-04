@@ -59,7 +59,17 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     if (targetUser.companyId !== currentUser.companyId) {
       return NextResponse.json({ error: "No tienes permisos para editar este usuario" }, { status: 403 });
     }
-    if (data.role && (data.role === UserRole.ADMIN || data.role === UserRole.COMPANY_ADMIN)) {
+    if (data.role && (data.role === UserRole.ADMIN || data.role === UserRole.COMPANY_ADMIN || data.role === 'SUPER_ADMIN')) {
+      return NextResponse.json({ error: "No tienes permisos para asignar este rol" }, { status: 403 });
+    }
+  }
+
+  // Validación para ADMIN
+  if (currentUser.role === UserRole.ADMIN) {
+    if (targetUser.role === 'SUPER_ADMIN' || targetUser.role === UserRole.ADMIN) {
+      return NextResponse.json({ error: "No tienes permisos para editar a este administrador" }, { status: 403 });
+    }
+    if (data.role && (data.role === 'SUPER_ADMIN' || data.role === UserRole.ADMIN)) {
       return NextResponse.json({ error: "No tienes permisos para asignar este rol" }, { status: 403 });
     }
   }
@@ -130,6 +140,16 @@ export const DELETE = withApiHandler(async (req: NextRequest, { params }: RouteC
 
   if (!targetUser) {
     return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+  }
+
+  // Protección del SUPER_ADMIN y usuario principal
+  if (targetUser.email === 'jespejo@jdevoto.cl' || targetUser.role === 'SUPER_ADMIN') {
+    return NextResponse.json({ error: "Este usuario está protegido y no puede ser eliminado" }, { status: 403 });
+  }
+
+  // Validación para ADMIN eliminando a otro ADMIN
+  if (currentUser.role === UserRole.ADMIN && targetUser.role === UserRole.ADMIN) {
+    return NextResponse.json({ error: "No tienes permisos para eliminar a otro administrador" }, { status: 403 });
   }
 
   if (currentUser.role === UserRole.COMPANY_ADMIN && targetUser.companyId !== currentUser.companyId) {

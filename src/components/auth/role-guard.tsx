@@ -23,7 +23,7 @@ export function RoleGuard({
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  const hasAccess = user && allowedRoles.includes(user.role);
+  const hasAccess = user && (user.role === 'SUPER_ADMIN' || allowedRoles.includes(user.role));
 
   useEffect(() => {
     if (!loading && !hasAccess && redirect) {

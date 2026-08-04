@@ -98,6 +98,10 @@ export function requireRole(
   user: AuthenticatedUser,
   allowedRoles: UserRole[]
 ): void {
+  // SUPER_ADMIN tiene acceso total, excepto si la lista de roles es muy restrictiva?
+  // No, el requerimiento es que SUPER_ADMIN tiene control absoluto.
+  if (user.role === 'SUPER_ADMIN') return;
+
   if (!allowedRoles.includes(user.role)) {
     throw new ForbiddenError(
       `Rol '${user.role}' no tiene acceso a este recurso`
