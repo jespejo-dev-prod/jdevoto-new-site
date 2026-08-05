@@ -14,7 +14,7 @@ export default function CustomerDetailPage() {
  const router = useRouter();
  const { fetcher } = useApi();
  const { user } = useAuth();
- const isAdmin = user?.role === 'ADMIN';
+ const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
  const { 
  data: customer, 
  isLoading, 

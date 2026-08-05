@@ -38,8 +38,8 @@ export default function OrderDetailPage() {
  const router = useRouter();
  const { data: order, isLoading, updateStatus, deleteOrder, updateOrder } = useOrder(id);
  const { user } = useAuth();
- const isAdmin = user?.role === 'ADMIN' || user?.role === 'SALES_REP';
- const canChangeStatus = user?.role === 'ADMIN';
+ const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'SALES_REP';
+ const canChangeStatus = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
  const { fetcher } = useApi();
  const [isSendingEmail, setIsSendingEmail] = useState(false);
  const [isPaying, setIsPaying] = useState(false);
