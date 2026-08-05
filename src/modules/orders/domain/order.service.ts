@@ -250,7 +250,7 @@ export class OrderService {
       // 8.1 Verificar que no tenga facturas vencidas
       const overdueOrders = await prisma.order.count({
         where: {
-          companyId: user.companyId,
+          companyId: companyId,
           paymentStatus: { not: "PAID" },
           dueDate: { lt: new Date() },
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.DRAFT] }
