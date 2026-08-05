@@ -8,8 +8,8 @@ import { UserRole } from "@prisma/client";
 export const GET = withApiHandler(async (req: NextRequest) => {
   const user = extractUserFromRequest(req);
 
-  // Solo ADMIN y SALES_REP pueden ver analítica global
-  if (user.role !== UserRole.ADMIN && user.role !== UserRole.SALES_REP) {
+  // Solo ADMIN, SUPER_ADMIN y SALES_REP pueden ver analítica global
+  if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN && user.role !== UserRole.SALES_REP) {
     throw new ForbiddenError("No tienes permisos para ver la analítica");
   }
 
