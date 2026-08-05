@@ -626,7 +626,7 @@ export class OrderService {
     return { success: true };
   }
 
-  async getOrderById(id: string, companyId?: string) {
+  async getOrderById(id: string, companyId?: string, salesRepId?: string) {
     const order = await prisma.order.findUnique({
       where: { id },
       include: {
@@ -660,9 +660,14 @@ export class OrderService {
 
     if (!order) throw new NotFoundError("Pedido", id);
 
-    // Si se provee companyId (contexto de BUYER), validar pertenencia
+    // Si se provee companyId, validar pertenencia
     if (companyId && order.companyId !== companyId) {
       throw new BusinessRuleError("No tienes permiso para ver este pedido", "FORBIDDEN_ORDER_ACCESS");
+    }
+
+    // Si se provee salesRepId, validar que la empresa le pertenezca
+    if (salesRepId && order.company?.salesRepId !== salesRepId) {
+      throw new BusinessRuleError("No tienes permiso para ver un pedido de una cartera ajena", "FORBIDDEN_ORDER_ACCESS");
     }
 
     return order;

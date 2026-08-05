@@ -56,6 +56,7 @@ Sigue estos pasos para arrancar el entorno de desarrollo:
    - Crea un archivo `.env` o renombra el de ejemplo y ajusta los valores:
      - `DATABASE_URL` (Obligatorio).
      - `JWT_SECRET` (Obligatorio para la autenticación).
+     - `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` (Obligatorio para Rate Limiting).
      - Credenciales de Mercado Pago, SMTP, etc.
 
 3. **Preparar la base de datos (Prisma):**

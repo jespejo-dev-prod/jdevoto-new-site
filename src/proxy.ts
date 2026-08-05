@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
+import { jwtVerify } from "jose";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
-// Rate limit en memoria (Edge-compatible, estado por worker)
-const rateLimitMap = new Map<string, { count: number, resetAt: number }>();
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutos
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.fixedWindow(10, "15 m"), // 10 peticiones cada 15 min por IP
+});
 const MAX_REQUESTS = 1000; // 1000 peticiones cada 15 min por IP (evita bloqueos de Next.js prefetch)
 
 export async function proxy(request: NextRequest) {
@@ -26,16 +29,15 @@ export async function proxy(request: NextRequest) {
   const isDev = process.env.NODE_ENV === 'development';
 
   if (ip !== 'unknown' && !isLocal && !isDev) {
-    const now = Date.now();
-    const limitRecord = rateLimitMap.get(ip);
-
-    if (limitRecord && limitRecord.resetAt > now) {
-      limitRecord.count++;
-      if (limitRecord.count > MAX_REQUESTS) {
-        return new NextResponse('Too Many Requests. Please try again later.', { status: 429 });
+    try {
+      if (pathname.startsWith('/api/auth/login')) {
+        const { success } = await ratelimit.limit(`login_rl_${ip}`);
+        if (!success) {
+          return NextResponse.json({ error: "Demasiadas peticiones. Intente más tarde." }, { status: 429 });
+        }
       }
-    } else {
-      rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    } catch (error) {
+      console.error("Upstash Rate Limit Error (Failing Open):", error);
     }
   }
 

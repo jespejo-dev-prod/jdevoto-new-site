@@ -52,12 +52,6 @@ const RegisterSchema = z.object({
     .min(3, "El giro debe tener al menos 3 caracteres")
     .max(255),
 
-  defaultDiscount: z
-    .number()
-    .min(0)
-    .max(100, "El descuento no puede superar el 100%")
-    .default(0),
-
   calleNumero: z.string().min(3, "La calle y número es obligatoria"),
   region: z.string().min(3, "La región es obligatoria"),
   comuna: z.string().min(3, "La comuna es obligatoria"),
@@ -150,7 +144,6 @@ export const POST = withApiHandler(async (req: NextRequest) => {
         giro: data.giro,
         telefono: data.telefono,
         email: data.email.toLowerCase(),
-        defaultDiscount: data.defaultDiscount,
         paymentTerms: 0,
         paymentTermDiscount: 0,
         billingStreet: data.calleNumero,

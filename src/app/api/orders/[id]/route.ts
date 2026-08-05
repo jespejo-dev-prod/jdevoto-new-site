@@ -9,16 +9,18 @@ import { withApiHandler, ok, RouteContext } from "@/lib/api-handler";
 import { extractUserFromRequest, requireRole } from "@/lib/auth";
 import { orderService } from "@/modules/orders/domain/order.service";
 import { UserRole } from "@prisma/client";
-import { ValidationError } from "@/lib/errors";
+import { ValidationError, BusinessRuleError, NotFoundError } from "@/lib/errors";
+import { prisma } from "@/lib/client";
 
 export const GET = withApiHandler(async (req: NextRequest, ctx: RouteContext) => {
   const user = extractUserFromRequest(req);
   const { id } = await ctx.params;
 
-  // Si es BUYER, el servicio validará que el pedido pertenezca a su empresa
-  const companyContext = user.role === UserRole.BUYER ? user.companyId ?? undefined : undefined;
+  const isCustomer = user.role === UserRole.BUYER || user.role === UserRole.COMPANY_ADMIN;
+  const companyContext = isCustomer ? (user.companyId ?? undefined) : undefined;
+  const salesRepContext = user.role === UserRole.SALES_REP ? user.id : undefined;
 
-  const order = await orderService.getOrderById(id, companyContext);
+  const order = await orderService.getOrderById(id, companyContext, salesRepContext);
 
   return ok(order);
 });
@@ -36,6 +38,18 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     }
   }
   
+  // Validación estricta de IDOR para Vendedores (SALES_REP) siempre
+  if (user.role === UserRole.SALES_REP) {
+    const orderTarget = await prisma.order.findUnique({
+      where: { id },
+      include: { company: true }
+    });
+    if (!orderTarget) throw new NotFoundError("Pedido", id);
+    if (orderTarget.company?.salesRepId !== user.id) {
+      throw new BusinessRuleError("No tienes permiso para editar un pedido que no pertenece a tu cartera.", "FORBIDDEN_ORDER_UPDATE");
+    }
+  }
+
   // Por simplicidad en este paso, pasamos el body directamente al servicio.
   // En producción, esto debería validarse con un OrderUpdateSchema.
   const updatedOrder = await orderService.updateOrder(id, body);
