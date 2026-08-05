@@ -8,7 +8,7 @@ import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 import { AdminEditButton } from "./AdminEditButton";
 import { AuthRender } from "@/components/auth/auth-render";
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 import {
   ChevronRight,
@@ -346,12 +346,18 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   Descripción del producto
                 </h2>
                 <div
-                  className="text-lg sm:text-xl text-zinc-700 leading-relaxed space-y-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_a]:text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-xl [&_img]:my-4"
+                  className="prose prose-zinc max-w-none text-zinc-600 prose-p:leading-relaxed prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-zinc-900 prose-ul:my-4 prose-li:my-1 text-sm md:text-base leading-relaxed"
                   dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      (product.description || "No hay descripción disponible.")
-                        .replace(/\\n/g, "<br />")
-                        .replace(/\n/g, "<br />")
+                    __html: sanitizeHtml(
+                      product.description || "Sin descripción disponible.",
+                      {
+                        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'iframe']),
+                        allowedAttributes: {
+                          ...sanitizeHtml.defaults.allowedAttributes,
+                          img: ['src', 'alt', 'width', 'height'],
+                          iframe: ['src', 'width', 'height', 'allowfullscreen', 'frameborder']
+                        }
+                      }
                     ),
                   }}
                 />
