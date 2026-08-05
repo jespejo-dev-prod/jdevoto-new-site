@@ -20,7 +20,10 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext) =
     customerEmail = orderCreator?.email || "ventas@tutiendab2b.cl";
   }
 
-  const result = await sendOrderEmail(order, customerEmail);
+  const body = await req.json().catch(() => ({}));
+  const isTransferRequest = !!body.isTransferRequest;
+
+  const result = await sendOrderEmail(order, customerEmail, isTransferRequest);
 
   if (!result.success) {
     throw new Error("No se pudo enviar el correo");

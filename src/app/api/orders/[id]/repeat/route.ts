@@ -85,9 +85,6 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext<{ 
   const directCheckout = req.nextUrl.searchParams.get("directCheckout") === "true";
   
   if (directCheckout) {
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SALES_REP) {
-      throw new ForbiddenError("No tienes permiso para clonar un pedido directamente");
-    }
 
     const newOrder = await orderService.createOrder({
       companyId: order.companyId,

@@ -25,6 +25,7 @@ export function OrderSummary() {
 
   const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
   const paymentTermsDays = effectiveCompany?.paymentTerms ?? 30;
+  const hasCreditB2b = effectiveCompany?.paymentTerms !== undefined;
 
   const creditDiscountPercent = React.useMemo(() => {
     if (paymentTermsDays === 90) return 0;
@@ -92,7 +93,9 @@ export function OrderSummary() {
               >
                 <option value="transfer">Transferencia Bancaria Directa (10% OFF)</option>
                 <option value="webpay">Mercado Pago (10% OFF)</option>
-                <option value="credit_b2b">Crédito Directo B2B ({creditDiscountPercent}% OFF)</option>
+                {hasCreditB2b && (
+                <option value="credit_b2b">Crédito Directo {paymentTermsDays} días ({creditDiscountPercent}% OFF)</option>
+              )}
               </select>
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
            </div>

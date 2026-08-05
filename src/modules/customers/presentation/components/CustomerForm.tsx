@@ -61,7 +61,7 @@ const findMatchingCommunaName = (regionName: string | undefined, comunaName: str
 export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, onActivate, isActivating }: CustomerFormProps) {
   const { user } = useAuth();
   const isCustomerUser = user?.role === 'COMPANY_ADMIN' || user?.role === 'BUYER';
-  const canEditCommercialTerms = user?.role === 'ADMIN';
+  const canEditCommercialTerms = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
 
   const [creditLimitDisplay, setCreditLimitDisplay] = useState('');
 
@@ -76,14 +76,16 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
 
   const handleCreditLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawVal = e.target.value;
-    // Keep only digits
     const cleanVal = rawVal.replace(/\D/g, '');
-    const parsed = parseInt(cleanVal, 10) || 0;
     
-    // Update RHF form state
+    if (cleanVal === '') {
+      setValue('creditLimit', 0, { shouldValidate: true, shouldDirty: true });
+      setCreditLimitDisplay('');
+      return;
+    }
+
+    const parsed = parseInt(cleanVal, 10);
     setValue('creditLimit', parsed, { shouldValidate: true, shouldDirty: true });
-    
-    // Update local state with formatting
     setCreditLimitDisplay(parsed.toLocaleString('es-CL'));
   };
 
@@ -186,7 +188,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
   // Lógica Automática: Descuento por condición de pago
   useEffect(() => {
     const termToDiscount: Record<number, number> = {
-      0: 0,
+      0: 10,
       30: 7,
       60: 4,
       90: 0
@@ -453,7 +455,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                 </div>
                 {watch('paymentTerms') === 0 && (
                   <div className="border-t border-zinc-800/50 pt-2 text-xs text-zinc-400 leading-relaxed">
-                    <span className="text-emerald-400 font-bold">Modo informativo:</span> 10% de descuento aplica al pagar con Transferencia o Mercado Pago.
+                    <span className="text-emerald-400 font-bold">Nota:</span> Se aplica un 10% de descuento por pago al contado.
                   </div>
                 )}
               </div>

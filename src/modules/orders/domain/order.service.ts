@@ -220,7 +220,7 @@ export class OrderService {
         if (paymentTermsDays === 90) paymentDiscountPercent = 0;
         else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
         else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
-        else if (paymentTermsDays === 0) paymentDiscountPercent = 0;
+        else if (paymentTermsDays === 0) paymentDiscountPercent = 10;
       }
     } else if (paymentMethod === 'webpay' || paymentMethod === 'transfer' || paymentMethod === 'mercadopago') {
       paymentDiscountPercent = 10;
@@ -246,6 +246,30 @@ export class OrderService {
           "CREDIT_LIMIT_EXCEEDED"
         );
       }
+
+      // 8.1 Verificar que no tenga facturas vencidas
+      const overdueOrders = await prisma.order.count({
+        where: {
+          companyId: user.companyId,
+          paymentStatus: { not: "PAID" },
+          dueDate: { lt: new Date() },
+          status: { notIn: [OrderStatus.CANCELLED, OrderStatus.DRAFT] }
+        }
+      });
+
+      if (overdueOrders > 0) {
+        throw new BusinessRuleError(
+          `No puede realizar nuevos pedidos porque mantiene ${overdueOrders} factura(s) vencida(s). Por favor regularice sus pagos para liberar cupo.`,
+          "OVERDUE_ORDERS_BLOCK"
+        );
+      }
+    }
+
+    // Calcular dueDate si es Crédito Directo y no es borrador
+    let dueDate: Date | undefined = undefined;
+    if (paymentMethod === 'credit_b2b' && status !== OrderStatus.DRAFT) {
+      dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + paymentTermsDays);
     }
 
     // 9. Ejecutar todo en una transacción atómica
@@ -259,13 +283,19 @@ export class OrderService {
         attributedSalesRepId = user.id;
       }
 
+      // Validar regla de negocio: Crédito B2B debe quedar CONFIRMED (no pending) si hay cupo
+      let finalStatus = status;
+      if (paymentMethod === 'credit_b2b' && finalStatus === 'PENDING') {
+        finalStatus = 'CONFIRMED';
+      }
+
       // Crear el pedido
       const newOrder = await tx.order.create({
         data: {
           orderNumber,
           companyId,
           createdById,
-          status,
+          status: finalStatus,
           paymentMethod,
           salesRepId: attributedSalesRepId,
           createdAt: input.createdAt || new Date(),
@@ -274,6 +304,7 @@ export class OrderService {
           totalGross,
           discountAmount: paymentDiscountAmount,
           notes: notes ?? null,
+          dueDate, // <-- NUEVO CAMPO AÑADIDO
           shippingAddress: shippingAddress
             ? (shippingAddress as Prisma.InputJsonValue)
             : Prisma.JsonNull,

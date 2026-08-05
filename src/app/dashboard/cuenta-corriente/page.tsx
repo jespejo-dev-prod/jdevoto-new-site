@@ -16,6 +16,7 @@ import {
  ArrowRight, 
  Calendar,
  Building,
+ Building2,
  Check
 } from 'lucide-react';
 import Link from 'next/link';
@@ -25,7 +26,7 @@ export default function CuentaCorrientePage() {
  const { user, accessToken } = useAuth();
  const queryClient = useQueryClient();
 
- const isAdmin = user?.role === UserRole.ADMIN;
+ const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
  const myCompanyId = user?.companyId || user?.company?.id || '';
 
  // Tab state for admins
@@ -127,6 +128,7 @@ export default function CuentaCorrientePage() {
  // Manual payment updates state
  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
  const [payingOrderId, setPayingOrderId] = useState<string | null>(null);
+ const [requestingTransferId, setRequestingTransferId] = useState<string | null>(null);
 
  const handleConfirmTransfer = async (orderId: string, orderNumber: string) => {
  if (!confirm(`¿Estás seguro de que deseas confirmar el pago de la orden ${orderNumber} por transferencia directa? Se liberará el cupo de la empresa en la base de datos.`)) {
@@ -180,8 +182,35 @@ export default function CuentaCorrientePage() {
  setPayingOrderId(null);
  }
  };
+  const handleRequestTransfer = async (orderId: string) => {
+    setRequestingTransferId(orderId);
+    const toastId = toast.loading("Enviando correo con instrucciones...");
+    try {
+      const res = await fetch(`/api/orders/${orderId}/send-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ isTransferRequest: true })
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || errData.error || 'Error al solicitar transferencia.');
+      }
+      
+      toast.success("Te hemos enviado un correo con los datos para la transferencia", { id: toastId });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Error al procesar.', { id: toastId });
+    } finally {
+      setRequestingTransferId(null);
+    }
+  };
 
- return (
+  return (
  <RoleGuard allowedRoles={[UserRole.COMPANY_ADMIN, UserRole.BUYER, UserRole.ADMIN]}>
  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  
@@ -420,7 +449,7 @@ export default function CuentaCorrientePage() {
  <th className="p-5 py-5 text-base font-bold text-zinc-300 uppercase tracking-wider">Fecha Emisión</th>
  <th className="p-5 py-5 text-base font-bold text-zinc-300 uppercase tracking-wider text-right">Neto</th>
  <th className="p-5 py-5 text-base font-bold text-zinc-300 uppercase tracking-wider text-right">Total Bruto</th>
- <th className="p-5 py-5 text-base font-bold text-zinc-300 uppercase tracking-wider text-center">Estado</th>
+ <th className="p-5 py-5 text-base font-bold text-zinc-300 uppercase tracking-wider text-center">Estado Pago</th>
  <th className="p-5 py-5 text-base font-bold text-zinc-300 uppercase tracking-wider text-right">Acción</th>
  </tr>
  </thead>
@@ -479,7 +508,7 @@ export default function CuentaCorrientePage() {
  <td className="p-5 py-6 text-center">
  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider bg-rose-500/10 border border-rose-500/20 text-rose-400 shadow-inner">
  <AlertCircle className="w-4 h-4" />
- Pendiente
+ Pago Pendiente
  </span>
  </td>
 
@@ -499,15 +528,25 @@ export default function CuentaCorrientePage() {
  Confirmar Transferencia
  </button>
  ) : (
- <button 
- onClick={() => handleOnlinePayment(order.id)}
- disabled={payingOrderId !== null}
- className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-primary/95 text-primary-foreground hover:opacity-90 disabled:opacity-50 text-sm font-bold transition-all shadow-md shadow-primary/10 inline-flex items-center gap-1.5 group select-none"
- >
- {payingOrderId === order.id && <Loader2 className="w-4 h-4 animate-spin" />}
- Pagar en línea
- {payingOrderId !== order.id && <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />}
- </button>
+ <div className="flex items-center justify-end gap-2">
+    <button 
+      onClick={() => handleRequestTransfer(order.id)}
+      disabled={requestingTransferId === order.id || payingOrderId !== null}
+      className="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold transition-all shadow-md inline-flex items-center gap-1.5 select-none disabled:opacity-50"
+    >
+      {requestingTransferId === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Building2 className="w-4 h-4" />}
+      Transferencia
+    </button>
+    <button 
+      onClick={() => handleOnlinePayment(order.id)}
+      disabled={payingOrderId !== null}
+      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-primary/95 text-primary-foreground hover:opacity-90 disabled:opacity-50 text-sm font-bold transition-all shadow-md shadow-primary/10 inline-flex items-center gap-1.5 group select-none"
+    >
+      {payingOrderId === order.id && <Loader2 className="w-4 h-4 animate-spin" />}
+      Pagar en línea
+      {payingOrderId !== order.id && <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />}
+    </button>
+  </div>
  )}
  </td>
  </tr>

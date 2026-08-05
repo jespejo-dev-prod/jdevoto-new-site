@@ -248,6 +248,7 @@ model Order {
   updatedAt       DateTime       @updatedAt
   billingAddress  Json?
   paymentMethod   String?
+  dueDate         DateTime?
   salesRepId      String?
   items           OrderItem[]
   messages        OrderMessage[]

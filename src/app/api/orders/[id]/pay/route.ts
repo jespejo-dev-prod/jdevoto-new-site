@@ -24,7 +24,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     }
 
     // Role check: Admin/Sales Rep or owner company
-    const isAdmin = user.role === UserRole.ADMIN || user.role === UserRole.SALES_REP;
+    const isAdmin = user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN || user.role === UserRole.SALES_REP;
     if (!isAdmin && order.companyId !== user.companyId) {
       throw new ValidationError("No tienes permisos para pagar este pedido");
     }
@@ -125,15 +125,26 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       });
 
       if (populatedOrder) {
-        const { sendOrderStatusUpdateEmail } = await import("@/lib/email");
+        const { sendOrderStatusUpdateEmail, sendOrderEmail } = await import("@/lib/email");
         let customerEmail = (populatedOrder.billingAddress as any)?.email;
         if (!customerEmail) {
           customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
         }
-        await sendOrderStatusUpdateEmail(populatedOrder, customerEmail);
+        
+        // Si es solo cambio a transferencia, enviamos el correo original de pedido que incluye
+        // los datos bancarios. Si es un pago exitoso (B2B o Webpay), enviamos la actualización de estado.
+        if (isTransferOnly) {
+          sendOrderEmail(populatedOrder, customerEmail).catch(emailErr => {
+            console.error("Error al enviar correo de instrucciones de transferencia:", emailErr);
+          });
+        } else {
+          sendOrderStatusUpdateEmail(populatedOrder, customerEmail).catch(emailErr => {
+            console.error("Error al enviar correo tras pago exitoso:", emailErr);
+          });
+        }
       }
     } catch (emailErr) {
-      console.error("Error al enviar correo tras pago:", emailErr);
+      console.error("Error en preparación de correo:", emailErr);
     }
   }
 

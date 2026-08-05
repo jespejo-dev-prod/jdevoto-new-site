@@ -56,7 +56,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
   const whereClause: Prisma.CompanyWhereInput = { AND: andConditions };
 
-  const needsTotals = user.role === UserRole.ADMIN && !unassigned;
+  const needsTotals = (user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN) && !unassigned;
 
   const [customers, total, totals] = await Promise.all([
     prisma.company.findMany({

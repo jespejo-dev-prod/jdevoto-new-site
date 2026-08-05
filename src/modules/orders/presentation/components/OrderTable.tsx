@@ -26,7 +26,7 @@ export function OrderTable({ orders }: OrderTableProps) {
   const queryClient = useQueryClient();
   const [repeatingId, setRepeatingId] = useState<string | null>(null);
 
-  const isSellerOrAdmin = user?.role === 'SALES_REP' || user?.role === 'ADMIN';
+  const isSellerOrAdmin = user?.role === 'SALES_REP' || user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-CL', {
@@ -38,39 +38,19 @@ export function OrderTable({ orders }: OrderTableProps) {
   const handleRepeatOrder = async (orderId: string, orderNumber: string) => {
     if (repeatingId) return;
 
-    if (isSellerOrAdmin) {
-      if (!confirm(`¿Estás seguro de que deseas clonar y generar inmediatamente un nuevo pedido basado en el pedido ${orderNumber}?`)) {
-        return;
-      }
-    } else {
-      if (items.length > 0) {
-        if (!confirm(`¿Estás seguro de que deseas repetir el pedido ${orderNumber}? Esto vaciará los productos que tienes en tu carrito actualmente.`)) {
-          return;
-        }
-      }
+    if (!confirm(`¿Estás seguro de que deseas repetir el pedido ${orderNumber}? Esto generará un nuevo pedido inmediatamente.\n\nNota: Si el pedido original fue realizado con Crédito B2B, este nuevo pedido descontará saldo automáticamente de tu línea de crédito y quedará confirmado.`)) {
+      return;
     }
 
     setRepeatingId(orderId);
     try {
-      const endpoint = isSellerOrAdmin 
-        ? `/api/orders/${orderId}/repeat?directCheckout=true` 
-        : `/api/orders/${orderId}/repeat`;
+      const endpoint = `/api/orders/${orderId}/repeat?directCheckout=true`;
         
       const response = await fetcher(endpoint, { method: "POST" });
       
       if (response && response.isDirect) {
         toast.success(`¡Pedido clonado y generado exitosamente bajo el número ${response.orderNumber}!`);
         queryClient.invalidateQueries({ queryKey: ["orders"] });
-      } else if (response && Array.isArray(response)) {
-        clearCart(); // Vaciar carrito actual
-        
-        // Agregar los ítems del pedido anterior con precios B2B actuales al carrito
-        response.forEach((item: any) => {
-          addItem(item.product, item.quantity);
-        });
-
-        toast.success(`¡Pedido ${orderNumber} repetido con éxito! Redirigiéndote al carrito...`);
-        router.push("/cart");
       }
     } catch (err: any) {
       console.error("Error repeating B2B order from dashboard:", err);

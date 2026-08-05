@@ -293,7 +293,7 @@ export default function CheckoutPage() {
       if (paymentTermsDays === 90) return 0;
       if (paymentTermsDays === 60) return 4;
       if (paymentTermsDays === 30) return 7;
-      if (paymentTermsDays === 0) return 0;
+      if (paymentTermsDays === 0) return 10;
       return 0;
     }
     if (paymentMethod === 'webpay' || paymentMethod === 'transfer' || paymentMethod === 'mercadopago') {
@@ -309,7 +309,7 @@ export default function CheckoutPage() {
     if (paymentTermsDays === 90) return 0;
     if (paymentTermsDays === 60) return 4;
     if (paymentTermsDays === 30) return 7;
-    if (paymentTermsDays === 0) return 0;
+    if (paymentTermsDays === 0) return 10;
     return 0;
   }, [paymentTermsDays, user?.company]);
 
@@ -894,7 +894,7 @@ export default function CheckoutPage() {
                           <input type="radio" name="payment" checked={paymentMethod === 'credit_b2b'} onChange={() => { setPaymentMethod('credit_b2b'); localStorage.setItem('jdevoto_payment_method', 'credit_b2b'); }} className="hidden" />
                           <Wallet className={`h-6 w-6 ${paymentMethod === 'credit_b2b' ? 'text-primary' : 'text-zinc-400'}`} />
                           <div className="flex flex-col">
-                             <span className="text-sm sm:text-base font-bold text-zinc-900">Crédito Directo B2B {creditB2bDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">-{creditB2bDiscountPercent}% OFF</span>}</span>
+                             <span className="text-sm sm:text-base font-bold text-zinc-900">Crédito Directo {user?.company?.paymentTerms ?? 30} días {creditB2bDiscountPercent > 0 && <span className="text-[10px] ml-2 text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">-{creditB2bDiscountPercent}% OFF</span>}</span>
                              <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide">Condición: Pago a {user?.company?.paymentTerms ?? 30} días</span>
                           </div>
                        </div>

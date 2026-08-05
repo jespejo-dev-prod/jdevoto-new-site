@@ -64,14 +64,14 @@ export default function OrderDetailPage() {
           body: JSON.stringify({ paymentMethod: 'credit_b2b' }) 
         });
         toast.success("Pago con Crédito B2B procesado correctamente", { id: toastId });
-        window.location.reload();
+        setTimeout(() => window.location.reload(), 2500);
       } else if (method === 'transfer') {
         await fetcher(`/api/orders/${id}/pay`, { 
           method: 'PATCH', 
           body: JSON.stringify({ paymentMethod: 'transfer' }) 
         });
         toast.success("Te hemos enviado un correo con los datos para la transferencia", { id: toastId });
-        window.location.reload();
+        setTimeout(() => window.location.reload(), 2500);
       }
     } catch (err: any) {
       toast.error("Error al procesar pago", { id: toastId });
@@ -184,7 +184,7 @@ export default function OrderDetailPage() {
  </button>
  <button 
  onClick={() => window.print()}
- className="px-6 py-3 bg-primary text-black rounded-2xl font-bold text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center gap-2 cursor-pointer"
+ className="px-6 py-3 bg-zinc-800 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all shadow-xl flex items-center gap-2 cursor-pointer"
  >
  Imprimir Picking List
  <ArrowRight className="h-4 w-4" />

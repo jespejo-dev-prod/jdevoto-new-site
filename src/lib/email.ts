@@ -112,22 +112,34 @@ async function getBankTransferConfig() {
   return config;
 }
 
-export async function sendOrderEmail(order: any, customerEmail: string) {
+export async function sendOrderEmail(order: any, customerEmail: string, forceTransferInfo: boolean = false) {
   try {
     const transporter = await getTransporter();
 
     let bankConfig = null;
-    if (order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER') {
+    if (order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER' || forceTransferInfo) {
       const setting = await getBankTransferConfig();
       if (setting && setting.value) {
         bankConfig = setting.value as any;
       }
     }
 
-    const htmlContent = generateOrderHtml(order, customerEmail, bankConfig, false);
+    const clientTitle = forceTransferInfo ? `Instrucciones de Pago` : undefined;
+    const clientDesc = forceTransferInfo ? `A continuación encontrarás los datos bancarios para realizar el pago de tu pedido.` : undefined;
+    
+    const htmlContent = generateOrderHtml(
+      order, 
+      customerEmail, 
+      bankConfig, 
+      false, 
+      undefined, 
+      undefined,
+      clientTitle,
+      clientDesc
+    );
     const statusConfig = getStatusConfig(order.status);
     const shortOrderNumber = order.orderNumber.split('-').pop();
-    const subject = `${statusConfig.subject}: #${shortOrderNumber}`;
+    const subject = forceTransferInfo ? `Instrucciones de Pago: #${shortOrderNumber}` : `${statusConfig.subject}: #${shortOrderNumber}`;
 
     // Add CCs
     const ccEmails = new Set<string>();
@@ -147,12 +159,22 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
     ];
 
     if (process.env.ADMIN_NOTIFICATION_EMAIL) {
-      const adminHtmlContent = generateOrderHtml(order, customerEmail, null, true);
+      const adminTitle = forceTransferInfo ? `Solicitud de Datos de Transferencia` : undefined;
+      const adminDesc = forceTransferInfo ? `El cliente ${order.company?.razonSocial || customerEmail} ha solicitado que se le reenvíen los datos de transferencia para el pedido.` : undefined;
+      
+      const adminHtmlContent = generateOrderHtml(
+        order, 
+        customerEmail, 
+        null, 
+        true,
+        adminTitle,
+        adminDesc
+      );
       promises.push(
         transporter.sendMail({
           from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
           to: process.env.ADMIN_NOTIFICATION_EMAIL.trim(),
-          subject: `Nuevo Pedido Ingresado: #${shortOrderNumber}`,
+          subject: forceTransferInfo ? `Solicitud de Transferencia: #${shortOrderNumber}` : `Nuevo Pedido Ingresado: #${shortOrderNumber}`,
           html: adminHtmlContent,
         })
       );
@@ -176,7 +198,16 @@ export async function sendOrderEmail(order: any, customerEmail: string) {
   }
 }
 
-function generateOrderHtml(order: any, customerEmail: string, bankConfig: any = null, isAdmin: boolean = false, adminTitleOverride?: string, adminDescOverride?: string) {
+function generateOrderHtml(
+  order: any, 
+  customerEmail: string, 
+  bankConfig: any = null, 
+  isAdmin: boolean = false, 
+  adminTitleOverride?: string, 
+  adminDescOverride?: string,
+  clientTitleOverride?: string,
+  clientDescOverride?: string
+) {
   const formatMoney = (val: number) => 
     `$${Math.round(Number(val)).toLocaleString('es-CL')}`;
 
@@ -229,7 +260,13 @@ function generateOrderHtml(order: any, customerEmail: string, bankConfig: any = 
     color: baseStatusConfig.color,
     label: baseStatusConfig.label,
     subject: "Notificación de Pedido",
-  } : baseStatusConfig;
+  } : {
+    title: clientTitleOverride || baseStatusConfig.title,
+    description: clientDescOverride || baseStatusConfig.description,
+    color: baseStatusConfig.color,
+    label: baseStatusConfig.label,
+    subject: baseStatusConfig.subject,
+  };
   
 
   const rawDate = order.createdAt ? new Date(order.createdAt) : new Date();
@@ -371,7 +408,7 @@ function generateOrderHtml(order: any, customerEmail: string, bankConfig: any = 
                 </div>
 
                 <!-- Bank Transfer Details Card -->
-                ${((order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER') && bankConfig?.accounts?.length > 0) ? `
+                ${(bankConfig?.accounts?.length > 0) ? `
                 <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 25px; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                   <h3 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 700; color: #1e3a8a;">Datos para transferencia bancaria</h3>
                   ${(bankConfig.instructions || bankConfig.description) ? `<p style="margin: 0 0 15px 0; color: #475569;">${bankConfig.instructions || bankConfig.description}</p>` : ''}
