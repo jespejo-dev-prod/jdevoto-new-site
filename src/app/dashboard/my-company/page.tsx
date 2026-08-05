@@ -5,6 +5,7 @@ import { RoleGuard } from"@/components/auth/role-guard";
 import { UserRole } from"@prisma/client";
 import { useAuth } from"@/context/auth-context";
 import { CustomerForm } from"@/modules/customers/presentation/components/CustomerForm";
+import { CustomerUserList } from"@/modules/customers/presentation/components/CustomerUserList";
 import { useCustomer } from"@/modules/customers/presentation/hooks/useCustomers";
 import { Building2, Loader2 } from"lucide-react";
 
@@ -63,9 +64,13 @@ export default function MyCompanyPage() {
  />
  </div>
  ) : (
- <div className="text-center py-24 text-zinc-500">
- No se pudo cargar la información de tu empresa.
+ <div className="text-zinc-400 py-12 text-center">
+ No se encontró información de la empresa.
  </div>
+ )}
+
+ {customer?.users && customer.users.length > 0 && (
+   <CustomerUserList users={customer.users} />
  )}
  </div>
  </RoleGuard>
