@@ -30,7 +30,7 @@ export const POST = withApiHandler(async (
   if (!order) throw new NotFoundError("Pedido", orderId);
 
   // 1.1 Verificar permisos / Alcance de la empresa
-  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP';
+  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP' || user.role === 'SUPER_ADMIN';
   if (!isAdmin && order.companyId !== user.companyId) {
     throw new ForbiddenError("No tiene permisos para enviar mensajes en este pedido");
   }
@@ -215,7 +215,7 @@ export const GET = withApiHandler(async (
 
   if (!order) throw new NotFoundError("Pedido", orderId);
 
-  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP';
+  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP' || user.role === 'SUPER_ADMIN';
   if (!isAdmin && order.companyId !== user.companyId) {
     throw new ForbiddenError("No tiene acceso a los mensajes de este pedido");
   }

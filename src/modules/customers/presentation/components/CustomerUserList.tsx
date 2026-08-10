@@ -2,6 +2,7 @@ import React from 'react';
 import { User, Key, LogOut, Unlink } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApi } from '@/shared/infrastructure/api/use-api';
+import { translateRole } from '@/lib/role-translations';
 
 interface CustomerUser {
   id: string;
@@ -22,7 +23,7 @@ export function CustomerUserList({ users, onUsersChanged }: CustomerUserListProp
   if (!users || users.length === 0) return null;
 
   const handleResetPassword = async (userId: string, email: string) => {
-    if (!confirm(`¿Enviar instrucciones de restablecimiento a ${email}?`)) return;
+    if (!window.confirm(`¿Enviar instrucciones de restablecimiento a ${email}?`)) return;
     try {
       await fetcher(`/api/users/${userId}/reset-password`, { method: 'POST' });
       toast.success("Instrucciones enviadas correctamente.");
@@ -32,7 +33,7 @@ export function CustomerUserList({ users, onUsersChanged }: CustomerUserListProp
   };
 
   const handleForceLogout = async (userId: string, name: string) => {
-    if (!confirm(`¿Cerrar todas las sesiones activas de ${name}?`)) return;
+    if (!window.confirm(`¿Cerrar todas las sesiones activas de ${name}?`)) return;
     try {
       await fetcher(`/api/users/${userId}/sessions`, { method: 'DELETE' });
       toast.info("Sesiones cerradas con éxito.");
@@ -42,7 +43,7 @@ export function CustomerUserList({ users, onUsersChanged }: CustomerUserListProp
   };
 
   const handleUnlinkUser = async (userId: string, name: string) => {
-    if (!confirm(`¿Estás seguro de que quieres desvincular al usuario ${name} de esta empresa?`)) return;
+    if (!window.confirm(`¿Estás seguro de que quieres desvincular al usuario ${name} de esta empresa?`)) return;
     try {
       await fetcher(`/api/users/${userId}`, { 
         method: 'PATCH', 
@@ -76,7 +77,7 @@ export function CustomerUserList({ users, onUsersChanged }: CustomerUserListProp
                 <p className="text-lg font-bold text-white truncate">{u.firstName} {u.lastName}</p>
                 <p className="text-sm text-zinc-400 truncate mt-0.5">{u.email}</p>
                 <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-                  {u.role}
+                  {translateRole(u.role)}
                 </span>
               </div>
             </div>

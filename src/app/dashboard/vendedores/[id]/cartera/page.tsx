@@ -6,7 +6,7 @@ import { useApi } from '@/shared/infrastructure/api/use-api';
 import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft, Users, Building2, Plus, X, Search,
-  Loader2, UserCheck, AlertTriangle, Mail
+  Loader2, UserCheck, AlertTriangle, Mail, TrendingUp
 } from 'lucide-react';
 import Link from 'next/link';
 import { RoleGuard } from '@/components/auth/role-guard';
@@ -106,13 +106,24 @@ export default function CarteraVendedorPage() {
 
         {/* Stats bar */}
         {!isLoading && rep && (
-          <div className="flex items-center gap-3 p-4 bg-zinc-900/40 border border-zinc-800 rounded-2xl">
-            <div className="p-2.5 bg-primary/10 rounded-xl">
-              <UserCheck className="w-5 h-5 text-primary" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3 p-4 bg-zinc-900/40 border border-zinc-800 rounded-2xl">
+              <div className="p-2.5 bg-primary/10 rounded-xl">
+                <UserCheck className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Clientes Asignados</p>
+                <p className="text-2xl font-black text-white">{rep.assignedCompanies?.length ?? 0}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Clientes Asignados</p>
-              <p className="text-2xl font-black text-white">{rep.assignedCompanies?.length ?? 0}</p>
+            <div className="flex items-center gap-3 p-4 bg-zinc-900/40 border border-zinc-800 rounded-2xl">
+              <div className="p-2.5 bg-emerald-500/10 rounded-xl">
+                <TrendingUp className="w-5 h-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Ventas Totales</p>
+                <p className="text-2xl font-black text-white">${(rep.assignedCompanies?.reduce((sum: number, c: any) => sum + Number(c.totalVentas || 0), 0) || 0).toLocaleString('es-CL')}</p>
+              </div>
             </div>
           </div>
         )}
@@ -166,9 +177,12 @@ export default function CarteraVendedorPage() {
                     <p className="text-base font-bold text-white truncate" title={c.razonSocial}>
                       {c.razonSocial}
                     </p>
-                    <div className="mt-1.5">
+                    <div className="mt-1.5 flex items-center gap-2">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-primary/20 text-primary font-bold text-sm font-mono tracking-wider">
                         {c.rut}
+                      </span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 font-bold text-sm font-mono tracking-wider border border-emerald-500/20">
+                        ${Number(c.totalVentas || 0).toLocaleString('es-CL')}
                       </span>
                     </div>
                   </div>

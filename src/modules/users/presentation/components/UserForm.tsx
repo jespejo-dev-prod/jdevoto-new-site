@@ -170,12 +170,12 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
               onChange={(e) => setFormData({...formData, role: e.target.value})}
               className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             >
-              <option value="BUYER">Comprador (Cliente)</option>
+              <option value="BUYER">Comprador</option>
               {!isCompanyAdmin && (
                 <>
-                  <option value="COMPANY_ADMIN">Admin de Empresa (Company Admin)</option>
-                  <option value="SALES_REP">Vendedor (Sales Rep)</option>
-                  <option value="ADMIN">Administrador (Sistema)</option>
+                  <option value="COMPANY_ADMIN">Administrador empresa</option>
+                  <option value="SALES_REP">Vendedor</option>
+                  <option value="ADMIN">Administrador del sistema</option>
                   {user?.role === 'SUPER_ADMIN' && (
                     <option value="SUPER_ADMIN">Super Administrador</option>
                   )}
@@ -212,23 +212,26 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
                     onClick={() => setShowCompanyDropdown(false)} 
                   />
                   
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-2 border-b border-zinc-800 flex items-center gap-2">
-                      <Search className="w-4 h-4 text-zinc-500 ml-2" />
+                  <div className="relative mt-3 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+                    <div className="p-3 border-b border-zinc-800/80 flex items-center gap-3 bg-zinc-950/50">
+                      <Search className="w-5 h-5 text-zinc-400 ml-1" />
                       <input 
                         autoFocus
-                        className="w-full bg-transparent border-none text-white focus:outline-none text-sm py-2"
+                        className="w-full bg-transparent border-none text-white focus:outline-none text-sm py-1 placeholder:text-zinc-600"
                         placeholder="Buscar por RUT o Razón Social..."
                         value={companySearch}
                         onChange={(e) => setCompanySearch(e.target.value)}
                       />
                     </div>
-                    <div className="max-h-60 overflow-y-auto p-2 space-y-1">
+                    <div className="max-h-72 overflow-y-auto p-2 space-y-1.5 custom-scrollbar">
                       {(() => {
                         const filtered = customers || [];
 
                         if (!filtered || filtered.length === 0) {
-                          return <div className="p-4 text-sm text-zinc-500 text-center">No se encontraron empresas</div>;
+                          return <div className="p-6 text-sm text-zinc-500 text-center flex flex-col items-center justify-center gap-2">
+                            <Search className="w-8 h-8 text-zinc-700" />
+                            <span>No se encontraron empresas</span>
+                          </div>;
                         }
 
                         return filtered.map((company: any) => (
@@ -240,13 +243,15 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
                               setShowCompanyDropdown(false);
                               setCompanySearch("");
                             }}
-                            className={`p-3 rounded-lg cursor-pointer text-sm flex justify-between items-center transition-colors ${formData.companyId === company.id ? 'bg-primary/20 text-primary' : 'hover:bg-zinc-800 text-zinc-300'}`}
+                            className={`p-3.5 rounded-xl cursor-pointer text-sm flex justify-between items-center transition-all ${formData.companyId === company.id ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-zinc-800/60 text-zinc-300 border border-transparent'}`}
                           >
-                            <div>
-                              <div className="font-bold">{company.razonSocial}</div>
-                              <div className="text-xs opacity-70">{company.rut}</div>
+                            <div className="flex flex-col gap-1.5">
+                              <div className="font-bold text-white text-base">{company.razonSocial}</div>
+                              <div className="text-xs text-zinc-400 font-medium flex items-center gap-1.5">
+                                <span className="px-2 py-0.5 rounded-md bg-zinc-800/80 text-zinc-300 border border-zinc-700/50">{company.rut}</span>
+                              </div>
                             </div>
-                            {formData.companyId === company.id && <Check className="w-4 h-4" />}
+                            {formData.companyId === company.id && <Check className="w-5 h-5" />}
                           </div>
                         ));
                       })()}

@@ -138,7 +138,7 @@ export default function ProductsPage() {
  });
 
  const { data: categoriesData = [] } = useCategories();
- const { data: brandsData = [] } = useBrands();
+ const { data: brandsData = [] } = useBrands(categoryId);
  const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
 
  const products = data?.products ?? [];
@@ -163,6 +163,7 @@ export default function ProductsPage() {
 
  const handleCategoryChange = (value: string) => {
  setCategoryId(value);
+ setBrandId('');
  setPage(1);
  };
 

@@ -105,7 +105,6 @@ export default function CheckoutPage() {
   const [coupon, setCoupon] = useState('');
   
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [pointsAccepted, setPointsAccepted] = useState(false);
 
   const [bankConfig, setBankConfig] = useState<any>(null);
   const [mpConfig, setMpConfig] = useState<any>(null);
@@ -950,10 +949,10 @@ export default function CheckoutPage() {
                  <div className="flex items-center justify-between">
                    <h2 className="text-lg sm:text-xl font-bold uppercase tracking-wider text-white">Tu Orden</h2>
                    <Link href="/cart">
-                     <Button variant="ghost" className="h-8 px-3 text-zinc-400 hover:text-white hover:bg-zinc-900 text-[10px] font-bold uppercase tracking-wider gap-1.5 rounded-full">
-                       <Edit2 className="h-3 w-3" /> Editar Carrito
-                     </Button>
-                   </Link>
+                      <Button className="h-8 px-4 bg-white text-zinc-950 hover:bg-zinc-200 text-[10px] font-bold uppercase tracking-wider gap-1.5 rounded-full shadow-md transition-all">
+                        <Edit2 className="h-3 w-3" /> Editar Carrito
+                      </Button>
+                    </Link>
                  </div>
                  
                  <div className="space-y-4 pb-6 border-b border-zinc-800 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
@@ -1054,16 +1053,6 @@ export default function CheckoutPage() {
                        </div>
                        <span className="text-[13px] text-zinc-400 font-medium group-hover:text-zinc-300 transition-colors leading-snug">
                           Acepto los <Link href="#" className="underline hover:text-white">términos y condiciones</Link>.
-                       </span>
-                    </label>
-
-                    <label className="flex items-start gap-3 cursor-pointer group">
-                       <div className="mt-0.5 relative flex items-center justify-center">
-                          <input type="checkbox" checked={pointsAccepted} onChange={(e) => setPointsAccepted(e.target.checked)} className="peer appearance-none h-5 w-5 border-2 border-zinc-600 rounded-md checked:bg-primary checked:border-primary transition-all cursor-pointer" />
-                          <CheckCircle2 className="h-3.5 w-3.5 text-zinc-950 absolute opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                       </div>
-                       <span className="text-[13px] text-zinc-400 font-medium group-hover:text-zinc-300 transition-colors leading-snug">
-                          Quiero ser parte del programa Puntos y aprovechar sus beneficios, recibir ofertas y novedades personalizadas.
                        </span>
                     </label>
                  </div>

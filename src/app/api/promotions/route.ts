@@ -41,7 +41,7 @@ const createPromotionSchema = z.object({
 
 async function requireAdmin() {
   const user = await getServerUser();
-  if (!user || user.role !== "ADMIN") {
+  if (!user || (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN")) {
     throw new ForbiddenError("Solo los administradores pueden gestionar promociones");
   }
   return user;

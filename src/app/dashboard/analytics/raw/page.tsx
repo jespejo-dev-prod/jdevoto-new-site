@@ -3,6 +3,7 @@ import { ExportButton } from './ExportButton';
 import { Database } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { translateRole } from '@/lib/role-translations';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,7 +88,7 @@ export default async function RawDataPage() {
                       {evt.user ? (
                         <div className="flex flex-col">
                           <span className="text-white">{evt.user.email}</span>
-                          <span className="text-xs text-zinc-500">{evt.user.role}</span>
+                          <span className="text-xs text-zinc-500">{translateRole(evt.user.role)}</span>
                         </div>
                       ) : (
                         <span className="text-zinc-600 italic">Anónimo</span>

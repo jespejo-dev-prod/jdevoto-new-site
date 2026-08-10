@@ -31,6 +31,7 @@ export function useOrders(filters: {
   return useQuery<PaginatedResult<OrderSummary>>({
     queryKey: ["orders", filters],
     queryFn: () => fetcher(`/api/orders?${queryParams.toString()}`),
+    staleTime: 1000 * 60 * 2, // 2 minutos
   });
 }
 
@@ -42,6 +43,7 @@ export function useOrder(id: string) {
     queryKey: ["order", id],
     queryFn: () => fetcher(`/api/orders/${id}`),
     enabled: !!id,
+    staleTime: 1000 * 60 * 2, // 2 minutos
   });
 
   const updateStatusMutation = useMutation({

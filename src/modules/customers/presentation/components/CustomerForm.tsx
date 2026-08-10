@@ -204,10 +204,13 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
   const isBillingEmailDirty = !!dirtyFields.billingEmail;
 
   useEffect(() => {
-    if (!isBillingEmailDirty && watchedEmail) {
+    // Solo autocompletamos el email de facturación automáticamente al CREAR un cliente nuevo.
+    // Si estamos editando (!initialData?.id es falso), no tocamos el billingEmail porque
+    // puede causar que se sobreescriba con el email normal al cargar el formulario.
+    if (!initialData?.id && !isBillingEmailDirty && watchedEmail) {
       setValue('billingEmail', watchedEmail, { shouldValidate: true, shouldDirty: false });
     }
-  }, [watchedEmail, isBillingEmailDirty, setValue]);
+  }, [watchedEmail, isBillingEmailDirty, setValue, initialData?.id]);
 
   const defaultDiscountVal = Number(watch('defaultDiscount') || 0);
   const paymentTermDiscountVal = Number(watch('paymentTermDiscount') || 0);
@@ -358,17 +361,9 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-              <div className="md:col-span-8 space-y-2">
-                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Calle</label>
+              <div className="md:col-span-12 space-y-2">
+                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Calle y Número</label>
                 <input {...register('shippingStreet')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" />
-              </div>
-              <div className="md:col-span-2 space-y-2">
-                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Número</label>
-                <input {...register('shippingNumber')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" />
-              </div>
-              <div className="md:col-span-2 space-y-2">
-                <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Depto/Ofi</label>
-                <input {...register('shippingApartment')} className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" />
               </div>
 
               <div className="md:col-span-4 space-y-2">

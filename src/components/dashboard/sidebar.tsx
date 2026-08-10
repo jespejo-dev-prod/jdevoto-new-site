@@ -22,7 +22,8 @@ import {
  X,
  Sliders,
  Mail,
- Briefcase
+ Briefcase,
+ FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
@@ -63,6 +64,7 @@ const mainItems = [
  { icon: Briefcase, label: 'Vendedores', href: '/dashboard/vendedores' },
  { icon: CreditCard, label: 'Pagos', href: '/dashboard/pagos' },
  { icon: CreditCard, label: 'Cuenta Corriente', href: '/dashboard/cuenta-corriente' },
+ { icon: FileText, label: 'Facturas', href: '/dashboard/facturas' },
  { icon: Sliders, label: 'Slider Home', href: '/dashboard/slider' },
  { icon: Mail, label: 'Emails Masivos', href: '/dashboard/emails' },
 ];
@@ -102,12 +104,12 @@ export function Sidebar() {
  });
 
  const filteredMainItems = mainItems.filter(item => {
- if (user?.role ==="BUYER") {
- return item.label ==="Pedidos" || item.label ==="Cuenta Corriente";
- }
- if (user?.role ==="COMPANY_ADMIN") {
- return item.label ==="Pedidos" || item.label ==="Equipo" || item.label ==="Mi Empresa" || item.label ==="Cuenta Corriente";
- }
+  if (user?.role ==="BUYER") {
+  return item.label ==="Pedidos" || item.label ==="Cuenta Corriente" || item.label === "Facturas";
+  }
+  if (user?.role ==="COMPANY_ADMIN") {
+  return item.label ==="Pedidos" || item.label ==="Equipo" || item.label ==="Mi Empresa" || item.label ==="Cuenta Corriente" || item.label === "Facturas";
+  }
  
  const isAdminOrSuper = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
 

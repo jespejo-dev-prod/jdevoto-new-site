@@ -233,6 +233,9 @@ export class OrderService {
     const taxAmount = round2(subtotalNet * TAX_RATE);
     const totalGross = round2(subtotalNet + taxAmount);
 
+    let finalStatus = status;
+    let finalInternalNotes = input.notes || ''; // Usamos notes de input porque internalNotes no existe en CreateOrderInput
+
     // 8. Verificar límite de crédito disponible de la empresa
     // SOLO si el pedido NO es un borrador (DRAFT) Y es con crédito directo
     if (status !== OrderStatus.DRAFT && paymentMethod === 'credit_b2b') {
@@ -240,11 +243,10 @@ export class OrderService {
         Number(company.creditLimit) - Number(company.creditUsed);
 
       if (totalGross > availableCredit) {
-        throw new BusinessRuleError(
-          `Límite de crédito insuficiente. Disponible: $${availableCredit.toLocaleString("es-CL")}, ` +
-            `requerido: $${totalGross.toLocaleString("es-CL")}`,
-          "CREDIT_LIMIT_EXCEEDED"
-        );
+        // En vez de bloquear, forzamos a PENDING para revisión manual
+        finalStatus = OrderStatus.PENDING;
+        finalInternalNotes = (finalInternalNotes ? finalInternalNotes + '\n' : '') + 
+          `[SISTEMA] Pedido excede límite de crédito. Disponible: $${availableCredit.toLocaleString("es-CL")}, Requerido: $${totalGross.toLocaleString("es-CL")}. Enviado a revisión.`;
       }
 
       // 8.1 Verificar que no tenga facturas vencidas
@@ -258,10 +260,9 @@ export class OrderService {
       });
 
       if (overdueOrders > 0) {
-        throw new BusinessRuleError(
-          `No puede realizar nuevos pedidos porque mantiene ${overdueOrders} factura(s) vencida(s). Por favor regularice sus pagos para liberar cupo.`,
-          "OVERDUE_ORDERS_BLOCK"
-        );
+        finalStatus = OrderStatus.PENDING;
+        finalInternalNotes = (finalInternalNotes ? finalInternalNotes + '\n' : '') + 
+          `[SISTEMA] Pedido enviado a revisión (PENDING) porque mantiene ${overdueOrders} factura(s) vencida(s).`;
       }
     }
 
@@ -284,8 +285,8 @@ export class OrderService {
       }
 
       // Validar regla de negocio: Crédito B2B debe quedar CONFIRMED (no pending) si hay cupo
-      let finalStatus = status;
-      if (paymentMethod === 'credit_b2b' && finalStatus === 'PENDING') {
+      const availableCreditForCheck = Number(company.creditLimit) - Number(company.creditUsed);
+      if (paymentMethod === 'credit_b2b' && finalStatus === 'PENDING' && totalGross <= availableCreditForCheck) {
         finalStatus = 'CONFIRMED';
       }
 
@@ -304,7 +305,8 @@ export class OrderService {
           totalGross,
           discountAmount: paymentDiscountAmount,
           notes: notes ?? null,
-          dueDate, // <-- NUEVO CAMPO AÑADIDO
+          internalNotes: finalInternalNotes,
+          dueDate,
           shippingAddress: shippingAddress
             ? (shippingAddress as Prisma.InputJsonValue)
             : Prisma.JsonNull,
@@ -349,7 +351,9 @@ export class OrderService {
 
     // Enviar correo si el pedido fue creado con éxito y no requiere pago online pendiente
     const isOnlinePayment = order.paymentMethod === 'webpay' || order.paymentMethod === 'mercadopago';
-    if (!isOnlinePayment) {
+    
+    // No enviar correo para borradores
+    if (!isOnlinePayment && order.status !== 'DRAFT') {
       try {
         const { sendOrderEmail } = await import('@/lib/email');
         let customerEmail = (order.billingAddress as any)?.email;
@@ -402,26 +406,27 @@ export class OrderService {
     const timestampFields = this.getTimestampField(newStatus);
 
     const updated = await prisma.$transaction(async (tx) => {
-      // SI PASA DE DRAFT A PENDING/CONFIRMED Y ES CON CRÉDITO, VALIDAR LÍMITE DE CRÉDITO
+      let finalStatus = newStatus;
+      let finalInternalNotes = internalNotes || '';
+
+      // SI PASA DE DRAFT A CONFIRMED Y ES CON CRÉDITO, VALIDAR LÍMITE DE CRÉDITO
       if (order.status === OrderStatus.DRAFT && newStatus === OrderStatus.CONFIRMED && order.paymentMethod === 'credit_b2b') {
         const company = await tx.company.findUnique({ where: { id: order.companyId } });
         if (!company) throw new NotFoundError("Empresa", order.companyId);
 
         const availableCredit = Number(company.creditLimit) - Number(company.creditUsed);
-        if (availableCredit < 0) {
-          throw new BusinessRuleError(
-            `Límite de crédito insuficiente. Límite: $${Number(company.creditLimit).toLocaleString("es-CL")}, ` +
-              `Utilizado: $${Number(company.creditUsed).toLocaleString("es-CL")} (excede en $${Math.abs(availableCredit).toLocaleString("es-CL")})`,
-            "CREDIT_LIMIT_EXCEEDED"
-          );
+        if (availableCredit < 0 || Number(order.totalGross) > availableCredit) {
+          finalStatus = OrderStatus.PENDING;
+          finalInternalNotes = (finalInternalNotes ? finalInternalNotes + '\n' : '') + 
+            `[SISTEMA] El pedido pasó a revisión (PENDING) porque excede el límite de crédito disponible ($${availableCredit.toLocaleString("es-CL")}).`;
         }
       }
 
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
-          status: newStatus,
-          ...(internalNotes ? { internalNotes } : {}),
+          status: finalStatus,
+          ...(finalInternalNotes ? { internalNotes: finalInternalNotes } : {}),
           ...timestampFields,
         },
         include: {
@@ -845,8 +850,8 @@ export class OrderService {
       )
     );
 
-    // Reducir crédito usado (solo si era con crédito)
-    if (order.paymentMethod === 'credit_b2b') {
+    // Reducir crédito usado (solo si era con crédito y NO ha sido pagado)
+    if (order.paymentMethod === 'credit_b2b' && order.paymentStatus !== 'PAID') {
       await tx.company.update({
         where: { id: order.companyId },
         data: {
@@ -884,7 +889,7 @@ export class OrderService {
     );
 
     // Incrementar crédito usado y validar límite (Solo crédito b2b)
-    if (order.paymentMethod === 'credit_b2b') {
+    if (order.paymentMethod === 'credit_b2b' && order.paymentStatus !== 'PAID') {
       const company = await tx.company.update({
         where: { id: order.companyId },
         data: {

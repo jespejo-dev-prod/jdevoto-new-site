@@ -4,10 +4,17 @@ import { jwtVerify } from "jose";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.fixedWindow(10, "15 m"), // 10 peticiones cada 15 min por IP
-});
+let ratelimit: Ratelimit | null = null;
+try {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    ratelimit = new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.fixedWindow(10, "15 m"), // 10 peticiones cada 15 min por IP
+    });
+  }
+} catch (e) {
+  console.warn("Upstash Redis no configurado correctamente. Rate limiting desactivado.");
+}
 const MAX_REQUESTS = 1000; // 1000 peticiones cada 15 min por IP (evita bloqueos de Next.js prefetch)
 
 export async function proxy(request: NextRequest) {
@@ -31,9 +38,11 @@ export async function proxy(request: NextRequest) {
   if (ip !== 'unknown' && !isLocal && !isDev) {
     try {
       if (pathname.startsWith('/api/auth/login')) {
-        const { success } = await ratelimit.limit(`login_rl_${ip}`);
-        if (!success) {
-          return NextResponse.json({ error: "Demasiadas peticiones. Intente más tarde." }, { status: 429 });
+        if (ratelimit) {
+          const { success } = await ratelimit.limit(`login_rl_${ip}`);
+          if (!success) {
+            return NextResponse.json({ error: "Demasiadas peticiones. Intente más tarde." }, { status: 429 });
+          }
         }
       }
     } catch (error) {

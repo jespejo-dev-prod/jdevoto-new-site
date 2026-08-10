@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
  Ticket, Plus, Trash2, Tag, Shield, 
  Layers, AlertCircle, CheckCircle2, Loader2,
@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/auth-context';
+import { useCategories, useBrands } from '@/modules/catalog/application/hooks/useCatalogData';
 
 const formatForDateTimeLocal = (dateStr: string | null) => {
  if (!dateStr) return '';
@@ -61,8 +62,17 @@ export default function DescuentosPage() {
 
  // Data
  const [promotions, setPromotions] = useState<Promotion[]>([]);
- const [categories, setCategories] = useState<Category[]>([]);
- const [brands, setBrands] = useState<Brand[]>([]);
+ const { data: rawCategories = [] } = useCategories();
+ const { data: brands = [] } = useBrands();
+ const categories = useMemo(() => (rawCategories as Category[]).filter(c => !c.isOutlet), [rawCategories]);
+ 
+ const categoryOptions = useMemo(() => categories.map(cat => (
+   <option key={cat.id} value={cat.id}>{cat.name}</option>
+ )), [categories]);
+
+ const brandOptions = useMemo(() => brands.map(brand => (
+   <option key={brand.id} value={brand.id}>{brand.name}</option>
+ )), [brands]);
  const [loading, setLoading] = useState(true);
  const [submitting, setSubmitting] = useState(false);
 
@@ -92,34 +102,9 @@ export default function DescuentosPage() {
  }
  }, [accessToken]);
 
- const fetchCategories = useCallback(async () => {
- try {
- const res = await fetch('/api/categories');
- if (!res.ok) return;
- const json = await res.json();
- if (json.success) {
- // Excluir categoría Outlet del selector
- setCategories((json.data || []).filter((c: Category) => !c.isOutlet));
- }
- } catch (err) {
- console.error('Error fetching categories', err);
- }
- }, []);
-
- const fetchBrands = useCallback(async () => {
- try {
- const res = await fetch('/api/brands');
- if (!res.ok) return;
- const json = await res.json();
- if (json.success) setBrands(json.data || []);
- } catch (err) {
- console.error('Error fetching brands', err);
- }
- }, []);
-
  useEffect(() => {
- Promise.all([fetchPromotions(), fetchCategories(), fetchBrands()]).finally(() => setLoading(false));
- }, [fetchPromotions, fetchCategories, fetchBrands]);
+ fetchPromotions().finally(() => setLoading(false));
+ }, [fetchPromotions]);
 
  // ─── Handlers ────────────────────────────────────────────────────────────────
 
@@ -309,7 +294,7 @@ export default function DescuentosPage() {
  </div>
 
  {/* Create Form */}
- <form onSubmit={handleSubmit} className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 rounded-3xl p-8 space-y-6">
+ <form onSubmit={handleSubmit} className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 space-y-6">
  <div className="flex items-center gap-3 pb-4 border-b border-zinc-800">
  {editingId ? (
  <Pencil className="h-5 w-5 text-primary" />
@@ -332,7 +317,7 @@ export default function DescuentosPage() {
  setSelectedCategoryId('');
  setSelectedBrandId('');
  }}
- className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-all"
+ className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-colors"
  >
  <option value="CATEGORY">Descuento por Categoría</option>
  <option value="BRAND">Descuento por Marca</option>
@@ -348,12 +333,10 @@ export default function DescuentosPage() {
  value={selectedCategoryId}
  onChange={(e) => setSelectedCategoryId(e.target.value)}
  required
- className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-all"
+ className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-colors"
  >
  <option value="">— Seleccionar —</option>
- {categories.map(cat => (
- <option key={cat.id} value={cat.id}>{cat.name}</option>
- ))}
+ {categoryOptions}
  </select>
  </div>
  )}
@@ -366,12 +349,10 @@ export default function DescuentosPage() {
  value={selectedBrandId}
  onChange={(e) => setSelectedBrandId(e.target.value)}
  required
- className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-all"
+ className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-colors"
  >
  <option value="">— Seleccionar —</option>
- {brands.map(brand => (
- <option key={brand.id} value={brand.id}>{brand.name}</option>
- ))}
+ {brandOptions}
  </select>
  </div>
  )}
@@ -403,7 +384,7 @@ export default function DescuentosPage() {
  setCustomValidTo('');
  }
  }}
- className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-all"
+ className="w-full h-12 rounded-xl border border-zinc-700 bg-zinc-800 px-4 text-sm font-medium text-white outline-none focus:border-primary transition-colors"
  >
  <option value="NA">Sin fecha de expiración (N/A)</option>
  <option value="STOCK">Hasta agotar stock</option>
@@ -421,6 +402,7 @@ export default function DescuentosPage() {
  type="datetime-local"
  value={customValidTo}
  onChange={(e) => setCustomValidTo(e.target.value)}
+ min={formatForDateTimeLocal(new Date().toISOString())}
  required
  className="h-12 rounded-xl bg-zinc-800 border-zinc-700 text-white font-medium"
  />
@@ -499,7 +481,7 @@ export default function DescuentosPage() {
  type="button"
  onClick={resetForm}
  variant="ghost"
- className="h-12 px-8 border border-zinc-700 text-white font-black uppercase text-sm tracking-widest rounded-xl transition-all active:scale-[0.98]"
+ className="h-12 px-8 border border-zinc-700 text-white font-black uppercase text-sm tracking-widest rounded-xl transition-colors active:scale-[0.98]"
  >
  <X className="h-4 w-4 mr-2" /> Cancelar
  </Button>
@@ -508,7 +490,7 @@ export default function DescuentosPage() {
  </form>
 
  {/* Promotions Table */}
- <div className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 rounded-3xl overflow-hidden">
+ <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
  <div className="px-8 py-6 border-b border-zinc-800 flex items-center justify-between">
  <h2 className="text-lg font-black text-white uppercase tracking-tight">Descuentos Actuales</h2>
  <span className="text-sm font-bold text-zinc-500">{promotions.length} registros</span>
@@ -622,14 +604,14 @@ export default function DescuentosPage() {
  <div className="flex justify-end gap-2">
  <button
  onClick={() => handleEdit(promo)}
- className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"
+ className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
  title="Editar promoción"
  >
  <Pencil className="h-4 w-4" />
  </button>
  <button
  onClick={() => handleDelete(promo.id, promo.name)}
- className="p-2 rounded-xl hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition-all"
+ className="p-2 rounded-xl hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition-colors"
  title="Eliminar promoción"
  >
  <Trash2 className="h-4 w-4" />

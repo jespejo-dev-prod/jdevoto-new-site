@@ -117,7 +117,7 @@ export async function sendOrderEmail(order: any, customerEmail: string, forceTra
     const transporter = await getTransporter();
 
     let bankConfig = null;
-    if (order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER' || forceTransferInfo) {
+    if (order.status === 'PENDING' || order.paymentMethod === 'transfer' || order.paymentMethod === 'TRANSFER' || forceTransferInfo) {
       const setting = await getBankTransferConfig();
       if (setting && setting.value) {
         bankConfig = setting.value as any;

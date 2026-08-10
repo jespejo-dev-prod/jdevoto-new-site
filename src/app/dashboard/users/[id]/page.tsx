@@ -7,6 +7,7 @@ import { ChevronLeft, Loader2, User, Key, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApi } from '@/shared/infrastructure/api/use-api';
 import Link from 'next/link';
+import { translateRole } from '@/lib/role-translations';
 
 export default function UserDetailPage() {
  const { id } = useParams<{ id: string }>();
@@ -81,7 +82,7 @@ export default function UserDetailPage() {
  <span className="text-zinc-500 font-mono text-base">{user.email}</span>
  <div className="h-1 w-1 rounded-full bg-zinc-800" />
  <span className="text-xs text-primary font-bold uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
- {user.role}
+ {translateRole(user.role)}
  </span>
  </div>
  </div>

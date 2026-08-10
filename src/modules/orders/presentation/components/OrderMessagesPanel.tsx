@@ -22,6 +22,7 @@ export function OrderMessagesPanel({ orderId, isAdmin = false }: { orderId: stri
     queryKey: ['order-messages', orderId],
     queryFn: () => fetcher(`/api/orders/${orderId}/messages`),
     enabled: !!orderId,
+    staleTime: 1000 * 60 * 5, // 5 minutos
   });
 
   const sendMessageMutation = useMutation({

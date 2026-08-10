@@ -21,6 +21,8 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { OrderStatus } from '@prisma/client';
 import { cn } from '@/lib/utils';
+import { CompanyFilter } from '@/components/dashboard/CompanyFilter';
+import { Suspense } from 'react';
 
 const TABS = [
  { id: '', label: 'Todas', icon: ShoppingBag },
@@ -68,6 +70,7 @@ export default function OrdersPage() {
  search: debouncedSearch,
  from: fromDate ? new Date(fromDate) : undefined,
  to: toDate ? new Date(toDate) : undefined,
+ companyId: searchParams.get('companyId') || undefined,
  });
 
  const orders = data?.data || [];
@@ -88,9 +91,12 @@ export default function OrdersPage() {
  </p>
  </div>
 
- <div className="flex items-center gap-3">
+ <div className="flex flex-col sm:flex-row items-center gap-3">
+ <Suspense fallback={<div className="h-10 w-48 bg-zinc-900 rounded-xl animate-pulse"></div>}>
+ <CompanyFilter basePath="/dashboard/orders" />
+ </Suspense>
  <Link href="/dashboard/orders/new">
- <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+ <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap">
  <Plus className="h-4 w-4" />
  Nuevo Pedido
  </button>

@@ -122,8 +122,10 @@ export default function CuentaCorrientePage() {
  available = Math.max(0, limit - used);
  }
 
- const pendingOrders = ordersData?.data || [];
- const pendingOrdersTotal = Math.round(pendingOrders.reduce((sum: number, o: any) => sum + Number(o.totalGross || 0), 0));
+  const pendingOrders = (ordersData?.data || []).filter(
+    (o: any) => o.status !== 'CANCELLED' && o.status !== 'REJECTED' && o.status !== 'DRAFT'
+  );
+  const pendingOrdersTotal = Math.round(pendingOrders.reduce((sum: number, o: any) => sum + Number(o.totalGross || 0), 0));
 
  // Manual payment updates state
  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);

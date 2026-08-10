@@ -78,8 +78,7 @@ export default function CustomersPage() {
  </div>
 
  {/* Barra de Filtros / Búsqueda */}
- <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
- <div className="md:col-span-8 relative">
+ <div className="relative w-full">
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
  <input
  type="text"
@@ -88,21 +87,6 @@ export default function CustomersPage() {
  onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
  className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-base text-white focus:border-primary/50 outline-none transition-all"
  />
- </div>
- <div className="md:col-span-4 flex gap-2">
- <button className="flex-1 bg-zinc-900/40 border border-zinc-800 rounded-2xl flex items-center justify-center gap-2 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all text-sm font-bold uppercase">
- <Filter className="h-4 w-4" />
- Filtros
- </button>
- <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-1 flex gap-1">
- <button className="p-2 bg-zinc-800 text-primary rounded-xl shadow-inner">
- <List className="h-4 w-4" />
- </button>
- <button className="p-2 text-zinc-500 hover:text-white transition-colors">
- <LayoutGrid className="h-4 w-4" />
- </button>
- </div>
- </div>
  </div>
 
  {/* Listado */}

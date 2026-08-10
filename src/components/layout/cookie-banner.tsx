@@ -1,12 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export function CookieBanner() {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
+    // Only show on home page
+    if (pathname !== '/') {
+      setIsVisible(false);
+      return;
+    }
+
     // Check if user already consented
     const consent = localStorage.getItem('cookie-consent');
     if (!consent) {
@@ -14,7 +22,7 @@ export function CookieBanner() {
       const timer = setTimeout(() => setIsVisible(true), 1200);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [pathname]);
 
   const handleDismiss = (value: string) => {
     setIsExiting(true);

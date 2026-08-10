@@ -10,8 +10,28 @@ import { NotFoundError } from "@/lib/errors";
 import { logAuditAction } from "@/lib/audit";
 import { revalidateTag } from "next/cache";
 
-export const GET = withApiHandler(async () => {
+export const GET = withApiHandler(async (req: NextRequest) => {
+  const url = new URL(req.url);
+  const categoryId = url.searchParams.get("categoryId");
+
+  // Si viene un categoryId, obtenemos también sus subcategorías directas (1 nivel)
+  let categoryIds = categoryId ? [categoryId] : [];
+  if (categoryId) {
+    const subcats = await prisma.category.findMany({
+      where: { parentId: categoryId },
+      select: { id: true }
+    });
+    categoryIds = [...categoryIds, ...subcats.map(c => c.id)];
+  }
+
   const brands = await prisma.brand.findMany({
+    where: categoryId ? {
+      products: {
+        some: {
+          categoryId: { in: categoryIds }
+        }
+      }
+    } : undefined,
     orderBy: { name: "asc" },
   });
   return ok(brands);

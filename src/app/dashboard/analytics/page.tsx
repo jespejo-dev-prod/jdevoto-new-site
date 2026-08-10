@@ -284,22 +284,6 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Info Card */}
-        <div className="bg-primary/5 border border-primary/20 p-8 rounded-[32px] flex flex-col justify-center items-center text-center space-y-4 shadow-2xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-             <TrendingUp className="h-48 w-48 text-primary" />
-          </div>
-          <div className="h-16 w-16 bg-primary text-black rounded-3xl flex items-center justify-center shadow-xl shadow-primary/20">
-            <DollarSign className="h-8 w-8" />
-          </div>
-          <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Próximo Nivel: ML</h3>
-          <p className="text-zinc-400 text-sm max-w-sm leading-relaxed">
-            Estamos listos para integrar modelos de **Machine Learning** que predigan tus ventas futuras basándose en este historial. 
-          </p>
-          <button className="px-8 py-3 bg-white text-black rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-primary transition-all mt-4">
-            Explorar Predicciones
-          </button>
-        </div>
       </div>
     </div>
   );

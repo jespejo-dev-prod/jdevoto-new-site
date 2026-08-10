@@ -59,6 +59,16 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
   }
 
+  // Si viene un categoryId, obtenemos también sus subcategorías directas (1 nivel)
+  let categoryIds = query.categoryId ? [query.categoryId] : [];
+  if (query.categoryId) {
+    const subcats = await prisma.category.findMany({
+      where: { parentId: query.categoryId },
+      select: { id: true }
+    });
+    categoryIds = [...categoryIds, ...subcats.map(c => c.id)];
+  }
+
   // Construir filtros
   const where: any = {
     ...(isPrivileged
@@ -70,7 +80,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
         ? { isActive: false, isDeleted: false }
         : { isDeleted: false } // status === "all" (publicados + borradores, ocultando papelera)
       : { isActive: true, isDeleted: false }), // Público: solo activos y no eliminados
-    ...(query.categoryId ? { categoryId: query.categoryId } : {}),
+    ...(query.categoryId ? { categoryId: { in: categoryIds } } : {}),
+    ...(query.brandId ? { brandId: query.brandId } : {}),
     ...(query.search
       ? {
           OR: [

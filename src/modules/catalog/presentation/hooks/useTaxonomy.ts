@@ -30,6 +30,7 @@ export function useCategories() {
   const query = useQuery<(Category & { parent?: { name: string } | null })[]>({
     queryKey: ["categories"],
     queryFn: () => fetcher("/api/categories"),
+    staleTime: 1000 * 60 * 30, // 30 mins
   });
 
   const createMutation = useMutation({
@@ -77,6 +78,7 @@ export function useBrands() {
   const query = useQuery<Brand[]>({
     queryKey: ["brands"],
     queryFn: () => fetcher("/api/brands"),
+    staleTime: 1000 * 60 * 30, // 30 mins
   });
 
   const createMutation = useMutation({

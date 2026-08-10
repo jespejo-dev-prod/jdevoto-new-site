@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { NotificationBell } from '@/components/dashboard/NotificationBell';
 import { useDashboard } from '@/app/dashboard/layout';
 import { useAuth } from '@/context/auth-context';
+import { translateRole } from '@/lib/role-translations';
 
 const segmentMap: Record<string, string> = {
  dashboard: 'Panel',
@@ -183,7 +184,7 @@ export function DashboardHeader() {
   <p className="text-sm font-medium text-zinc-500 truncate">{user?.email}</p>
   {user?.role && (
     <span className="inline-block mt-1 px-2 py-0.5 bg-zinc-800/80 text-zinc-400 text-[10px] font-bold rounded-md uppercase tracking-wider w-fit">
-      {user.role === 'ADMIN' ? 'Administrador' : user.role === 'COMPANY_ADMIN' ? 'Admin de Empresa' : user.role === 'SALES_REP' ? 'Vendedor' : user.role === 'BUYER' ? 'Comprador' : user.role}
+      {translateRole(user.role)}
     </span>
   )}
   </div>

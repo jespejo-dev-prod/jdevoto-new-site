@@ -1,8 +1,16 @@
 'use client';
 
 import React from 'react';
+import { useAuth } from '@/context/auth-context';
 
 export function WhatsAppButton() {
+  const { user } = useAuth();
+
+  // No mostrar para roles administrativos
+  if (user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') {
+    return null;
+  }
+
   const phoneNumber = '56964247084';
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
   const message = `Hola Comercial J. Devoto, necesito ayuda con la plataforma B2B.\n${appUrl}`;

@@ -70,6 +70,7 @@
 import { MercadoPagoConfig, Preference, Payment, PaymentRefund } from "mercadopago";
 import { prisma } from "@/lib/client";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { decryptData } from "@/lib/crypto";
 
 export class PaymentService {
   /**
@@ -100,6 +101,20 @@ export class PaymentService {
   }
 
   /**
+   * Helper para obtener y desencriptar la configuración de Mercado Pago
+   */
+  private async getMpConfig(): Promise<any> {
+    const config = await prisma.storeSettings.findUnique({
+      where: { key: 'mercadopago_config' }
+    });
+    const mpConfig = config?.value as any;
+    if (mpConfig?.accessToken) {
+      mpConfig.accessToken = decryptData(mpConfig.accessToken);
+    }
+    return mpConfig;
+  }
+
+  /**
    * Crear preferencia de pago para un pedido B2B.
    * Si Mercado Pago no está configurado o está deshabilitado en panel, retorna el enlace al simulador local.
    *
@@ -107,10 +122,7 @@ export class PaymentService {
    * @returns { preferenceId: string, initPoint: string }
    */
   async createPreference(orderId: string, context: 'checkout' | 'invoice' = 'checkout'): Promise<{ preferenceId: string; initPoint: string }> {
-    const config = await prisma.storeSettings.findUnique({
-      where: { key: 'mercadopago_config' }
-    });
-    const mpConfig = config?.value as any;
+    const mpConfig = await this.getMpConfig();
 
     // Si no está habilitado o no tiene Access Token, fallback al simulador local
     if (!mpConfig || !mpConfig.enabled || !mpConfig.accessToken) {
@@ -181,10 +193,7 @@ export class PaymentService {
    * @param paymentId - ID del pago retornado por MP
    */
   async getPaymentStatus(paymentId: string): Promise<any> {
-    const config = await prisma.storeSettings.findUnique({
-      where: { key: 'mercadopago_config' }
-    });
-    const mpConfig = config?.value as any;
+    const mpConfig = await this.getMpConfig();
 
     if (!mpConfig || !mpConfig.accessToken) {
       throw new Error("Mercado Pago no está configurado.");
@@ -320,10 +329,7 @@ export class PaymentService {
    * @param amount    - Monto a reembolsar (opcional)
    */
   async refundPayment(paymentId: string, amount?: number): Promise<any> {
-    const config = await prisma.storeSettings.findUnique({
-      where: { key: 'mercadopago_config' }
-    });
-    const mpConfig = config?.value as any;
+    const mpConfig = await this.getMpConfig();
 
     if (!mpConfig || !mpConfig.accessToken) {
       throw new Error("Mercado Pago no está configurado.");

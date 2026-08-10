@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { PublicHeader } from '@/components/layout/public-header';
 import { PublicFooter } from '@/components/layout/public-footer';
 import { toast } from 'sonner';
+import { translateRole } from '@/lib/role-translations';
 
 export default function ProfilePage() {
   const { user, accessToken, loading, logout, refresh } = useAuth();
@@ -282,13 +283,7 @@ export default function ProfilePage() {
     }
   };
 
-  const roleLabels: Record<string, string> = {
-    ADMIN: 'Administrador de Sistema',
-    COMPANY_ADMIN: 'Administrador de Empresa',
-    BUYER: 'Comprador Corporativo',
-    SALES_REP: 'Representante de Ventas',
-  };
-  const roleLabel = roleLabels[user.role] || user.role || 'Usuario';
+  const roleLabel = translateRole(user.role);
 
   const SidebarItem = ({ id, icon: Icon, label }: { id: string, icon: any, label: string }) => (
     <button 

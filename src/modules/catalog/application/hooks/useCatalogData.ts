@@ -27,12 +27,13 @@ export function useCategories() {
   });
 }
 
-export function useBrands() {
+export function useBrands(categoryId?: string) {
   const api = useApi();
   return useQuery({
-    queryKey: ["brands"],
+    queryKey: ["brands", categoryId],
     queryFn: async () => {
-      const response = await api.get("/api/brands");
+      const url = categoryId ? `/api/brands?categoryId=${categoryId}` : `/api/brands`;
+      const response = await api.get(url);
       return response as Brand[];
     },
     staleTime: 1000 * 60 * 30, // 30 mins

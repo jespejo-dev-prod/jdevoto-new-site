@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/auth-context";
 import { LoginSchema, LoginDto } from "@/validations/auth.schemas";
 import { useState, useEffect } from "react";
+import { translateRole } from "@/lib/role-translations";
 
 export default function LoginPage() {
   const { login, verify2fa, user, logout } = useAuth();
@@ -234,7 +235,7 @@ export default function LoginPage() {
             <div className="flex justify-between items-center text-sm">
               <span className="text-zinc-500">Rol</span>
               <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary capitalize">
-                {user.role}
+                {translateRole(user.role)}
               </span>
             </div>
             <div className="h-px bg-zinc-800/50" />

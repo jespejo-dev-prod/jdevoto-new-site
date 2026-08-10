@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useTrackingContext } from '@/components/providers/TrackingProvider';
 
 import { CategoriesMenu, type Category } from './categories-menu';
+import { translateRole } from '@/lib/role-translations';
 
 const FIREWORK_PARTICLES = [
   { dx: -32, dy: -32, color: 'bg-yellow-250' },
@@ -187,14 +188,16 @@ export function PublicHeader() {
             </Link>
           )}
 
-          <div className="hidden md:flex flex-col text-right">
-            {user ? (
-              <>
+          {user ? (
+            <>
+              <div className="hidden md:flex flex-col text-right">
                 <span className="text-sm font-black text-white uppercase tracking-wide">
                   {user.firstName} {user.lastName}
                 </span>
                 <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest flex items-center justify-end">
-                  {user.role === 'SALES_REP' ? (
+                  {user.role === 'SUPER_ADMIN' || user.role === 'ADMIN' ? (
+                    translateRole(user.role).toUpperCase()
+                  ) : user.role === 'SALES_REP' ? (
                     effectiveCompany ? (
                       <>
                         <span className="text-primary mr-1">CLIENTE:</span>
@@ -215,30 +218,21 @@ export function PublicHeader() {
                     </>
                   )}
                 </span>
-              </>
-            ) : (
-              <>
-                <span className="text-sm font-black text-white uppercase tracking-wide">Invitado</span>
-                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Empresa</span>
-              </>
-            )}
-          </div>
+              </div>
 
-          {/* Menú de usuario con Dropdown */}
-          <div className="relative user-dropdown-container hidden md:block">
-            <button
-              onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-              className="relative group cursor-pointer flex items-center justify-center focus:outline-none p-1.5 rounded-lg hover:bg-zinc-900 transition-colors"
-              title="Menú de usuario"
-              aria-label="Menú de usuario"
-            >
-              <User className="h-6 w-6 text-zinc-400 group-hover:text-white transition-colors" />
-            </button>
+              {/* Menú de usuario con Dropdown */}
+              <div className="relative user-dropdown-container hidden md:block">
+                <button
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  className="relative group cursor-pointer flex items-center justify-center focus:outline-none p-1.5 rounded-lg hover:bg-zinc-900 transition-colors"
+                  title="Menú de usuario"
+                  aria-label="Menú de usuario"
+                >
+                  <User className="h-6 w-6 text-zinc-400 group-hover:text-white transition-colors" />
+                </button>
 
-            {isUserDropdownOpen && (
-              <div className="absolute right-0 mt-3 w-56 rounded-2xl bg-white border border-zinc-200 shadow-2xl p-4 flex flex-col gap-1.5 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-200">
-                {user ? (
-                  <>
+                {isUserDropdownOpen && (
+                  <div className="absolute right-0 mt-3 w-56 rounded-2xl bg-white border border-zinc-200 shadow-2xl p-4 flex flex-col gap-1.5 z-50 text-left animate-in fade-in slide-in-from-top-2 duration-200">
                     <Link
                       href="/dashboard"
                       className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
@@ -263,19 +257,21 @@ export function PublicHeader() {
                     >
                       Cerrar sesión
                     </button>
-                  </>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="px-4 py-2.5 rounded-xl text-blue-600 hover:bg-blue-50 font-black text-sm transition-all text-center"
-                    onClick={() => setIsUserDropdownOpen(false)}
-                  >
-                    Iniciar sesión
-                  </Link>
+                  </div>
                 )}
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            <div className="hidden md:flex items-center">
+              <Link
+                href="/login"
+                className="flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-black uppercase tracking-widest transition-all"
+              >
+                <User className="h-4 w-4" />
+                Iniciar Sesión
+              </Link>
+            </div>
+          )}
 
           {/* Wishlist visible solo para usuarios autenticados */}
           {!!user && (
@@ -462,9 +458,27 @@ export function PublicHeader() {
                   {user.firstName} {user.lastName}
                 </span>
                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                  {user.company?.razonSocial} 
-                  {user.company?.rut && (
-                    <span className="text-primary ml-1">| RUT: {user.company.rut}</span>
+                  {user.role === 'SUPER_ADMIN' || user.role === 'ADMIN' ? (
+                    translateRole(user.role).toUpperCase()
+                  ) : user.role === 'SALES_REP' ? (
+                    effectiveCompany ? (
+                      <>
+                        <span className="text-primary mr-1">CLIENTE:</span>
+                        {effectiveCompany.razonSocial}
+                        {effectiveCompany.rut && (
+                          <span className="text-primary ml-1">| RUT: {effectiveCompany.rut}</span>
+                        )}
+                      </>
+                    ) : (
+                      "VENDEDOR"
+                    )
+                  ) : (
+                    <>
+                      {effectiveCompany?.razonSocial || "Empresa"} 
+                      {effectiveCompany?.rut && (
+                        <span className="text-primary ml-1">| RUT: {effectiveCompany.rut}</span>
+                      )}
+                    </>
                   )}
                 </span>
               </div>

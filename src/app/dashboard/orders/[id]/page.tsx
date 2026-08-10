@@ -246,7 +246,12 @@ export default function OrderDetailPage() {
  Pago / Usuario
  </div>
  <div className="space-y-1.5 mt-1">
- <p className="text-[17px] font-bold text-white">{order.paymentStatus}</p>
+ <p className="text-[17px] font-bold text-white">
+    {order.paymentStatus === 'PAID' ? 'PAGADO' : 
+     (order.paymentStatus === 'PENDING' && order.paymentMethod === 'credit_b2b') ? 'CONFIRMADO' : 
+     order.paymentStatus === 'PENDING' ? 'PENDIENTE' : 
+     order.paymentStatus}
+  </p>
  <div className="flex items-center gap-2 mt-2">
  <div className="h-6 w-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[11px] font-bold text-primary">
  {order.createdBy.firstName[0]}

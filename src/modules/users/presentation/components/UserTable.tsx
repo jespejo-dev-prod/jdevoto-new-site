@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 
+import { translateRole } from "@/lib/role-translations";
+
 interface UserTableProps {
   users: any[];
   isLoading: boolean;
@@ -69,13 +71,14 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                 <td className="p-4">
                   <span className={cn(
                     "px-2.5 py-0.5 rounded-full text-sm font-bold uppercase tracking-wider border whitespace-nowrap",
-                    u.role === "ADMIN" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
+                    (u.role === "ADMIN" || u.role === "SUPER_ADMIN") ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
                     u.role === "SALES_REP" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
                     "bg-zinc-800 text-zinc-400 border-zinc-700"
                   )}>
-                    {u.role}
+                    {translateRole(u.role)}
                   </span>
                 </td>
+
                 <td className="p-4">
                   {(u.role === 'SALES_REP' || u.role === 'ADMIN') ? (
                     <span className="text-sm text-zinc-500 italic font-medium tracking-wide">Multicliente</span>
@@ -95,15 +98,19 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                   </div>
                 </td>
                 <td className="p-4 pr-8" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex items-center gap-1">
+                  <div className="flex flex-col gap-1.5">
                     {/* Botón de Reset Password */}
                     {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && (
                       <button 
-                        onClick={() => onResetPassword(u.id)}
-                        className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-yellow-500 transition-colors opacity-50 group-hover:opacity-100"
-                        title="Restablecer contraseña"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`¿Enviar instrucciones de restablecimiento a ${u.email}?`)) {
+                            onResetPassword(u.id);
+                          }
+                        }}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-yellow-500 transition-colors opacity-70 group-hover:opacity-100 text-xs font-bold uppercase tracking-wider text-left"
                       >
-                        <Key className="w-4 h-4" />
+                        <Key className="w-4 h-4 shrink-0" /> Restablecer Pass
                       </button>
                     )}
                     
@@ -111,25 +118,25 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                     {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && (
                       <Link 
                         href={`/dashboard/users/${u.id}`}
-                        className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors opacity-50 group-hover:opacity-100"
-                        title="Editar miembro"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors opacity-70 group-hover:opacity-100 text-xs font-bold uppercase tracking-wider text-left"
                       >
-                        <Pencil className="w-4 h-4" />
+                        <Pencil className="w-4 h-4 shrink-0" /> Editar
                       </Link>
                     )}
 
                     {/* Botón de Eliminar */}
                     {u.email !== 'jespejo@jdevoto.cl' && u.role !== 'SUPER_ADMIN' && !(currentUser?.role === 'ADMIN' && u.role === 'ADMIN') && (
                       <button 
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           if (window.confirm("¿Estás seguro de que deseas eliminar este miembro del equipo?")) {
                             onDelete(u.id);
                           }
                         }}
-                        className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100"
-                        title="Eliminar miembro"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/10 text-zinc-400 hover:text-red-500 transition-colors opacity-70 group-hover:opacity-100 text-xs font-bold uppercase tracking-wider text-left"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 shrink-0" /> Eliminar
                       </button>
                     )}
                   </div>

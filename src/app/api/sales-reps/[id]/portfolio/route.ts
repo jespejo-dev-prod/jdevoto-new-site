@@ -32,5 +32,32 @@ export const GET = withApiHandler(async (req: NextRequest, { params }: RouteCont
     return ok({ assignedCompanies: [] });
   }
 
-  return ok(rep);
+  // Fetch total sales by this sales rep per company
+  const salesData = await prisma.order.groupBy({
+    by: ['companyId'],
+    where: {
+      salesRepId: id,
+      status: { notIn: ['CANCELLED', 'REJECTED', 'DRAFT'] }
+    },
+    _sum: {
+      totalGross: true
+    }
+  });
+
+  // Map sales to a dictionary for quick lookup
+  const salesByCompany = salesData.reduce((acc, curr) => {
+    acc[curr.companyId] = curr._sum.totalGross?.toNumber() || 0;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Attach totalVentas to each company
+  const repWithSales = {
+    ...rep,
+    assignedCompanies: rep.assignedCompanies.map((c) => ({
+      ...c,
+      totalVentas: salesByCompany[c.id] || 0
+    }))
+  };
+
+  return ok(repWithSales);
 });
