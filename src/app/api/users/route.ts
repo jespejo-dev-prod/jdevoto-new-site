@@ -6,6 +6,7 @@ import { UserRole } from "@prisma/client";
 import { sendNotificationEmail } from "@/lib/email";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { logAuditAction } from "@/lib/audit";
 
 const CreateUserSchema = z.object({
   email: z.string().email(),
