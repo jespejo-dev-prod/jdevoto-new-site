@@ -154,6 +154,13 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     });
   }
 
+  // 8. Invalidar caché global del frontend si hubo actualizaciones exitosas
+  if (updatedProducts.length > 0) {
+    const { revalidatePath } = require("next/cache");
+    revalidatePath("/");
+    revalidatePath("/(store)", "layout");
+  }
+
   return ok({
     successes: successList,
     failures: failuresList,
