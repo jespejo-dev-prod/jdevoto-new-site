@@ -139,9 +139,13 @@ export const POST = withApiHandler(async (req: NextRequest) => {
           console.error("Error enviando email de bienvenida al usuario reactivado", err);
         });
         
-        const { sendUserUpdatedAdminNotification } = await import("@/lib/email");
-        sendUserUpdatedAdminNotification(reactivatedUser.email, roleName, true).catch(err => {
-          console.error("Error enviando notificación de reactivación al admin", err);
+        await logAuditAction({
+          userId: currentUser.id,
+          action: "USER_UPDATED",
+          entity: "User",
+          entityId: reactivatedUser.id,
+          details: { targetEmail: reactivatedUser.email, role: reactivatedUser.role, action: "REACTIVATED" },
+          req,
         });
       } else {
         const crypto = require("crypto");
@@ -219,9 +223,13 @@ export const POST = withApiHandler(async (req: NextRequest) => {
         console.error("Error enviando email de actualización", err);
       });
 
-      const { sendUserUpdatedAdminNotification } = await import("@/lib/email");
-      sendUserUpdatedAdminNotification(updatedUser.email, roleName, false).catch(err => {
-        console.error("Error enviando notificación de actualización al admin", err);
+      await logAuditAction({
+        userId: currentUser.id,
+        action: "USER_UPDATED",
+        entity: "User",
+        entityId: updatedUser.id,
+        details: { targetEmail: updatedUser.email, role: updatedUser.role, changes: Object.keys(updateData) },
+        req,
       });
 
       const { passwordHash: _, ...userWithoutPassword } = updatedUser;
@@ -297,6 +305,20 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       });
     }
   }
+
+  await logAuditAction({
+    userId: currentUser.id,
+    action: "USER_REGISTERED",
+    entity: "User",
+    entityId: newUser.id,
+    details: { 
+      firstName: newUser.firstName, 
+      lastName: newUser.lastName, 
+      email: newUser.email, 
+      role: newUser.role 
+    },
+    req,
+  });
 
   return created(userWithoutPassword);
 });

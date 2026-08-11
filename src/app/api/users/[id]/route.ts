@@ -103,18 +103,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     data: updateData,
   });
 
-  if (data.role !== undefined && data.role !== targetUser.role) {
-    const roleName = 
-      data.role === 'ADMIN' ? 'Administrador' :
-      data.role === 'COMPANY_ADMIN' ? 'Administrador de Empresa' :
-      data.role === 'SALES_REP' ? 'Vendedor' : 'Comprador';
-      
-    const { sendUserUpdatedAdminNotification } = await import("@/lib/email");
-    sendUserUpdatedAdminNotification(updatedUser.email, roleName, false).catch(err => {
-      console.error("Error enviando notificación de actualización al admin", err);
-    });
-  }
-
+  // Eliminada la notificación antigua; ahora se delega 100% en el AuditLog de abajo.
   await logAuditAction({
     userId: currentUser.id,
     action: "USER_UPDATED",
@@ -168,22 +157,12 @@ export const DELETE = withApiHandler(async (req: NextRequest, { params }: RouteC
     });
   }
 
-  const roleName = 
-    targetUser.role === 'ADMIN' ? 'Administrador' :
-    targetUser.role === 'COMPANY_ADMIN' ? 'Administrador de Empresa' :
-    targetUser.role === 'SALES_REP' ? 'Vendedor' : 'Comprador';
-
-  const { sendUserDeletedAdminNotification } = await import("@/lib/email");
-  sendUserDeletedAdminNotification(targetUser.email, roleName).catch(err => {
-    console.error("Error enviando notificación de eliminación de usuario", err);
-  });
-
   await logAuditAction({
     userId: currentUser.id,
-    action: "USER_UPDATED",
+    action: "USER_DELETED",
     entity: "User",
     entityId: id,
-    details: { targetEmail: targetUser.email, action: "DELETED/DEACTIVATED" },
+    details: { targetEmail: targetUser.email, role: targetUser.role, action: "DELETED/DEACTIVATED" },
     req,
   });
 

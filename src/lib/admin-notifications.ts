@@ -91,13 +91,22 @@ const NOTIFICATION_BUILDERS: Partial<Record<AuditAction, NotificationBuilder>> =
   }),
 
   USER_UPDATED: (name, d) => ({
-    title: "Usuario Actualizado",
+    title: `Usuario Actualizado: ${d?.targetEmail || d?.email || ''}`,
     message: `El usuario ${name} ha modificado un usuario.` +
       detailsTable(
         detailRow("Email del usuario", d?.targetEmail || d?.email) +
         detailRow("Campos modificados", d?.changes ? formatChanges(d.changes) : null) +
         detailRow("Nuevo Rol", d?.newRole) +
         detailRow("Empresa asignada", d?.companyName)
+      ),
+    link: "/dashboard/users",
+  }),
+
+  USER_DELETED: (name, d) => ({
+    title: `Usuario Eliminado: ${d?.targetEmail || d?.email || ''}`,
+    message: `El usuario ${name} ha eliminado a un usuario de la plataforma.` +
+      detailsTable(
+        detailRow("Email del usuario eliminado", d?.targetEmail || d?.email)
       ),
     link: "/dashboard/users",
   }),

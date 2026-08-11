@@ -129,7 +129,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
         // los datos bancarios. Si es un pago exitoso (B2B o Webpay), enviamos la actualización de estado.
         if (isTransferOnly) {
           try {
-            await sendOrderEmail(populatedOrder, customerEmail);
+            await sendOrderEmail(populatedOrder, customerEmail, true);
           } catch (emailErr) {
             console.error("Error al enviar correo de instrucciones de transferencia:", emailErr);
           }
