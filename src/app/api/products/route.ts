@@ -40,7 +40,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const query = GetProductsQuerySchema.parse(rawParams);
 
   // Para el dashboard de admin/sales_rep: pueden ver productos inactivos
-  const isPrivileged = user && (user.role === UserRole.ADMIN || user.role === UserRole.SALES_REP);
+  const isPrivileged = user && (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN || user.role === UserRole.SALES_REP);
   const includeInactive =
     req.nextUrl.searchParams.get("includeInactive") === "true" && isPrivileged;
 
