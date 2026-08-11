@@ -128,13 +128,17 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
         // Si es solo cambio a transferencia, enviamos el correo original de pedido que incluye
         // los datos bancarios. Si es un pago exitoso (B2B o Webpay), enviamos la actualización de estado.
         if (isTransferOnly) {
-          sendOrderEmail(populatedOrder, customerEmail).catch(emailErr => {
+          try {
+            await sendOrderEmail(populatedOrder, customerEmail);
+          } catch (emailErr) {
             console.error("Error al enviar correo de instrucciones de transferencia:", emailErr);
-          });
+          }
         } else {
-          sendOrderStatusUpdateEmail(populatedOrder, customerEmail).catch(emailErr => {
+          try {
+            await sendOrderStatusUpdateEmail(populatedOrder, customerEmail);
+          } catch (emailErr) {
             console.error("Error al enviar correo tras pago exitoso:", emailErr);
-          });
+          }
         }
       }
     } catch (emailErr) {
