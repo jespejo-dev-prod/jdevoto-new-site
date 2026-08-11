@@ -153,7 +153,7 @@ export class PaymentService {
     }
     const webhookUrl = process.env.MP_WEBHOOK_URL || baseUrl;
 
-    const redirectPath = context === 'invoice' ? '/dashboard/cuenta-corriente' : '/dashboard/orders';
+    const redirectPath = context === 'invoice' ? `/dashboard/orders/${orderId}` : '/dashboard/orders';
 
     try {
       const response = await preference.create({
