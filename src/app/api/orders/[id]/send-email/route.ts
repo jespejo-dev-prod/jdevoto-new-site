@@ -13,6 +13,9 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext) =
   const { id } = await ctx.params;
   const order = await orderService.getOrderById(id);
 
+  const { requireOrderAccess } = await import('@/lib/auth');
+  await requireOrderAccess(user, order.companyId);
+
   // Determine recipient email
   let customerEmail = (order.billingAddress as any)?.email;
   if (!customerEmail) {

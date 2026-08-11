@@ -231,41 +231,62 @@ export class PaymentService {
       let wasAlreadyPaid = false;
 
       if (status === "approved" && orderId) {
-        await prisma.$transaction(async (tx) => {
-          const order = await tx.order.findUnique({
-            where: { id: orderId }
-          });
-
-          if (!order) {
-            throw new Error(`Pedido ${orderId} no encontrado en webhook.`);
-          }
-
-          if (order.paymentStatus === PaymentStatus.PAID) {
-            wasAlreadyPaid = true;
-            return;
-          }
-
-          // Marcar el pedido como pagado y confirmado
-          await tx.order.update({
-            where: { id: orderId },
-            data: {
-              paymentStatus: PaymentStatus.PAID,
-              status: OrderStatus.CONFIRMED
-            }
-          });
-
-          // Si el método de pago original era crédito B2B, liberar cupo decrementando el crédito utilizado
-          if (order.paymentMethod === 'credit_b2b') {
-            await tx.company.update({
-              where: { id: order.companyId },
+        let wasAlreadyPaid = false;
+        
+        try {
+          await prisma.$transaction(async (tx) => {
+            // 1. Idempotencia Robusta: Intentar registrar el pago
+            // Si ya existe (webhooks concurrentes), lanzará P2002
+            await tx.mercadoPagoPayment.create({
               data: {
-                creditUsed: {
-                  decrement: Number(order.totalGross)
-                }
+                paymentId: String(paymentId),
+                orderId: orderId,
+                status: status,
               }
             });
+
+            const order = await tx.order.findUnique({
+              where: { id: orderId }
+            });
+
+            if (!order) {
+              throw new Error(`Pedido ${orderId} no encontrado en webhook.`);
+            }
+
+            if (order.paymentStatus === PaymentStatus.PAID) {
+              wasAlreadyPaid = true;
+              return; // Salir de la transacción sin hacer cambios
+            }
+
+            // Marcar el pedido como pagado y confirmado
+            await tx.order.update({
+              where: { id: orderId },
+              data: {
+                paymentStatus: PaymentStatus.PAID,
+                status: OrderStatus.CONFIRMED
+              }
+            });
+
+            // Si el método de pago original era crédito B2B, liberar cupo
+            if (order.paymentMethod === 'credit_b2b') {
+              await tx.company.update({
+                where: { id: order.companyId },
+                data: {
+                  creditUsed: {
+                    decrement: Number(order.totalGross)
+                  }
+                }
+              });
+            }
+          });
+        } catch (error: any) {
+          if (error.code === 'P2002') {
+            wasAlreadyPaid = true;
+            console.log(`[Webhook MercadoPago] Webhook duplicado para pago ${paymentId}. Retornando éxito sin reprocesar.`);
+          } else {
+            throw error; // Relanzar cualquier otro error 
           }
-        });
+        }
 
         // Enviar correo de confirmación de pago
         if (!wasAlreadyPaid) {

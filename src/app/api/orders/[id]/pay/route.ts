@@ -23,11 +23,8 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       throw new ValidationError("Pedido no encontrado");
     }
 
-    // Role check: Admin/Sales Rep or owner company
-    const isAdmin = user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN || user.role === UserRole.SALES_REP;
-    if (!isAdmin && order.companyId !== user.companyId) {
-      throw new ValidationError("No tienes permisos para pagar este pedido");
-    }
+    const { requireOrderAccess } = await import('@/lib/auth');
+    await requireOrderAccess(user, order.companyId);
 
     if (order.paymentStatus === PaymentStatus.PAID && !isTransferOnly && newPaymentMethod !== 'credit_b2b') {
       wasAlreadyPaid = true;
@@ -43,19 +40,16 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
       const company = await tx.company.findUnique({ where: { id: order.companyId } });
       if (!company) throw new ValidationError("Empresa no encontrada");
       
-      let availableCredit = Number(company.creditLimit || 0) - Number(company.creditUsed || 0);
-      if (availableCredit < 0) availableCredit = 0;
-      
-      if (availableCredit < Number(order.totalGross)) {
-        throw new ValidationError(
-          `Crédito B2B insuficiente. Disponible: $${availableCredit.toLocaleString("es-CL")} - Requerido: $${Number(order.totalGross).toLocaleString("es-CL")}`
-        );
+      const rowsAffected = await tx.$executeRaw`
+        UPDATE "companies"
+        SET "creditUsed" = "creditUsed" + ${Number(order.totalGross)}
+        WHERE "id" = ${order.companyId}
+          AND "creditLimit" - "creditUsed" >= ${Number(order.totalGross)}
+      `;
+
+      if (rowsAffected === 0) {
+        throw new ValidationError("Crédito B2B insuficiente (o consumido por otra operación concurrente).");
       }
-      
-      await tx.company.update({
-        where: { id: order.companyId },
-        data: { creditUsed: { increment: Number(order.totalGross) } }
-      });
     } else if (!isCreditB2B && wasCreditB2B) {
       // Liberar crédito si cambia de B2B a otro método
       await tx.company.update({

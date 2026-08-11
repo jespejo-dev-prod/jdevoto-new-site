@@ -35,10 +35,9 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext<{ 
 
   if (!order) throw new NotFoundError("Pedido", id);
 
-  // 2. Si es BUYER o COMPANY_ADMIN, validar pertenencia a su propia empresa
-  if ((user.role === UserRole.BUYER || user.role === UserRole.COMPANY_ADMIN) && user.companyId !== order.companyId) {
-    throw new ForbiddenError("No tienes permiso para repetir un pedido de otra empresa");
-  }
+  // 2. Verificar permisos / Alcance de la empresa
+  const { requireOrderAccess } = await import('@/lib/auth');
+  await requireOrderAccess(user, order.companyId);
 
   // 3. Extraer los productos de los items de la orden
   const companyId = order.companyId;

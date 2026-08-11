@@ -37,9 +37,14 @@ export async function proxy(request: NextRequest) {
 
   if (ip !== 'unknown' && !isLocal && !isDev) {
     try {
-      if (pathname.startsWith('/api/auth/login')) {
+      if (
+        pathname.startsWith('/api/auth/login') ||
+        pathname.startsWith('/api/auth/register') ||
+        pathname.startsWith('/api/auth/forgot-password')
+      ) {
         if (ratelimit) {
-          const { success } = await ratelimit.limit(`login_rl_${ip}`);
+          const action = pathname.split('/').pop() || 'auth';
+          const { success } = await ratelimit.limit(`${action}_rl_${ip}`);
           if (!success) {
             return NextResponse.json({ error: "Demasiadas peticiones. Intente más tarde." }, { status: 429 });
           }

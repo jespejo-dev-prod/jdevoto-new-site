@@ -30,10 +30,8 @@ export const POST = withApiHandler(async (
   if (!order) throw new NotFoundError("Pedido", orderId);
 
   // 1.1 Verificar permisos / Alcance de la empresa
-  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP' || user.role === 'SUPER_ADMIN';
-  if (!isAdmin && order.companyId !== user.companyId) {
-    throw new ForbiddenError("No tiene permisos para enviar mensajes en este pedido");
-  }
+  const { requireOrderAccess } = await import('@/lib/auth');
+  await requireOrderAccess(user, order.companyId);
 
   // 2. Parsear el FormData
   const formData = await req.formData();
@@ -101,10 +99,11 @@ export const POST = withApiHandler(async (
     }
   });
 
-  const isInvoicePdf = file && file.type === 'application/pdf' && isAdmin;
+  const isAdminOrRep = user.role === 'ADMIN' || user.role === 'SALES_REP' || user.role === 'SUPER_ADMIN';
+  const isInvoicePdf = file && file.type === 'application/pdf' && isAdminOrRep;
 
   // 4.1 Crear Notificaciones Globales
-  if (isAdmin) {
+  if (isAdminOrRep) {
     // Notificar al comprador
     if (order.createdById !== user.id) {
       const notifTitle = isInvoicePdf
@@ -170,7 +169,7 @@ export const POST = withApiHandler(async (
   }
 
   // 5. Notificar al cliente por correo si se solicitó o si es una factura en PDF (sólo si es admin)
-  if ((notifyCustomer || isInvoicePdf) && isAdmin) {
+  if ((notifyCustomer || isInvoicePdf) && isAdminOrRep) {
     try {
       const { sendOrderMessageEmail } = await import('@/lib/email');
       let customerEmail = (order.billingAddress as any)?.email;
@@ -215,10 +214,8 @@ export const GET = withApiHandler(async (
 
   if (!order) throw new NotFoundError("Pedido", orderId);
 
-  const isAdmin = user.role === 'ADMIN' || user.role === 'SALES_REP' || user.role === 'SUPER_ADMIN';
-  if (!isAdmin && order.companyId !== user.companyId) {
-    throw new ForbiddenError("No tiene acceso a los mensajes de este pedido");
-  }
+  const { requireOrderAccess } = await import('@/lib/auth');
+  await requireOrderAccess(user, order.companyId);
 
   const messages = await prisma.orderMessage.findMany({
     where: { orderId },

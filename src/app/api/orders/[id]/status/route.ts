@@ -23,9 +23,8 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
 
     const order = await orderService.getOrderById(id);
 
-    if (order.companyId !== user.companyId) {
-      throw new ForbiddenError("No puedes modificar un pedido que no pertenece a tu empresa.");
-    }
+    const { requireOrderAccess } = await import('@/lib/auth');
+    await requireOrderAccess(user, order.companyId);
 
     if (
       order.status !== OrderStatus.DRAFT &&
@@ -34,6 +33,11 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     ) {
       throw new ForbiddenError("Solo puedes cancelar pedidos en estado Borrador, Pendiente o Confirmado.");
     }
+  } else {
+    // Para ADMIN/SALES_REP, necesitamos validar el acceso primero
+    const order = await orderService.getOrderById(id);
+    const { requireOrderAccess } = await import('@/lib/auth');
+    await requireOrderAccess(user, order.companyId);
   }
 
   const updated = await orderService.updateOrderStatus(id, status, internalNotes);

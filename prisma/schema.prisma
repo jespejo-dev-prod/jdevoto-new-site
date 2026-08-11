@@ -525,3 +525,15 @@ enum RecipientStatus {
   BOUNCED
   COMPLAINED
 }
+
+model MercadoPagoPayment {
+  id          String   @id @default(cuid())
+  paymentId   String   @unique
+  orderId     String
+  status      String
+  processedAt DateTime @default(now())
+
+  @@index([orderId])
+  @@map("mercadopago_payments")
+}
+

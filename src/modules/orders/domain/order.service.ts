@@ -330,20 +330,34 @@ export class OrderService {
       // Reservar stock de cada producto (no se descuenta del stock físico todavía)
       // El descuento real ocurre cuando el pedido pasa a DELIVERED
       await Promise.all(
-        items.map((item) =>
-          tx.product.update({
-            where: { id: item.productId },
-            data: { stockReserved: { increment: item.quantity } },
-          })
-        )
+        items.map(async (item) => {
+          const rowsAffected = await tx.$executeRaw`
+            UPDATE "products"
+            SET "stockReserved" = "stockReserved" + ${item.quantity}
+            WHERE "id" = ${item.productId}
+              AND "stockQuantity" - "stockReserved" >= ${item.quantity}
+          `;
+          if (rowsAffected === 0) {
+            const p = await tx.product.findUnique({ where: { id: item.productId }, select: { name: true } });
+            throw new BusinessRuleError(
+              `Stock insuficiente para '${p?.name || item.productId}'. Otro usuario podría haber reservado el stock justo ahora.`,
+              "INSUFFICIENT_STOCK"
+            );
+          }
+        })
       );
 
       // Actualizar crédito usado por la empresa (Solo si es con crédito)
       if (paymentMethod === 'credit_b2b') {
-        await tx.company.update({
-          where: { id: companyId },
-          data: { creditUsed: { increment: totalGross } },
-        });
+        const rowsAffected = await tx.$executeRaw`
+          UPDATE "companies"
+          SET "creditUsed" = "creditUsed" + ${totalGross}
+          WHERE "id" = ${companyId}
+            AND "creditLimit" - "creditUsed" >= ${totalGross}
+        `;
+        if (rowsAffected === 0) {
+          throw new BusinessRuleError("Crédito B2B insuficiente. Es posible que el cupo haya sido consumido simultáneamente por otro pedido.", "INSUFFICIENT_CREDIT");
+        }
       }
 
       return newOrder;

@@ -108,3 +108,31 @@ export function requireRole(
     );
   }
 }
+
+
+// ============================================================
+// GUARD DE ORDENES (IDOR)
+// ============================================================
+
+import { prisma } from "@/lib/client";
+
+export async function requireOrderAccess(
+  user: AuthenticatedUser,
+  orderCompanyId: string
+): Promise<void> {
+  if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') return;
+
+  if ((user.role === 'COMPANY_ADMIN' || user.role === 'BUYER') && user.companyId !== orderCompanyId) {
+    throw new ForbiddenError("No tienes permiso para acceder a los pedidos de otra empresa.");
+  }
+
+  if (user.role === 'SALES_REP') {
+    const company = await prisma.company.findUnique({
+      where: { id: orderCompanyId },
+      select: { salesRepId: true }
+    });
+    if (company?.salesRepId !== user.id) {
+      throw new ForbiddenError("No tienes permiso para acceder a los pedidos de esta empresa.");
+    }
+  }
+}

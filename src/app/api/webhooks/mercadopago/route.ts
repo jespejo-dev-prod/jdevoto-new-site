@@ -21,11 +21,16 @@ export async function POST(req: NextRequest) {
       payload.id = id;
     }
 
-    console.log("[Webhook MercadoPago Recibido]", JSON.stringify(payload));
+    const eventType = topic || payload.action || payload.type || 'unknown';
+    const eventId = id || payload.data?.id || 'unknown';
+    console.log(`[Webhook MercadoPago Recibido] Evento: ${eventType} - ID: ${eventId}`);
 
     // Validar firma si el secreto del webhook está configurado en las variables de entorno
     const webhookSecret = process.env.MP_WEBHOOK_SECRET;
-    if (webhookSecret) {
+    if (!webhookSecret) {
+      console.error("[Webhook MercadoPago Error Crítico] MP_WEBHOOK_SECRET no está configurado en las variables de entorno. Rechazando webhook.");
+      return NextResponse.json({ success: false, error: "Configuration Error" }, { status: 500 });
+    }
       const xSignature = req.headers.get("x-signature");
       const xRequestId = req.headers.get("x-request-id");
 
@@ -77,9 +82,6 @@ export async function POST(req: NextRequest) {
       }
 
       console.log("[Webhook MercadoPago] Firma verificada exitosamente.");
-    } else {
-      console.warn("[Webhook MercadoPago Warning] MP_WEBHOOK_SECRET no está configurado en las variables de entorno. Omitiendo verificación de firma HMAC.");
-    }
     
     await paymentService.processWebhook(payload);
     
