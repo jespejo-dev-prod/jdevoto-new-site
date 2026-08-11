@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       try {
         isSignatureValid = crypto.timingSafeEqual(
           Buffer.from(hmac, "utf-8"),
-          Buffer.from(v1, "utf-8")
+          Buffer.from(v1 || "", "utf-8")
         );
       } catch {
         isSignatureValid = hmac === v1;
