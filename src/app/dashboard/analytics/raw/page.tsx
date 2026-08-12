@@ -77,7 +77,7 @@ export default async function RawDataPage() {
                 eventsWithUser.map((evt) => (
                   <tr key={evt.id} className="hover:bg-zinc-800/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {format(new Date(evt.createdAt), "dd MMM yyyy, HH:mm", { locale: es })}
+                      {new Intl.DateTimeFormat('es-CL', { timeZone: 'America/Santiago', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(evt.createdAt))}
                     </td>
                     <td className="px-6 py-4 font-bold text-white">
                       <span className="px-2 py-1 bg-zinc-800 rounded-md text-xs">
