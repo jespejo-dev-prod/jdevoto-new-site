@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     }
 
     const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - 7);
+    // cutoffDate.setDate(cutoffDate.getDate() - 7); // Comentado temporalmente para que procese eventos recientes y puedas probarlo ahora
 
     // Step 1: Query analytics_events older than 7 days
     const oldEvents = await prisma.analyticsEvent.findMany({
