@@ -102,7 +102,8 @@ export default function OrderDetailPage() {
  };
 
  const handleStatusChange = (newStatus: OrderStatus) => {
- if (confirm(`¿Cambiar el estado del pedido a ${newStatus}?`)) {
+ const statusLabel = STATUS_CONFIG[newStatus]?.label || newStatus;
+ if (confirm(`¿Cambiar el estado del pedido a ${statusLabel}?`)) {
  updateStatus.mutate({ status: newStatus });
  }
  };

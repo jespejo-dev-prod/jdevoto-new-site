@@ -71,4 +71,4 @@ next-env.d.ts
 # Gemini progress
 gemini-progress.json
 test/
-
+/docs

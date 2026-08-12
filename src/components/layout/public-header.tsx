@@ -238,7 +238,7 @@ export function PublicHeader() {
                       className="px-4 py-2.5 rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 font-semibold text-sm transition-all"
                       onClick={() => setIsUserDropdownOpen(false)}
                     >
-                      Dashboard B2B
+                      Portal de Compras
                     </Link>
                     <Link
                       href="/profile"
@@ -492,7 +492,7 @@ export function PublicHeader() {
                   className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-zinc-900 text-zinc-400 hover:text-white transition-all text-sm font-bold uppercase tracking-wider"
                 >
                   <User className="h-5 w-5 text-primary" />
-                  Ir a mi Dashboard
+                  Ir a mi Portal de Compras
                 </Link>
                 <Link 
                   href="/profile" 
