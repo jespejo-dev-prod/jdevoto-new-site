@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
-import { useFetcher } from "@/lib/fetcher";
+import { useApi } from "@/shared/infrastructure/api/use-api";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -17,7 +17,7 @@ interface UserTableProps {
 }
 
 export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserTableProps) {
-  const fetcher = useFetcher();
+  const { fetcher } = useApi();
   const [sendingWelcome, setSendingWelcome] = useState<string | null>(null);
   const router = useRouter();
   const { user: currentUser } = useAuth();
