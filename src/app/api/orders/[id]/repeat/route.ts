@@ -84,6 +84,21 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext<{ 
   const directCheckout = req.nextUrl.searchParams.get("directCheckout") === "true";
   
   if (directCheckout) {
+    // Determinar método de pago: si la empresa tiene crédito disponible, usar credit_b2b
+    // para que el pedido se confirme automáticamente y descuente del cupo.
+    let paymentMethod = order.paymentMethod || "Transferencia";
+    
+    const company = await prisma.company.findUnique({
+      where: { id: order.companyId },
+      select: { creditLimit: true, creditUsed: true },
+    });
+    
+    if (company) {
+      const availableCredit = Number(company.creditLimit) - Number(company.creditUsed);
+      if (availableCredit > 0) {
+        paymentMethod = "credit_b2b";
+      }
+    }
 
     const newOrder = await orderService.createOrder({
       companyId: order.companyId,
@@ -94,7 +109,7 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext<{ 
       })),
       notes: `Pedido clonado a partir de ${order.orderNumber}${order.notes ? `\n\nNotas originales: ${order.notes}` : ''}`,
       status: OrderStatus.PENDING,
-      paymentMethod: order.paymentMethod || "Transferencia",
+      paymentMethod,
       shippingAddress: (order.shippingAddress as Record<string, unknown>) || undefined,
       billingAddress: (order.billingAddress as Record<string, unknown>) || undefined,
     });
