@@ -421,7 +421,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                     className="text-sm sm:text-base font-bold text-blue-600 hover:underline"
                   >
                     Conoce nuestros términos de crédito
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
