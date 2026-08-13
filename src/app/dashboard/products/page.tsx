@@ -71,6 +71,14 @@ export default function ProductsPage() {
 
  const [view, setView] = useState<'grid' | 'list'>('list');
  const [search, setSearch] = useState(urlSearch);
+
+ // Set default view to grid on mobile
+ useEffect(() => {
+   if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+     setView('grid');
+   }
+ }, []);
+
  const [categoryId, setCategoryId] = useState('');
  const [brandId, setBrandId] = useState('');
  const [page, setPage] = useState(1);

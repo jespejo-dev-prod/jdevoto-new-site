@@ -299,7 +299,7 @@ export function ProductSlider({
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className="relative z-10 flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pt-1 cursor-grab active:cursor-grabbing select-none"
+          className="relative z-10 flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pt-1 cursor-grab active:cursor-grabbing select-none px-6 md:px-8"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {children}
@@ -309,9 +309,9 @@ export function ProductSlider({
   }
 
   return (
-    <section className="mt-12 bg-white rounded-[32px] p-6 md:p-8 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+    <section className="mt-12 bg-white rounded-[32px] py-6 md:py-8 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
        {/* Header del Contenedor */}
-       <div className="flex items-center justify-between mb-8 pb-4 border-b border-zinc-100">
+       <div className="flex items-center justify-between mb-8 px-6 md:px-8 pb-4 border-b border-zinc-100">
           <div className="flex items-end gap-4">
             <h2 className="text-xl md:text-2xl font-black text-zinc-950 tracking-tight">{title}</h2>
             

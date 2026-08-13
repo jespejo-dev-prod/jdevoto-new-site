@@ -171,7 +171,7 @@ export function CustomerTable({ customers, onDelete, onReactivate, onUnassign, i
   
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-x-auto shadow-xl">
-      <table className="w-full text-left border-collapse">
+      <table className="w-full min-w-[1000px] text-left border-collapse">
         <thead className="bg-zinc-950/50 border-b border-zinc-800">
           <tr>
             <th className="p-4 text-sm font-bold text-zinc-400 uppercase tracking-widest pl-8">Cliente / Empresa</th>

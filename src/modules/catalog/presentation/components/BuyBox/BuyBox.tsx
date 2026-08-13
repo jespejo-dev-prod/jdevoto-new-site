@@ -126,7 +126,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
   }
 
   return (
-    <div className="p-8 rounded-[48px] border border-zinc-100 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] space-y-8">
+    <div className="p-5 sm:p-8 rounded-[32px] sm:rounded-[48px] border border-zinc-100 bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] space-y-6 sm:space-y-8">
       <div className="space-y-2.5">
         {discountPercent > 0 ? (
           <>

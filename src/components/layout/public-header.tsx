@@ -278,7 +278,7 @@ export function PublicHeader() {
             <Link href="/wishlist" className="relative group cursor-pointer mr-1" title="Lista de deseos">
               <Heart className="h-6 w-6 text-zinc-400 hover:text-white transition-colors" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black h-5 w-5 rounded-full flex items-center justify-center animate-in zoom-in">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center animate-in zoom-in">
                   {wishlistCount}
                 </span>
               )}
@@ -289,7 +289,7 @@ export function PublicHeader() {
           <Link href="/cart" className="relative group cursor-pointer" title="Carrito">
             <ShoppingCart className="h-6 w-6 text-zinc-400 hover:text-white transition-colors" />
             {!!user && itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-primary text-zinc-950 text-[10px] font-black h-5 w-5 rounded-full flex items-center justify-center animate-in zoom-in">
+              <span className="absolute -top-2 -right-2 bg-primary text-zinc-950 text-[10px] font-black h-5 min-w-[20px] px-1 rounded-full flex items-center justify-center animate-in zoom-in">
                 {itemCount}
               </span>
             )}
@@ -385,11 +385,11 @@ export function PublicHeader() {
           <div className="flex items-center gap-2 truncate font-black relative z-10">
             {isMinimumMet ? (
               <span>
-                🎉 ¡Mínimo Alcanzado! | Neto: ${formattedSubtotal}
+                🎉 <span className="hidden sm:inline">¡Mínimo Alcanzado! | </span>Neto: ${formattedSubtotal}
               </span>
             ) : (
               <span>
-                Compra Mínima: <span className="text-yellow-300 font-black">$100.000</span> | Neto: ${formattedSubtotal} (Te faltan: <span className="text-yellow-300 font-black">${formattedMissing}</span>)
+                <span className="hidden sm:inline">Compra Mínima: </span><span className="text-yellow-300 font-black">$100.000</span> | Neto: ${formattedSubtotal} <span className="hidden xs:inline">(Faltan: <span className="text-yellow-300 font-black">${formattedMissing}</span>)</span>
               </span>
             )}
           </div>

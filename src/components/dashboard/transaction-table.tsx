@@ -84,9 +84,9 @@ export function TransactionTable() {
  </div>
  </div>
 
- <div className="overflow-x-auto min-h-[200px] relative">
+ <div className="flex-1 min-h-[400px] overflow-x-auto relative scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
  {loading ? (
- <div className="absolute inset-0 flex items-center justify-center">
+ <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/50 backdrop-blur-sm z-10">
  <Loader2 className="w-6 h-6 text-primary animate-spin" />
  </div>
  ) : orders.length === 0 ? (
@@ -94,7 +94,7 @@ export function TransactionTable() {
  <p className="text-sm font-medium">No hay pedidos recientes</p>
  </div>
  ) : (
- <table className="w-full text-left">
+ <table className="w-full min-w-[800px] text-left">
  <thead>
  <tr className="text-xs font-bold text-zinc-400 uppercase tracking-wider bg-zinc-950/50">
  <th className="px-6 py-4">N° Pedido</th>

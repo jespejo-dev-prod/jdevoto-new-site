@@ -43,8 +43,8 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
                       <Package className="h-6 w-6 text-zinc-700" />
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <p className="font-bold text-white truncate max-w-[300px] text-[15px]">{item.productName}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-white line-clamp-2 md:truncate md:max-w-[300px] whitespace-normal md:whitespace-nowrap text-[15px] leading-snug">{item.productName}</p>
                     <p className="text-sm font-bold text-sky-400 font-mono mt-1">SKU: {item.productSku}</p>
                     {Number(item.discount) > 0 && (
                       <span className="inline-block mt-1 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-tighter">

@@ -16,7 +16,7 @@ export function SalesRepTable({ salesReps, isLoading, onAssignCompany, onRemoveC
   return (
     <>
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-x-auto shadow-2xl">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full min-w-[800px] text-left border-collapse">
           <thead className="bg-zinc-950/50 border-b border-zinc-800">
             <tr>
               <th className="p-4 text-sm font-bold text-zinc-400 uppercase tracking-widest pl-8">Vendedor</th>

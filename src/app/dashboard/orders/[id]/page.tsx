@@ -270,7 +270,7 @@ export default function OrderDetailPage() {
       {/* Decorative gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50" />
       
-      <div className="relative z-10 flex items-center justify-between mb-4">
+      <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
         <h3 className="text-lg font-bold text-white flex items-center gap-3">
           <CreditCard className="h-5 w-5 text-primary" />
           Opciones de Pago
@@ -278,7 +278,7 @@ export default function OrderDetailPage() {
         {!isPaying && (
           <button 
             onClick={() => setIsPaying(true)}
-            className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-black rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg transition-all shadow-primary/20"
+            className="w-full sm:w-auto px-6 py-2.5 bg-primary hover:bg-primary/90 text-black rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg transition-all shadow-primary/20"
           >
             Pagar Pedido
           </button>
