@@ -1,8 +1,11 @@
-import { Mail, CheckCircle2, Trash2, Loader2, Pencil, Key } from "lucide-react";
+import { Mail, CheckCircle2, Trash2, Loader2, Pencil, Key, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { useFetcher } from "@/lib/fetcher";
+import { toast } from "sonner";
+import { useState } from "react";
 
 import { translateRole } from "@/lib/role-translations";
 
@@ -14,6 +17,8 @@ interface UserTableProps {
 }
 
 export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserTableProps) {
+  const fetcher = useFetcher();
+  const [sendingWelcome, setSendingWelcome] = useState<string | null>(null);
   const router = useRouter();
   const { user: currentUser } = useAuth();
   
@@ -99,6 +104,30 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                 </td>
                 <td className="p-4 pr-8" onClick={(e) => e.stopPropagation()}>
                   <div className="flex flex-col gap-1.5">
+                    {/* Botón de Reenviar Correo de Bienvenida */}
+                    {(currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') && (
+                      <button 
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          if (!window.confirm(`¿Reenviar correo de bienvenida a ${u.email}?\n\nSe enviará un nuevo enlace para que cree su contraseña (válido por 1 hora).`)) return;
+                          setSendingWelcome(u.id);
+                          try {
+                            await fetcher(`/api/users/${u.id}/resend-welcome`, { method: 'POST' });
+                            toast.success(`Correo reenviado a ${u.email}`);
+                          } catch (err: any) {
+                            toast.error(err.message || 'Error al reenviar correo');
+                          } finally {
+                            setSendingWelcome(null);
+                          }
+                        }}
+                        disabled={sendingWelcome === u.id}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-sky-400 transition-colors opacity-70 group-hover:opacity-100 text-xs font-bold uppercase tracking-wider text-left disabled:opacity-30"
+                      >
+                        {sendingWelcome === u.id ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" /> : <Send className="w-4 h-4 shrink-0" />}
+                        {sendingWelcome === u.id ? 'Enviando...' : 'Reenviar Correo'}
+                      </button>
+                    )}
+
                     {/* Botón de Reset Password */}
                     {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && (
                       <button 
