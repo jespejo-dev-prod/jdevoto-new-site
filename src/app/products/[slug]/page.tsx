@@ -346,7 +346,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   Descripción del producto
                 </h2>
                 <div
-                  className="prose prose-zinc max-w-none text-zinc-600 prose-p:leading-relaxed prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-zinc-900 prose-ul:my-4 prose-li:my-1 text-sm md:text-base leading-relaxed whitespace-pre-wrap"
+                  className="prose prose-zinc max-w-none text-zinc-600 prose-p:leading-relaxed prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-zinc-900 prose-ul:my-4 prose-li:my-1 text-sm md:text-base leading-relaxed whitespace-pre-wrap space-y-4"
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHtml(
                       (product.description || "Sin descripción disponible.").replace(/\\n/g, '\n'),
