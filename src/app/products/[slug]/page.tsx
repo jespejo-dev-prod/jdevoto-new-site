@@ -416,8 +416,8 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   </div>
                 </div>
                 <div className="pt-2 border-t border-zinc-50">
-                  <a
-                    href="#"
+                  <Link
+                    href="/terms"
                     className="text-sm sm:text-base font-bold text-blue-600 hover:underline"
                   >
                     Conoce nuestros términos de crédito

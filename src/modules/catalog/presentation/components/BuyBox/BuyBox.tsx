@@ -173,8 +173,8 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
         <div className="flex gap-4 items-start text-xs sm:text-[13px] font-normal uppercase tracking-tight text-zinc-400">
           <ShieldCheck className="h-5 w-5 text-zinc-400 shrink-0 mt-0.5" />
           <div className="flex flex-col leading-tight">
-            <span>Cambio o Devolución</span>
-            <span className="text-zinc-950 font-normal">hasta 6 Meses</span>
+            <span>Garantía Legal</span>
+            <span className="text-zinc-950 font-normal">6 meses por falla de fábrica</span>
           </div>
         </div>
       </div>
@@ -252,7 +252,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
                 <RotateCcw className="h-5 w-5 text-zinc-400" />
               </div>
               <p className="text-sm sm:text-[15px] text-zinc-500 leading-relaxed">
-                <span className="text-[#3483fa] cursor-pointer hover:underline">Devolución gratis.</span> Tienes 30 días desde que lo recibes.
+                <span className="text-[#3483fa] font-semibold">Políticas B2B:</span> No aplica derecho a retracto unilateral para compras mayoristas institucionales.
               </p>
             </div>
             <div className="flex gap-3">
@@ -260,7 +260,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
                 <ShieldCheck className="h-5 w-5 text-zinc-400" />
               </div>
               <p className="text-sm sm:text-[15px] text-zinc-500 leading-relaxed">
-                <span className="text-[#3483fa] cursor-pointer hover:underline">Compra Protegida:</span> Recibe el producto que esperabas o te devolvemos tu dinero.
+                <span className="text-[#3483fa] font-semibold">Garantía comercial:</span> 6 meses de garantía exclusivamente por fallas o defectos de fabricación.
               </p>
             </div>
           </div>
