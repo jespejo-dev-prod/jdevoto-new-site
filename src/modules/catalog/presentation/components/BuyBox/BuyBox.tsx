@@ -247,14 +247,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
           </button>
 
           <div className="space-y-4 pt-2">
-            <div className="flex gap-3">
-              <div className="shrink-0 pt-0.5">
-                <RotateCcw className="h-5 w-5 text-zinc-400" />
-              </div>
-              <p className="text-sm sm:text-[15px] text-zinc-500 leading-relaxed">
-                <span className="text-[#3483fa] font-semibold">Políticas B2B:</span> No aplica derecho a retracto unilateral para compras mayoristas institucionales.
-              </p>
-            </div>
+
             <div className="flex gap-3">
               <div className="shrink-0 pt-0.5">
                 <ShieldCheck className="h-5 w-5 text-zinc-400" />

@@ -13,8 +13,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const issuer = 'J. Devoto B2B';
   const otpauthUrl = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(user.email)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
   
-  // Generar URL del código QR mediante una API pública ligera y rápida
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauthUrl)}`;
+  // Generar URL del código QR mediante QuickChart (más confiable que qrserver)
+  const qrCodeUrl = `https://quickchart.io/qr?size=200&text=${encodeURIComponent(otpauthUrl)}`;
 
   return ok({
     secret,
