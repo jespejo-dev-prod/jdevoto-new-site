@@ -153,7 +153,7 @@ export default function CampaignDetailPage() {
  return r.status === statusFilter;
  });
 
- const isAdmin = authUser?.role === 'ADMIN';
+ const isAdmin = authUser?.role === 'ADMIN' || authUser?.role === 'SUPER_ADMIN';
 
  return (
  <div className="flex flex-col gap-6 p-6 max-w-5xl mx-auto">

@@ -8,7 +8,7 @@ import { Pencil } from "lucide-react";
 export function AdminEditButton({ productId }: { productId: string }) {
   const { user } = useAuth();
   
-  if (user?.role !== "ADMIN") return null;
+  if (user?.role !== "ADMIN" && user?.role !== "SUPER_ADMIN") return null;
 
   return (
     <Link

@@ -24,7 +24,7 @@ export function ProductActions({
   const { toggleWishlist, isInWishlist } = useWishlist();
   
   const isAuthenticated = !!accessToken;
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   const isDashboard = variant === 'dashboard';
   const isSaved = isInWishlist(product.id);
 

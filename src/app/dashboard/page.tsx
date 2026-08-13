@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
  return (
  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
-      {user.role === 'ADMIN' ? (
+      {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') ? (
         <AdminDashboard />
       ) : user.role === 'SALES_REP' ? (
         <SalesRepDashboard />

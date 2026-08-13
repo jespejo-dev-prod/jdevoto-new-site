@@ -14,7 +14,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   }
   const companyId = user?.companyId || null;
 
-  const isPrivileged = user && (user.role === "ADMIN" || user.role === "SALES_REP");
+  const isPrivileged = user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN" || user.role === "SALES_REP");
   let hideOutOfStock = false;
   if (!isPrivileged) {
     const hideSetting = await prisma.storeSettings.findUnique({
