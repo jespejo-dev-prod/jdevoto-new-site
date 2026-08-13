@@ -41,7 +41,7 @@ const nextConfig: NextConfig = {
     if (isProd) {
       securityHeaders.push({
         key: "Content-Security-Policy",
-        value: "default-src 'self'; connect-src 'self' https://nominatim.openstreetmap.org https://www.google-analytics.com https://region1.google-analytics.com; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com https://www.jdevoto.cl https://res.cloudinary.com https://www.googletagmanager.com; font-src 'self' data:;"
+        value: "default-src 'self'; connect-src 'self' https://nominatim.openstreetmap.org https://www.google-analytics.com https://region1.google-analytics.com; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://plus.unsplash.com https://www.jdevoto.cl https://res.cloudinary.com https://www.googletagmanager.com https://quickchart.io; font-src 'self' data:;"
       });
     }
 
