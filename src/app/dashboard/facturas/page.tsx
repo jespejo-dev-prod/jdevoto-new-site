@@ -28,15 +28,38 @@ export default async function FacturasPage({ searchParams }: { searchParams: Pro
     attachmentUrl: { not: null },
   };
 
-  // Si no es ADMIN/SUPER_ADMIN/SALES_REP, solo puede ver las de su empresa, y que estén visibles
-  if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN' && user.role !== 'SALES_REP') {
-    whereClause.order = { companyId: user.companyId };
-    whereClause.isCustomerVisible = true;
-  } else {
-    // Si es admin/vendedor, puede filtrar si lo desea
+  // Si no es ADMIN/SUPER_ADMIN, restringir acceso
+  if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+    // Admin puede ver todo, opcionalmente filtrar por empresa
     if (companyId && companyId !== 'ALL') {
       whereClause.order = { companyId: companyId };
     }
+  } else if (user.role === 'SALES_REP') {
+    // Vendedor solo puede ver facturas de sus clientes asignados
+    const assignedCompanies = await prisma.company.findMany({
+      where: { salesRepId: user.id },
+      select: { id: true },
+    });
+    const assignedIds = assignedCompanies.map((c) => c.id);
+
+    if (assignedIds.length === 0) {
+      // Si no tiene clientes asignados, no ver nada
+      whereClause.order = { companyId: 'NONE' };
+    } else if (companyId && companyId !== 'ALL') {
+      // Solo permitir filtrar por empresas que tiene asignadas
+      if (assignedIds.includes(companyId)) {
+        whereClause.order = { companyId: companyId };
+      } else {
+        whereClause.order = { companyId: 'NONE' };
+      }
+    } else {
+      // Sin filtro específico: mostrar todas las de sus clientes
+      whereClause.order = { companyId: { in: assignedIds } };
+    }
+  } else {
+    // BUYER / COMPANY_ADMIN: solo puede ver las de su empresa, y que estén visibles
+    whereClause.order = { companyId: user.companyId };
+    whereClause.isCustomerVisible = true;
   }
 
   const facturas = await prisma.orderMessage.findMany({
@@ -96,7 +119,7 @@ export default async function FacturasPage({ searchParams }: { searchParams: Pro
                       <ShoppingBag className="h-3.5 w-3.5" />
                       Pedido {factura.order.orderNumber}
                     </span>
-                    {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && factura.order.company && (
+                    {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.role === 'SALES_REP') && factura.order.company && (
                       <span className="text-primary/80">
                         {factura.order.company.razonSocial}
                       </span>
