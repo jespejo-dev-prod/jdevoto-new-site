@@ -349,7 +349,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   className="prose prose-zinc max-w-none text-zinc-600 prose-p:leading-relaxed prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-zinc-900 prose-ul:my-4 prose-li:my-1 text-sm md:text-base leading-relaxed whitespace-pre-wrap"
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHtml(
-                      product.description || "Sin descripción disponible.",
+                      (product.description || "Sin descripción disponible.").replace(/\\n/g, '\n'),
                       {
                         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'iframe']),
                         allowedAttributes: {
