@@ -200,6 +200,9 @@ export default function ProfilePage() {
 
   const handleToggle2fa = async () => {
     if (twoFactorEnabled) {
+      if (!window.confirm("⚠️ ADVERTENCIA: ¿Estás seguro de que deseas desactivar la Autenticación de Doble Factor?\n\nTu cuenta quedará más vulnerable a accesos no autorizados. Si haces esto, cualquier persona con tu contraseña podrá acceder a tu cuenta corporativa.")) {
+        return;
+      }
       setIsSaving(true);
       try {
         const res = await fetch('/api/profile/2fa/disable', {
@@ -599,9 +602,16 @@ export default function ProfilePage() {
                               <ShieldCheck className={cn("h-6 w-6", twoFactorEnabled ? "text-primary" : "text-zinc-400")} />
                               <h3 className="text-lg font-black text-white uppercase tracking-tight">Autenticación de Doble Factor (2FA)</h3>
                            </div>
-                           <p className="text-sm text-zinc-300 leading-relaxed">
-                              Añade una capa extra de protección a tu cuenta corporativa. Al iniciar sesión, se te solicitará un código dinámico generado por tu aplicación de autenticación (Google Authenticator, Microsoft Authenticator, etc.).
-                           </p>
+                           <div className="space-y-3">
+                              <p className="text-sm text-zinc-300 leading-relaxed">
+                                 Añade una capa extra de protección a tu cuenta corporativa. Al iniciar sesión, se te solicitará un código dinámico de 6 dígitos.
+                              </p>
+                              <div className="bg-sky-500/10 border border-sky-500/20 p-4 rounded-2xl">
+                                 <p className="text-sm text-sky-200 leading-relaxed font-medium">
+                                    <span className="font-bold text-sky-400">Importante:</span> Este sistema no usa mensajes de texto (SMS). Debes descargar una aplicación gratuita como <span className="font-bold text-white">Google Authenticator</span>, <span className="font-bold text-white">Authy</span> o <span className="font-bold text-white">Microsoft Authenticator</span> en tu celular.
+                                 </p>
+                              </div>
+                           </div>
                         </div>
                         
                         <div className="shrink-0 flex items-center">
@@ -620,8 +630,8 @@ export default function ProfilePage() {
                      {show2faSetup && (
                        <div className="bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800 space-y-6 max-w-xl mx-auto animate-in zoom-in duration-300">
                           <div className="text-center space-y-2">
-                             <h4 className="text-sm font-bold text-white uppercase tracking-wider">Configurar Autenticador</h4>
-                             <p className="text-[11px] text-zinc-500">Escanea el código QR con tu aplicación preferida e ingresa el código de 6 dígitos generado.</p>
+                             <h4 className="text-sm font-bold text-white uppercase tracking-wider">Paso 1: Configurar Autenticador</h4>
+                             <p className="text-[11px] text-zinc-400">Abre tu aplicación (Google Authenticator, Authy, etc.) y escanea este código QR.</p>
                           </div>
 
                           <div className="flex justify-center bg-white p-4 rounded-2xl w-40 h-40 mx-auto shadow-inner">
