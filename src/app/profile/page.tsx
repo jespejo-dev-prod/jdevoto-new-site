@@ -84,8 +84,8 @@ export default function ProfilePage() {
         setShippingRegion(user.company.shippingRegion || 'METROPOLITANA DE SANTIAGO');
       }
 
-      // Check 2FA status using user.twoFactorSecret
-      const is2faActive = !!(user as any).twoFactorSecret;
+      // Check 2FA status using user.twoFactorEnabled
+      const is2faActive = !!(user as any).twoFactorEnabled || !!(user as any).twoFactorSecret;
       setTwoFactorEnabled(is2faActive);
     }
   }, [user]);

@@ -130,6 +130,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       role: storedToken.user.role,
       companyId: storedToken.user.companyId,
       company: storedToken.user.company,
+      twoFactorEnabled: !!storedToken.user.twoFactorSecret,
     }
   });
 });
