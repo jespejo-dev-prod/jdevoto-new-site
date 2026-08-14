@@ -93,7 +93,7 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext<{ 
       select: { creditLimit: true, creditUsed: true },
     });
     
-    if (company && user.role !== UserRole.ADMIN && user.role !== UserRole.SUPERADMIN) {
+    if (company && user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
       const availableCredit = Number(company.creditLimit) - Number(company.creditUsed);
       if (availableCredit > 0) {
         paymentMethod = "credit_b2b";
