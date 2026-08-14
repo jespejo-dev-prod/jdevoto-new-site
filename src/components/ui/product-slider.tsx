@@ -165,13 +165,13 @@ export function ProductSlider({
             
             <div className="flex flex-col items-center md:items-start text-center md:text-left">
               <span 
-                className="text-[10px] font-black uppercase tracking-widest leading-none mb-1"
+                className="text-xs md:text-sm font-black uppercase tracking-widest leading-none mb-1.5"
                 style={{ color: campaignColor || '#dc2626' }}
               >
                 Apúrate
               </span>
               <span 
-                className="text-xs sm:text-sm font-black uppercase tracking-tight"
+                className="text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight"
                 style={{ color: campaignColor || '#dc2626' }}
               >
                 {validTo && !isStockMode

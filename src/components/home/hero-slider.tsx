@@ -114,20 +114,21 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
   });
   const [current, setCurrent] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Fetch dinámico eliminado: ahora los slides se inyectan mediante SSR (initialSlides)
   // para evitar retrasos en el LCP generados por el renderizado asíncrono en cliente.
 
   useEffect(() => {
-    if (activeSlides.length <= 1) return;
+    if (activeSlides.length <= 1 || isHovered) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % activeSlides.length);
-    }, 5000);
+    }, 7000);
 
     return () => {
       clearInterval(timer);
     };
-  }, [activeSlides]);
+  }, [activeSlides, current, isHovered]);
 
   const nextSlide = () => setCurrent((prev) => (prev + 1) % activeSlides.length);
   const prevSlide = () =>
@@ -136,7 +137,11 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
   const activeSlide = activeSlides[current] || DEFAULT_SLIDES[0];
 
   return (
-    <div className="relative h-[420px] md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group">
+    <div 
+      className="relative h-[420px] md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Grid Pattern Overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000004_1px,transparent_1px),linear-gradient(to_bottom,#00000004_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none z-10" />
 
@@ -199,7 +204,12 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
           )}
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-zinc-950 max-w-xl leading-[1.1] tracking-tight uppercase animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
+          <h1 className={`text-4xl md:text-5xl lg:text-6xl font-black max-w-xl leading-[1.1] tracking-tight uppercase animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both ${
+            activeSlide.title.toLowerCase().includes('outlet') ? 'text-red-600' :
+            activeSlide.title.toLowerCase().includes('despacho gratis') ? 'text-emerald-600' :
+            (activeSlide.title.toLowerCase().includes('ferreteria') || activeSlide.title.toLowerCase().includes('ferretería')) ? 'text-[#6F4E37]' :
+            'text-zinc-950'
+          }`}>
             {activeSlide.title}
           </h1>
 

@@ -34,14 +34,14 @@ export function BenefitBar() {
               idx === 0 ? "lg:pl-2" : ""
             } ${idx > 0 ? "pt-4 sm:pt-0 lg:pt-0" : ""}`}
           >
-            <div className="h-10 w-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center shrink-0">
-              <item.icon className="h-5 w-5 text-zinc-700" />
+            <div className="h-12 w-12 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center shrink-0">
+              <item.icon className="h-6 w-6 text-zinc-700" />
             </div>
             <div>
-              <div className="text-xs font-black text-zinc-900 uppercase tracking-wider leading-none mb-1">
+              <div className="text-sm font-black text-zinc-900 uppercase tracking-widest leading-none mb-1.5">
                 {item.title}
               </div>
-              <p className="text-[10px] font-semibold text-zinc-500 leading-tight">
+              <p className="text-[11px] sm:text-xs font-bold text-zinc-500 leading-tight">
                 {item.desc}
               </p>
             </div>
