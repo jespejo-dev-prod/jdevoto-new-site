@@ -93,25 +93,26 @@ export default function RegisterPage() {
 
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-        {/* Imagen de fondo vertical */}
+      <div className="relative hidden h-full flex-col bg-muted text-white lg:flex dark:border-r">
+        {/* Imagen de fondo con filtro gris */}
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/login-bg.jpeg')" }}
+          style={{ backgroundImage: "url('/login-background.jpg')", filter: 'grayscale(0.7) brightness(0.8)' }}
         />
-        {/* Opacidad negra del 70% */}
-        <div className="absolute inset-0 bg-black/70 z-10" />
 
-        <div
-          className="absolute inset-0 opacity-20 z-10"
-          style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)`,
-            backgroundSize: "24px 24px",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/50 z-10" />
+        {/* Botón volver arriba izquierda */}
+        <div className="absolute top-8 left-8 z-30">
+          <Link
+            href="/login"
+            className="flex items-center gap-2 text-sm font-medium text-zinc-300/80 hover:text-white transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Volver al login
+          </Link>
+        </div>
 
-        <div className="relative z-20 flex items-center">
+        {/* Logo centrado con efecto glow */}
+        <div className="relative z-20 flex flex-1 flex-col items-center justify-center px-12">
           <Link
             href="/"
             className="hover:scale-105 transition-transform shrink-0"
@@ -119,32 +120,55 @@ export default function RegisterPage() {
             <img
               src="/home/devoto.png"
               alt="JDevoto Logo"
-              className="h-14 w-auto"
+              className="h-20 w-auto"
+              style={{
+                filter: 'drop-shadow(0 0 27px rgba(255, 255, 255, 0.51)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.25))',
+              }}
             />
           </Link>
+
+          {/* Texto de bienvenida debajo del logo */}
+          <div className="mt-10 text-center">
+            <h2 className="text-4xl font-bold text-primary tracking-tight">
+              Crea tu cuenta
+            </h2>
+            <p className="mt-3 text-lg text-zinc-300/70 font-medium">
+              Completa tus datos para registrarte y comenzar.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="lg:p-8 flex items-center justify-center bg-zinc-950/50 lg:bg-transparent py-12">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-white">
-              Crear una cuenta
-            </h1>
-            <p className="text-sm text-zinc-400">
-              Ingresa los datos de tu empresa para comenzar
+      <div className="flex items-center justify-center bg-zinc-950 min-h-screen lg:min-h-0 p-4 lg:p-8 overflow-y-auto">
+        <div className="mx-auto flex w-full flex-col justify-center space-y-4 sm:w-[520px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          
+          {/* Logo solo visible en mobile */}
+          <div className="flex flex-col items-center lg:hidden mb-2">
+            <Link href="/">
+              <img
+                src="/home/devoto.png"
+                alt="JDevoto Logo"
+                className="h-16 w-auto"
+                style={{
+                  filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))',
+                }}
+              />
+            </Link>
+            <h2 className="mt-4 text-2xl font-bold text-primary">Crea tu cuenta</h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              Completa tus datos para registrarte y comenzar.
             </p>
           </div>
 
-          <div className="grid gap-6">
+          <div className="grid gap-4">
             <form
               onSubmit={handleSubmit(onSubmit, onInvalid)}
               noValidate
               className="space-y-4"
             >
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="razonSocial" className="text-zinc-300">
+                <div>
+                  <Label htmlFor="razonSocial" className="text-sm font-semibold text-zinc-300 mb-1 block">
                     Razón Social
                   </Label>
                   <Input
@@ -152,11 +176,11 @@ export default function RegisterPage() {
                     placeholder="Empresa S.A."
                     disabled={isSubmitting}
                     {...register("razonSocial")}
-                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.razonSocial ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.razonSocial ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="rut" className="text-zinc-300">
+                <div>
+                  <Label htmlFor="rut" className="text-sm font-semibold text-zinc-300 mb-1 block">
                     RUT
                   </Label>
                   <Input
@@ -164,14 +188,14 @@ export default function RegisterPage() {
                     placeholder="12.345.678-9"
                     disabled={isSubmitting}
                     {...register("rut")}
-                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.rut ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.rut ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="telefono" className="text-zinc-300">
+                <div>
+                  <Label htmlFor="telefono" className="text-sm font-semibold text-zinc-300 mb-1 block">
                     Teléfono
                   </Label>
                   <Input
@@ -179,11 +203,11 @@ export default function RegisterPage() {
                     placeholder="+56912345678"
                     disabled={isSubmitting}
                     {...register("telefono")}
-                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.telefono ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.telefono ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="giro" className="text-zinc-300">
+                <div>
+                  <Label htmlFor="giro" className="text-sm font-semibold text-zinc-300 mb-1 block">
                     Giro
                   </Label>
                   <Input
@@ -191,132 +215,94 @@ export default function RegisterPage() {
                     placeholder="Venta de..."
                     disabled={isSubmitting}
                     {...register("giro")}
-                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.giro ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.giro ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   />
-                </div>
-              </div>
-              <div className="pt-4 border-t border-zinc-800 space-y-4">
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest text-left mb-4">
-                  Dirección
-                </p>
-                <div className="space-y-2">
-                  <Label htmlFor="calleNumero" className="text-zinc-300">
-                    CALLE Y NÚMERO
-                  </Label>
-                  <Input
-                    id="calleNumero"
-                    placeholder="Ej: Av. Apoquindo 4501"
-                    disabled={isSubmitting}
-                    {...register("calleNumero")}
-                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.calleNumero ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="region" className="text-zinc-300">
-                      REGIÓN
-                    </Label>
-                    <Input
-                      id="region"
-                      placeholder="Ej: Metropolitana de Santiago"
-                      disabled={isSubmitting}
-                      {...register("region")}
-                      className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.region ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="comuna" className="text-zinc-300">
-                      COMUNA
-                    </Label>
-                    <Input
-                      id="comuna"
-                      placeholder="Ej: Las Condes"
-                      disabled={isSubmitting}
-                      {...register("comuna")}
-                      className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.comuna ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="ciudad" className="text-zinc-300">
-                      CIUDAD
-                    </Label>
-                    <Input
-                      id="ciudad"
-                      placeholder="Ej: Santiago"
-                      disabled={isSubmitting}
-                      {...register("ciudad")}
-                      className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.ciudad ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                    />
-                  </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-zinc-800 space-y-4 mt-6">
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest text-left mb-4">
-                  DATOS DEL ADMINISTRADOR
+              <div className="pt-3 border-t border-zinc-800 space-y-4">
+                <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest text-left">
+                  Dirección
                 </p>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-zinc-300">
-                    Correo del Administrador
-                  </Label>
+                <div>
+                  <Input
+                    id="calleNumero"
+                    placeholder="Calle y número (Ej: Av. Apoquindo 4501)"
+                    disabled={isSubmitting}
+                    {...register("calleNumero")}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.calleNumero ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <Input
+                    id="region"
+                    placeholder="Región"
+                    disabled={isSubmitting}
+                    {...register("region")}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.region ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  />
+                  <Input
+                    id="comuna"
+                    placeholder="Comuna"
+                    disabled={isSubmitting}
+                    {...register("comuna")}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.comuna ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  />
+                  <Input
+                    id="ciudad"
+                    placeholder="Ciudad"
+                    disabled={isSubmitting}
+                    {...register("ciudad")}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.ciudad ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-zinc-800 space-y-4">
+                <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest text-left">
+                  Datos de Acceso
+                </p>
+                <div className="grid grid-cols-2 gap-4">
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@empresa.cl"
+                    placeholder="Correo del administrador"
                     disabled={isSubmitting}
                     {...register("email")}
-                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Contraseña"
+                      disabled={isSubmitting}
+                      {...register("password")}
+                      className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary pr-12 h-14 text-base rounded-full px-4 ${errors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-zinc-300">
-                  Contraseña
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    disabled={isSubmitting}
-                    {...register("password")}
-                    className={`bg-zinc-900/50 border-zinc-800 text-white focus:ring-primary pr-10 ${errors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Requisitos de Contraseña */}
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 space-y-2 text-left">
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">
-                  Requisitos de la contraseña:
+                {/* Requisitos de Contraseña - inline */}
+                <p className="text-[11px] text-zinc-500">
+                  Mínimo 7 caracteres, una mayúscula y un número o símbolo.
                 </p>
-                <ul className="text-xs text-zinc-500 space-y-1 list-disc list-inside">
-                  <li>Mínimo 7 caracteres de longitud.</li>
-                  <li>Al menos una letra mayúscula.</li>
-                  <li>Al menos un número o símbolo especial.</li>
-                </ul>
-              </div>
 
-              {/* Verificación de Seguridad (Captcha Matemático) */}
-              <div className="space-y-2">
-                <Label className="text-zinc-300 flex items-center gap-2">
-                  <span>Verificación de Seguridad</span>
-                  <span className="text-xs text-zinc-500 font-normal">
-                    (Resuelve la suma)
-                  </span>
-                </Label>
-                <div className="flex items-center gap-3">
-                  <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 font-bold text-white select-none tracking-wide text-sm shrink-0">
+                {/* Verificación de Seguridad (Captcha Matemático) */}
+                <div className="flex items-center gap-4">
+                  <span className="text-xs font-semibold text-zinc-400">Verificación:</span>
+                  <div className="bg-zinc-900 border border-zinc-800 rounded-full px-4 py-1.5 font-bold text-white select-none tracking-wide text-sm shrink-0">
                     {mounted
                       ? `${mathNums.n1} + ${mathNums.n2} =`
                       : "... + ... ="}
@@ -329,53 +315,34 @@ export default function RegisterPage() {
                       setUserMathAnswer(e.target.value);
                       if (captchaError) setCaptchaError(false);
                     }}
-                    className={`w-24 bg-zinc-900/50 border text-center font-bold text-sm text-white placeholder:text-zinc-600 focus:ring-primary ${
+                    className={`w-20 bg-zinc-900/60 border text-center font-bold text-sm text-white placeholder:text-zinc-500 focus:ring-primary h-14 rounded-full ${
                       captchaError
                         ? "border-red-500 focus-visible:ring-red-500"
-                        : "border-zinc-800"
+                        : "border-zinc-700/60"
                     }`}
                     placeholder="?"
                   />
                 </div>
                 {captchaError && (
-                  <p className="text-xs font-semibold text-red-500 mt-1 text-left">
+                  <p className="text-xs font-semibold text-red-500 text-left">
                     El resultado es incorrecto. Por favor vuelve a intentarlo.
                   </p>
                 )}
               </div>
-              </div>
 
               <Button
                 disabled={isSubmitting}
-                className="w-full h-11 bg-white text-black hover:bg-zinc-200 transition-all font-semibold"
+                className="w-full h-16 bg-white text-lg text-black hover:bg-zinc-200 transition-all font-bold text-base rounded-full mt-1"
               >
                 {isSubmitting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 ) : null}
                 {isSubmitting ? "Creando cuenta..." : "Crear Cuenta"}
               </Button>
             </form>
           </div>
 
-          <p className="px-8 text-center text-xs text-zinc-500 leading-relaxed">
-            Al registrarte, aceptas nuestros{" "}
-            <Link
-              href="/terms"
-              className="underline underline-offset-4 hover:text-white"
-            >
-              Términos de Servicio
-            </Link>{" "}
-            y{" "}
-            <Link
-              href="/privacy"
-              className="underline underline-offset-4 hover:text-white"
-            >
-              Privacidad
-            </Link>
-            .
-          </p>
-
-          <p className="text-center text-sm text-zinc-400">
+          <div className="flex items-center justify-center gap-1 text-sm text-zinc-400">
             ¿Ya tienes una cuenta?{" "}
             <Link
               href="/login"
@@ -383,7 +350,7 @@ export default function RegisterPage() {
             >
               Inicia sesión aquí
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>

@@ -268,25 +268,15 @@ export default function LoginPage() {
 
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-        {/* Imagen de fondo vertical */}
+      <div className="relative hidden h-full flex-col bg-muted text-white lg:flex dark:border-r">
+        {/* Imagen de fondo */}
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/login-bg.jpeg')" }}
+          style={{ backgroundImage: "url('/login-background.jpg')" }}
         />
-        {/* Opacidad negra del 70% */}
-        <div className="absolute inset-0 bg-black/70 z-10" />
 
-        <div
-          className="absolute inset-0 opacity-20 z-10"
-          style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)`,
-            backgroundSize: "24px 24px",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/50 z-10" />
-
-        <div className="relative z-20 flex items-center">
+        {/* Logo centrado con efecto glow */}
+        <div className="relative z-20 flex flex-1 flex-col items-center justify-center px-12">
           <Link
             href="/"
             className="hover:scale-105 transition-transform shrink-0"
@@ -294,84 +284,102 @@ export default function LoginPage() {
             <img
               src="/home/devoto.png"
               alt="JDevoto Logo"
-              className="h-14 w-auto"
+              className="h-20 w-auto"
+              style={{
+                filter: 'drop-shadow(0 0 27px rgba(255, 255, 255, 0.51)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.25))',
+              }}
             />
           </Link>
+
+          {/* Texto de bienvenida debajo del logo */}
+          <div className="mt-10 text-center">
+            <h2 className="text-4xl font-bold text-primary tracking-tight">
+              Te damos la bienvenida
+            </h2>
+            <p className="mt-3 text-lg text-zinc-300/70 font-medium">
+              Ingresa tu usuario y contraseña para continuar.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="lg:p-8 flex items-center justify-center bg-zinc-950/50 lg:bg-transparent">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[380px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-white">
-              Bienvenido
-            </h1>
-            <p className="text-sm text-zinc-400">
-              Ingresa tus credenciales para acceder al portal
+      <div className="flex items-center justify-center bg-zinc-950 min-h-screen lg:min-h-0 p-6 lg:p-16">
+        <div className="mx-auto flex w-full flex-col justify-center space-y-10 sm:w-[480px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          
+          {/* Logo solo visible en mobile */}
+          <div className="flex flex-col items-center lg:hidden mb-4">
+            <Link href="/">
+              <img
+                src="/home/devoto.png"
+                alt="JDevoto Logo"
+                className="h-16 w-auto"
+                style={{
+                  filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))',
+                }}
+              />
+            </Link>
+            <h2 className="mt-5 text-2xl font-bold text-primary">Te damos la bienvenida</h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              Ingresa tu usuario y contraseña para continuar.
             </p>
           </div>
 
-          <div className="grid gap-6">
+          <div className="grid gap-8">
             <form
               onSubmit={handleSubmit(onSubmit, onInvalid)}
               noValidate
-              className="space-y-4"
+              className="space-y-6"
             >
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-zinc-300">
-                    Correo electrónico
-                  </Label>
+              <div className="space-y-5">
+                <div>
                   <Input
                     id="email"
-                    placeholder="nombre@empresa.com"
+                    placeholder="Ingresa tu correo electrónico"
                     type="email"
                     disabled={isSubmitting}
                     {...register("email")}
-                    className={`bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-primary ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-[15px] rounded-full px-6 ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-zinc-300">
-                      Contraseña
-                    </Label>
-                    <Link
-                      href="/forgot-password"
-                      className="text-xs text-primary hover:underline"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </Link>
-                  </div>
+                <div>
                   <div className="relative">
                     <Input
                       id="password"
+                      placeholder="Ingresa tu contraseña"
                       type={showPassword ? "text" : "password"}
                       disabled={isSubmitting}
                       {...register("password")}
-                      className={`bg-zinc-900/50 border-zinc-800 text-white focus:ring-primary pr-10 ${errors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                      className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary pr-14 h-14 text-[15px] rounded-full px-6 ${errors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300"
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-300"
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-5 w-5" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-5 w-5" />
                       )}
                     </button>
+                  </div>
+                  <div className="flex justify-end mt-2.5">
+                    <Link
+                      href="/forgot-password"
+                      className="text-sm text-primary hover:underline font-medium"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
                   </div>
                 </div>
               </div>
 
               <Button
                 disabled={isSubmitting}
-                className="w-full h-11 bg-white text-black hover:bg-zinc-200 transition-all font-semibold"
+                className="w-full h-14 bg-white text-black hover:bg-zinc-200 transition-all font-bold text-base rounded-full"
               >
                 {isSubmitting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 ) : null}
                 {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
               </Button>
