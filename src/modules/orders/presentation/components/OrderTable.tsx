@@ -38,7 +38,12 @@ export function OrderTable({ orders }: OrderTableProps) {
   const handleRepeatOrder = async (orderId: string, orderNumber: string) => {
     if (repeatingId) return;
 
-    if (!confirm(`¿Estás seguro de que deseas repetir el pedido ${orderNumber}? Esto generará un nuevo pedido inmediatamente.\n\nNota: Si el pedido original fue realizado con Crédito B2B, este nuevo pedido descontará saldo automáticamente de tu línea de crédito y quedará confirmado.`)) {
+    const isAdminOrSuperAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+    const confirmMessage = isAdminOrSuperAdmin
+      ? `¿Estás seguro de que deseas repetir el pedido ${orderNumber}? Esto generará un nuevo pedido inmediatamente que quedará en estado PENDIENTE.`
+      : `¿Estás seguro de que deseas repetir el pedido ${orderNumber}? Esto generará un nuevo pedido inmediatamente.\n\nNota: Si el pedido original fue realizado con Crédito B2B, este nuevo pedido descontará saldo automáticamente de tu línea de crédito y quedará confirmado.`;
+
+    if (!confirm(confirmMessage)) {
       return;
     }
 

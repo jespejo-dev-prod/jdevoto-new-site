@@ -285,9 +285,12 @@ export class OrderService {
       }
 
       // Validar regla de negocio: Crédito B2B debe quedar CONFIRMED (no pending) si hay cupo
+      // EXCEPTO si el usuario es ADMIN o SUPER_ADMIN, los cuales deben quedar como pendientes.
       const availableCreditForCheck = Number(company.creditLimit) - Number(company.creditUsed);
       if (paymentMethod === 'credit_b2b' && finalStatus === 'PENDING' && totalGross <= availableCreditForCheck) {
-        finalStatus = 'CONFIRMED';
+        if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+          finalStatus = 'CONFIRMED';
+        }
       }
 
       // Crear el pedido
@@ -349,12 +352,25 @@ export class OrderService {
 
       // Actualizar crédito usado por la empresa (Solo si es con crédito)
       if (paymentMethod === 'credit_b2b') {
-        const rowsAffected = await tx.$executeRaw`
-          UPDATE "companies"
-          SET "creditUsed" = "creditUsed" + ${totalGross}
-          WHERE "id" = ${companyId}
-            AND "creditLimit" - "creditUsed" >= ${totalGross}
-        `;
+        let rowsAffected = 0;
+        
+        // Si el pedido quedó PENDING (ya sea por admin o porque superó el límite y va a revisión),
+        // permitimos que se registre el uso de crédito (pudiendo sobrepasar el límite temporalmente)
+        if (finalStatus === 'PENDING') {
+          rowsAffected = await tx.$executeRaw`
+            UPDATE "companies"
+            SET "creditUsed" = "creditUsed" + ${totalGross}
+            WHERE "id" = ${companyId}
+          `;
+        } else {
+          rowsAffected = await tx.$executeRaw`
+            UPDATE "companies"
+            SET "creditUsed" = "creditUsed" + ${totalGross}
+            WHERE "id" = ${companyId}
+              AND "creditLimit" - "creditUsed" >= ${totalGross}
+          `;
+        }
+
         if (rowsAffected === 0) {
           throw new BusinessRuleError("Crédito B2B insuficiente. Es posible que el cupo haya sido consumido simultáneamente por otro pedido.", "INSUFFICIENT_CREDIT");
         }
@@ -913,7 +929,7 @@ export class OrderService {
         },
       });
 
-      if (order.status !== OrderStatus.DRAFT) {
+      if (order.status !== OrderStatus.DRAFT && order.status !== OrderStatus.PENDING) {
         const availableCredit = Number(company.creditLimit) - Number(company.creditUsed);
         if (availableCredit < 0) {
           throw new BusinessRuleError(
