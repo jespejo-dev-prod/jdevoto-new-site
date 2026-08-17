@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/client";
 import { getTransporter } from "@/lib/email";
+import { UAParser } from "ua-parser-js";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
-    const authHeader = req.headers.get('authorization');
-    // if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    //   return new NextResponse('Unauthorized', { status: 401 });
-    // }
-
     const cutoffDate = new Date();
     // cutoffDate.setDate(cutoffDate.getDate() - 7);
 
@@ -26,22 +22,134 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "No hay eventos antiguos para procesar." });
     }
 
-    // Step 2: Generate .jsonl content in memory
-    const jsonlContent = oldEvents.map(e => JSON.stringify(e)).join("\n");
+    // Calcular fechas
+    const startDate = new Date(oldEvents[0].createdAt);
+    const endDate = new Date(oldEvents[oldEvents.length - 1].createdAt);
+    
+    const formatDateForFilename = (d: Date) => d.toISOString().split('T')[0];
+    const dateRangeStr = `${formatDateForFilename(startDate)}-to-${formatDateForFilename(endDate)}`;
 
-    // Step 3: Send email with .jsonl attachment
+    const formatReadableDate = (d: Date) => {
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const day = pad(d.getUTCDate());
+      const month = pad(d.getUTCMonth() + 1);
+      const year = d.getUTCFullYear();
+      const hours = pad(d.getUTCHours());
+      const minutes = pad(d.getUTCMinutes());
+      const seconds = pad(d.getUTCSeconds());
+      return `${day}-${month}-${year} ${hours}:${minutes}:${seconds} hrs`;
+    };
+
+    // Resumen para el correo
+    const eventCountsByType: Record<string, number> = {};
+    const uniqueSessions = new Set<string>();
+    const uniqueUsers = new Set<string>();
+
+    // Arrays para CSV y JSONL
+    const csvRows: string[] = [];
+    const csvHeaders = [
+      'id', 'createdAt', 'eventType', 'sessionId', 'userId',
+      'productId', 'sku', 'price', 'quantity', 'priceSource',
+      'pageUrl', 'referrer',
+      'browser', 'operatingSystem', 'deviceType',
+      'userAgentRaw', 'ipAddress'
+    ];
+    csvRows.push(csvHeaders.join(','));
+
+    const jsonlRows: string[] = [];
+
+    // Parseador de User Agent
+    const parser = new UAParser();
+
+    // Step 2: Generar datos CSV y JSONL y resumen
+    for (const event of oldEvents) {
+      // JSONL
+      jsonlRows.push(JSON.stringify(event));
+
+      // Resumen
+      eventCountsByType[event.eventType] = (eventCountsByType[event.eventType] || 0) + 1;
+      if (event.sessionId) uniqueSessions.add(event.sessionId);
+      if (event.userId) uniqueUsers.add(event.userId);
+
+      // Parseo User Agent
+      parser.setUA(event.userAgent || '');
+      const browserInfo = parser.getBrowser();
+      const osInfo = parser.getOS();
+      const deviceInfo = parser.getDevice();
+
+      const browser = `${browserInfo.name || ''} ${browserInfo.version || ''}`.trim();
+      const os = `${osInfo.name || ''} ${osInfo.version || ''}`.trim();
+      const deviceType = deviceInfo.type || 'desktop';
+
+      // Event Data
+      const data = (event.eventData || {}) as any;
+
+      // Escape helper para CSV
+      const escapeCsv = (str: any) => {
+        if (str === null || str === undefined) return '';
+        const stringified = String(str);
+        if (stringified.includes(',') || stringified.includes('"') || stringified.includes('\n')) {
+          return `"${stringified.replace(/"/g, '""')}"`;
+        }
+        return stringified;
+      };
+
+      const row = [
+        event.id,
+        formatReadableDate(new Date(event.createdAt)),
+        event.eventType,
+        event.sessionId,
+        event.userId,
+        data.productId,
+        data.sku,
+        data.price,
+        data.quantity,
+        data.priceSource,
+        event.pageUrl,
+        event.referrer,
+        browser,
+        os,
+        deviceType,
+        event.userAgent,
+        event.ipAddress
+      ].map(escapeCsv);
+
+      csvRows.push(row.join(','));
+    }
+
+    const jsonlContent = jsonlRows.join("\n");
+    const csvContent = csvRows.join("\n");
+
+    // Email Body
+    let emailText = `Reporte semanal de analíticas\n\n`;
+    emailText += `Este archivo contiene todos los eventos registrados entre:\n`;
+    emailText += `${formatReadableDate(startDate)}\n`;
+    emailText += `y\n`;
+    emailText += `${formatReadableDate(endDate)}\n\n`;
+    emailText += `Total de eventos: ${oldEvents.length}\n\n`;
+    emailText += `Eventos por tipo:\n`;
+    for (const [type, count] of Object.entries(eventCountsByType)) {
+      emailText += `- ${type}: ${count}\n`;
+    }
+    emailText += `\nSesiones únicas: ${uniqueSessions.size}\n`;
+    emailText += `Usuarios únicos: ${uniqueUsers.size}\n`;
+
+    // Step 3: Send email with attachments
     const transporter = await getTransporter();
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'jespejo@jdevoto.cl';
-    const dateStr = new Date().toISOString().split('T')[0];
 
     await transporter.sendMail({
       from: `"Sistema JDevoto" <${process.env.SMTP_USER}>`,
       to: adminEmail,
-      subject: `📊 Backup Semanal de Analíticas - ${dateStr}`,
-      text: `Adjunto encontrarás el respaldo de los ${oldEvents.length} eventos de analíticas con más de 7 días de antigüedad. Estos registros han sido agregados y eliminados de la base de datos para optimizar espacio.`,
+      subject: `📊 Backup Semanal de Analíticas - ${dateRangeStr}`,
+      text: emailText,
       attachments: [
         {
-          filename: `analytics-backup-${dateStr}.jsonl`,
+          filename: `analytics-events-${dateRangeStr}.csv`,
+          content: csvContent
+        },
+        {
+          filename: `analytics-events-${dateRangeStr}.jsonl`,
           content: jsonlContent
         }
       ]
