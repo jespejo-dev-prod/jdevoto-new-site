@@ -121,9 +121,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       setItems(prevItems => {
         let changed = false;
-        const updated = prevItems.map(item => {
-          const fresh = freshProducts.find(p => p.id === item.id || p.slug === item.slug);
-          if (!fresh) return item;
+        
+        const validItems = prevItems.filter(item => {
+          const exists = freshProducts.some(p => p.id === item.id || p.slug === item.slug);
+          if (!exists) changed = true;
+          return exists;
+        });
+
+        const updated = validItems.map(item => {
+          const fresh = freshProducts.find(p => p.id === item.id || p.slug === item.slug)!;
 
           let finalPrice = fresh.price?.discountedNetPrice || fresh.price?.unitNetPrice || fresh.basePrice || 0;
           let discountPct = fresh.price?.discountPercent || 0;
