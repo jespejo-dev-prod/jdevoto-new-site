@@ -1,8 +1,9 @@
 import React from 'react';
-import { User, Key, LogOut, Unlink } from 'lucide-react';
+import { User, Key, LogOut, Unlink, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useApi } from '@/shared/infrastructure/api/use-api';
 import { translateRole } from '@/lib/role-translations';
+import Link from 'next/link';
 
 interface CustomerUser {
   id: string;
@@ -15,12 +16,16 @@ interface CustomerUser {
 interface CustomerUserListProps {
   users: CustomerUser[];
   onUsersChanged?: () => void;
+  companyId?: string;
+  companyName?: string;
+  companyRut?: string;
+  showAddButton?: boolean;
 }
 
-export function CustomerUserList({ users, onUsersChanged }: CustomerUserListProps) {
+export function CustomerUserList({ users, onUsersChanged, companyId, companyName, companyRut, showAddButton }: CustomerUserListProps) {
   const { fetcher } = useApi();
 
-  if (!users || users.length === 0) return null;
+  if (!users) return null;
 
   const handleResetPassword = async (userId: string, email: string) => {
     if (!window.confirm(`¿Enviar instrucciones de restablecimiento a ${email}?`)) return;
@@ -62,11 +67,27 @@ export function CustomerUserList({ users, onUsersChanged }: CustomerUserListProp
 
   return (
     <div className="bg-zinc-900/20 border border-zinc-800 rounded-3xl p-8 space-y-6 mt-12">
-      <h3 className="text-xl font-bold text-white flex items-center gap-3">
-        <User className="h-5 w-5 text-primary" />
-        Usuarios vinculados ({users.length})
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h3 className="text-xl font-bold text-white flex items-center gap-3">
+          <User className="h-5 w-5 text-primary" />
+          Usuarios vinculados ({users.length})
+        </h3>
+        
+        {showAddButton && companyId && (
+          <Link 
+            href={`/dashboard/users/new?companyId=${companyId}&companyName=${encodeURIComponent(companyName || '')}&companyRut=${encodeURIComponent(companyRut || '')}`}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl text-sm font-bold tracking-widest hover:bg-primary/90 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            AÑADIR MIEMBRO
+          </Link>
+        )}
+      </div>
+
+      {users.length === 0 ? (
+        <div className="text-zinc-500 text-sm py-4">No hay usuarios vinculados a esta empresa.</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {users.map((u) => (
           <div key={u.id} className="p-6 bg-zinc-950 border border-zinc-800 rounded-3xl flex flex-col gap-4 shadow-xl hover:border-zinc-700 transition-all">
             <div className="flex items-center gap-4">
