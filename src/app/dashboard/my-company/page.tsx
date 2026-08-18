@@ -69,8 +69,8 @@ export default function MyCompanyPage() {
  </div>
  )}
 
- {customer?.users && customer.users.length > 0 && (
-   <CustomerUserList users={customer.users} />
+ {customer && (
+   <CustomerUserList users={customer.users.filter(u => u.id !== user?.id)} />
  )}
  </div>
  </RoleGuard>

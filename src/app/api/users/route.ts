@@ -107,6 +107,11 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   });
 
   if (existing) {
+    // Evitar que un COMPANY_ADMIN reclame/modifique a un usuario que no pertenece a su empresa
+    if (currentUser.role === UserRole.COMPANY_ADMIN && existing.companyId !== currentUser.companyId) {
+      return NextResponse.json({ error: "Este correo ya está registrado en otra cuenta o empresa." }, { status: 400 });
+    }
+
     if (!existing.isActive) {
       // Si existe pero está inactivo, lo "reactivamos" y sobreescribimos sus datos
       
