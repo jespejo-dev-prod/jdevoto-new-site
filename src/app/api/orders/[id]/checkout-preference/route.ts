@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+﻿import { NextRequest } from "next/server";
 import { withApiHandler, ok, RouteContext } from "@/lib/api-handler";
 import { paymentService } from "@/modules/billing/domain/payment.service";
 import { extractUserFromRequest } from "@/lib/auth";
@@ -17,6 +17,10 @@ export const POST = withApiHandler(async (req: NextRequest, ctx: RouteContext) =
 
   const url = new URL(req.url);
   const context = url.searchParams.get('context') || 'checkout';
-  const result = await paymentService.createPreference(id, context as 'checkout' | 'invoice');
+  
+  // Extraemos el origen para que MercadoPago arme bien las URLs de retorno a jdevoto.cl
+  const origin = req.headers.get('origin') || undefined;
+  
+  const result = await paymentService.createPreference(id, context as 'checkout' | 'invoice', origin);
   return ok(result);
 });

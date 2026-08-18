@@ -121,7 +121,7 @@ export class PaymentService {
    * @param orderId - ID del pedido en la DB
    * @returns { preferenceId: string, initPoint: string }
    */
-  async createPreference(orderId: string, context: 'checkout' | 'invoice' = 'checkout'): Promise<{ preferenceId: string; initPoint: string }> {
+  async createPreference(orderId: string, context: 'checkout' | 'invoice' = 'checkout', originUrl?: string): Promise<{ preferenceId: string; initPoint: string }> {
     const mpConfig = await this.getMpConfig();
 
     // Si no está habilitado o no tiene Access Token, fallback al simulador local
@@ -145,7 +145,7 @@ export class PaymentService {
     const client = new MercadoPagoConfig({ accessToken: mpConfig.accessToken });
     const preference = new Preference(client);
 
-    let baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    let baseUrl = originUrl || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     // Para entornos locales de prueba, forzar el uso del túnel HTTPS (MP_WEBHOOK_URL) para evitar que Mercado Pago
     // descarte los back_urls basados en http://localhost
     if ((baseUrl.includes("localhost") || baseUrl.includes("127.0.0.1")) && process.env.MP_WEBHOOK_URL) {
