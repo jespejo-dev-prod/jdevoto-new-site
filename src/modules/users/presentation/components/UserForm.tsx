@@ -84,13 +84,15 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
       const requiresCompany = submitData.role === 'BUYER' || submitData.role === 'COMPANY_ADMIN';
       // Validate company selection for non-company-admin users
       if (!isCompanyAdmin && requiresCompany && !submitData.companyId) {
-        toast.error("Debes seleccionar una empresa asociada.");
+        toast.error("Debes seleccionar una empresa asociada para este rol.");
         return;
       }
       
-      if (!requiresCompany) {
+      // SALES_REP is the only one that absolutely shouldn't have a company associated in this way (they have assignedCompanies instead)
+      if (submitData.role === 'SALES_REP') {
         submitData.companyId = "";
       }
+
       if (!submitData.password) {
         delete (submitData as any).password;
       } else {
@@ -193,10 +195,10 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
           </div>
         )}
         
-        {!isCompanyAdmin && (formData.role === 'BUYER' || formData.role === 'COMPANY_ADMIN') && (
+        {!isCompanyAdmin && formData.role !== 'SALES_REP' && (
           <div className="space-y-2 md:col-span-2 relative">
             <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1 flex items-center justify-between">
-              <span>Empresa Asociada</span>
+              <span>{formData.role === 'ADMIN' || formData.role === 'SUPER_ADMIN' ? 'Empresa Asociada (Opcional para Admin)' : 'Empresa Asociada'}</span>
               {isLoadingCustomers && <Loader2 className="w-3 h-3 animate-spin text-zinc-500" />}
             </label>
             
