@@ -60,6 +60,32 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  // Redirecciones 301 para preservar el SEO del sitio antiguo (WooCommerce/WordPress)
+  async redirects() {
+    return [
+      {
+        source: '/tienda',
+        destination: '/products',
+        permanent: true,
+      },
+      {
+        source: '/contacto',
+        destination: '/support',
+        permanent: true,
+      },
+      {
+        source: '/product-category/:category*',
+        destination: '/products?category=:category*',
+        permanent: true,
+      },
+      {
+        source: '/outlet',
+        destination: '/products', // Puedes ajustarlo si existe un filtro especial
+        permanent: true,
+      }
+    ];
+  },
+
   // ── Optimizaciones del compilador ────────────────────────────────────────
   experimental: {
     cpus: 2,
