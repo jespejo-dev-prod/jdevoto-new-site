@@ -17,13 +17,10 @@ function NewUserForm() {
   const companyName = searchParams.get('companyName');
   const companyRut = searchParams.get('companyRut');
 
-  const initialData = companyId ? {
-    companyId,
-    company: {
-      id: companyId,
-      razonSocial: companyName || '',
-      rut: companyRut || ''
-    }
+  const fixedCompany = companyId ? {
+    id: companyId,
+    razonSocial: companyName || '',
+    rut: companyRut || ''
   } : undefined;
 
   return (
@@ -44,7 +41,7 @@ function NewUserForm() {
       </div>
 
       <UserForm 
-        initialData={initialData}
+        fixedCompany={fixedCompany}
         onSubmit={create} 
         isSubmitting={isCreating} 
         onSuccess={() => router.push(companyId ? `/dashboard/customers/${companyId}` : '/dashboard/users')} 

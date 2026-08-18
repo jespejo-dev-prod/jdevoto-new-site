@@ -11,9 +11,14 @@ interface UserFormProps {
   onSuccess: () => void;
   initialData?: any;
   fixedRole?: string;
+  fixedCompany?: {
+    id: string;
+    razonSocial: string;
+    rut: string;
+  };
 }
 
-export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixedRole }: UserFormProps) {
+export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixedRole, fixedCompany }: UserFormProps) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -63,10 +68,13 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
         firstName: "",
         lastName: "",
         role: fixedRole || "BUYER",
-        companyId: ""
+        companyId: fixedCompany ? fixedCompany.id : ""
       });
+      if (fixedCompany) {
+        setSelectedCompany(fixedCompany);
+      }
     }
-  }, [initialData, fixedRole]);
+  }, [initialData, fixedRole, fixedCompany]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,14 +202,18 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
             
             <div className="relative">
               <div 
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-base text-white cursor-pointer flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                onClick={() => setShowCompanyDropdown(!showCompanyDropdown)}
-                tabIndex={0}
+                className={`w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-base flex justify-between items-center transition-all ${
+                  fixedCompany ? 'cursor-default opacity-80' : 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20 text-white'
+                }`}
+                onClick={() => {
+                  if (!fixedCompany) setShowCompanyDropdown(!showCompanyDropdown);
+                }}
+                tabIndex={fixedCompany ? -1 : 0}
               >
                 <span className={formData.companyId ? "text-white" : "text-zinc-500"}>
                   {selectedCompany ? `${selectedCompany.razonSocial} (${selectedCompany.rut})` : "Seleccione una empresa (Requerido)"}
                 </span>
-                <ChevronDown className="w-4 h-4 text-zinc-500" />
+                {!fixedCompany && <ChevronDown className="w-4 h-4 text-zinc-500" />}
               </div>
 
               {showCompanyDropdown && (
