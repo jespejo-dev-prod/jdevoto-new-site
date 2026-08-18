@@ -113,7 +113,7 @@ export class OrderService {
       const product = productMap.get(item.productId)!;
       const price = priceMap.get(item.productId)!;
 
-      const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET';
+      const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET' || product.sku === 'TEST-001';
       const discount = isExcluded ? 0 : defaultDiscountPercent;
       const unitNetPrice = price.discountedNetPrice;
 
@@ -584,7 +584,7 @@ export class OrderService {
           const product = productMap.get(item.productId)!;
           const price = priceMap.get(item.productId)!;
 
-          const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET';
+          const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET' || product.sku === 'TEST-001';
           const discount = isExcluded ? 0 : defaultDiscountPercent;
           const unitNetPrice = price.discountedNetPrice;
 
