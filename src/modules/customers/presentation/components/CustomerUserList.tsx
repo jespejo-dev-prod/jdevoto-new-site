@@ -98,8 +98,17 @@ export function CustomerUserList({ users, onUsersChanged }: CustomerUserListProp
                 Cerrar
               </button>
               <button 
-                onClick={() => handleUnlinkUser(u.id, u.firstName || u.email)}
-                className="flex items-center justify-center gap-2 py-2.5 px-3 bg-orange-500/5 hover:bg-orange-500/10 text-orange-500/60 hover:text-orange-500 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border border-orange-500/10"
+                onClick={() => {
+                  if (u.role === 'COMPANY_ADMIN') return;
+                  handleUnlinkUser(u.id, u.firstName || u.email);
+                }}
+                disabled={u.role === 'COMPANY_ADMIN'}
+                title={u.role === 'COMPANY_ADMIN' ? "No se puede desvincular al administrador principal de la empresa" : "Desvincular usuario de la empresa"}
+                className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
+                  u.role === 'COMPANY_ADMIN' 
+                    ? 'bg-zinc-900/50 text-zinc-600 border-zinc-800/50 cursor-not-allowed' 
+                    : 'bg-orange-500/5 hover:bg-orange-500/10 text-orange-500/60 hover:text-orange-500 border-orange-500/10'
+                }`}
               >
                 <Unlink className="h-3 w-3" />
                 Desvincular
