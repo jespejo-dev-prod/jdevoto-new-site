@@ -275,8 +275,11 @@ export class OrderService {
 
     // 9. Ejecutar todo en una transacción atómica
     const order = await prisma.$transaction(async (tx) => {
+      // Determinar si es una empresa de pruebas para el prefijo de la orden
+      const isTest = company.razonSocial.toLowerCase().includes('test');
+      
       // Generar número de pedido secuencial
-      const orderNumber = await this.generateOrderNumber(tx);
+      const orderNumber = await this.generateOrderNumber(tx, isTest);
 
       // Determinar la atribución del vendedor (Sales Rep) para comisiones y reportes
       let attributedSalesRepId = company.salesRepId;
@@ -823,10 +826,11 @@ export class OrderService {
    * Formato: ORD-YYYY-NNNN (e.g. ORD-2024-0001)
    */
   private async generateOrderNumber(
-    tx: Prisma.TransactionClient
+    tx: Prisma.TransactionClient,
+    isTest: boolean = false
   ): Promise<string> {
     const year = new Date().getFullYear();
-    const prefix = `ORD-${year}-`;
+    const prefix = isTest ? `TEST-` : `ORD-${year}-`;
 
     const lastOrder = await tx.order.findFirst({
       where: { orderNumber: { startsWith: prefix } },
