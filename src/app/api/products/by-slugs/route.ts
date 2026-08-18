@@ -23,6 +23,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
   }
   const stockFilter = hideOutOfStock ? { stockQuantity: { gt: 0 } } : {};
+  const isSuperOrAdmin = user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
+  const testProductFilter = isSuperOrAdmin ? {} : { sku: { not: "TEST-001" } };
 
   const slugsQuery = req.nextUrl.searchParams.get("slugs") || "";
   const slugs = slugsQuery.split(",").filter(Boolean);
@@ -61,6 +63,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
         isActive: true,
         isDeleted: false,
         ...stockFilter,
+        ...testProductFilter,
         OR: [
           ...(categoryIds.length > 0 ? [{ categoryId: { in: categoryIds } }] : []),
           ...(brandIds.length > 0 ? [{ brandId: { in: brandIds } }] : [])
@@ -96,6 +99,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       isActive: true,
       isDeleted: false,
       ...stockFilter,
+      ...testProductFilter,
     },
     include: {
       category: { select: { id: true, name: true, slug: true } },
