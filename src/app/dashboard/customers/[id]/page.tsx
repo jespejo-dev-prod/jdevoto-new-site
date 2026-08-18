@@ -100,7 +100,7 @@ export default function CustomerDetailPage() {
  {/* Listado de usuarios asociados (Opcional, pero útil para completar la vista) */}
  {isAdmin && customer.users && (
     <CustomerUserList 
-      users={customer.users.filter((u: any) => u.id !== user?.id)} 
+      users={customer.users} 
       companyId={customer.id}
       companyName={customer.razonSocial}
       companyRut={customer.rut}
