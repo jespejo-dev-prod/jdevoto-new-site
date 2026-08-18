@@ -22,11 +22,23 @@ export default async function FacturasPage({ searchParams }: { searchParams: Pro
 
   const resolvedParams = await searchParams;
   const companyId = resolvedParams.companyId;
+  const from = resolvedParams.from;
+  const to = resolvedParams.to;
 
   // Filtrar los mensajes con adjuntos (facturas) según el rol
   const whereClause: any = {
     attachmentUrl: { not: null },
   };
+
+  if (from || to) {
+    whereClause.createdAt = {};
+    if (from) {
+      whereClause.createdAt.gte = new Date(`${from}T00:00:00.000Z`);
+    }
+    if (to) {
+      whereClause.createdAt.lte = new Date(`${to}T23:59:59.999Z`);
+    }
+  }
 
   // Si no es ADMIN/SUPER_ADMIN, restringir acceso
   if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
