@@ -73,6 +73,15 @@ export async function generateMetadata({
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.jdevoto.cl";
   try {
     const product = await getCachedProduct(slug);
+    
+    if (product.sku === 'TEST-001') {
+      const { getServerUser } = await import('@/lib/server-auth');
+      const user = await getServerUser();
+      if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN') {
+        return { title: "No Encontrado" };
+      }
+    }
+
     const brandName =
       typeof product.brand === "string"
         ? product.brand
@@ -140,6 +149,14 @@ export default async function DynamicProductPage(props: ProductPageProps) {
 
   try {
     product = await getCachedProduct(params.slug);
+    
+    if (product.sku === 'TEST-001') {
+      const { getServerUser } = await import('@/lib/server-auth');
+      const user = await getServerUser();
+      if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN') {
+        notFound();
+      }
+    }
   } catch {
     notFound();
     return; // TypeScript guard

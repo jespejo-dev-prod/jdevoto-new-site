@@ -96,6 +96,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
         }
       : {}),
     ...((query.inStock || hideOutOfStock) ? { stockQuantity: { gt: 0 } } : {}),
+    ...(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN ? {} : { sku: { not: "TEST-001" } }),
   };
 
   const skip = (query.page - 1) * query.limit;

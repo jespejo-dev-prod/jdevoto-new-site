@@ -57,12 +57,14 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const user = await getServerUser();
   const companyId = user?.companyId || null;
+  const isPrivileged = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN';
 
   const hideSetting = await prisma.storeSettings.findUnique({
     where: { key: 'hideOutOfStock' },
   });
   const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
   const stockFilter = hideOutOfStock ? { stockQuantity: { gt: 0 } } : {};
+  const testProductFilter = isPrivileged ? {} : { sku: { not: "TEST-001" } };
 
   const homeSlidesSetting = await prisma.storeSettings.findUnique({
     where: { key: 'home_slides' },
@@ -141,6 +143,7 @@ export default async function HomePage() {
       isActive: true,
       isDeleted: false,
       ...stockFilter,
+      ...testProductFilter,
       OR: [
         ...(promoBrandIds.length > 0 ? [{ brandId: { in: promoBrandIds } }] : []),
         ...(allPromoCategoryIds.length > 0 ? [{ categoryId: { in: allPromoCategoryIds } }] : [])
@@ -186,7 +189,7 @@ export default async function HomePage() {
 
   // 4. Fetch general fallback products
   const fallbackRaw = await prisma.product.findMany({
-    where: { isActive: true, isDeleted: false, ...stockFilter },
+    where: { isActive: true, isDeleted: false, ...stockFilter, ...testProductFilter },
     take: 20,
     select: productSelectFields,
     orderBy: { name: 'asc' }
