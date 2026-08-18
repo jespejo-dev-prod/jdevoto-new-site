@@ -36,11 +36,11 @@ export default function CheckoutPage() {
   const paymentTermsDays = effectiveCompany?.paymentTerms ?? 30;
 
   const excludedSubtotal = items
-    .filter(item => item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET')
+    .filter(item => item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET' || item.sku === 'TEST-001')
     .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
 
   const nonExcludedSubtotal = items
-    .filter(item => item.priceSource !== 'PROMOTION' && item.priceSource !== 'OUTLET')
+    .filter(item => item.priceSource !== 'PROMOTION' && item.priceSource !== 'OUTLET' && item.sku !== 'TEST-001')
     .reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0);
 
   // 1. Subtotales Netos
@@ -963,7 +963,7 @@ export default function CheckoutPage() {
                       <p className="text-sm text-zinc-500 italic text-center py-4">Tu carrito está vacío</p>
                     ) : (
                       items.map(item => {
-                         const isExcluded = item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET';
+                         const isExcluded = item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET' || item.sku === 'TEST-001';
                          const companyDiscount = isExcluded ? 0 : companyDiscountPercent;
                          const discountedPrice = item.price * (1 - companyDiscount / 100);
                          const lineTotal = Math.round(discountedPrice * item.quantity);

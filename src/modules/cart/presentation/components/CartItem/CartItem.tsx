@@ -17,7 +17,7 @@ export function CartItem({ item }: CartItemProps) {
 
   const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
   const companyDiscountPercent = effectiveCompany?.defaultDiscount ? Number(effectiveCompany.defaultDiscount) : 0;
-  const isExcluded = item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET';
+  const isExcluded = item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET' || item.sku === 'TEST-001';
   const companyDiscount = isExcluded ? 0 : companyDiscountPercent;
 
   const discountedPrice = item.price * (1 - companyDiscount / 100);
