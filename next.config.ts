@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 192, 256, 384],
     // Tiempo de caché en la CDN/browser (30 días)
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    // APAGAR OPTIMIZACIÓN DE VERCEL PARA NO GASTAR LÍMITE (Usa directamente las URLs originales)
+    unoptimized: true,
   },
 
   // ── Compresión de respuestas HTTP ────────────────────────────────────────
