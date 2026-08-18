@@ -13,7 +13,7 @@ export const metadata = {
   title: 'Facturas | J. Devoto B2B',
 };
 
-export default async function FacturasPage({ searchParams }: { searchParams: Promise<{ companyId?: string }> }) {
+export default async function FacturasPage({ searchParams }: { searchParams: Promise<{ companyId?: string; from?: string; to?: string }> }) {
   const user = await getServerUser();
 
   if (!user) {
