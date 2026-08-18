@@ -137,7 +137,8 @@ export function CustomerUserList({ users, onUsersChanged, companyId, companyName
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
