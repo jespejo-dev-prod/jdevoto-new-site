@@ -77,7 +77,19 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/product-category/:category*',
-        destination: '/products?category=:category*',
+        destination: '/categorias/:category*',
+        permanent: true,
+      },
+      {
+        source: '/products',
+        has: [
+          {
+            type: 'query',
+            key: 'category',
+            value: '(?<slug>.*)'
+          }
+        ],
+        destination: '/categorias/:slug',
         permanent: true,
       },
       {

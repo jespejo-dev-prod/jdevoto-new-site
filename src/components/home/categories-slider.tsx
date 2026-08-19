@@ -42,7 +42,7 @@ export function CategoriesSlider({ categories }: CategoriesSliderProps) {
       {categories.map((category, index) => (
         <Link 
           key={category.id} 
-          href={`/products?category=${category.slug}`}
+          href={`/categorias/${category.slug}`}
           className="w-[80vw] sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-2.5rem)/3)] lg:w-[calc((100%-5rem)/5)] shrink-0 snap-start group relative h-[360px] rounded-[28px] overflow-hidden flex flex-col justify-end p-6 border border-zinc-200/40 shadow-[0_8px_25px_rgba(0,0,0,0.02)] hover:shadow-2xl transition-shadow duration-500"
         >
           <Image 

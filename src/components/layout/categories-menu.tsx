@@ -69,7 +69,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
               return (
                 <Link
                   key={parent.id}
-                  href={`/products?category=${parent.slug}`}
+                  href={`/categorias/${parent.slug}`}
                   onMouseEnter={() => setActiveParentId(parent.id)}
                   onClick={() => {
                     trackCategoryView(parent.id, parent.name);
@@ -105,7 +105,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
               <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-6">
                 <div>
                   <Link 
-                    href={`/products?category=${activeParent.slug}`}
+                    href={`/categorias/${activeParent.slug}`}
                     onClick={() => {
                       trackCategoryView(activeParent.id, activeParent.name);
                       onClose();
@@ -119,7 +119,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                 </div>
                 
                 <Link
-                  href={`/products?category=${activeParent.slug}`}
+                  href={`/categorias/${activeParent.slug}`}
                   onClick={() => {
                     trackCategoryView(activeParent.id, activeParent.name);
                     onClose();
@@ -136,7 +136,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                     return (
                       <Link
                         key={child.id}
-                        href={`/products?category=${activeParent.slug}&subcategories=${child.slug}`}
+                        href={`/categorias/${activeParent.slug}?subcategories=${child.slug}`}
                         onClick={() => {
                           trackCategoryView(child.id, displayName);
                           onClose();
@@ -200,7 +200,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                 {hasChildren && isExpanded && (
                   <div className="pl-3 pr-2 py-2 space-y-2.5 bg-zinc-50/70 rounded-2xl mb-2 animate-in fade-in slide-in-from-top-1 duration-200 flex flex-col">
                     <Link
-                      href={`/products?category=${parent.slug}`}
+                      href={`/categorias/${parent.slug}`}
                       onClick={() => {
                         trackCategoryView(parent.id, parent.name);
                         onClose();
@@ -214,7 +214,7 @@ export function CategoriesMenu({ onClose, topOffset = '73px', categories }: Cate
                       return (
                         <Link
                           key={child.id}
-                          href={`/products?category=${parent.slug}&subcategories=${child.slug}`}
+                          href={`/categorias/${parent.slug}?subcategories=${child.slug}`}
                           onClick={() => {
                             trackCategoryView(child.id, displayName);
                             onClose();

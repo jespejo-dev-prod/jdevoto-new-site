@@ -167,10 +167,10 @@ export default async function HomePage() {
       const validToSerialized = promo.validTo ? promo.validTo.toISOString() : null;
 
       let linkHref = '/products?offers=true';
-      if (promo.category?.slug && promo.brand?.slug) {
-        linkHref = `/products?category=${promo.category.slug}&brands=${promo.brand.slug}&offers=true`;
-      } else if (promo.category?.slug) {
-        linkHref = `/products?category=${promo.category.slug}&offers=true`;
+      if (promo.category && promo.brand) {
+        linkHref = `/categorias/${promo.category.slug}?brands=${promo.brand.slug}&offers=true`;
+      } else if (promo.category) {
+        linkHref = `/categorias/${promo.category.slug}?offers=true`;
       } else if (promo.brand?.slug) {
         linkHref = `/products?brands=${promo.brand.slug}&offers=true`;
       }

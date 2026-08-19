@@ -41,7 +41,7 @@ const DEFAULT_SLIDES: HomeSlide[] = [
  title:"Productos en Outlet",
  description:"Aprovecha precios rebajados en una gran variedad de productos destacados.",
  cta:"Ver Ofertas",
- href:"/products?category=outlet"
+ href: "/categorias/outlet"
  },
  {
  id:"default-2",
@@ -345,7 +345,7 @@ export default function SliderPage() {
  <Input
  value={slide.href ||""}
  onChange={(e) => handleFieldChange(slide.id,"href", e.target.value)}
- placeholder="Ej: /products?category=iluminacion"
+ placeholder="Ej: /categorias/iluminacion"
  className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-11 text-sm sm:text-base focus:border-primary/50"
  />
  </div>

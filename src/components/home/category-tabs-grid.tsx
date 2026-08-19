@@ -22,10 +22,10 @@ export function CategoryTabsGrid({
 }: CategoryTabsGridProps) {
   const tabs = [
     { id: 'todos', label: 'Todos', icon: Sparkles, products: todos, link: '/products' },
-    { id: 'papeleria', label: 'Papelería y Manualidades', icon: PenTool, products: papeleria, link: '/products?category=papeleria-y-manualidades' },
-    { id: 'oficina', label: 'Oficina y Escritorio', icon: Briefcase, products: oficina, link: '/products?category=oficina-y-escritorio' },
-    { id: 'ferreteria', label: 'Ferretería y Fijaciones', icon: Wrench, products: ferreteria, link: '/products?category=ferreteria-y-fijaciones' },
-    { id: 'regalos', label: 'Regalos y Novedades', icon: Gift, products: regalos, link: '/products?category=regalos-y-novedades' },
+    { id: 'papeleria', label: 'Papelería y Manualidades', icon: PenTool, products: papeleria, link: '/categorias/papeleria-y-manualidades' },
+    { id: 'oficina', label: 'Oficina y Escritorio', icon: Briefcase, products: oficina, link: '/categorias/oficina-y-escritorio' },
+    { id: 'ferreteria', label: 'Ferretería y Fijaciones', icon: Wrench, products: ferreteria, link: '/categorias/ferreteria-y-fijaciones' },
+    { id: 'regalos', label: 'Regalos y Novedades', icon: Gift, products: regalos, link: '/categorias/regalos-y-novedades' },
   ];
 
   const [activeTabId, setActiveTabId] = useState('todos');

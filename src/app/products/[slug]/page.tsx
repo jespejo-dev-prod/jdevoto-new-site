@@ -238,7 +238,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
               "@type": "ListItem",
               position: 3,
               name: (product.category as any).name,
-              item: `${baseUrl}/products?category=${(product.category as any).slug || ""}`,
+              item: `${baseUrl}/categorias/${(product.category as any).slug || ""}`,
             },
           ]
         : []),
@@ -271,7 +271,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
             <Link
               href={
                 product.category?.slug
-                  ? `/products?category=${product.category.slug}`
+                  ? `/categorias/${product.category.slug}`
                   : "/products"
               }
               className="flex items-center gap-1 text-blue-600 hover:text-blue-700 transition-colors font-black shrink-0"

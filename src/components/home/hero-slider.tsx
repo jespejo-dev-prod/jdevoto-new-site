@@ -44,7 +44,7 @@ const DEFAULT_SLIDES: SlideItem[] = [
     description:
       "Aprovecha precios rebajados en una gran variedad de productos destacados.",
     cta: "Ver Ofertas",
-    href: "/products?category=outlet",
+    href: "/categorias/outlet",
     gradient: "from-sky-100/30 via-zinc-100/50 to-transparent",
     imageClass:
       "object-center scale-110 md:scale-120 translate-x-[3%] md:translate-x-[8%] origin-center",
