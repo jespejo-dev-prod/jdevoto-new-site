@@ -214,19 +214,6 @@ export default async function HomePage() {
         {/* Sleek Benefit Bar - No ScrollReveal here since it's above the fold */}
         <BenefitBar />
 
-        {/* Bloque SEO Visible (Mejora de indexación para Google) */}
-        <section className="bg-white rounded-lg shadow-sm p-8 mb-8 text-center max-w-4xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Distribuidora mayorista de papelería, oficina, arte y ferretería en Chile
-          </h1>
-          <h2 className="text-lg md:text-xl text-primary font-medium mb-6">
-            Despacho a todo Chile • Precios mayoristas • Abastecemos a librerías, empresas, colegios y emprendimientos
-          </h2>
-          <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-            En Comercial J. Devoto somos especialistas en la comercialización y distribución al por mayor de artículos escolares, papelería, oficina, arte, manualidades, regalos y ferretería. Compra por volumen con precios competitivos y atención personalizada. Explora nuestras categorías, revisa las promociones y solicita ayuda a nuestros ejecutivos para cotizaciones y abastecimiento integral.
-          </p>
-        </section>
-
         {/* Productos en Promoción Slider */}
         {/* Active Promotion Sliders */}
         {promoSliders.map((slider, index) => {
