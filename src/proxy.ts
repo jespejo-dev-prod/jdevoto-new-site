@@ -21,6 +21,17 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ==========================================
+  // 0. SEO CLEAN REDIRECTS
+  // ==========================================
+  const url = request.nextUrl.clone();
+  if (url.pathname === '/products' && url.searchParams.has('category')) {
+    const categorySlug = url.searchParams.get('category');
+    url.searchParams.delete('category');
+    url.pathname = `/categorias/${categorySlug}`;
+    return NextResponse.redirect(url, 301);
+  }
+
+  // ==========================================
   // 1. BLOQUEO DE ARCHIVOS SENSIBLES
   // ==========================================
   const sensitivePatterns = ['.env', '.git', '.sql', '.yaml', '.yml'];
