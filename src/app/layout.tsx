@@ -83,15 +83,24 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Organization",
+        "@type": ["Organization", "LocalBusiness", "WholesaleStore"],
         "@id": `${process.env.NEXT_PUBLIC_APP_URL || "https://www.jdevoto.cl"}#organization`,
         name: "Comercial J. Devoto",
         url: process.env.NEXT_PUBLIC_APP_URL || "https://www.jdevoto.cl",
         logo: `${process.env.NEXT_PUBLIC_APP_URL || "https://www.jdevoto.cl"}/logo-svg.png`,
+        telephone: "+56 32 331 5100",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Calle Décima Avenida 1740, Placilla Oriente",
+          addressLocality: "Valparaíso",
+          addressRegion: "Valparaíso",
+          addressCountry: "CL"
+        },
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "sales",
           email: "jespejo@jdevoto.cl",
+          telephone: "+56 32 331 5100",
           areaServed: "CL",
           availableLanguage: "Spanish",
         },

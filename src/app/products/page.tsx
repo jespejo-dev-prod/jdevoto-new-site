@@ -45,8 +45,8 @@ export async function generateMetadata(
   // Búsquedas y páginas 2+ generan thin content: no indexar
   const shouldNoIndex = hasSearch || hasPagination;
 
-  let title = 'Catálogo Mayorista de Tecnología';
-  let description = 'Explora más de 2000 productos de tecnología al por mayor: computación, electrónica, iluminación y más. Precios mayoristas B2B con crédito para empresas en Chile.';
+  let title = 'Catálogo de Productos Mayorista';
+  let description = 'Empresa mayorista dedicada a la distribución y comercialización de artículos escolares, didácticos, herramientas y mucho más. Precios mayoristas B2B en Chile.';
 
   if (categorySlug && !hasSearch) {
     // Capitalizar el slug para el título
