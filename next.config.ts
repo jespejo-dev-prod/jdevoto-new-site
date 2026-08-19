@@ -81,18 +81,6 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: '/products',
-        has: [
-          {
-            type: 'query',
-            key: 'category',
-            value: '(?<slug>.*)'
-          }
-        ],
-        destination: '/categorias/:slug',
-        permanent: true,
-      },
-      {
         source: '/outlet',
         destination: '/products', // Puedes ajustarlo si existe un filtro especial
         permanent: true,

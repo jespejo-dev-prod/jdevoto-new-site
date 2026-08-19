@@ -111,13 +111,11 @@ export default async function CategoryPage(props: CategoryPageProps) {
     "url": `${baseUrl}/categorias/${slug}`
   } : null;
 
-  // Header textual SEO específico para la categoría (H1 visible y optimizado)
+  // Header oculto visualmente pero presente para SEO (como hace MercadoLibre)
   const categoryHeader = (
-    <div className="bg-white rounded-lg shadow-sm p-8 mb-6 text-center border-b border-zinc-100">
-      <h1 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-2">
-        {readable} al por mayor
-      </h1>
-      <p className="text-zinc-500 text-sm md:text-base max-w-2xl mx-auto">
+    <div className="sr-only">
+      <h1>{readable} al por mayor</h1>
+      <p>
         Explora nuestro catálogo B2B de {readable.toLowerCase()} con despacho a todo Chile y precios exclusivos para empresas, librerías y colegios.
       </p>
     </div>
