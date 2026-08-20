@@ -15,8 +15,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssignCustomerModal } from '@/modules/customers/presentation/components/AssignCustomerModal';
+import { useAuth } from '@/context/auth-context';
 
 export default function CustomersPage() {
+ const { user } = useAuth();
  const [page, setPage] = useState(1);
  const [limit, setLimit] = useState(100);
  const [searchTerm, setSearchTerm] = useState('');
@@ -61,13 +63,15 @@ export default function CustomersPage() {
  </div>
 
  <div className="flex items-center gap-3">
- <button 
-   onClick={() => setIsAssignModalOpen(true)}
-   className="flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 px-4 py-2.5 rounded-xl font-bold transition-all border border-purple-500/20 text-base"
- >
-   <LinkIcon className="w-4 h-4" />
-   Vincular Existente
- </button>
+  {user?.role !== 'SALES_REP' && (
+    <button 
+      onClick={() => setIsAssignModalOpen(true)}
+      className="flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 px-4 py-2.5 rounded-xl font-bold transition-all border border-purple-500/20 text-base"
+    >
+      <LinkIcon className="w-4 h-4" />
+      Vincular Existente
+    </button>
+  )}
  <Link href="/dashboard/customers/new">
  <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
  <UserPlus className="w-4 h-4" />

@@ -45,7 +45,7 @@ export function SalesRepDashboard() {
           <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-medium text-zinc-400 mb-1">Ventas Totales (30d)</p>
+                <p className="text-sm font-medium text-zinc-400 mb-1">Ventas Totales (Histórico)</p>
                 <h3 className="text-2xl font-bold text-white">{formatCurrency(data.metrics.totalRevenue)}</h3>
               </div>
               <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
@@ -57,7 +57,7 @@ export function SalesRepDashboard() {
           <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-medium text-zinc-400 mb-1">Pedidos (30d)</p>
+                <p className="text-sm font-medium text-zinc-400 mb-1">Pedidos (Histórico)</p>
                 <h3 className="text-2xl font-bold text-white">{data.metrics.totalOrders}</h3>
               </div>
               <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
@@ -121,22 +121,7 @@ export function SalesRepDashboard() {
           </Link>
         </div>
 
-        {/* Vincular Cliente Existente */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/40 border border-zinc-800 hover:border-purple-500/50 transition-colors rounded-2xl p-6 flex flex-col justify-between gap-6 group">
-          <div>
-            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Search className="w-6 h-6 text-purple-500" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Vincular Cliente</h3>
-            <p className="text-sm text-zinc-400">Busca una empresa que ya existe en el sistema y asígnala a tu cartera.</p>
-          </div>
-          <button 
-            onClick={() => setIsAssignModalOpen(true)}
-            className="w-full py-3 rounded-xl bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 text-sm font-bold transition-all border border-purple-500/20"
-          >
-            Vincular Existente
-          </button>
-        </div>
+        {/* Placeholder for layout balance if needed, or just let it wrap */}
 
         {/* Ver Cartera */}
         <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/40 border border-zinc-800 hover:border-emerald-500/50 transition-colors rounded-2xl p-6 flex flex-col justify-between gap-6 group lg:col-span-3">
@@ -155,11 +140,12 @@ export function SalesRepDashboard() {
         </div>
       </div>
 
-      {/* Table Section */}
+      {/* Recent Orders Table */}
       <div className="mt-8">
-        <h2 className="text-xl font-bold text-white mb-4">Pedidos de tu cartera</h2>
+        <h2 className="text-xl font-bold text-white mb-4">Últimos Pedidos</h2>
         <TransactionTable />
       </div>
+
       <AssignCustomerModal 
         isOpen={isAssignModalOpen} 
         onClose={() => setIsAssignModalOpen(false)} 

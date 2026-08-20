@@ -760,7 +760,12 @@ export class OrderService {
 
     const where: Prisma.OrderWhereInput = {
       ...(companyId ? { companyId } : query.companyId ? { companyId: query.companyId } : {}),
-      ...(salesRepId ? { company: { salesRepId } } : {}),
+      ...(salesRepId ? { 
+        company: { 
+          salesRepId,
+          NOT: { razonSocial: { contains: 'test', mode: 'insensitive' } }
+        } 
+      } : {}),
       ...(status ? { status } : {}),
       ...(paymentStatus ? { paymentStatus } : {}),
       ...(paymentMethod ? { paymentMethod } : {}),

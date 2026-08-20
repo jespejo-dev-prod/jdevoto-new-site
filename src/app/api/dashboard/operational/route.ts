@@ -21,9 +21,11 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   ] = await Promise.all([
     prisma.order.aggregate({
       where: {
-        createdAt: { gte: thirtyDaysAgo },
         status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
-        ...(user.role === UserRole.SALES_REP ? { company: { salesRepId: user.id } } : {})
+        company: {
+          NOT: { razonSocial: { contains: 'test', mode: 'insensitive' } },
+          ...(user.role === UserRole.SALES_REP ? { salesRepId: user.id } : {})
+        }
       },
       _sum: { totalGross: true },
       _count: { _all: true }
@@ -40,7 +42,10 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     `,
     prisma.order.findMany({
       where: {
-        ...(user.role === UserRole.SALES_REP ? { company: { salesRepId: user.id } } : {})
+        company: {
+          NOT: { razonSocial: { contains: 'test', mode: 'insensitive' } },
+          ...(user.role === UserRole.SALES_REP ? { salesRepId: user.id } : {})
+        }
       },
       orderBy: { createdAt: 'desc' },
       take: 5,
