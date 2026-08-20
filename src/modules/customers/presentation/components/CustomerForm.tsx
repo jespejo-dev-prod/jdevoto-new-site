@@ -330,6 +330,15 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   {errors.email && <p className="text-red-400 text-[10px] font-bold px-1">{errors.email.message}</p>}
                </div>
 
+               <div className="space-y-2">
+                  <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Teléfono</label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                    <input {...register('telefono')} placeholder="+56 9 1234 5678" className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 pl-12 pr-4 text-white focus:border-primary/50 outline-none text-base" />
+                  </div>
+                  {errors.telefono && <p className="text-red-400 text-[10px] font-bold px-1">{errors.telefono.message}</p>}
+               </div>
+
                {!initialData?.id && (
                  <div className="space-y-2">
                     <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">Contraseña de Acceso (Opcional)</label>
