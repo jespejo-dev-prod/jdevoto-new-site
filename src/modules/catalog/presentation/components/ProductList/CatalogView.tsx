@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Zap, ChevronLeft, ChevronRight, ChevronDown, X, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,7 @@ export function CatalogView({
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const showRecentlyViewed = searchParams.get('recentlyViewed') === 'true';
   const showSearchHistory = searchParams.get('searchHistory') === 'true';
@@ -131,10 +132,10 @@ export function CatalogView({
 
   const navigateWithFilters = (updates: {
     page?: number;
-    categoryId?: string | null;
-    subcategories?: string[] | null;
-    search?: string | null;
-    brands?: string[] | null;
+    categoryId?: string;
+    subcategories?: string[];
+    search?: string;
+    brands?: string[];
     limit?: number | null;
   }) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -146,17 +147,18 @@ export function CatalogView({
       params.delete('page');
     }
 
+    let basePath = pathname;
+
     if (updates.categoryId !== undefined) {
       params.delete('categoryId'); // clean up legacy CUID param
+      params.delete('category'); // clean up legacy query param
+
       if (updates.categoryId) {
         const cat = categories.find(c => c.id === updates.categoryId);
-        if (cat?.slug) {
-          params.set('category', cat.slug);
-        } else {
-          params.set('category', updates.categoryId);
-        }
+        const slug = cat?.slug || updates.categoryId;
+        basePath = `/categorias/${slug}`;
       } else {
-        params.delete('category');
+        basePath = '/products';
       }
       
       // Limpiar subcategorías al cambiar de categoría padre
@@ -208,7 +210,8 @@ export function CatalogView({
       }
     }
 
-    router.push(`/products?${params.toString()}`);
+    const queryString = params.toString();
+    router.push(queryString ? `${basePath}?${queryString}` : basePath);
   };
 
   const getPageLink = (pageNumber: number) => {
@@ -218,7 +221,8 @@ export function CatalogView({
     } else {
       params.delete('page');
     }
-    return `/products?${params.toString()}`;
+    const queryString = params.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
   };
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -594,7 +598,7 @@ export function CatalogView({
                   setSelectedSpecs({});
                   setActiveCategory('');
                   setSearchQuery('');
-                  router.push('/products');
+                  router.push(pathname);
                 }}
                 className="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border border-red-100 flex items-center justify-center gap-2"
               >
@@ -951,7 +955,7 @@ export function CatalogView({
                   setActiveCategory('');
                   setSearchQuery('');
                   setIsMobileFiltersOpen(false);
-                  router.push('/products');
+                  router.push(pathname);
                 }}
                 className="flex-1 py-3 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all text-center border border-red-150 flex items-center justify-center"
               >
