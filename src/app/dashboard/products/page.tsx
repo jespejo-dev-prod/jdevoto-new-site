@@ -322,4 +322,7 @@ export default function ProductsPage() {
  disabled={isFetching}
  />
  )}
- </div>\n  </RoleGuard>\n  );\n}\n
+  </div>
+  </RoleGuard>
+  );
+}
