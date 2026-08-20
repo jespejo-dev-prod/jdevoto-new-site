@@ -29,7 +29,12 @@ export default async function RawDataPage() {
   const userIds = [...new Set(events.map(e => e.userId).filter(Boolean))] as string[];
   const users = await prisma.user.findMany({
     where: { id: { in: userIds } },
-    select: { id: true, email: true, role: true }
+    select: { 
+      id: true, 
+      email: true, 
+      role: true,
+      company: { select: { rut: true } }
+    }
   });
   const userMap = new Map(users.map(u => [u.id, u]));
 
@@ -86,9 +91,14 @@ export default async function RawDataPage() {
                     </td>
                     <td className="px-6 py-4">
                       {evt.user ? (
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-0.5">
                           <span className="text-white">{evt.user.email}</span>
-                          <span className="text-xs text-zinc-500">{translateRole(evt.user.role)}</span>
+                          {evt.user.company?.rut && (
+                            <span className="text-xs font-bold text-primary tracking-wide">
+                              {evt.user.company.rut}
+                            </span>
+                          )}
+                          <span className="text-xs text-zinc-500 mt-1">{translateRole(evt.user.role)}</span>
                         </div>
                       ) : (
                         <span className="text-zinc-600 italic">Anónimo</span>
