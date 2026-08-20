@@ -83,7 +83,9 @@ export default function CampaignDetailPage() {
  const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
  const fetchCampaign = useCallback(async () => {
- try {
+  const isAdmin = authUser?.role === 'ADMIN' || authUser?.role === 'SUPER_ADMIN';
+  if (!isAdmin) { setLoading(false); return; }
+  try {
  const res = await fetch(`/api/campaigns/${id}?t=${Date.now()}`, {
  headers: { Authorization: `Bearer ${accessToken}` },
  cache: 'no-store'

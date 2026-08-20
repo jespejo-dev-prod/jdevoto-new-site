@@ -37,7 +37,8 @@ const STATUS_CONFIG = {
 };
 
 export default function EmailCampaignsPage() {
- const { accessToken } = useAuth();
+ const { user, accessToken } = useAuth();
+ const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
  const router = useRouter();
  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
  const [loading, setLoading] = useState(true);
@@ -56,7 +57,7 @@ export default function EmailCampaignsPage() {
  } finally {
  setLoading(false);
  }
- }, [accessToken]);
+ }, [accessToken, isAdmin]);
 
  useEffect(() => { fetchCampaigns(); }, [fetchCampaigns]);
 

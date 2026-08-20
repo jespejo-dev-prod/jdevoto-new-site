@@ -29,11 +29,23 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const skip = (page - 1) * limit;
 
   const baseWhere: any = user.role === UserRole.COMPANY_ADMIN 
-    ? { companyId: user.companyId, isActive: true } 
+    ? { 
+        companyId: user.companyId, 
+        isActive: true,
+        role: { in: [UserRole.COMPANY_ADMIN, UserRole.BUYER] }
+      } 
     : { isActive: true };
 
   if (roleFilter) {
-    baseWhere.role = roleFilter;
+    if (user.role === UserRole.COMPANY_ADMIN) {
+      if ([UserRole.COMPANY_ADMIN, UserRole.BUYER].includes(roleFilter as UserRole)) {
+        baseWhere.role = roleFilter;
+      } else {
+        baseWhere.role = { in: [] }; // Si busca un rol no permitido, retorna nada
+      }
+    } else {
+      baseWhere.role = roleFilter;
+    }
   }
 
   const whereClause = {
