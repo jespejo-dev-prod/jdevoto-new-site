@@ -38,7 +38,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
   if (roleFilter) {
     if (user.role === UserRole.COMPANY_ADMIN) {
-      if ([UserRole.COMPANY_ADMIN, UserRole.BUYER].includes(roleFilter as UserRole)) {
+      if (([UserRole.COMPANY_ADMIN, UserRole.BUYER] as UserRole[]).includes(roleFilter as UserRole)) {
         baseWhere.role = roleFilter;
       } else {
         baseWhere.role = { in: [] }; // Si busca un rol no permitido, retorna nada
