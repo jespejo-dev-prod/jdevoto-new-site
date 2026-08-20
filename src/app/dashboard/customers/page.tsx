@@ -17,13 +17,22 @@ import Link from 'next/link';
 import { AssignCustomerModal } from '@/modules/customers/presentation/components/AssignCustomerModal';
 import { useAuth } from '@/context/auth-context';
 
+import { useRouter } from 'next/navigation';
+
 export default function CustomersPage() {
  const { user } = useAuth();
+ const router = useRouter();
  const [page, setPage] = useState(1);
  const [limit, setLimit] = useState(100);
  const [searchTerm, setSearchTerm] = useState('');
  const [debouncedSearch, setDebouncedSearch] = useState('');
  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+
+ useEffect(() => {
+   if (user && (user.role === 'BUYER' || user.role === 'COMPANY_ADMIN')) {
+     router.replace('/dashboard');
+   }
+ }, [user, router]);
 
  // Debounce search
  useEffect(() => {
@@ -44,7 +53,8 @@ export default function CustomersPage() {
  } = useCustomers({
  page,
  limit,
- search: debouncedSearch
+ search: debouncedSearch,
+ enabled: !!user && user.role !== 'BUYER' && user.role !== 'COMPANY_ADMIN'
  });
 
  return (
