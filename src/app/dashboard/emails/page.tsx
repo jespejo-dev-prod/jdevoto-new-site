@@ -11,6 +11,8 @@ import {
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 
 interface Campaign {
  id: string;
@@ -83,7 +85,8 @@ export default function EmailCampaignsPage() {
  const sentCampaigns = campaigns.filter((c) => c.status === 'SENT').length;
 
  return (
- <div className="flex flex-col gap-6 p-6">
+  <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+  <div className="flex flex-col gap-6 p-6">
  {/* Header */}
  <div className="flex items-center justify-between">
  <div>
@@ -225,6 +228,7 @@ export default function EmailCampaignsPage() {
  </div>
  )}
  </div>
- </div>
+  </div>
+  </RoleGuard>
  );
 }

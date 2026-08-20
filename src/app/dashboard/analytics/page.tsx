@@ -23,6 +23,8 @@ const STATUS_COLORS: Record<string, string> = {
 
 import { useState } from 'react';
 import { useAuth } from '@/context/auth-context';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState<'30d' | '60d' | '90d' | '120d' | 'all' | 'custom'>('all');
@@ -47,6 +49,7 @@ export default function AnalyticsPage() {
   const { summary, dailySales, statusDistribution, topCustomers } = stats;
 
   return (
+    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
     <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -286,6 +289,7 @@ export default function AnalyticsPage() {
 
       </div>
     </div>
+    </RoleGuard>
   );
 }
 

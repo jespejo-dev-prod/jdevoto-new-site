@@ -1,5 +1,7 @@
 'use client';
 
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
@@ -198,7 +200,8 @@ export default function NuevaCampañaPage() {
  };
 
  return (
- <div className="flex flex-col gap-6 p-6 w-full max-w-none">
+    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+    <div className="flex flex-col gap-6 p-6 w-full max-w-none">
  {/* Header */}
  <div className="flex items-center gap-3">
  <button
@@ -527,5 +530,6 @@ export default function NuevaCampañaPage() {
  </div>
  </div>
  </div>
- );
+    </RoleGuard>
+  );
 }

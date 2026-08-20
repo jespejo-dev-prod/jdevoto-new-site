@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 import {
  Mail, ArrowLeft, Send, CheckCircle2, AlertCircle, Eye,
  MousePointerClick, Calendar, Loader2, RefreshCw, BarChart2,
@@ -156,7 +158,8 @@ export default function CampaignDetailPage() {
  const isAdmin = authUser?.role === 'ADMIN' || authUser?.role === 'SUPER_ADMIN';
 
  return (
- <div className="flex flex-col gap-6 p-6 max-w-5xl mx-auto">
+ <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+ <div className="flex flex-col gap-6 p-4 sm:p-6 pb-24 max-w-5xl mx-auto">
  {/* Header */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-3">
@@ -438,6 +441,7 @@ export default function CampaignDetailPage() {
  </div>
  </div>
  )}
- </div>
+  </div>
+  </RoleGuard>
  );
 }

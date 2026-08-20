@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/auth-context';
 import { useCategories, useBrands } from '@/modules/catalog/application/hooks/useCatalogData';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 
 const formatForDateTimeLocal = (dateStr: string | null) => {
  if (!dateStr) return '';
@@ -275,7 +277,8 @@ export default function DescuentosPage() {
  }
 
  return (
- <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
+  <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  {/* Header */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-4">
@@ -626,5 +629,6 @@ export default function DescuentosPage() {
  )}
  </div>
  </div>
+ </RoleGuard>
  );
 }

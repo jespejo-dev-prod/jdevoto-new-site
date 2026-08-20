@@ -11,6 +11,8 @@ import { useProducts } from '@/modules/catalog/presentation/hooks/useProducts';
 import { useDeleteProduct } from '@/modules/catalog/presentation/hooks/useDeleteProduct';
 import { useCategories, useBrands } from '@/modules/catalog/application/hooks/useCatalogData';
 import { useAuth } from '@/context/auth-context';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 
 // Components
 import { ProductCard } from '@/modules/catalog/presentation/components/ProductList/ProductCard';
@@ -181,7 +183,8 @@ export default function ProductsPage() {
  };
 
  return (
- <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
+  <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
 
  {/* Header */}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -319,6 +322,4 @@ export default function ProductsPage() {
  disabled={isFetching}
  />
  )}
- </div>
- );
-}
+ </div>\n  </RoleGuard>\n  );\n}\n
