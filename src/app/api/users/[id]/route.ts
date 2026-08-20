@@ -59,10 +59,10 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     if (targetUser.companyId !== currentUser.companyId) {
       return NextResponse.json({ error: "No tienes permisos para editar a este usuario porque pertenece a otra empresa" }, { status: 403 });
     }
-    if ([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES_REP].includes(targetUser.role)) {
+    if (([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES_REP] as UserRole[]).includes(targetUser.role)) {
       return NextResponse.json({ error: "No tienes permisos para editar a este administrador del sistema" }, { status: 403 });
     }
-    if (data.role && [UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES_REP].includes(data.role)) {
+    if (data.role && ([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES_REP] as UserRole[]).includes(data.role as UserRole)) {
       return NextResponse.json({ error: "No puedes asignar roles administrativos globales" }, { status: 403 });
     }
   }
