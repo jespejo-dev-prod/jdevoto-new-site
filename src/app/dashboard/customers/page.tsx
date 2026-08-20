@@ -62,23 +62,14 @@ export default function CustomersPage() {
  </p>
  </div>
 
- <div className="flex items-center gap-3">
-  {user?.role !== 'SALES_REP' && (
-    <button 
-      onClick={() => setIsAssignModalOpen(true)}
-      className="flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 px-4 py-2.5 rounded-xl font-bold transition-all border border-purple-500/20 text-base"
-    >
-      <LinkIcon className="w-4 h-4" />
-      Vincular Existente
-    </button>
-  )}
- <Link href="/dashboard/customers/new">
- <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
- <UserPlus className="w-4 h-4" />
- Nuevo Cliente
- </button>
- </Link>
- </div>
+  <div className="flex items-center gap-3">
+    <Link href="/dashboard/customers/new">
+      <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+        <UserPlus className="w-4 h-4" />
+        Nuevo Cliente
+      </button>
+    </Link>
+  </div>
  </div>
 
  {/* Barra de Filtros / Búsqueda */}
