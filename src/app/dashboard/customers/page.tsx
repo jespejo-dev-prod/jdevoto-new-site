@@ -8,31 +8,22 @@ import {
  Search, 
  UserPlus, 
  Loader2, 
- LayoutGrid, 
- List,
  Filter,
  Link as LinkIcon
 } from 'lucide-react';
 import Link from 'next/link';
 import { AssignCustomerModal } from '@/modules/customers/presentation/components/AssignCustomerModal';
 import { useAuth } from '@/context/auth-context';
-
-import { useRouter } from 'next/navigation';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 
 export default function CustomersPage() {
  const { user } = useAuth();
- const router = useRouter();
  const [page, setPage] = useState(1);
  const [limit, setLimit] = useState(100);
  const [searchTerm, setSearchTerm] = useState('');
  const [debouncedSearch, setDebouncedSearch] = useState('');
  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-
- useEffect(() => {
-   if (user && (user.role === 'BUYER' || user.role === 'COMPANY_ADMIN')) {
-     router.replace('/dashboard');
-   }
- }, [user, router]);
 
  // Debounce search
  useEffect(() => {
@@ -58,7 +49,8 @@ export default function CustomersPage() {
  });
 
  return (
- <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
+  <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SALES_REP]}>
+  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  {/* Header */}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
@@ -180,9 +172,10 @@ export default function CustomersPage() {
  </div>
  )}
  <AssignCustomerModal 
-   isOpen={isAssignModalOpen} 
-   onClose={() => setIsAssignModalOpen(false)} 
- />
- </div>
+    isOpen={isAssignModalOpen} 
+    onClose={() => setIsAssignModalOpen(false)} 
+  />
+  </div>
+  </RoleGuard>
  );
 }
