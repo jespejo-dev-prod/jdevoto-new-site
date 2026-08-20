@@ -42,10 +42,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     `,
     prisma.order.findMany({
       where: {
-        company: {
-          NOT: { razonSocial: { contains: 'test', mode: 'insensitive' } },
-          ...(user.role === UserRole.SALES_REP ? { salesRepId: user.id } : {})
-        }
+        ...(user.role === UserRole.SALES_REP ? { company: { salesRepId: user.id } } : {})
       },
       orderBy: { createdAt: 'desc' },
       take: 5,
