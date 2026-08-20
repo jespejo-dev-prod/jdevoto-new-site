@@ -47,7 +47,10 @@ export class AnalyticsService {
         where: {
           ...(dateFilter ? { createdAt: dateFilter } : {}),
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
-          ...(salesRepId ? { company: { salesRepId } } : {})
+          company: {
+            NOT: { razonSocial: { contains: 'test', mode: 'insensitive' } },
+            ...(salesRepId ? { salesRepId } : {})
+          }
         },
         _sum: { totalGross: true },
         _count: { _all: true }
@@ -56,7 +59,10 @@ export class AnalyticsService {
         where: {
           createdAt: prevDateFilter,
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
-          ...(salesRepId ? { company: { salesRepId } } : {})
+          company: {
+            NOT: { razonSocial: { contains: 'test', mode: 'insensitive' } },
+            ...(salesRepId ? { salesRepId } : {})
+          }
         },
         _sum: { totalGross: true },
         _count: { _all: true }
@@ -70,6 +76,7 @@ export class AnalyticsService {
         WHERE (${period} = 'all' OR (o."createdAt" >= ${startDateObj || new Date(0)} AND o."createdAt" <= ${endDateObj || new Date()}))
           AND o.status NOT IN ('CANCELLED', 'REJECTED')
           AND c."salesRepId" = ${salesRepId}
+          AND c."razonSocial" NOT ILIKE '%test%'
         GROUP BY 1
         ORDER BY 1 ASC
       ` : prisma.$queryRaw<Array<{ date: string; total: number }>>`
@@ -79,6 +86,7 @@ export class AnalyticsService {
         FROM "orders"
         WHERE (${period} = 'all' OR ("createdAt" >= ${startDateObj || new Date(0)} AND "createdAt" <= ${endDateObj || new Date()}))
           AND status NOT IN ('CANCELLED', 'REJECTED')
+          AND "companyId" IN (SELECT id FROM "companies" WHERE "razonSocial" NOT ILIKE '%test%')
         GROUP BY 1
         ORDER BY 1 ASC
       `,
@@ -87,7 +95,10 @@ export class AnalyticsService {
         _count: { _all: true },
         where: { 
           ...(dateFilter ? { createdAt: dateFilter } : {}),
-          ...(salesRepId ? { company: { salesRepId } } : {})
+          company: {
+            NOT: { razonSocial: { contains: 'test', mode: 'insensitive' } },
+            ...(salesRepId ? { salesRepId } : {})
+          }
         }
       }),
       prisma.order.groupBy({
@@ -99,7 +110,10 @@ export class AnalyticsService {
         where: { 
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REJECTED] },
           ...(dateFilter ? { createdAt: dateFilter } : {}),
-          ...(salesRepId ? { company: { salesRepId } } : {})
+          company: {
+            NOT: { razonSocial: { contains: 'test', mode: 'insensitive' } },
+            ...(salesRepId ? { salesRepId } : {})
+          }
         }
       })
     ]);
