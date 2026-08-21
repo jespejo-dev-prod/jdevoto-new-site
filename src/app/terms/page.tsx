@@ -153,16 +153,17 @@ export default function TermsPage() {
                   en un plazo de 24 a 48 horas hábiles.
                 </li>
                 <li>
-                  **Zona Extrema Norte (Arica, Iquique, Antofagasta, Calama):**
+                  **Región de Valparaíso:** Despacho gratuito en compras desde
+                  **$100.000 CLP netos**.
+                </li>
+                <li>
+                  **Zona Extrema Norte (Arica, Iquique, Calama):**
                   Despacho gratuito en compras desde **$500.000 CLP netos**,
                   transportado vía FedEx o G y G en un plazo estimado de 24 a 96
                   horas hábiles.
                 </li>
                 <li>
-                  **Zona Extrema Sur (Coyhaique, Aysén, Punta Arenas,
-                  Porvenir):** Despacho gratuito en compras desde **$1.000.000
-                  CLP netos**, transportado vía Swisslog o A.T.E. en un plazo
-                  estimado de 5 a 8 días hábiles.
+                  **Zona Extrema Sur (Coyhaique, Aysén, Punta Arenas, Porvenir, Puerto Cisnes, Cochrane, Puerto Natales):** Despacho gratuito en compras desde **$1.000.000 CLP netos**, transportado vía Swisslog o A.T.E. (Puerto Natales vía FedEx) en un plazo estimado de 5 a 8 días hábiles.
                 </li>
                 <li>
                   **Otras regiones principales (Centro y Sur):** Despacho
@@ -179,9 +180,9 @@ export default function TermsPage() {
                 flete pagado gratis en su zona geográfica, el despacho se
                 enviará por cobrar. El usuario deberá seleccionar
                 obligatoriamente al finalizar la compra su courier de
-                preferencia (Starken, Chilexpress, Blue Express, Pullman Cargo,
-                Varmontt o Cruz del Sur) y cancelar el costo logístico
-                correspondiente al recibir el pedido.
+                preferencia (Starken, Chilexpress, Blue Express, Pullman Cargo o
+                Varmontt) y cancelar el costo logístico correspondiente al
+                recibir el pedido.
               </p>
             </section>
 

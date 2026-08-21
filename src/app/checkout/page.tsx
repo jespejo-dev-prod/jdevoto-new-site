@@ -238,9 +238,9 @@ export default function CheckoutPage() {
       r.includes("AYSEN") || 
       r.includes("MAGALLANES") ||
       c.includes("PUNTA ARENAS") || 
-      c.includes("PUERTO NATALES") || 
+      c.includes("NATALES") || 
       c.includes("AYSEN") ||
-      c.includes("PUERTO CISNE") ||
+      c.includes("CISNES") ||
       c.includes("PUERTO AYSEN") ||
       c.includes("COIHAIQUE") ||
       c.includes("COCHRANE") ||
@@ -819,7 +819,7 @@ export default function CheckoutPage() {
                                         <option value="Blue Express">Blue Express</option>
                                         <option value="Pullman Cargo">Pullman Cargo</option>
                                         <option value="Varmontt">Varmontt</option>
-                                        <option value="Cruz del Sur">Cruz del Sur</option>
+
                                         <option value="otro">Otro (Especificar...)</option>
                                      </select>
                                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />

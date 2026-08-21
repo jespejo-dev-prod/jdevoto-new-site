@@ -119,8 +119,8 @@ export default function SupportPage() {
     {
       category: "despacho",
       categoryName: "Despachos y Fletes",
-      q: "¿Cuáles son las políticas de flete y montos mínimos para despacho gratuito?",
-      a: "El monto mínimo de compra neta para despacho gratuito en la Región Metropolitana es de $100.000 CLP. Para la zona extrema norte el mínimo es de $500.000 CLP y para la zona extrema sur es de $1.000.000 CLP. Los despachos a territorios insulares no son elegibles para despacho gratuito. Cabe destacar que el subtotal neto mínimo para realizar cualquier pedido en la plataforma es de $100.000 CLP netos (El monto se calcula incluyendo todos los descuentos).",
+      q: "¿Cuáles son las políticas de flete y montos mínimos para despacho gratuitos?",
+      a: "El monto mínimo de compra neta para despacho gratuito en la Región Metropolitana y Quinta Región es de $100.000. Desde Antofagasta a Puerto Montt es de $250.000. La zona extrema norte el mínimo es de $500.000 CLP y para la zona extrema sur es de $1.000.000 CLP. Los despachos a territorios insulares no son elegibles para despacho gratuito. Cabe destacar que el subtotal neto mínimo para realizar cualquier pedido en la plataforma es de $100.000 CLP netos (El monto se calcula incluyendo todos los descuentos).",
     },
     {
       category: "despacho",
@@ -132,7 +132,7 @@ export default function SupportPage() {
       category: "despacho",
       categoryName: "Despachos y Fletes",
       q: '¿Cómo funciona la modalidad "Flete por Pagar" y qué transporte debo elegir?',
-      a: 'Si tu pedido no alcanza el monto mínimo para despacho gratis, se enviará bajo la modalidad "Flete por Pagar". Al finalizar tu compra en el Checkout, el usuario deberá indicar obligatoriamente el transporte por el cual desea recibir sus productos, pudiendo seleccionar entre Starken, Chilexpress, Blue Express, Pullman Cargo, Varmontt, Cruz del Sur o especificar otro alternativo. El costo del flete se cancela directamente al transportista elegido al momento de recibir la mercadería.',
+      a: 'Si tu pedido no alcanza el monto mínimo para despacho gratis, se enviará bajo la modalidad "Flete por Pagar". Al finalizar tu compra en el Checkout, el usuario deberá indicar obligatoriamente el transporte por el cual desea recibir sus productos, pudiendo seleccionar entre Starken, Chilexpress, Blue Express, Pullman Cargo, Varmontt o especificar otro alternativo. El costo del flete se cancela directamente al transportista elegido al momento de recibir la mercadería.',
     },
     {
       category: "descuentos",

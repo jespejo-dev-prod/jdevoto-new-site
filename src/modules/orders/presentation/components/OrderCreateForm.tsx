@@ -65,11 +65,11 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
   );
 
   const [shippingMethod, setShippingMethod] = useState<'free' | 'client_pays'>(
-    initialData?.shippingAddress?.shippingMethod || 'client_pays'
+    initialData?.shippingAddress?.shippingMethod as 'free' | 'client_pays' || 'free'
   );
 
   const [selectedCourier, setSelectedCourier] = useState<string>(
-    initialData?.shippingAddress?.courier && ['Starken', 'Chilexpress', 'Blue Express', 'Pullman Cargo', 'Varmontt', 'Cruz del Sur'].includes(initialData.shippingAddress.courier)
+    initialData?.shippingAddress?.courier && ['Starken', 'Chilexpress', 'Blue Express', 'Pullman Cargo', 'Varmontt'].includes(initialData.shippingAddress.courier)
       ? initialData.shippingAddress.courier
       : initialData?.shippingAddress?.courier === 'FLETE INCLUIDO' || initialData?.shippingAddress?.shippingMethod === 'free'
         ? ''
@@ -79,7 +79,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
   );
 
   const [customCourier, setCustomCourier] = useState<string>(
-    initialData?.shippingAddress?.courier && !['Starken', 'Chilexpress', 'Blue Express', 'Pullman Cargo', 'Varmontt', 'Cruz del Sur', 'FLETE INCLUIDO', 'POR PAGAR'].includes(initialData.shippingAddress.courier)
+    initialData?.shippingAddress?.courier && !['Starken', 'Chilexpress', 'Blue Express', 'Pullman Cargo', 'Varmontt', 'FLETE INCLUIDO', 'POR PAGAR'].includes(initialData.shippingAddress.courier)
       ? initialData.shippingAddress.courier
       : ''
   );
@@ -1267,7 +1267,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                           <option value="Blue Express">Blue Express</option>
                           <option value="Pullman Cargo">Pullman Cargo</option>
                           <option value="Varmontt">Varmontt</option>
-                          <option value="Cruz del Sur">Cruz del Sur</option>
+
                           <option value="otro">Otro (Especificar...)</option>
                         </select>
                         <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />

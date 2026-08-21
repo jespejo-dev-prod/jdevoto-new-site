@@ -180,9 +180,9 @@ export class OrderService {
         r.includes("AYSEN") || 
         r.includes("MAGALLANES") ||
         c.includes("PUNTA ARENAS") || 
-        c.includes("PUERTO NATALES") || 
+        c.includes("NATALES") || 
         c.includes("AYSEN") ||
-        c.includes("PUERTO CISNE") ||
+        c.includes("CISNES") ||
         c.includes("PUERTO AYSEN") ||
         c.includes("COIHAIQUE") ||
         c.includes("COCHRANE") ||
