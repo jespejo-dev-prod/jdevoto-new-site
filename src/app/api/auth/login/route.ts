@@ -60,7 +60,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     // Registrar intento fallido antes de lanzar el error al handler global
     const current = loginAttempts.get(ip) || { count: 0, blockedUntil: 0 };
     current.count += 1;
-    if (current.count >= 5) {
+    if (current.count >= 8) {
       current.blockedUntil = Date.now() + 10 * 60 * 1000; // 10 minutos
     }
     loginAttempts.set(ip, current);
@@ -71,7 +71,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       req,
     });
 
-    if (current.count >= 5) {
+    if (current.count >= 8) {
       return NextResponse.json({
         success: false,
         error: {
