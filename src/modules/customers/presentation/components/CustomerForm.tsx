@@ -364,10 +364,24 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
           </div>
 
           <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 space-y-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-white flex items-center gap-3">
-              <Truck className="h-5 w-5 text-primary" />
-              Dirección de Envío / Despacho
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-3">
+                <Truck className="h-5 w-5 text-primary" />
+                Dirección de Envío / Despacho
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('shippingStreet', watch('direccion'), { shouldValidate: true, shouldDirty: true });
+                  setValue('shippingRegion', watch('region'), { shouldValidate: true, shouldDirty: true });
+                  setValue('shippingCommune', watch('comuna'), { shouldValidate: true, shouldDirty: true });
+                  setValue('shippingCity', watch('ciudad'), { shouldValidate: true, shouldDirty: true });
+                }}
+                className="text-[11px] font-bold text-primary hover:text-white transition-colors uppercase tracking-wider bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-lg border border-primary/20 self-start sm:self-auto"
+              >
+                Copiar Dir. Tributaria
+              </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               <div className="md:col-span-12 space-y-2">

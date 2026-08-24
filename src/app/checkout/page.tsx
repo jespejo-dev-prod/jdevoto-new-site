@@ -167,6 +167,34 @@ export default function CheckoutPage() {
       setIsVerifyingAddress(false);
     }
   };
+  
+  const handleCopyBillingAddress = () => {
+    if (effectiveCompany) {
+      setShippingStreet(effectiveCompany.direccion || '');
+      
+      const regionMatch = CHILE_REGIONS.find(r => 
+        r.name.toLowerCase() === effectiveCompany.region?.toLowerCase() ||
+        r.name.toLowerCase().includes(effectiveCompany.region?.toLowerCase() || '')
+      );
+      
+      if (regionMatch) {
+        setRegion(regionMatch.name);
+        const comunaMatch = regionMatch.comunas.find(c => 
+          c.name.toLowerCase() === effectiveCompany.comuna?.toLowerCase() ||
+          c.name.toLowerCase().includes(effectiveCompany.comuna?.toLowerCase() || '')
+        );
+        if (comunaMatch) {
+          setTimeout(() => setComuna(comunaMatch.name), 10);
+        } else {
+          setTimeout(() => setComuna(effectiveCompany.comuna || ''), 10);
+        }
+      } else {
+        setRegion(effectiveCompany.region || '');
+        setTimeout(() => setComuna(effectiveCompany.comuna || ''), 10);
+      }
+    }
+  };
+
 
   useEffect(() => {
     if (shippingStreet && comuna && region) {
@@ -623,8 +651,18 @@ export default function CheckoutPage() {
               {/* SECCIÓN 2: DESPACHO */}
               <section className="bg-white p-8 lg:p-10 rounded-[40px] border border-zinc-200 shadow-sm space-y-8 relative overflow-hidden">
                  <div className="absolute top-0 left-0 w-2 h-full bg-purple-500" />
-                 <div className="flex items-center gap-4">
+                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 uppercase tracking-tight">Opciones de Despacho</h2>
+                    {effectiveCompany?.direccion && (
+                      <button
+                        type="button"
+                        onClick={handleCopyBillingAddress}
+                        className="text-[11px] font-bold text-purple-600 hover:text-purple-700 transition-colors uppercase tracking-wider bg-purple-50 hover:bg-purple-100 px-4 py-2 rounded-xl border border-purple-200 self-start sm:self-auto flex items-center gap-2"
+                      >
+                        <Truck className="h-4 w-4" />
+                        Copiar Dir. Tributaria
+                      </button>
+                    )}
                  </div>
                  
                  <div className="space-y-6">
