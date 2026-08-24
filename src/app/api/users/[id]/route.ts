@@ -99,6 +99,8 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
 
   if (data.password !== undefined && data.password.trim() !== "") {
     updateData.passwordHash = await bcrypt.hash(data.password, 10);
+    updateData.failedLoginAttempts = 0;
+    updateData.lockedUntil = null;
   }
 
   const updatedUser = await prisma.user.update({

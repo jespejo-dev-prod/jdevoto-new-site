@@ -48,7 +48,11 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   // 4. Update user password
   await prisma.user.update({
     where: { email: resetToken.email },
-    data: { passwordHash: hashedPassword }
+    data: { 
+      passwordHash: hashedPassword,
+      failedLoginAttempts: 0,
+      lockedUntil: null
+    }
   });
 
   // 5. Delete the token so it can't be reused
