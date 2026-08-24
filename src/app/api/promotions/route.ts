@@ -77,9 +77,9 @@ export const POST = withApiHandler(async (req) => {
       where: { id: data.categoryId },
       select: { isOutlet: true, name: true },
     });
-    if (category?.isOutlet) {
+    if (category?.isOutlet || (category?.name && category.name.toUpperCase().includes("OUTLET"))) {
       throw new ValidationError(
-        `La categoría "${category.name}" es Outlet y no puede tener promociones`
+        `La categoría "${category?.name}" es Outlet y no puede tener promociones`
       );
     }
   }
@@ -167,9 +167,9 @@ export const PUT = withApiHandler(async (req) => {
       where: { id: data.categoryId },
       select: { isOutlet: true, name: true },
     });
-    if (category?.isOutlet) {
+    if (category?.isOutlet || (category?.name && category.name.toUpperCase().includes("OUTLET"))) {
       throw new ValidationError(
-        `La categoría "${category.name}" es Outlet y no puede tener promociones`
+        `La categoría "${category?.name}" es Outlet y no puede tener promociones`
       );
     }
   }

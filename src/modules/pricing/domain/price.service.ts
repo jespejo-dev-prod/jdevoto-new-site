@@ -43,50 +43,58 @@ function resolvePrice(
   promotionBrandMap: Map<string, Promotion>,
   promotionCategoryMap: Map<string, Promotion>,
   promotionCombinedMap: Map<string, Promotion>,
-  categoryParentMap: Record<string, string | null>
+  categoryParentMap: Record<string, string | null>,
+  categoryOutletMap: Record<string, boolean>
 ): PriceBreakdown {
   const basePrice = Number(product.basePrice);
 
-  // 1. Outlet: sin descuento, precio base
-  if (product.category?.isOutlet) {
+  // 1. Outlet: sin descuento, precio base (evalúa si la categoría o ancestros son outlet)
+  if (product.categoryId && categoryOutletMap[product.categoryId]) {
     return buildPrice(product, basePrice, 0, "OUTLET");
   }
 
-  // 2. Lista de precios (empresa o general)
-  const listItem = listPriceMap.get(product.id);
-  if (listItem) {
-    const source = listItem.type === "COMPANY" ? "COMPANY_LIST" : "GENERAL_LIST";
-    return buildPrice(product, listItem.netPrice, listItem.totalDiscount, source);
-  }
-
-  // 3. Promoción por marca y/o categoría
+  // 2. Promoción por marca y/o categoría
   //    Prioridad: Combinado (categoría+marca) > Categoría > Marca
   const combinedKey = product.categoryId && product.brandId
     ? `${product.categoryId}:${product.brandId}`
     : null;
   let combinedPromo = combinedKey ? promotionCombinedMap.get(combinedKey) : undefined;
   
-  // Buscar promoción combinada usando la categoría padre
-  const parentId = product.categoryId ? categoryParentMap[product.categoryId] : null;
-  if (!combinedPromo && parentId && product.brandId) {
-    combinedPromo = promotionCombinedMap.get(`${parentId}:${product.brandId}`);
-  }
-
-  const categoryPromo = product.categoryId ? promotionCategoryMap.get(product.categoryId) : undefined;
+  let categoryPromo: Promotion | undefined;
   
-  // Buscar promoción de categoría usando la categoría padre si no hay directa
-  const parentCategoryPromo = !categoryPromo && parentId
-    ? promotionCategoryMap.get(parentId)
-    : undefined;
+  // Buscar promoción combinada y de categoría usando toda la jerarquía de ancestros
+  let currentCategoryId = product.categoryId;
+  
+  while (currentCategoryId) {
+    if (!combinedPromo && product.brandId) {
+      combinedPromo = promotionCombinedMap.get(`${currentCategoryId}:${product.brandId}`);
+    }
+    if (!categoryPromo) {
+      categoryPromo = promotionCategoryMap.get(currentCategoryId);
+    }
+    
+    // Si ya encontramos ambas, podemos salir del bucle
+    if (combinedPromo && categoryPromo) break;
+    
+    // Subir al padre
+    currentCategoryId = categoryParentMap[currentCategoryId] || null;
+  }
 
   const brandPromo = product.brandId ? promotionBrandMap.get(product.brandId) : undefined;
   
-  const promo = combinedPromo || categoryPromo || parentCategoryPromo || brandPromo;
+  const promo = combinedPromo || categoryPromo || brandPromo;
   if (promo) {
     const validToIso = promo.validTo
       ? (promo.validTo instanceof Date ? promo.validTo.toISOString() : String(promo.validTo))
       : null;
     return buildPrice(product, basePrice, Number(promo.discount), "PROMOTION", validToIso);
+  }
+
+  // 3. Lista de precios (empresa o general)
+  const listItem = listPriceMap.get(product.id);
+  if (listItem) {
+    const source = listItem.type === "COMPANY" ? "COMPANY_LIST" : "GENERAL_LIST";
+    return buildPrice(product, listItem.netPrice, listItem.totalDiscount, source);
   }
 
   // 4. Descuento por defecto de la empresa - DESACTIVADO POR SOLICITUD DE USUARIO (Se maneja a nivel global de orden en Carrito y Checkout)
@@ -116,12 +124,13 @@ export class PriceService {
   ): Promise<PriceBreakdown[]> {
     if (products.length === 0) return [];
 
-    // Carga paralela: listas de precios + promociones + descuento de empresa + mapa de padres
-    const [priceLists, promotions, company, categoryParentMap] = await Promise.all([
+    // Carga paralela: listas de precios + promociones + descuento de empresa + mapa de padres + mapa de outlets
+    const [priceLists, promotions, company, categoryParentMap, categoryOutletMap] = await Promise.all([
       this.loadPriceLists(companyId),
       this.loadPromotions(),
       this.loadCompanyDiscount(companyId),
       this.loadCategoryParentMap(),
+      this.loadCategoryOutletMap(),
     ]);
 
     const companyDefaultDiscount = company ? Number(company.defaultDiscount) : 0;
@@ -132,7 +141,7 @@ export class PriceService {
 
     // Resolver precio de cada producto
     return products.map((product) =>
-      resolvePrice(product, companyDefaultDiscount, listPriceMap, promotionBrandMap, promotionCategoryMap, promotionCombinedMap, categoryParentMap)
+      resolvePrice(product, companyDefaultDiscount, listPriceMap, promotionBrandMap, promotionCategoryMap, promotionCombinedMap, categoryParentMap, categoryOutletMap)
     );
   }
 
@@ -297,6 +306,49 @@ export class PriceService {
       return await unstable_cache(
         fetchFn,
         ["category-parent-map"],
+        { revalidate: 300, tags: ["categories"] }
+      )();
+    } catch (error: any) {
+      if (error?.message?.includes("incrementalCache")) {
+        return fetchFn();
+      }
+      throw error;
+    }
+  }
+
+  /** Carga el mapa de si una categoría (o sus ancestros) es Outlet. */
+  private async loadCategoryOutletMap(): Promise<Record<string, boolean>> {
+    const fetchFn = async () => {
+      const categories = await prisma.category.findMany({
+        select: { id: true, parentId: true, name: true, isOutlet: true },
+      });
+      
+      const map: Record<string, boolean> = {};
+      
+      // Primera pasada: outlets directos (por flag o por nombre)
+      for (const cat of categories) {
+        map[cat.id] = cat.isOutlet || cat.name.toUpperCase().includes('OUTLET');
+      }
+
+      // Segunda pasada: propagar hacia abajo (si el padre es outlet, el hijo también lo es)
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const cat of categories) {
+          if (!map[cat.id] && cat.parentId && map[cat.parentId]) {
+            map[cat.id] = true;
+            changed = true;
+          }
+        }
+      }
+      
+      return map;
+    };
+
+    try {
+      return await unstable_cache(
+        fetchFn,
+        ["category-outlet-map"],
         { revalidate: 300, tags: ["categories"] }
       )();
     } catch (error: any) {
