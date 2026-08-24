@@ -643,6 +643,15 @@ export function CatalogView({
               variant="catalog"
               limit={itemsPerPage}
               onLimitChange={(val) => navigateWithFilters({ limit: val, page: 1 })}
+              onClearFilters={() => {
+                setSelectedBrands([]);
+                setSelectedSubcategories([]);
+                setSubcatSearch('');
+                setSelectedSpecs({});
+                setActiveCategory('');
+                setSearchQuery('');
+                router.push('/products');
+              }}
             />
           </div>
         </div>

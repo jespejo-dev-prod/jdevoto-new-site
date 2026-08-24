@@ -19,6 +19,7 @@ interface ProductsFilterBarProps {
   variant?: 'dashboard' | 'catalog';
   limit?: number;
   onLimitChange?: (limit: number) => void;
+  onClearFilters?: () => void;
 }
 
 const DEBOUNCE_MS = 350;
@@ -38,6 +39,7 @@ export function ProductsFilterBar({
   variant = 'dashboard',
   limit = 24,
   onLimitChange,
+  onClearFilters,
 }: ProductsFilterBarProps) {
   const isDashboard = variant === 'dashboard';
   const [localSearch, setLocalSearch] = useState(search);
@@ -167,10 +169,14 @@ export function ProductsFilterBar({
         {hasActiveFilters && (
           <button
             onClick={() => {
-              setLocalSearch('');
-              onSearchChange('');
-              onCategoryChange('');
-              if (onBrandChange) onBrandChange('');
+              if (onClearFilters) {
+                onClearFilters();
+              } else {
+                setLocalSearch('');
+                onSearchChange('');
+                onCategoryChange('');
+                if (onBrandChange) onBrandChange('');
+              }
             }}
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-red-500 hover:bg-red-500/10 transition-all"
           >

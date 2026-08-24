@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/client";
 import { getTransporter } from "@/lib/email";
 import { UAParser } from "ua-parser-js";
+import * as XLSX from "xlsx";
 
 export const dynamic = 'force-dynamic';
 
@@ -120,6 +121,45 @@ export async function GET(req: Request) {
     const jsonlContent = jsonlRows.join("\n");
     const csvContent = csvRows.join("\n");
 
+    // Generar XLSX
+    // Utilizaremos los mismos datos del CSV pero transformados a array bidimensional
+    const excelData = [csvHeaders];
+    for (const event of oldEvents) {
+      parser.setUA(event.userAgent || '');
+      const browserInfo = parser.getBrowser();
+      const osInfo = parser.getOS();
+      const deviceInfo = parser.getDevice();
+      const browser = `${browserInfo.name || ''} ${browserInfo.version || ''}`.trim();
+      const os = `${osInfo.name || ''} ${osInfo.version || ''}`.trim();
+      const deviceType = deviceInfo.type || 'desktop';
+      const data = (event.eventData || {}) as any;
+
+      excelData.push([
+        event.id,
+        formatReadableDate(new Date(event.createdAt)),
+        event.eventType,
+        event.sessionId || '',
+        event.userId || '',
+        data.productId || '',
+        data.sku || '',
+        data.price || '',
+        data.quantity || '',
+        data.priceSource || '',
+        event.pageUrl || '',
+        event.referrer || '',
+        browser,
+        os,
+        deviceType,
+        event.userAgent || '',
+        event.ipAddress || ''
+      ]);
+    }
+
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Analytics');
+    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
     // Email Body
     let emailText = `Reporte semanal de analíticas\n\n`;
     emailText += `Este archivo contiene todos los eventos registrados entre:\n`;
@@ -144,6 +184,10 @@ export async function GET(req: Request) {
       subject: `📊 Backup Semanal de Analíticas - ${dateRangeStr}`,
       text: emailText,
       attachments: [
+        {
+          filename: `analytics-events-${dateRangeStr}.xlsx`,
+          content: excelBuffer
+        },
         {
           filename: `analytics-events-${dateRangeStr}.csv`,
           content: csvContent
