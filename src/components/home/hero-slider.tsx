@@ -115,6 +115,41 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
   const [current, setCurrent] = useState(0);
   const [isClient, setIsClient] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  
+  // Swipe logic
+  const [pointerDownX, setPointerDownX] = useState<number | null>(null);
+  const [pointerUpX, setPointerUpX] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setPointerUpX(null);
+    setPointerDownX(e.clientX);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    // Solo registramos el movimiento si hemos presionado
+    if (pointerDownX !== null) {
+      setPointerUpX(e.clientX);
+    }
+  };
+
+  const handlePointerUp = () => {
+    if (pointerDownX === null || pointerUpX === null) {
+      setPointerDownX(null);
+      setPointerUpX(null);
+      return;
+    }
+    const distance = pointerDownX - pointerUpX;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+    setPointerDownX(null);
+    setPointerUpX(null);
+  };
 
   // Fetch dinámico eliminado: ahora los slides se inyectan mediante SSR (initialSlides)
   // para evitar retrasos en el LCP generados por el renderizado asíncrono en cliente.
@@ -138,9 +173,16 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
 
   return (
     <div 
-      className="relative h-[420px] md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group"
+      className="relative h-[420px] md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group touch-pan-y"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        handlePointerUp(); // Si sale del slider mientras arrastra
+      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
     >
       {/* Grid Pattern Overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000004_1px,transparent_1px),linear-gradient(to_bottom,#00000004_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none z-10" />
