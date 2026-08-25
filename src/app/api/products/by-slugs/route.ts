@@ -23,6 +23,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
   }
   const stockFilter = hideOutOfStock ? { stockQuantity: { gt: 0 } } : {};
+  const priceFilter = !isPrivileged ? { basePrice: { gt: 0 } } : {};
   const isSuperOrAdmin = user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
   const testProductFilter = isSuperOrAdmin ? {} : { sku: { not: "TEST-001" } };
 
@@ -63,6 +64,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
         isActive: true,
         isDeleted: false,
         ...stockFilter,
+        ...priceFilter,
         ...testProductFilter,
         OR: [
           ...(categoryIds.length > 0 ? [{ categoryId: { in: categoryIds } }] : []),
@@ -99,6 +101,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
       isActive: true,
       isDeleted: false,
       ...stockFilter,
+      ...priceFilter,
       ...testProductFilter,
     },
     include: {

@@ -64,6 +64,7 @@ export default async function HomePage() {
   });
   const hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
   const stockFilter = hideOutOfStock ? { stockQuantity: { gt: 0 } } : {};
+  const priceFilter = isPrivileged ? {} : { basePrice: { gt: 0 } };
   const testProductFilter = isPrivileged ? {} : { sku: { not: "TEST-001" } };
 
   const homeSlidesSetting = await prisma.storeSettings.findUnique({
@@ -143,6 +144,7 @@ export default async function HomePage() {
       isActive: true,
       isDeleted: false,
       ...stockFilter,
+      ...priceFilter,
       ...testProductFilter,
       OR: [
         ...(promoBrandIds.length > 0 ? [{ brandId: { in: promoBrandIds } }] : []),
@@ -189,7 +191,7 @@ export default async function HomePage() {
 
   // 4. Fetch general fallback products
   const fallbackRaw = await prisma.product.findMany({
-    where: { isActive: true, isDeleted: false, ...stockFilter, ...testProductFilter },
+    where: { isActive: true, isDeleted: false, ...stockFilter, ...priceFilter, ...testProductFilter },
     take: 20,
     select: productSelectFields,
     orderBy: { name: 'asc' }

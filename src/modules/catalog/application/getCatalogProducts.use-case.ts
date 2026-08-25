@@ -74,7 +74,8 @@ function resolveIds(
 export async function getCatalogProductsUseCase(
   filters: CatalogFilters,
   filtersData: CatalogFiltersData,
-  companyId: string | null
+  companyId: string | null,
+  isPrivileged: boolean = false
 ): Promise<CatalogProductsResult> {
   const { page, limit, offersOnly, bestSellersOnly, essentialsOnly, search } = filters;
   const { categories, brands } = filtersData;
@@ -133,6 +134,7 @@ export async function getCatalogProductsUseCase(
     isActive: true,
     isDeleted: false,
     ...(hideOutOfStock ? { stockQuantity: { gt: 0 } } : {}),
+    ...(!isPrivileged ? { basePrice: { gt: 0 } } : {}),
   };
 
   // Filtro: Ofertas (por marca o categoría con promoción activa)
@@ -252,6 +254,10 @@ export async function getCatalogProductsUseCase(
 
     if (hideOutOfStock) {
       conditions.push(`p."stockQuantity" > 0`);
+    }
+
+    if (!isPrivileged) {
+      conditions.push(`p."basePrice" > 0`);
     }
 
     if (resolvedSubcategoryIds.length > 0) {

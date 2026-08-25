@@ -20,12 +20,14 @@ interface ProductGridServerProps {
   filters: CatalogFilters;
   filtersData: CatalogFiltersData;
   companyId: string | null;
+  isPrivileged?: boolean;
 }
 
 export async function ProductGridServer({
   filters,
   filtersData,
   companyId,
+  isPrivileged = false,
 }: ProductGridServerProps) {
   const {
     products,
@@ -33,7 +35,7 @@ export async function ProductGridServer({
     resolvedCategoryId,
     resolvedSubcategoryIds,
     resolvedBrandIds,
-  } = await getCatalogProductsUseCase(filters, filtersData, companyId);
+  } = await getCatalogProductsUseCase(filters, filtersData, companyId, isPrivileged);
 
   return (
     <CatalogView

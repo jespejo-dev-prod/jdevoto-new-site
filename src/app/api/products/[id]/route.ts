@@ -36,6 +36,11 @@ export const GET = withApiHandler(async (req: NextRequest, ctx: RouteContext) =>
 
   if (!product) throw new NotFoundError("Producto", id);
 
+  const isPrivileged = user && (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN || user.role === UserRole.SALES_REP);
+  if (!isPrivileged && Number(product.basePrice) === 0) {
+    throw new NotFoundError("Producto", id);
+  }
+
   const targetCompanyId = user.role === UserRole.BUYER 
     ? (user.companyId ?? null)
     : (req.nextUrl.searchParams.get("companyId") || user.companyId || null);
