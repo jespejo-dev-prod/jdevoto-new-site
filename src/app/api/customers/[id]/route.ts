@@ -67,6 +67,12 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
   });
   if (!existing) throw new NotFoundError("Cliente", id);
 
+  if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    if (companyData.rut !== undefined && companyData.rut !== existing.rut) {
+      throw new ForbiddenError("No estás autorizado para modificar el RUT de la empresa.");
+    }
+  }
+
   if (user.role === UserRole.COMPANY_ADMIN) {
     const hasDifferentCredit = companyData.creditLimit !== undefined && Number(companyData.creditLimit) !== Number(existing.creditLimit);
     const hasDifferentDiscount = companyData.defaultDiscount !== undefined && Number(companyData.defaultDiscount) !== Number(existing.defaultDiscount);

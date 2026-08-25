@@ -187,7 +187,6 @@ export type RegisterCompanyDto = z.infer<typeof RegisterCompanySchema>;
 
 // Esquema para ACTUALIZACIÓN (Partial) - Basado en el esquema SIN defaults.
 export const UpdateCompanySchema = BaseCompanySchema
-  .omit({ rut: true })
   .partial();
 
 export type UpdateCompanyDto = z.infer<typeof UpdateCompanySchema>;

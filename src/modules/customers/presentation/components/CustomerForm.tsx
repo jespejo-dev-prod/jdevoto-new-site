@@ -61,7 +61,8 @@ const findMatchingCommunaName = (regionName: string | undefined, comunaName: str
 export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, onActivate, isActivating }: CustomerFormProps) {
   const { user } = useAuth();
   const isCustomerUser = user?.role === 'COMPANY_ADMIN' || user?.role === 'BUYER';
-  const canEditCommercialTerms = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const canEditCommercialTerms = isAdmin;
 
   const [creditLimitDisplay, setCreditLimitDisplay] = useState('');
 
@@ -242,7 +243,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                 <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">RUT Empresa</label>
                 <input 
                   {...register('rut')}
-                  disabled={!!initialData?.id}
+                  disabled={!!initialData?.id && !isAdmin}
                   className={cn(
                     "w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none transition-all disabled:opacity-50",
                     errors.rut && "border-red-500/50 focus:border-red-500"
@@ -250,6 +251,9 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   placeholder="12345678-9"
                 />
                 {errors.rut && <p className="text-red-400 text-[10px] font-bold px-1">{errors.rut.message}</p>}
+                {!!initialData?.id && !isAdmin && (
+                  <p className="text-sm text-zinc-400 px-1 italic mt-1">Solo administradores pueden modificar el RUT.</p>
+                )}
               </div>
 
               <div className="space-y-2">
