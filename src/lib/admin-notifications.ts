@@ -349,6 +349,7 @@ export async function notifyAdminAction(action: AuditAction, userId?: string, de
 
   let userName = "Sistema / Usuario Desconocido";
   let userRole = "";
+  let rawRole = "";
 
   if (userId) {
     try {
@@ -359,6 +360,7 @@ export async function notifyAdminAction(action: AuditAction, userId?: string, de
       if (user) {
         userName = `${user.firstName} ${user.lastName}`;
         userRole = `[${user.role}] `;
+        rawRole = user.role;
       }
     } catch (error) {
       console.error("Error fetching user for admin notification:", error);
@@ -367,9 +369,18 @@ export async function notifyAdminAction(action: AuditAction, userId?: string, de
 
   const notification = builder(`${userRole}${userName}`, details);
 
+  // Determinar correo de destino:
+  // Si el actor es ADMIN o SUPER_ADMIN, enviar a TECH_ADMIN_EMAIL (o fallback a ADMIN_NOTIFICATION_EMAIL).
+  // Si es otro rol (ej. Vendedor, Cliente), enviar al correo regular de ventas.
+  let targetEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+  
+  if (rawRole === "ADMIN" || rawRole === "SUPER_ADMIN") {
+    targetEmail = process.env.TECH_ADMIN_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL;
+  }
+
   try {
     await sendNotificationEmail(
-      process.env.ADMIN_NOTIFICATION_EMAIL,
+      targetEmail,
       `${notification.title} - Jdevoto.cl`,
       notification.message,
       notification.link
