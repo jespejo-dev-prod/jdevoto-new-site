@@ -23,8 +23,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
     hideOutOfStock = hideSetting ? (hideSetting.value as boolean) === true : false;
   }
   const stockFilter = hideOutOfStock ? { stockQuantity: { gt: 0 } } : {};
-  const priceFilter = !isPrivileged ? { basePrice: { gt: 0 } } : {};
   const isSuperOrAdmin = user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
+  const priceFilter = !isSuperOrAdmin ? { basePrice: { gt: 0 } } : {};
   const testProductFilter = isSuperOrAdmin ? {} : { sku: { not: "TEST-001" } };
 
   const slugsQuery = req.nextUrl.searchParams.get("slugs") || "";

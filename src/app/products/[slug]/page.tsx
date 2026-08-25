@@ -77,7 +77,7 @@ export async function generateMetadata({
     if (product.sku === 'TEST-001' || Number(product.basePrice) === 0) {
       const { getServerUser } = await import('@/lib/server-auth');
       const user = await getServerUser();
-      if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'SALES_REP') {
+      if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN') {
         return { title: "No Encontrado" };
       }
     }
@@ -153,7 +153,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
     if (product.sku === 'TEST-001' || Number(product.basePrice) === 0) {
       const { getServerUser } = await import('@/lib/server-auth');
       const user = await getServerUser();
-      if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'SALES_REP') {
+      if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN') {
         notFound();
       }
     }

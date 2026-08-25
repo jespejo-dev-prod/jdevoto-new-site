@@ -120,7 +120,7 @@ export default async function CatalogPage(props: {
   ]);
 
   const companyId = user?.companyId || null;
-  const isPrivileged = user ? (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN' || user.role === 'SALES_REP') : false;
+  const isPrivileged = user ? (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN') : false;
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] flex flex-col">
