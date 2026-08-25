@@ -140,7 +140,7 @@ export function PublicHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full flex flex-col">
-      <nav className="bg-zinc-950 text-white p-4 px-4 sm:px-8 flex items-center justify-between border-b border-zinc-800 shadow-md">
+      <nav className="bg-[#1d2e5d] text-white p-4 px-4 sm:px-8 flex items-center justify-between border-b border-zinc-800 shadow-md">
         <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="hover:scale-105 transition-transform shrink-0">
             <Image 
@@ -158,7 +158,7 @@ export function PublicHeader() {
               setIsCategoriesOpen(!isCategoriesOpen);
               setIsMobileMenuOpen(false);
             }}
-            className="hidden md:flex items-center gap-1.5 sm:gap-2 h-10 sm:h-11 px-3 sm:px-4 rounded-xl bg-zinc-900 border border-zinc-850 hover:bg-zinc-800 hover:border-zinc-700 hover:text-white transition-all font-bold text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer text-zinc-400 select-none active:scale-[0.98]"
+            className="hidden md:flex items-center gap-1.5 sm:gap-2 h-10 sm:h-11 px-3 sm:px-4 rounded-xl bg-[#16244a] border border-zinc-850 hover:bg-[#1d2e5d] hover:border-zinc-700 hover:text-white transition-all font-bold text-[10px] sm:text-[11px] uppercase tracking-widest cursor-pointer text-zinc-400 select-none active:scale-[0.98]"
           >
             {isCategoriesOpen ? <X className="h-4 w-4 text-primary" /> : <Menu className="h-4 w-4" />}
             <span>Categorías</span>
@@ -171,10 +171,10 @@ export function PublicHeader() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar en el catálogo mayorista..." 
-            className="w-full h-11 rounded-xl bg-zinc-900 border border-zinc-800 px-5 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-zinc-650" 
+            className="w-full h-11 rounded-xl bg-[#16244a] border border-zinc-800 px-5 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-zinc-650 text-white" 
           />
           <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary p-2 rounded-lg cursor-pointer" aria-label="Buscar">
-            <Search className="h-4 w-4 text-zinc-950" />
+            <Search className="h-4 w-4 text-[#1d2e5d]" />
           </button>
         </form>
 
@@ -265,7 +265,7 @@ export function PublicHeader() {
             <div className="hidden md:flex items-center">
               <Link
                 href="/login"
-                className="flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-black uppercase tracking-widest transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-[#16244a] hover:bg-[#1d2e5d] text-white rounded-xl text-[11px] font-black uppercase tracking-widest transition-all"
               >
                 <User className="h-4 w-4" />
                 Iniciar Sesión
@@ -301,7 +301,7 @@ export function PublicHeader() {
               setIsMobileMenuOpen(!isMobileMenuOpen);
               setIsCategoriesOpen(false);
             }}
-            className="md:hidden p-2 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-all cursor-pointer text-zinc-400 hover:text-white active:scale-95"
+            className="md:hidden p-2 rounded-lg bg-[#16244a] border border-zinc-800 hover:bg-[#1d2e5d] transition-all cursor-pointer text-zinc-400 hover:text-white active:scale-95"
             aria-label="Menú principal"
           >
             {isMobileMenuOpen ? <X className="h-5 w-5 text-primary" /> : <Menu className="h-5 w-5" />}
@@ -310,13 +310,13 @@ export function PublicHeader() {
       </nav>
 
       {/* Sub-nav móvil con Categorías y Buscador (Separado para evitar doble hamburguesa) */}
-      <div className="flex md:hidden items-center gap-3 bg-zinc-900 p-3 px-4 border-b border-zinc-800 text-white">
+      <div className="flex md:hidden items-center gap-3 bg-[#16244a] p-3 px-4 border-b border-zinc-800 text-white">
         <button
           onClick={() => {
             setIsCategoriesOpen(!isCategoriesOpen);
             setIsMobileMenuOpen(false);
           }}
-          className="flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl bg-zinc-950 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 font-bold text-xs uppercase tracking-wider select-none active:scale-[0.98] shrink-0"
+          className="flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl bg-[#1d2e5d] border border-zinc-800 hover:bg-[#16244a] text-zinc-400 font-bold text-xs uppercase tracking-wider select-none active:scale-[0.98] shrink-0"
         >
           {isCategoriesOpen ? <X className="h-4.5 w-4.5 text-primary" /> : <Menu className="h-4.5 w-4.5" />}
           <span>Categorías</span>
@@ -327,10 +327,10 @@ export function PublicHeader() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar en catálogo..." 
-            className="w-full h-10 rounded-xl bg-zinc-950 border border-zinc-800 pl-4 pr-10 text-xs focus:ring-2 focus:ring-primary/50 outline-none text-white placeholder:text-zinc-650" 
+            className="w-full h-10 rounded-xl bg-[#1d2e5d] border border-zinc-800 pl-4 pr-10 text-xs focus:ring-2 focus:ring-primary/50 outline-none text-white placeholder:text-zinc-650" 
           />
           <button type="submit" className="absolute right-1.5 bg-primary p-1.5 rounded-lg cursor-pointer" aria-label="Buscar">
-            <Search className="h-3.5 w-3.5 text-zinc-950" />
+            <Search className="h-3.5 w-3.5 text-[#1d2e5d]" />
           </button>
         </form>
       </div>
@@ -395,7 +395,7 @@ export function PublicHeader() {
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 relative z-10">
             <div className={`w-20 sm:w-44 h-2.5 rounded-full overflow-hidden relative border ${
-              isMinimumMet ? 'bg-emerald-800 border-emerald-700' : 'bg-zinc-950 border-zinc-900/50'
+              isMinimumMet ? 'bg-emerald-800 border-emerald-700' : 'bg-[#1d2e5d] border-zinc-900/50'
             }`}>
               <div 
                 className="h-full transition-all duration-500 ease-out bg-white"
@@ -424,7 +424,7 @@ export function PublicHeader() {
       {/* Drawer de Navegación Móvil */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-zinc-950/95 backdrop-blur-md z-45 flex flex-col p-6 animate-in slide-in-from-top duration-300 md:hidden"
+          className="fixed inset-0 bg-[#1d2e5d]/95 backdrop-blur-md z-45 flex flex-col p-6 animate-in slide-in-from-top duration-300 md:hidden"
           style={{ top: topOffset }}
         >
           {/* Buscador Móvil */}
@@ -433,10 +433,10 @@ export function PublicHeader() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar en catálogo..." 
-              className="w-full h-12 rounded-xl bg-zinc-900 border border-zinc-800 px-5 text-sm focus:ring-2 focus:ring-primary/50 outline-none text-white placeholder:text-zinc-650" 
+              className="w-full h-12 rounded-xl bg-[#16244a] border border-zinc-800 px-5 text-sm focus:ring-2 focus:ring-primary/50 outline-none text-white placeholder:text-zinc-650" 
             />
             <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary p-2 rounded-lg">
-              <Search className="h-4 w-4 text-zinc-950" />
+              <Search className="h-4 w-4 text-[#1d2e5d]" />
             </button>
           </form>
 
