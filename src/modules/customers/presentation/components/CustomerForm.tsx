@@ -43,19 +43,19 @@ const findMatchingRegionName = (name: string | null | undefined): string => {
     const rNorm = r.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
     return rNorm === norm || rNorm.includes(norm) || norm.includes(rNorm);
   });
-  return match ? match.name : "";
+  return match ? match.name : name;
 };
 
 const findMatchingCommunaName = (regionName: string | undefined, comunaName: string | null | undefined): string => {
-  if (!regionName || !comunaName) return "";
+  if (!comunaName) return "";
   const norm = comunaName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
   const region = CHILE_REGIONS.find(r => r.name === regionName);
-  if (!region) return "";
+  if (!region) return comunaName;
   const match = region.comunas.find(c => {
     const cNorm = c.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
     return cNorm === norm || cNorm.includes(norm) || norm.includes(cNorm);
   });
-  return match ? match.name : "";
+  return match ? match.name : comunaName;
 };
 
 export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, onActivate, isActivating }: CustomerFormProps) {
