@@ -51,8 +51,7 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
   }
 
   // Por simplicidad en este paso, pasamos el body directamente al servicio.
-  // En producción, esto debería validarse con un OrderUpdateSchema.
-  const updatedOrder = await orderService.updateOrder(id, body);
+  const updatedOrder = await orderService.updateOrder(id, body, user.role);
 
   return ok(updatedOrder);
 });

@@ -26,7 +26,7 @@ import type {
   PaginatedResult,
 } from "@/types/domain";
 import { TAX_RATE } from "@/types/domain";
-import { OrderStatus, Prisma } from "@prisma/client";
+import { OrderStatus, Prisma, UserRole } from "@prisma/client";
 import type { GetOrdersQuery } from "@/validations/order.schemas";
 
 // ============================================================
@@ -525,7 +525,7 @@ export class OrderService {
    * Actualiza un pedido existente.
    * Si el pedido cambia de ítems o totales, se recalculan stock y crédito.
    */
-  async updateOrder(orderId: string, input: Partial<CreateOrderInput>) {
+  async updateOrder(orderId: string, input: Partial<CreateOrderInput>, userRole?: UserRole) {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: { items: true },
@@ -533,10 +533,17 @@ export class OrderService {
 
     if (!order) throw new NotFoundError("Pedido", orderId);
 
-    const nonEditableStatuses = [OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REJECTED];
+    const nonEditableStatuses: OrderStatus[] = [OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REJECTED];
     if (nonEditableStatuses.includes(order.status) && input.items) {
       throw new BusinessRuleError(
         `No se pueden editar los ítems de un pedido en estado ${order.status}.`,
+        "UPDATE_NOT_ALLOWED"
+      );
+    }
+
+    if (order.status !== OrderStatus.DRAFT && userRole && userRole !== UserRole.ADMIN && userRole !== UserRole.SUPER_ADMIN && input.items) {
+      throw new BusinessRuleError(
+        "Solo los administradores pueden editar los ítems de un pedido que ya no es Borrador.",
         "UPDATE_NOT_ALLOWED"
       );
     }
