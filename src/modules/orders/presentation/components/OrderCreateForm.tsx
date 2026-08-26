@@ -136,6 +136,36 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
       });
     }
   }, [selectedCustomer]);
+
+  // Recalcular descuentos si cambia el cliente o al cargar
+  useEffect(() => {
+    if (selectedCustomer) {
+      const defaultDiscount = Number(selectedCustomer.defaultDiscount || 0);
+      setItems(prev => {
+        let changed = false;
+        const newItems = prev.map(item => {
+          // Conservar 0 si es promoción, pero si es un descuento normal, actualizarlo.
+          // Como no tenemos el motor de precios aquí, si el descuento actual es 0 y el base es distinto,
+          // podría ser una promoción, PERO si acabamos de abrir la página, `discount` podría ser 0 porque el cliente no tenía descuento.
+          // Solo reseteamos a 0 si es outlet o TEST-001.
+          let newDiscount = defaultDiscount;
+          if ((item.category as any)?.slug === 'outlet' || item.sku === 'TEST-001') {
+            newDiscount = 0;
+          }
+          if (item.discount !== newDiscount) {
+            changed = true;
+            return {
+              ...item,
+              discount: newDiscount,
+              price: item.basePrice * (1 - newDiscount / 100)
+            };
+          }
+          return item;
+        });
+        return changed ? newItems : prev;
+      });
+    }
+  }, [selectedCustomer?.defaultDiscount]);
   
   // Búsqueda
   const [customerSearch, setCustomerSearch] = useState('');
@@ -188,6 +218,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     basePrice: number;
     discount: number;
     image?: string;
+    category?: string;
   }>>(initialData?.items?.map((i: any) => ({
     productId: i.productId,
     sku: i.productSku || i.product?.sku || '',
@@ -199,7 +230,8 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     basePrice: Number(i.unitNetPrice),
     price: Number(i.unitNetPrice) * (1 - Number(i.discount) / 100),
     discount: Number(i.discount),
-    image: i.product?.images?.[0]?.url
+    image: i.product?.images?.[0]?.url,
+    category: i.product?.category
   })) || []);
 
   // Hooks de datos
@@ -356,7 +388,10 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     }
     
     // Descuento corporativo base
-    const discountPercent = Number(selectedCustomer?.defaultDiscount || 0);
+    let discountPercent = Number(selectedCustomer?.defaultDiscount || 0);
+    if (product.category?.slug === 'outlet' || product.sku === 'TEST-001') {
+      discountPercent = 0;
+    }
     const discountedPrice = product.basePrice * (1 - discountPercent / 100);
 
     if (existing) {
@@ -399,7 +434,8 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
         basePrice: product.basePrice,
         price: discountedPrice,
         discount: discountPercent,
-        image: product.images?.[0]?.url
+        image: product.images?.[0]?.url,
+        category: product.category
       }]);
     }
     toast.success(`${product.name} agregado`);

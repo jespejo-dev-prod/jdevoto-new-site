@@ -745,6 +745,7 @@ export class OrderService {
                 minOrderQty: true,
                 inner: true,
                 stockQuantity: true,
+                category: true,
                 images: { where: { isPrimary: true }, take: 1 }
               }
             }
