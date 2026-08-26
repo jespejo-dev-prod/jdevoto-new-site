@@ -33,6 +33,7 @@ interface HomeSlide {
  imagePositionX?: number;
  imageScale?: number;
  hideOverlay?: boolean;
+ textAnimation?: 'slide-up' | 'slide-left' | 'fade' | 'zoom' | 'none';
 }
 
 const DEFAULT_SLIDES: HomeSlide[] = [
@@ -351,6 +352,21 @@ export default function SliderPage() {
  />
  </div>
  </div>
+  
+  <div className="space-y-2 pt-2">
+    <Label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Animación de Entrada del Texto</Label>
+    <select
+      value={slide.textAnimation || 'slide-up'}
+      onChange={(e) => handleFieldChange(slide.id, "textAnimation", e.target.value)}
+      className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-xl h-11 px-4 text-sm focus:border-primary/50 outline-none"
+    >
+      <option value="slide-up">Deslizar desde abajo (Slide Up)</option>
+      <option value="slide-left">Deslizar desde la izquierda (Slide Left)</option>
+      <option value="fade">Aparecer suavemente (Fade In)</option>
+      <option value="zoom">Acercar (Zoom In)</option>
+      <option value="none">Sin Animación</option>
+    </select>
+  </div>
   
   <div className="flex items-center gap-3 pt-2">
     <input 

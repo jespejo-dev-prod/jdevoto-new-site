@@ -26,6 +26,7 @@ interface SlideItem {
   imagePositionX?: number;
   imageScale?: number;
   hideOverlay?: boolean;
+  textAnimation?: 'slide-up' | 'slide-left' | 'fade' | 'zoom' | 'none';
 }
 
 const iconMap: Record<string, any> = {
@@ -108,7 +109,8 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
           imageClass: s.imageClass || "object-center scale-100",
           imagePositionX: s.imagePositionX,
           imageScale: s.imageScale,
-          hideOverlay: s.hideOverlay
+          hideOverlay: s.hideOverlay,
+          textAnimation: s.textAnimation || 'slide-up'
         };
       });
     }
@@ -192,44 +194,47 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
       {/* Light glow effects */}
       <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[60%] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
 
-      {/* Background image — visible Inmediatamente (LCP detectable por Lighthouse) */}
-      <div className="absolute inset-0 z-0">
-        {(() => {
-          const hasInlineTransform = activeSlide.imagePositionX !== undefined || activeSlide.imageScale !== undefined;
+      {/* Background images — Crossfade */}
+      <div className="absolute inset-0 z-0 bg-zinc-100">
+        {activeSlides.map((slide, idx) => {
+          const isActive = idx === current;
+          const hasInlineTransform = slide.imagePositionX !== undefined || slide.imageScale !== undefined;
           const safeImageClass = hasInlineTransform
-            ? (activeSlide.imageClass || '').replace(/\bscale-\S+\b|\btranslate-x-\S+\b/g, '').trim()
-            : (activeSlide.imageClass || '');
+            ? (slide.imageClass || '').replace(/\bscale-\S+\b|\btranslate-x-\S+\b/g, '').trim()
+            : (slide.imageClass || '');
+            
           return (
-            <Image
-              src={activeSlide.image}
-              alt={activeSlide.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
-              className={`${activeSlide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-85 md:opacity-95'} transition-opacity transition-transform duration-700 ${safeImageClass}`}
-              priority
-              quality={60}
-              fetchPriority="high"
-              style={
-                hasInlineTransform
-                  ? {
-                      transform: `scale(${(activeSlide.imageScale || 100) / 100}) translateX(${activeSlide.imagePositionX || 0}%)`
-                    }
-                  : undefined
-              }
-            />
+            <div 
+              key={slide.id || idx}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100' : 'opacity-0'}`}
+            >
+              <Image
+                src={slide.image}
+                alt={slide.title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
+                className={`${slide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-85 md:opacity-95'} ${safeImageClass}`}
+                priority={idx === 0}
+                quality={60}
+                fetchPriority={idx === 0 ? "high" : "auto"}
+                style={
+                  hasInlineTransform
+                    ? {
+                        transform: `scale(${(slide.imageScale || 100) / 100}) translateX(${slide.imagePositionX || 0}%)`
+                      }
+                    : undefined
+                }
+              />
+              {!slide.hideOverlay && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent md:hidden" />
+                  <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-40 pointer-events-none`} />
+                </>
+              )}
+            </div>
           );
-        })()}
-        {!activeSlide.hideOverlay && (
-          <>
-            {/* Light gradient fade for text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent md:hidden" />
-            {/* Subtle color highlight gradient glow */}
-            <div
-              className={`absolute inset-0 bg-gradient-to-r ${activeSlide.gradient} opacity-40 pointer-events-none`}
-            />
-          </>
-        )}
+        })}
       </div>
 
       {/* Text Container: Pure CSS Animations */}
@@ -241,7 +246,13 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
           
           {/* Badge */}
           {activeSlide.badge && (
-            <div className="mb-4 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
+            <div className={`mb-4 delay-100 ${
+              activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
+              activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
+              activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
+              activeSlide.textAnimation === 'none' ? '' :
+              'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
+            }`}>
               <span className={`inline-flex items-center gap-2 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${activeSlide.badgeColor || ""}`}>
                 {activeSlide.badgeIcon && (
                   <activeSlide.badgeIcon className="h-3.5 w-3.5" />
@@ -252,7 +263,13 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
           )}
 
           {/* Title */}
-          <h1 className={`text-4xl md:text-5xl lg:text-6xl font-black max-w-xl leading-[1.1] tracking-tight uppercase animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both ${
+          <h1 className={`text-4xl md:text-5xl lg:text-6xl font-black max-w-xl leading-[1.1] tracking-tight uppercase delay-200 ${
+            activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'none' ? '' :
+            'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
+          } ${
             activeSlide.title.toLowerCase().includes('outlet') ? 'text-red-600' :
             activeSlide.title.toLowerCase().includes('despacho gratis') ? 'text-emerald-600' :
             (activeSlide.title.toLowerCase().includes('ferreteria') || activeSlide.title.toLowerCase().includes('ferretería')) ? 'text-[#6F4E37]' :
@@ -262,12 +279,24 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
           </h1>
 
           {/* Description */}
-          <p className="text-sm md:text-base lg:text-lg text-zinc-600 mt-4 max-w-md font-semibold leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
+          <p className={`text-sm md:text-base lg:text-lg text-zinc-600 mt-4 max-w-md font-semibold leading-relaxed delay-300 ${
+            activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'none' ? '' :
+            'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
+          }`}>
             {activeSlide.description}
           </p>
 
           {/* CTA Button */}
-          <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
+          <div className={`mt-8 delay-500 ${
+            activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
+            activeSlide.textAnimation === 'none' ? '' :
+            'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
+          }`}>
             <Link
               href={activeSlide.href}
               className="inline-flex items-center justify-center px-8 py-3.5 bg-zinc-950 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 transition-colors shadow-xl shadow-zinc-900/10 hover:scale-[1.03] active:scale-95 duration-300"
@@ -305,15 +334,25 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
             aria-label={`Slide ${idx + 1}`}
           >
             <span 
-              className={`h-1.5 rounded-full transition-colors duration-500 ${
+              className={`h-1.5 rounded-full transition-all duration-500 ${
                 idx === current
                   ? "w-8 bg-zinc-950"
-                  : "w-2 bg-zinc-300 group-hover:bg-zinc-400"
+                  : "w-2 bg-zinc-300 hover:bg-zinc-400"
               }`}
             />
           </button>
         ))}
       </div>
+
+      {/* Full slide clickable area */}
+      {activeSlide.href && (
+        <Link 
+          href={activeSlide.href} 
+          className="absolute inset-0 z-[15] opacity-0"
+          aria-label={activeSlide.title || "Ver más"}
+          draggable={false}
+        />
+      )}
     </div>
   );
 }
