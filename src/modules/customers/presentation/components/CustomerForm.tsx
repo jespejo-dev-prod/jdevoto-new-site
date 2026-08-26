@@ -193,6 +193,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       30: 7,
       31: 10,
       60: 4,
+      61: 0,
       90: 0
     };
     
@@ -455,7 +456,8 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     <option value={0}>Contado (0 días)</option>
                     <option value={30}>30 días (7% Dcto)</option>
                     <option value={31}>30 días, 10% Dcto</option>
-                    <option value={60}>60 días</option>
+                    <option value={60}>60 días (4% Dcto)</option>
+                    <option value={61}>60 días, 0% Dcto</option>
                     <option value={90}>90 días</option>
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
