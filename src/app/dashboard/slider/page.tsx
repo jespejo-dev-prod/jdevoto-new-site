@@ -32,6 +32,7 @@ interface HomeSlide {
  href?: string;
  imagePositionX?: number;
  imageScale?: number;
+ hideOverlay?: boolean;
 }
 
 const DEFAULT_SLIDES: HomeSlide[] = [
@@ -350,6 +351,19 @@ export default function SliderPage() {
  />
  </div>
  </div>
+  
+  <div className="flex items-center gap-3 pt-2">
+    <input 
+      type="checkbox" 
+      id={`hideOverlay-${slide.id}`}
+      checked={slide.hideOverlay || false}
+      onChange={(e) => handleFieldChange(slide.id, "hideOverlay", e.target.checked)}
+      className="w-5 h-5 rounded border-zinc-800 bg-zinc-950 text-primary focus:ring-primary focus:ring-offset-zinc-900"
+    />
+    <Label htmlFor={`hideOverlay-${slide.id}`} className="text-sm font-medium text-zinc-300 cursor-pointer">
+      Ocultar texto y efecto blanco (Solo mostrar la imagen y dejarla en formato natural)
+    </Label>
+  </div>
  </div>
 
  {/* Right col - background image & upload */}

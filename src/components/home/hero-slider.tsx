@@ -25,6 +25,7 @@ interface SlideItem {
   imageClass?: string;
   imagePositionX?: number;
   imageScale?: number;
+  hideOverlay?: boolean;
 }
 
 const iconMap: Record<string, any> = {
@@ -106,7 +107,8 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
           gradient: s.gradient || "from-sky-100/10 via-zinc-100/30 to-transparent",
           imageClass: s.imageClass || "object-center scale-100",
           imagePositionX: s.imagePositionX,
-          imageScale: s.imageScale
+          imageScale: s.imageScale,
+          hideOverlay: s.hideOverlay
         };
       });
     }
@@ -203,7 +205,7 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
               alt={activeSlide.title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
-              className={`object-cover opacity-85 md:opacity-95 transition-opacity transition-transform duration-700 ${safeImageClass}`}
+              className={`${activeSlide.hideOverlay ? 'object-contain opacity-100' : 'object-cover opacity-85 md:opacity-95'} transition-opacity transition-transform duration-700 ${safeImageClass}`}
               priority
               quality={60}
               fetchPriority="high"
@@ -217,13 +219,17 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
             />
           );
         })()}
-        {/* Light gradient fade for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent md:hidden" />
-        {/* Subtle color highlight gradient glow */}
-        <div
-          className={`absolute inset-0 bg-gradient-to-r ${activeSlide.gradient} opacity-40 pointer-events-none`}
-        />
+        {!activeSlide.hideOverlay && (
+          <>
+            {/* Light gradient fade for text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-100 via-zinc-100/60 to-transparent md:hidden" />
+            {/* Subtle color highlight gradient glow */}
+            <div
+              className={`absolute inset-0 bg-gradient-to-r ${activeSlide.gradient} opacity-40 pointer-events-none`}
+            />
+          </>
+        )}
       </div>
 
       {/* Text Container: Pure CSS Animations */}
