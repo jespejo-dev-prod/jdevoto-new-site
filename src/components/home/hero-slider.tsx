@@ -205,7 +205,7 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
               alt={activeSlide.title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
-              className={`${activeSlide.hideOverlay ? 'object-contain opacity-100' : 'object-cover opacity-85 md:opacity-95'} transition-opacity transition-transform duration-700 ${safeImageClass}`}
+              className={`${activeSlide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-85 md:opacity-95'} transition-opacity transition-transform duration-700 ${safeImageClass}`}
               priority
               quality={60}
               fetchPriority="high"
