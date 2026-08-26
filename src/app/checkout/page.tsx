@@ -520,6 +520,7 @@ export default function CheckoutPage() {
                       {validAccounts.map((acc: any, i: number) => (
                         <div key={i} className="text-sm bg-white p-4 rounded-xl border border-zinc-200 shadow-sm flex flex-col gap-1">
                           {acc.bankName && <p className="flex justify-between"><span className="text-zinc-500">Banco</span> <span className="font-bold text-zinc-900">{acc.bankName}</span></p>}
+                          {acc.accountType && <p className="flex justify-between"><span className="text-zinc-500">Tipo de cuenta</span> <span className="font-bold text-zinc-900">{acc.accountType}</span></p>}
                           {acc.accountDetails && <p className="flex justify-between"><span className="text-zinc-500">Cuenta</span> <span className="font-bold text-zinc-900">{acc.accountDetails}</span></p>}
                           {acc.accountName && <p className="flex justify-between"><span className="text-zinc-500">Titular</span> <span className="font-bold text-zinc-900">{acc.accountName}</span></p>}
                           {acc.rut && <p className="flex justify-between"><span className="text-zinc-500">RUT</span> <span className="font-bold text-zinc-900">{acc.rut}</span></p>}

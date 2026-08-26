@@ -18,6 +18,7 @@ type BankAccount = {
  bankName: string;
  rut?: string;
  email?: string;
+ accountType?: string;
 };
 
 type BankTransferConfig = {
@@ -229,6 +230,7 @@ export default function PagosDashboard() {
  <th className="px-4 py-3">RUT</th>
  <th className="px-4 py-3">Correo</th>
  <th className="px-4 py-3">Banco</th>
+ <th className="px-4 py-3">Tipo</th>
  <th className="px-4 py-3">N° Cuenta</th>
  <th className="px-4 py-3 w-16"></th>
  </tr>
@@ -264,6 +266,13 @@ export default function PagosDashboard() {
  <Input {...bankForm.register(`accounts.${index}.bankName`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Banco" />
  ) : (
  <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.bankName`) || '-'}</span>
+ )}
+ </td>
+ <td className="px-4 py-2">
+ {isEditing ? (
+ <Input {...bankForm.register(`accounts.${index}.accountType`)} className="h-9 text-base text-zinc-900 font-medium" placeholder="Tipo (ej. Cuenta Corriente)" />
+ ) : (
+ <span className="text-base font-medium text-zinc-900">{bankForm.getValues(`accounts.${index}.accountType`) || '-'}</span>
  )}
  </td>
  <td className="px-4 py-2">
@@ -316,7 +325,7 @@ export default function PagosDashboard() {
  variant="outline" 
  size="sm" 
  onClick={() => {
- appendAccount({ accountName: '', accountDetails: '', bankName: '', rut: '', email: '' });
+ appendAccount({ accountName: '', accountDetails: '', bankName: '', rut: '', email: '', accountType: '' });
  setEditingIndex(accountFields.length);
  }}
  className="text-sm font-bold text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"

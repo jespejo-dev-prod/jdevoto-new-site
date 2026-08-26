@@ -416,6 +416,7 @@ function generateOrderHtml(
                   ${bankConfig.accounts.map((acc: any) => `
                     <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 10px;">
                       ${acc.bankName ? `<div style="margin-bottom: 4px;"><strong>Banco:</strong> ${acc.bankName}</div>` : ''}
+                      ${acc.accountType ? `<div style="margin-bottom: 4px;"><strong>Tipo de cuenta:</strong> ${acc.accountType}</div>` : ''}
                       ${acc.accountDetails ? `<div style="margin-bottom: 4px;"><strong>Cuenta:</strong> ${acc.accountDetails}</div>` : ''}
                       ${acc.accountName ? `<div style="margin-bottom: 4px;"><strong>Titular:</strong> ${acc.accountName}</div>` : ''}
                       ${acc.rut ? `<div style="margin-bottom: 4px;"><strong>RUT:</strong> ${acc.rut}</div>` : ''}
