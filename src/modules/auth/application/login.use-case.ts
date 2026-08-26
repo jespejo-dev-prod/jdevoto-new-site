@@ -40,7 +40,7 @@ export async function loginUseCase({ email, password }: LoginInput) {
       where: { id: user.id },
       data: {
         failedLoginAttempts: newAttempts,
-        lockedUntil: newAttempts >= 8 ? new Date(Date.now() + lockDurationMs) : null
+        lockedUntil: newAttempts >= 10 ? new Date(Date.now() + lockDurationMs) : null
       }
     });
 
