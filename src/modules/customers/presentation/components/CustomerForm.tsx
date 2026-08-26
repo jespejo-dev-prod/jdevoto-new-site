@@ -191,6 +191,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
     const termToDiscount: Record<number, number> = {
       0: 10,
       30: 7,
+      31: 10,
       60: 4,
       90: 0
     };
@@ -452,7 +453,8 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none appearance-none font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value={0}>Contado (0 días)</option>
-                    <option value={30}>30 días</option>
+                    <option value={30}>30 días (7% Dcto)</option>
+                    <option value={31}>30 días, 10% Dcto</option>
                     <option value={60}>60 días</option>
                     <option value={90}>90 días</option>
                   </select>
