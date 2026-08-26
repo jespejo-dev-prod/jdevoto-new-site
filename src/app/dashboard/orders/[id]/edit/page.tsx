@@ -14,13 +14,13 @@ export default function EditOrderPage() {
  return (
  <div className="flex flex-col items-center justify-center py-24 gap-4">
  <Loader2 className="h-10 w-10 text-primary animate-spin" />
- <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Cargando borrador...</p>
+ <p className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Cargando...</p>
  </div>
  );
  }
 
  if (!order) {
- return <div className="p-8 text-center text-zinc-500">Borrador no encontrado.</div>;
+ return <div className="p-8 text-center text-zinc-500">Pedido no encontrado.</div>;
  }
 
  return (
@@ -34,7 +34,7 @@ export default function EditOrderPage() {
  Volver al expediente
  </Link>
  <h1 className="text-3xl font-bold text-white tracking-tight">
- Editar Borrador #{order.orderNumber.split('-').pop()}
+ {order.status === 'DRAFT' ? 'Editar Borrador' : 'Editar Pedido'} #{order.orderNumber.split('-').pop()}
  </h1>
  </div>
 

@@ -168,11 +168,11 @@ export default function OrderDetailPage() {
  </div>
 
  <div className="flex items-center gap-3 no-print">
- {order.status === OrderStatus.DRAFT && (
+ {((order.status === OrderStatus.DRAFT) || (isAdmin && ![OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REJECTED].includes(order.status))) && (
  <Link href={`/dashboard/orders/${id}/edit`}>
  <button className="px-6 py-3 bg-zinc-800 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all shadow-xl flex items-center gap-2 cursor-pointer">
  <Pencil className="h-4 w-4 text-primary" />
- Editar Borrador
+ {order.status === OrderStatus.DRAFT ? "Editar Borrador" : "Editar Pedido"}
  </button>
  </Link>
  )}

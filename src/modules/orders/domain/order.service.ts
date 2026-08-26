@@ -533,16 +533,15 @@ export class OrderService {
 
     if (!order) throw new NotFoundError("Pedido", orderId);
 
-    // Si el pedido NO es DRAFT, restringimos qué se puede editar
-    // (Por ahora permitimos editar todo si es DRAFT, para otros estados solo notas/status)
-    if (order.status !== OrderStatus.DRAFT && input.items) {
+    const nonEditableStatuses = [OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REJECTED];
+    if (nonEditableStatuses.includes(order.status) && input.items) {
       throw new BusinessRuleError(
-        "No se pueden editar los ítems de un pedido que ya no es Borrador.",
+        `No se pueden editar los ítems de un pedido en estado ${order.status}.`,
         "UPDATE_NOT_ALLOWED"
       );
     }
 
-    return await prisma.$transaction(async (tx) => {
+    const updatedOrderTransaction = await prisma.$transaction(async (tx) => {
       // 1. Revertir efectos del pedido actual (Stock y Crédito)
       await this.reverseOrderEffects(tx, orderId);
 
@@ -664,6 +663,32 @@ export class OrderService {
 
       return updatedOrder;
     });
+
+    if (updatedOrderTransaction.status !== OrderStatus.DRAFT) {
+      try {
+        const populatedOrder = await prisma.order.findUnique({
+          where: { id: orderId },
+          include: {
+            items: { include: { product: { select: { sku: true, name: true } } } },
+            company: { select: { razonSocial: true, rut: true, telefono: true, giro: true, email: true, billingEmail: true } },
+            createdBy: { select: { phone: true, firstName: true, lastName: true, email: true } },
+            salesRep: { select: { email: true, firstName: true, lastName: true, phone: true } },
+          }
+        });
+        if (populatedOrder) {
+          const { sendOrderStatusUpdateEmail } = await import('@/lib/email');
+          let customerEmail = (populatedOrder.billingAddress as any)?.email;
+          if (!customerEmail) {
+            customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
+          }
+          await sendOrderStatusUpdateEmail(populatedOrder, customerEmail);
+        }
+      } catch (err) {
+        console.error("Error al enviar correo de actualización de pedido:", err);
+      }
+    }
+
+    return updatedOrderTransaction;
   }
 
   /**
