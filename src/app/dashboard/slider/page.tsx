@@ -198,37 +198,6 @@ export default function SliderPage() {
  setSlides(slides.map(s => s.id === id ? { ...s, [field]: value } : s));
  };
 
- // Handle file upload
- const handleFileUpload = async (id: string, file: File) => {
- if (!accessToken) return;
-
- setUploadingId(id);
- const formData = new FormData();
- formData.append("file", file);
-
- try {
- const response = await fetch("/api/upload/slides", {
- method:"POST",
- headers: {
-"Authorization": `Bearer ${accessToken}`
- },
- body: formData
- });
-
- const data = await response.json();
- if (response.ok && data.url) {
- handleFieldChange(id,"image", data.url);
- toast.success("Imagen de fondo subida con éxito.");
- } else {
- throw new Error(data.error ||"Fallo en la subida.");
- }
- } catch (err: any) {
- console.error("Error uploading slide image:", err);
- toast.error(err.message ||"Error al subir la imagen. Asegúrate de que sea JPG/PNG/WEBP.");
- } finally {
- setUploadingId(null);
- }
- };
 
  if (isLoading) {
  return (
