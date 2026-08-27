@@ -510,6 +510,7 @@ export default function SliderPage() {
   <MediaGalleryModal
     isOpen={activeMediaSelector !== null}
     onClose={() => setActiveMediaSelector(null)}
+    accessToken={accessToken || undefined}
     onSelect={(url, publicId) => {
       if (activeMediaSelector) {
         handleFieldChange(activeMediaSelector.slideId, activeMediaSelector.field, url);

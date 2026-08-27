@@ -5,7 +5,7 @@ import { X, Search, Trash2, Image as ImageIcon, Loader2, UploadCloud, Folder } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { CldUploadWidget } from "next-cloudinary";
+
 
 interface MediaResource {
   publicId: string;
@@ -23,9 +23,10 @@ interface MediaGalleryModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (url: string, publicId: string) => void;
+  accessToken?: string;
 }
 
-export function MediaGalleryModal({ isOpen, onClose, onSelect }: MediaGalleryModalProps) {
+export function MediaGalleryModal({ isOpen, onClose, onSelect, accessToken }: MediaGalleryModalProps) {
   const [activeTab, setActiveTab] = useState<'library' | 'upload'>('library');
   const [resources, setResources] = useState<MediaResource[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -210,27 +211,48 @@ export function MediaGalleryModal({ isOpen, onClose, onSelect }: MediaGalleryMod
                 <p className="text-zinc-400 mb-8 text-sm">
                   Se recomienda usar formato panorámico (ej. 1440x580) para escritorio y cuadrado (ej. 1080x1080) para móviles. Máximo 10MB.
                 </p>
-                <CldUploadWidget 
-                  uploadPreset="jdevoto_preset"
-                  options={{
-                    folder: 'jdevoto',
-                    maxFiles: 1,
-                    clientAllowedFormats: ["jpg", "jpeg", "png", "webp", "avif"],
-                    maxFileSize: 10485760, // 10MB
-                  }}
-                  onSuccess={(result: any) => {
-                    if (result.info) {
-                      toast.success("Imagen subida con éxito");
-                      onSelect(result.info.secure_url, result.info.public_id);
-                    }
-                  }}
-                >
-                  {({ open }) => (
-                    <Button onClick={() => open()} className="bg-primary hover:bg-primary/90 text-white font-bold h-12 px-8 rounded-xl w-full">
-                      Seleccionar archivo...
-                    </Button>
-                  )}
-                </CldUploadWidget>
+                <div className="relative">
+                  <input 
+                    type="file"
+                    accept="image/jpeg, image/png, image/webp"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file || !accessToken) return;
+                      
+                      setIsLoading(true);
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      
+                      try {
+                        const res = await fetch("/api/upload/slides", {
+                          method: "POST",
+                          headers: { "Authorization": `Bearer ${accessToken}` },
+                          body: formData
+                        });
+                        const data = await res.json();
+                        
+                        if (res.ok && data.url) {
+                          toast.success("Imagen subida con éxito");
+                          // Volver a cargar la galería para que aparezca la nueva imagen
+                          fetchMedia(undefined, true);
+                          // Seleccionar automáticamente
+                          onSelect(data.url, '');
+                        } else {
+                          throw new Error(data.error || "Fallo en la subida");
+                        }
+                      } catch (err: any) {
+                        toast.error(err.message || "Error al subir la imagen");
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                  />
+                  <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-12 px-8 rounded-xl w-full pointer-events-none">
+                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                    {isLoading ? "Subiendo..." : "Seleccionar archivo..."}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
