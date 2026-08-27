@@ -136,10 +136,9 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
   });
 
   // Invalidar caché del frontend para que el cambio de stock/precio se vea de inmediato
-  const { revalidatePath } = require("next/cache");
+  const { revalidatePath, revalidateTag } = require("next/cache");
   revalidatePath(`/products/${updated.slug}`);
-  revalidatePath("/"); // Por si aparece en los carruseles del home
-  revalidatePath("/(store)", "layout"); // Invalidar las páginas del store
+  revalidateTag("products");
 
   return ok(serializeDecimal(updated));
 });

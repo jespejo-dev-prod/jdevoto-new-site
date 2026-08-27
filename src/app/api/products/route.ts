@@ -296,5 +296,8 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     req,
   });
 
+  const { revalidateTag } = require("next/cache");
+  revalidateTag("products");
+
   return created(product);
 });

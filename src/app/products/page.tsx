@@ -19,7 +19,7 @@ import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 
 // ISR: shell estático cacheado, grid via streaming con Suspense.
-export const revalidate = 60;
+export const revalidate = 86400;
 
 import { getServerUser } from '@/lib/server-auth';
 import { PublicHeader } from '@/components/layout/public-header';

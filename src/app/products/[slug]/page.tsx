@@ -51,7 +51,7 @@ interface ProductPageProps {
 
 // ISR: 1 hora — datos de producto son estables.
 // generateStaticParams pre-construye todas las URLs en build.
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 /**
  * generateStaticParams

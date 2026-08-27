@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 
 // ISR: regenera la home cada 5 minutos en Vercel Edge.
 // Googlebot recibe HTML pre-generado (TTFB < 50ms).
-export const revalidate = 300;
+export const revalidate = 86400;
 
 import { prisma } from '@/lib/client';
 import { priceService } from '@/modules/pricing/domain/price.service';

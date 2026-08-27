@@ -128,5 +128,5 @@ export const getCatalogFiltersUseCase = unstable_cache(
     return { categories, brands };
   },
   ['catalog-filters-dynamic-v2'],
-  { revalidate: 3600, tags: ['categories', 'brands', 'products'] }
+  { revalidate: 86400, tags: ['categories', 'brands', 'products'] }
 );

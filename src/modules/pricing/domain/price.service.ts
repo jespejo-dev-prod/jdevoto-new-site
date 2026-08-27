@@ -228,7 +228,7 @@ export class PriceService {
       return await unstable_cache(
         fetchFn,
         [`price-lists-${cacheKey}`],
-        { revalidate: 300, tags: ["price-lists"] }
+        { revalidate: 86400, tags: ["price-lists"] }
       )();
     } catch (error: any) {
       if (error?.message?.includes("incrementalCache")) {
@@ -255,7 +255,7 @@ export class PriceService {
       return await unstable_cache(
         fetchFn,
         ["promotions-active"],
-        { revalidate: 300, tags: ["promotions"] }
+        { revalidate: 86400, tags: ["promotions"] }
       )();
     } catch (error: any) {
       if (error?.message?.includes("incrementalCache")) {
@@ -279,7 +279,7 @@ export class PriceService {
       return await unstable_cache(
         fetchFn,
         [`company-discount-${companyId}`],
-        { revalidate: 300, tags: ["companies"] }
+        { revalidate: 86400, tags: ["companies"] }
       )();
     } catch (error: any) {
       if (error?.message?.includes("incrementalCache")) {
@@ -306,7 +306,7 @@ export class PriceService {
       return await unstable_cache(
         fetchFn,
         ["category-parent-map"],
-        { revalidate: 300, tags: ["categories"] }
+        { revalidate: 86400, tags: ["categories"] }
       )();
     } catch (error: any) {
       if (error?.message?.includes("incrementalCache")) {
@@ -349,7 +349,7 @@ export class PriceService {
       return await unstable_cache(
         fetchFn,
         ["category-outlet-map"],
-        { revalidate: 300, tags: ["categories"] }
+        { revalidate: 86400, tags: ["categories"] }
       )();
     } catch (error: any) {
       if (error?.message?.includes("incrementalCache")) {

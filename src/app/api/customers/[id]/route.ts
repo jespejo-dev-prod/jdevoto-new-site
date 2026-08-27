@@ -136,6 +136,10 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
     req,
   });
 
+  const { revalidateTag } = require("next/cache");
+  revalidateTag("companies");
+  revalidateTag("price-lists");
+
   return ok(updated);
 });
 
