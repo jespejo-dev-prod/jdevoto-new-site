@@ -30,10 +30,15 @@ interface HomeSlide {
  description: string;
  cta?: string;
  href?: string;
+ imageClass?: string;
  imagePositionX?: number;
  imageScale?: number;
  hideOverlay?: boolean;
  textAnimation?: 'slide-up' | 'slide-left' | 'fade' | 'zoom' | 'none';
+ mobileImage?: string;
+ imagePublicId?: string;
+ mobileImagePublicId?: string;
+ altText?: string;
 }
 
 const DEFAULT_SLIDES: HomeSlide[] = [
@@ -63,6 +68,8 @@ const DEFAULT_SLIDES: HomeSlide[] = [
  }
 ];
 
+import { MediaGalleryModal } from "@/components/dashboard/MediaGalleryModal";
+
 export default function SliderPage() {
  const { accessToken } = useAuth();
  const { fetcher } = useApi();
@@ -70,7 +77,7 @@ export default function SliderPage() {
  const [slides, setSlides] = useState<HomeSlide[]>([]);
  const [isLoading, setIsLoading] = useState(true);
  const [isSaving, setIsSaving] = useState(false);
- const [uploadingId, setUploadingId] = useState<string | null>(null);
+ const [activeMediaSelector, setActiveMediaSelector] = useState<{ slideId: string, field: 'image' | 'mobileImage' } | null>(null);
 
  // Load slides on mount
  useEffect(() => {
@@ -413,34 +420,63 @@ export default function SliderPage() {
  </div>
 
  <div className="space-y-3">
- <Input
- value={slide.image}
- onChange={(e) => handleFieldChange(slide.id,"image", e.target.value)}
- placeholder="URL de la imagen..."
- className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-10 text-sm focus:border-primary/50"
- />
- 
- <Label 
- className={`w-full h-10 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-900 text-zinc-300 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wider cursor-pointer transition-all ${
- uploadingId === slide.id ?"opacity-50 pointer-events-none" :""
- }`}
- >
- {uploadingId === slide.id ? (
- <Loader2 className="h-3.5 w-3.5 animate-spin" />
- ) : (
- <Upload className="h-3.5 w-3.5" />
- )}
- {uploadingId === slide.id ?"Subiendo..." :"Subir Archivo"}
- <input
- type="file"
- accept="image/*"
- onChange={(e) => {
- const file = e.target.files?.[0];
- if (file) handleFileUpload(slide.id, file);
- }}
- className="hidden"
- />
- </Label>
+ <div className="space-y-3">
+  {/* Desktop Image Field */}
+  <div className="flex flex-col gap-2 p-3 bg-zinc-900/50 rounded-xl border border-zinc-800/80">
+    <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+      Imagen para Computadoras
+      <span className="text-[9px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">1440x580</span>
+    </Label>
+    <Input
+      value={slide.image}
+      onChange={(e) => handleFieldChange(slide.id,"image", e.target.value)}
+      placeholder="URL de la imagen..."
+      className="bg-zinc-950 border-zinc-800 text-white rounded-lg h-9 text-xs focus:border-primary/50"
+    />
+    <Button 
+      variant="outline"
+      onClick={() => setActiveMediaSelector({ slideId: slide.id, field: 'image' })}
+      className="w-full h-9 rounded-lg border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold uppercase tracking-wider"
+    >
+      <Upload className="h-3.5 w-3.5 mr-2" />
+      Seleccionar Imagen
+    </Button>
+  </div>
+
+  {/* Mobile Image Field */}
+  <div className="flex flex-col gap-2 p-3 bg-zinc-900/50 rounded-xl border border-zinc-800/80">
+    <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+      Imagen para Celulares
+      <span className="text-[9px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">Opcional (1080x1080)</span>
+    </Label>
+    <Input
+      value={slide.mobileImage || ''}
+      onChange={(e) => handleFieldChange(slide.id,"mobileImage", e.target.value)}
+      placeholder="URL de la imagen..."
+      className="bg-zinc-950 border-zinc-800 text-white rounded-lg h-9 text-xs focus:border-primary/50"
+    />
+    <Button 
+      variant="outline"
+      onClick={() => setActiveMediaSelector({ slideId: slide.id, field: 'mobileImage' })}
+      className="w-full h-9 rounded-lg border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold uppercase tracking-wider"
+    >
+      <Upload className="h-3.5 w-3.5 mr-2" />
+      Seleccionar Imagen Móvil
+    </Button>
+  </div>
+
+  {/* Alt Text Field */}
+  <div className="flex flex-col gap-2 pt-2">
+    <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+      Texto Alternativo SEO (Alt)
+    </Label>
+    <Input
+      value={slide.altText || ''}
+      onChange={(e) => handleFieldChange(slide.id,"altText", e.target.value)}
+      placeholder="Ej: Tenida Marquis Exclusiva en Ripley"
+      className="bg-zinc-950 border-zinc-800 text-white rounded-xl h-10 text-sm focus:border-primary/50"
+    />
+  </div>
 
  {slide.image && (
  <div className="space-y-3 pt-2 border-t border-zinc-800/60">
@@ -501,6 +537,18 @@ export default function SliderPage() {
  )}
 
  </div>
+
+  <MediaGalleryModal
+    isOpen={activeMediaSelector !== null}
+    onClose={() => setActiveMediaSelector(null)}
+    onSelect={(url, publicId) => {
+      if (activeMediaSelector) {
+        handleFieldChange(activeMediaSelector.slideId, activeMediaSelector.field, url);
+        handleFieldChange(activeMediaSelector.slideId, activeMediaSelector.field === 'image' ? 'imagePublicId' : 'mobileImagePublicId', publicId);
+        setActiveMediaSelector(null);
+      }
+    }}
+  />
  </RoleGuard>
  );
 }

@@ -27,6 +27,8 @@ interface SlideItem {
   imageScale?: number;
   hideOverlay?: boolean;
   textAnimation?: 'slide-up' | 'slide-left' | 'fade' | 'zoom' | 'none';
+  mobileImage?: string;
+  altText?: string;
 }
 
 const iconMap: Record<string, any> = {
@@ -110,7 +112,9 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
           imagePositionX: s.imagePositionX,
           imageScale: s.imageScale,
           hideOverlay: s.hideOverlay,
-          textAnimation: s.textAnimation || 'slide-up'
+          textAnimation: s.textAnimation || 'slide-up',
+          mobileImage: s.mobileImage,
+          altText: s.altText
         };
       });
     }
@@ -177,7 +181,7 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
 
   return (
     <div 
-      className="relative h-[420px] md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group touch-pan-y"
+      className="relative aspect-square sm:aspect-[4/5] md:aspect-auto md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group touch-pan-y"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -208,23 +212,57 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
               key={slide.id || idx}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100' : 'opacity-0'}`}
             >
-              <Image
-                src={slide.image}
-                alt={slide.title}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
-                className={`${slide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-85 md:opacity-95'} ${safeImageClass}`}
-                priority={idx === 0}
-                quality={60}
-                fetchPriority={idx === 0 ? "high" : "auto"}
-                style={
-                  hasInlineTransform
-                    ? {
-                        transform: `scale(${(slide.imageScale || 100) / 100}) translateX(${slide.imagePositionX || 0}%)`
-                      }
-                    : undefined
-                }
-              />
+              {slide.mobileImage ? (
+                <>
+                  {/* Mobile Image */}
+                  <Image
+                    src={slide.mobileImage}
+                    alt={slide.altText || slide.title || "Banner"}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 1px"
+                    className={`${slide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-85'} md:hidden ${safeImageClass}`}
+                    priority={idx === 0}
+                    quality={60}
+                    fetchPriority={idx === 0 ? "high" : "auto"}
+                  />
+                  {/* Desktop Image */}
+                  <Image
+                    src={slide.image}
+                    alt={slide.altText || slide.title || "Banner"}
+                    fill
+                    sizes="(max-width: 768px) 1px, (max-width: 1200px) 100vw, 1440px"
+                    className={`${slide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-95'} hidden md:block ${safeImageClass}`}
+                    priority={idx === 0}
+                    quality={60}
+                    fetchPriority={idx === 0 ? "high" : "auto"}
+                    style={
+                      hasInlineTransform
+                        ? {
+                            transform: `scale(${(slide.imageScale || 100) / 100}) translateX(${slide.imagePositionX || 0}%)`
+                          }
+                        : undefined
+                    }
+                  />
+                </>
+              ) : (
+                <Image
+                  src={slide.image}
+                  alt={slide.altText || slide.title || "Banner"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
+                  className={`${slide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-85 md:opacity-95'} ${safeImageClass}`}
+                  priority={idx === 0}
+                  quality={60}
+                  fetchPriority={idx === 0 ? "high" : "auto"}
+                  style={
+                    hasInlineTransform
+                      ? {
+                          transform: `scale(${(slide.imageScale || 100) / 100}) translateX(${slide.imagePositionX || 0}%)`
+                        }
+                      : undefined
+                  }
+                />
+              )}
               {!slide.hideOverlay && (
                 <>
                   <div className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-100/90 to-transparent hidden md:block" />
@@ -349,7 +387,7 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
         <Link 
           href={activeSlide.href} 
           className="absolute inset-0 z-[15] opacity-0"
-          aria-label={activeSlide.title || "Ver más"}
+          aria-label={activeSlide.altText || activeSlide.title || "Ver más"}
           draggable={false}
         />
       )}
