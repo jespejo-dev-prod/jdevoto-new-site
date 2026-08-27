@@ -74,7 +74,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'publicId is required' }, { status: 400 });
     }
 
-    const settings = await prisma.setting.findUnique({
+    const settings = await prisma.storeSettings.findUnique({
       where: { key: 'home_slides' }
     });
 

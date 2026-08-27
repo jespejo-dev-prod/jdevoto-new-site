@@ -516,6 +516,8 @@ export default function SliderPage() {
  </div>
  </div>
  </div>
+ </div>
+ </div>
  ))}
  </div>
 
