@@ -27,7 +27,7 @@ export function AdminDashboard() {
   const { data, isLoading } = useQuery({
     queryKey: ['operational-dashboard'],
     queryFn: () => fetcher('/api/dashboard/operational'),
-    refetchInterval: 30000, // Refresh every 30 seconds
+    // Eliminado refetchInterval: 30000 para no agotar las horas de Neon
   });
 
   const formatCurrency = (val: number) => 

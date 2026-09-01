@@ -28,7 +28,7 @@ export function NotificationBell() {
  const { data: result } = useQuery({
  queryKey: ['notifications'],
  queryFn: () => fetcher('/api/notifications'),
- refetchInterval: 30000, // Refrescar cada 30 segundos
+ // Eliminado refetchInterval: 30000 para no agotar las horas de Neon
  });
 
  const markAsReadMutation = useMutation({

@@ -17,7 +17,7 @@ export function SalesRepDashboard() {
   const { data, isLoading } = useQuery({
     queryKey: ['sales-rep-operational-dashboard'],
     queryFn: () => fetcher('/api/dashboard/operational'),
-    refetchInterval: 30000,
+    // Eliminado refetchInterval: 30000 para no agotar las horas de Neon
   });
 
   const formatCurrency = (val: number) => 
