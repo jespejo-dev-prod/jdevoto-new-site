@@ -65,7 +65,8 @@ export const ProductCard = memo(function ProductCard({
     <div className={cardClasses}>
       {/* Overlay Link - Hace que toda la card sea clickeable */}
       <Link 
-        href={linkHref} 
+        href={linkHref}
+        prefetch={false}
         onClick={() => {
           if (!isDashboard) {
             trackProductClick(product.id, product.sku);
