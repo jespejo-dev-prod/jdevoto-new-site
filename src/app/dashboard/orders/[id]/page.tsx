@@ -234,19 +234,44 @@ export default function OrderDetailPage() {
  <p className="text-sm text-zinc-400 font-medium uppercase tracking-wide">{(order.shippingAddress as any).comuna}, {(order.shippingAddress as any).region}</p>
  
  {/* Modalidad de Despacho y Transporte */}
- {((order.shippingAddress as any).shippingMethod || (order.shippingAddress as any).courier) && (
+ {order.shippingAddress && (
    <div className="mt-3 pt-3 border-t border-zinc-800/50 space-y-1">
-     {((order.shippingAddress as any).shippingMethod || (order.shippingAddress as any).courier === 'FLETE INCLUIDO') && (
-       <>
-         <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider">Modalidad de Despacho</p>
-         <p className="text-sm text-emerald-400 font-medium">
-           {((order.shippingAddress as any).shippingMethod === 'free' || (order.shippingAddress as any).courier === 'FLETE INCLUIDO') 
-             ? 'Flete Incluido (Gratis)' 
-             : ((order.shippingAddress as any).shippingMethod === 'client_pays' ? 'Flete por Pagar (Cliente)' : 'Flete por Pagar (Cliente)')}
+     <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider">Modalidad de Despacho</p>
+     {(() => {
+       const ship = order.shippingAddress as any;
+       let method = ship.shippingMethod;
+       
+       // Si es un pedido antiguo sin shippingMethod guardado, lo inferimos igual que en el checkout
+       if (!method) {
+         if (ship.courier === 'FLETE INCLUIDO') {
+           method = 'free';
+         } else if (ship.region && ship.comuna) {
+           const r = ship.region.toUpperCase();
+           const c = ship.comuna.toUpperCase();
+           let min = 250000;
+           if (c.includes("JUAN FERNANDEZ") || c.includes("ISLA DE PASCUA")) {
+             method = 'client_pays'; // Insular nunca es gratis
+           } else {
+             if (r.includes("AYSEN") || r.includes("MAGALLANES") || c.includes("PUNTA ARENAS") || c.includes("NATALES") || c.includes("COIHAIQUE") || c.includes("COCHRANE") || c.includes("PORVENIR") || c.includes("CISNES")) min = 1000000;
+             else if (r.includes("TARAPACA") || r.includes("ARICA") || c.includes("ARICA") || c.includes("IQUIQUE") || c.includes("CALAMA")) min = 500000;
+             else if (r.includes("METROPOLITANA") || r.includes("VALPARAISO")) min = 100000;
+             
+             method = Number(order.subtotalNet) >= min ? 'free' : 'client_pays';
+           }
+         } else {
+           method = 'client_pays'; // Fallback por defecto si no hay info
+         }
+       }
+
+       const isFree = method === 'free';
+       return (
+         <p className={`text-sm font-medium ${isFree ? 'text-emerald-400' : 'text-zinc-300'}`}>
+           {isFree ? 'Flete Incluido (Gratis)' : 'Flete por Pagar (Cliente)'}
          </p>
-       </>
-     )}
-     {((order.shippingAddress as any).courier && (order.shippingAddress as any).courier !== 'FLETE INCLUIDO') && (
+       );
+     })()}
+
+     {((order.shippingAddress as any).courier && (order.shippingAddress as any).courier !== 'FLETE INCLUIDO' && (order.shippingAddress as any).courier !== 'POR PAGAR') && (
        <>
          <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider mt-2">Transporte</p>
          <p className="text-sm text-white font-medium">{(order.shippingAddress as any).courier}</p>

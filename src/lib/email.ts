@@ -215,6 +215,26 @@ function generateOrderHtml(
   const createdBy = order.createdBy || {};
   const items = order.items || [];
   const shipping = order.shippingAddress || {};
+  
+  if (shipping.street && !shipping.shippingMethod) {
+    if (shipping.courier === 'FLETE INCLUIDO') {
+      shipping.shippingMethod = 'free';
+    } else if (shipping.region && shipping.comuna) {
+      const r = shipping.region.toUpperCase();
+      const c = shipping.comuna.toUpperCase();
+      let min = 250000;
+      if (c.includes("JUAN FERNANDEZ") || c.includes("ISLA DE PASCUA")) {
+        shipping.shippingMethod = 'client_pays';
+      } else {
+        if (r.includes("AYSEN") || r.includes("MAGALLANES") || c.includes("PUNTA ARENAS") || c.includes("NATALES") || c.includes("COIHAIQUE") || c.includes("COCHRANE") || c.includes("PORVENIR") || c.includes("CISNES")) min = 1000000;
+        else if (r.includes("TARAPACA") || r.includes("ARICA") || c.includes("ARICA") || c.includes("IQUIQUE") || c.includes("CALAMA")) min = 500000;
+        else if (r.includes("METROPOLITANA") || r.includes("VALPARAISO")) min = 100000;
+        shipping.shippingMethod = Number(order.subtotalNet) >= min ? 'free' : 'client_pays';
+      }
+    } else {
+      shipping.shippingMethod = 'client_pays';
+    }
+  }
 
   const discountAmount = Number(order.discountAmount) || 0;
   const totalNet = Number(order.subtotalNet) || 0;
@@ -435,20 +455,16 @@ function generateOrderHtml(
                     ${shipping.comuna || ''}, ${shipping.region || ''}
                   </p>
                   
-                  ${(shipping.shippingMethod || shipping.courier) ? `
                   <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
-                    ${(shipping.shippingMethod || shipping.courier === 'FLETE INCLUIDO') ? `
-                      <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155; font-size: 13px;">Modalidad de Despacho</p>
-                      <p style="margin: 0; color: #16a34a; font-weight: 600;">
-                        ${(shipping.shippingMethod === 'free' || shipping.courier === 'FLETE INCLUIDO') ? 'Flete Incluido (Gratis)' : (shipping.shippingMethod === 'client_pays' ? 'Flete por Pagar (Cliente)' : 'Flete por Pagar (Cliente)')}
-                      </p>
-                    ` : ''}
-                    ${(shipping.courier && shipping.courier !== 'FLETE INCLUIDO') ? `
+                    <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155; font-size: 13px;">Modalidad de Despacho</p>
+                    <p style="margin: 0; color: ${shipping.shippingMethod === 'free' ? '#16a34a' : '#64748b'}; font-weight: 600;">
+                      ${shipping.shippingMethod === 'free' ? 'Flete Incluido (Gratis)' : 'Flete por Pagar (Cliente)'}
+                    </p>
+                    ${(shipping.courier && shipping.courier !== 'FLETE INCLUIDO' && shipping.courier !== 'POR PAGAR') ? `
                       <p style="margin: 8px 0 4px 0; font-weight: 700; color: #334155; font-size: 13px;">Transporte</p>
                       <p style="margin: 0; color: #475569;">${shipping.courier}</p>
                     ` : ''}
                   </div>
-                  ` : ''}
                   
                   ${shipping.details ? `
                     <p style="margin: 12px 0 0 0; font-style: italic; color: #64748b; font-size: 12px;">"${shipping.details}"</p>
