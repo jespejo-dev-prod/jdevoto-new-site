@@ -861,6 +861,7 @@ export default function CheckoutPage() {
                                         <option value="Blue Express">Blue Express</option>
                                         <option value="Pullman Cargo">Pullman Cargo</option>
                                         <option value="Varmontt">Varmontt</option>
+                                        <option value="Fedex">Fedex</option>
 
                                         <option value="otro">Otro (Especificar...)</option>
                                      </select>

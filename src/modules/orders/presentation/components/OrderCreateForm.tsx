@@ -69,7 +69,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
   );
 
   const [selectedCourier, setSelectedCourier] = useState<string>(
-    initialData?.shippingAddress?.courier && ['Starken', 'Chilexpress', 'Blue Express', 'Pullman Cargo', 'Varmontt'].includes(initialData.shippingAddress.courier)
+    initialData?.shippingAddress?.courier && ['Starken', 'Chilexpress', 'Blue Express', 'Pullman Cargo', 'Varmontt', 'Fedex'].includes(initialData.shippingAddress.courier)
       ? initialData.shippingAddress.courier
       : initialData?.shippingAddress?.courier === 'FLETE INCLUIDO' || initialData?.shippingAddress?.shippingMethod === 'free'
         ? ''
@@ -79,7 +79,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
   );
 
   const [customCourier, setCustomCourier] = useState<string>(
-    initialData?.shippingAddress?.courier && !['Starken', 'Chilexpress', 'Blue Express', 'Pullman Cargo', 'Varmontt', 'FLETE INCLUIDO', 'POR PAGAR'].includes(initialData.shippingAddress.courier)
+    initialData?.shippingAddress?.courier && !['Starken', 'Chilexpress', 'Blue Express', 'Pullman Cargo', 'Varmontt', 'Fedex', 'FLETE INCLUIDO', 'POR PAGAR'].includes(initialData.shippingAddress.courier)
       ? initialData.shippingAddress.courier
       : ''
   );
@@ -1306,6 +1306,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                           <option value="Blue Express">Blue Express</option>
                           <option value="Pullman Cargo">Pullman Cargo</option>
                           <option value="Varmontt">Varmontt</option>
+                          <option value="Fedex">Fedex</option>
 
                           <option value="otro">Otro (Especificar...)</option>
                         </select>
