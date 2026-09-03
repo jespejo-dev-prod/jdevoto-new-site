@@ -378,6 +378,11 @@ export async function notifyAdminAction(action: AuditAction, userId?: string, de
     targetEmail = process.env.TECH_ADMIN_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL;
   }
 
+  // Redirigir notificaciones de usuarios a logweb@jdevoto.cl para no saturar ventas
+  if (action === "PASSWORD_RESET_COMPLETED" || action === "USER_REGISTERED") {
+    targetEmail = "logweb@jdevoto.cl";
+  }
+
   try {
     await sendNotificationEmail(
       targetEmail,
