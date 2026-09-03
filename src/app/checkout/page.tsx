@@ -856,12 +856,12 @@ export default function CheckoutPage() {
                                         className="w-full h-12 rounded-xl border border-zinc-200 px-4 pr-10 text-sm font-semibold text-zinc-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-zinc-50 cursor-pointer appearance-none"
                                      >
                                         <option value="" className="text-zinc-500">Selecciona un transporte...</option>
+                                        <option value="Fedex">Fedex</option>
                                         <option value="Starken">Starken</option>
                                         <option value="Chilexpress">Chilexpress</option>
                                         <option value="Blue Express">Blue Express</option>
                                         <option value="Pullman Cargo">Pullman Cargo</option>
                                         <option value="Varmontt">Varmontt</option>
-                                        <option value="Fedex">Fedex</option>
 
                                         <option value="otro">Otro (Especificar...)</option>
                                      </select>

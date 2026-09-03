@@ -1301,12 +1301,12 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                           className="w-full h-12 bg-zinc-950 border border-zinc-800 rounded-xl px-4 pr-10 text-sm font-semibold text-white outline-none focus:border-primary/50 cursor-pointer appearance-none"
                         >
                           <option value="" className="text-zinc-500">Selecciona un transporte...</option>
+                          <option value="Fedex">Fedex</option>
                           <option value="Starken">Starken</option>
                           <option value="Chilexpress">Chilexpress</option>
                           <option value="Blue Express">Blue Express</option>
                           <option value="Pullman Cargo">Pullman Cargo</option>
                           <option value="Varmontt">Varmontt</option>
-                          <option value="Fedex">Fedex</option>
 
                           <option value="otro">Otro (Especificar...)</option>
                         </select>
