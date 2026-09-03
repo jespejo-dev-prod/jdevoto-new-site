@@ -435,16 +435,20 @@ function generateOrderHtml(
                     ${shipping.comuna || ''}, ${shipping.region || ''}
                   </p>
                   
+                  ${(shipping.shippingMethod || shipping.courier) ? `
                   <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
-                    <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155; font-size: 13px;">Modalidad de Despacho</p>
-                    <p style="margin: 0; color: #16a34a; font-weight: 600;">
-                      ${shipping.shippingMethod === 'free' ? 'Flete Incluido (Gratis)' : 'Flete por Pagar (Cliente)'}
-                    </p>
-                    ${shipping.courier ? `
+                    ${(shipping.shippingMethod || shipping.courier === 'FLETE INCLUIDO') ? `
+                      <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155; font-size: 13px;">Modalidad de Despacho</p>
+                      <p style="margin: 0; color: #16a34a; font-weight: 600;">
+                        ${(shipping.shippingMethod === 'free' || shipping.courier === 'FLETE INCLUIDO') ? 'Flete Incluido (Gratis)' : (shipping.shippingMethod === 'client_pays' ? 'Flete por Pagar (Cliente)' : 'Flete por Pagar (Cliente)')}
+                      </p>
+                    ` : ''}
+                    ${(shipping.courier && shipping.courier !== 'FLETE INCLUIDO') ? `
                       <p style="margin: 8px 0 4px 0; font-weight: 700; color: #334155; font-size: 13px;">Transporte</p>
                       <p style="margin: 0; color: #475569;">${shipping.courier}</p>
                     ` : ''}
                   </div>
+                  ` : ''}
                   
                   ${shipping.details ? `
                     <p style="margin: 12px 0 0 0; font-style: italic; color: #64748b; font-size: 12px;">"${shipping.details}"</p>

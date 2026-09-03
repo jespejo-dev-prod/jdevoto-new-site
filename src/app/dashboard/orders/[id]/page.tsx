@@ -234,18 +234,26 @@ export default function OrderDetailPage() {
  <p className="text-sm text-zinc-400 font-medium uppercase tracking-wide">{(order.shippingAddress as any).comuna}, {(order.shippingAddress as any).region}</p>
  
  {/* Modalidad de Despacho y Transporte */}
- <div className="mt-3 pt-3 border-t border-zinc-800/50 space-y-1">
-   <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider">Modalidad de Despacho</p>
-   <p className="text-sm text-emerald-400 font-medium">
-     {(order.shippingAddress as any).shippingMethod === 'free' ? 'Flete Incluido (Gratis)' : 'Flete por Pagar (Cliente)'}
-   </p>
-   {(order.shippingAddress as any).courier && (
-     <>
-       <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider mt-2">Transporte</p>
-       <p className="text-sm text-white font-medium">{(order.shippingAddress as any).courier}</p>
-     </>
-   )}
- </div>
+ {((order.shippingAddress as any).shippingMethod || (order.shippingAddress as any).courier) && (
+   <div className="mt-3 pt-3 border-t border-zinc-800/50 space-y-1">
+     {((order.shippingAddress as any).shippingMethod || (order.shippingAddress as any).courier === 'FLETE INCLUIDO') && (
+       <>
+         <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider">Modalidad de Despacho</p>
+         <p className="text-sm text-emerald-400 font-medium">
+           {((order.shippingAddress as any).shippingMethod === 'free' || (order.shippingAddress as any).courier === 'FLETE INCLUIDO') 
+             ? 'Flete Incluido (Gratis)' 
+             : ((order.shippingAddress as any).shippingMethod === 'client_pays' ? 'Flete por Pagar (Cliente)' : 'Flete por Pagar (Cliente)')}
+         </p>
+       </>
+     )}
+     {((order.shippingAddress as any).courier && (order.shippingAddress as any).courier !== 'FLETE INCLUIDO') && (
+       <>
+         <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wider mt-2">Transporte</p>
+         <p className="text-sm text-white font-medium">{(order.shippingAddress as any).courier}</p>
+       </>
+     )}
+   </div>
+ )}
 
  { (order.shippingAddress as any).details && (
  <p className="text-[11px] text-primary font-bold italic mt-3 pt-3 border-t border-zinc-800/50">"{(order.shippingAddress as any).details}"</p>
