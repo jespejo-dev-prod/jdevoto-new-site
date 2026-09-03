@@ -222,7 +222,10 @@ export class OrderService {
         paymentDiscountPercent = Number(company.paymentTermDiscount);
       } else {
         if (paymentTermsDays === 90) paymentDiscountPercent = 0;
+        else if (paymentTermsDays === 61) paymentDiscountPercent = 0;
         else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
+        else if (paymentTermsDays === 32) paymentDiscountPercent = 0;
+        else if (paymentTermsDays === 31) paymentDiscountPercent = 10;
         else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
         else if (paymentTermsDays === 0) paymentDiscountPercent = 10;
       }
@@ -625,7 +628,10 @@ export class OrderService {
             paymentDiscountPercent = Number(company.paymentTermDiscount);
           } else {
             if (paymentTermsDays === 90) paymentDiscountPercent = 0;
+            else if (paymentTermsDays === 61) paymentDiscountPercent = 0;
             else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
+            else if (paymentTermsDays === 32) paymentDiscountPercent = 0;
+            else if (paymentTermsDays === 31) paymentDiscountPercent = 10;
             else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
             else if (paymentTermsDays === 0) paymentDiscountPercent = 0;
           }

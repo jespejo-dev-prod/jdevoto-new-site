@@ -192,6 +192,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
       0: 10,
       30: 7,
       31: 10,
+      32: 0,
       60: 4,
       61: 0,
       90: 0
@@ -456,6 +457,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     <option value={0}>Contado (0 días)</option>
                     <option value={30}>30 días (7% Dcto)</option>
                     <option value={31}>30 días, 10% Dcto</option>
+                    <option value={32}>30 días, 0% Dcto</option>
                     <option value={60}>60 días (4% Dcto)</option>
                     <option value={61}>60 días, 0% Dcto</option>
                     <option value={90}>90 días</option>

@@ -284,9 +284,12 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
       return Number(selectedCustomer.paymentTermDiscount);
     }
     if (paymentTermsDays === 90) return 0;
+    if (paymentTermsDays === 61) return 0;
     if (paymentTermsDays === 60) return 4;
+    if (paymentTermsDays === 32) return 0;
+    if (paymentTermsDays === 31) return 10;
     if (paymentTermsDays === 30) return 7;
-    if (paymentTermsDays === 0) return 0;
+    if (paymentTermsDays === 0) return 10;
     return 0;
   }, [selectedCustomer, paymentTermsDays]);
 

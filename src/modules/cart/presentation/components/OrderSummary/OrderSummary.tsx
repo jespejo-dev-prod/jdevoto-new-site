@@ -29,7 +29,10 @@ export function OrderSummary() {
 
   const creditDiscountPercent = React.useMemo(() => {
     if (paymentTermsDays === 90) return 0;
+    if (paymentTermsDays === 61) return 0;
     if (paymentTermsDays === 60) return 4;
+    if (paymentTermsDays === 32) return 0;
+    if (paymentTermsDays === 31) return 10;
     if (paymentTermsDays === 30) return 7;
     if (paymentTermsDays === 0) return 10;
     return 0;
@@ -93,7 +96,7 @@ export function OrderSummary() {
                 <option value="transfer">Transferencia Bancaria Directa (10% OFF)</option>
                 <option value="webpay">Mercado Pago (10% OFF)</option>
                 {hasCreditB2b && (
-                <option value="credit_b2b">Crédito Directo {paymentTermsDays === 31 ? 30 : paymentTermsDays === 61 ? 60 : paymentTermsDays} días ({creditDiscountPercent}% OFF)</option>
+                <option value="credit_b2b">Crédito Directo {paymentTermsDays === 31 || paymentTermsDays === 32 ? 30 : paymentTermsDays === 61 ? 60 : paymentTermsDays} días ({creditDiscountPercent}% OFF)</option>
               )}
               </select>
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
