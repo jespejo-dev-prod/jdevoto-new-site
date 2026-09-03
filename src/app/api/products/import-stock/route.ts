@@ -124,6 +124,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
           data,
           select: {
             sku: true,
+            slug: true,
             stockQuantity: true,
             basePrice: true,
           },
@@ -154,10 +155,15 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     });
   }
 
-  // 8. Invalidar caché global del frontend si hubo actualizaciones exitosas
+  // 8. Invalidar caché del frontend GRANULARMENTE si hubo actualizaciones exitosas
   if (updatedProducts.length > 0) {
-    const { revalidateTag } = require("next/cache");
-    revalidateTag("products");
+    const { revalidatePath } = require("next/cache");
+    // Invalidamos página a página para no botar la caché completa de Vercel
+    for (const p of updatedProducts) {
+      if (p.slug) {
+        revalidatePath(`/products/${p.slug}`);
+      }
+    }
   }
 
   return ok({
