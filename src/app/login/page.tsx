@@ -267,8 +267,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <div className="relative hidden h-full flex-col bg-muted text-white lg:flex dark:border-r">
+    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0 bg-black">
+      <div className="relative hidden h-full flex-col bg-black text-white lg:flex dark:border-r">
         {/* Imagen de fondo */}
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -303,7 +303,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center bg-zinc-950 min-h-screen lg:min-h-0 p-6 lg:p-16">
+      <div className="flex items-center justify-center bg-black min-h-screen lg:min-h-0 p-6 lg:p-16">
         <div className="mx-auto flex w-full flex-col justify-center space-y-10 sm:w-[480px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
           
           {/* Logo solo visible en mobile */}
