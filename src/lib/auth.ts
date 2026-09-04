@@ -13,7 +13,7 @@ import { randomUUID } from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || JWT_SECRET;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "1h";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "1d";
 
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET no está definido en las variables de entorno");
@@ -31,7 +31,7 @@ export function signRefreshToken(userId: string): string {
   return jwt.sign(
     { sub: userId, type: "refresh", jti: randomUUID() }, 
     JWT_REFRESH_SECRET, 
-    { expiresIn: "1d" } as jwt.SignOptions
+    { expiresIn: "7d" } as jwt.SignOptions
   );
 }
 

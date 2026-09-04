@@ -99,7 +99,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   // con múltiples pestañas o React Strict Mode), simplemente extendemos su vigencia (Rolling Session).
   await prisma.refreshToken.update({
     where: { id: storedToken.id },
-    data: { expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) },
+    data: { expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
   });
 
   // 2. Generar SOLO nuevo access token
@@ -114,9 +114,9 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   cookieStore.set("refresh_token", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24, // 1 día en segundos
+    maxAge: 60 * 60 * 24 * 7, // 7 días en segundos
   });
 
   return ok({
