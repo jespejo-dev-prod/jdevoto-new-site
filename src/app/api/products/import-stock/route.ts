@@ -70,7 +70,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     }
   }
 
-  // 5. Buscar qué productos existen en la base de datos
+  // 5. Buscar qué productos existen en la base de datos con su stock y precio actual
   const existingProducts = await prisma.product.findMany({
     where: {
       sku: { in: Array.from(skusToQuery) },
@@ -78,28 +78,31 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     },
     select: {
       sku: true,
+      stockQuantity: true,
+      basePrice: true,
     },
   });
 
-  const existingSkuSet = new Set(existingProducts.map((p) => p.sku));
+  const existingSkuMap = new Map(existingProducts.map((p) => [p.sku, p]));
   const updatePromises: any[] = [];
   const resolvedSkuToUpdateMap = new Map<string, typeof validatedUpdates[number]>();
+  const unchangedProducts: typeof existingProducts = [];
 
   // 6. Separar registros existentes de los que no existen
   for (const item of validatedUpdates) {
     let resolvedSku = item.sku;
 
     // Si el SKU exacto no existe, pero la versión acolchada a 7 dígitos sí existe, la usamos
-    if (!existingSkuSet.has(resolvedSku)) {
+    if (!existingSkuMap.has(resolvedSku)) {
       if (/^\d+$/.test(resolvedSku) && resolvedSku.length < 7) {
         const padded = resolvedSku.padStart(7, "0");
-        if (existingSkuSet.has(padded)) {
+        if (existingSkuMap.has(padded)) {
           resolvedSku = padded;
         }
       }
     }
 
-    if (!existingSkuSet.has(resolvedSku)) {
+    if (!existingSkuMap.has(resolvedSku)) {
       failuresList.push({
         sku: item.sku,
         reason: "El producto no existe en el catálogo",
@@ -107,14 +110,31 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       continue;
     }
 
+    const currentData = existingSkuMap.get(resolvedSku)!;
     resolvedSkuToUpdateMap.set(resolvedSku, item);
 
     const data: any = {};
+    let hasChanges = false;
+    
     if (item.stock !== undefined && item.stock !== null) {
-      data.stockQuantity = BigInt(item.stock);
+      const newStock = BigInt(item.stock);
+      if (currentData.stockQuantity !== newStock) {
+        data.stockQuantity = newStock;
+        hasChanges = true;
+      }
     }
     if (item.price !== undefined && item.price !== null) {
-      data.basePrice = new Prisma.Decimal(item.price);
+      const newPrice = new Prisma.Decimal(item.price);
+      if (!currentData.basePrice || !currentData.basePrice.equals(newPrice)) {
+        data.basePrice = newPrice;
+        hasChanges = true;
+      }
+    }
+
+    if (!hasChanges) {
+      // Add to unchanged so we can report them as successes without DB writes
+      unchangedProducts.push(currentData);
+      continue;
     }
 
     if (Object.keys(data).length > 0) {
@@ -144,8 +164,11 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     updatedProducts = await prisma.$transaction(updatePromises);
   }
 
+  // Juntar los actualizados y los sin cambios para la respuesta
+  const allSuccessfulProducts = [...updatedProducts, ...unchangedProducts];
+
   // 7. Formatear la lista de actualizaciones exitosas
-  for (const p of updatedProducts) {
+  for (const p of allSuccessfulProducts) {
     const originalUpdate = resolvedSkuToUpdateMap.get(p.sku);
 
     successList.push({
@@ -155,7 +178,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     });
   }
 
-  // 8. Invalidar caché del frontend GRANULARMENTE si hubo actualizaciones exitosas
+  // 8. Invalidar caché del frontend GRANULARMENTE solo si hubo actualizaciones reales
   if (updatedProducts.length > 0) {
     const { revalidatePath } = require("next/cache");
     // Invalidamos página a página para no botar la caché completa de Vercel
