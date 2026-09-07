@@ -121,15 +121,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       setItems(prevItems => {
         let changed = false;
-        
-        const validItems = prevItems.filter(item => {
-          const exists = freshProducts.some(p => p.id === item.id || p.slug === item.slug);
-          if (!exists) changed = true;
-          return exists;
-        });
 
-        const updated = validItems.map(item => {
-          const fresh = freshProducts.find(p => p.id === item.id || p.slug === item.slug)!;
+        const updated = prevItems.map(item => {
+          const fresh = freshProducts.find(p => p.id === item.id || p.slug === item.slug);
+          
+          if (!fresh) {
+            // Producto ya no está disponible (ej: sesión expiró, se agotó o fue borrado).
+            // Lo mantenemos en el carrito pero con stock 0 para no borrar el trabajo del usuario silenciosamente.
+            if (item.stockQuantity !== 0) changed = true;
+            return { ...item, stockQuantity: 0 };
+          }
 
           let finalPrice = fresh.price?.discountedNetPrice || fresh.price?.unitNetPrice || fresh.basePrice || 0;
           let discountPct = fresh.price?.discountPercent || 0;
