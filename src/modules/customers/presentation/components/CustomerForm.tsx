@@ -72,7 +72,12 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
   
   const handleRutBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
     const rut = e.target.value;
-    if (!rut || !!initialData?.id) return;
+    if (!!initialData?.id) return;
+    
+    if (!rut) {
+      setRutDuplicateError(null);
+      return;
+    }
 
     try {
       setIsCheckingRut(true);
