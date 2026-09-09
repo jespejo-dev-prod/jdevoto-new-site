@@ -459,7 +459,6 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   <h3 className="text-2xl font-black text-zinc-950 tracking-tight">
                     Características y especificaciones
                   </h3>
-                  <ChevronDown className="h-6 w-6 text-zinc-400" />
                 </div>
                 <table className="w-full text-base sm:text-lg">
                   <tbody className="divide-y divide-zinc-50">
@@ -499,7 +498,6 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                   <h3 className="text-2xl font-black text-zinc-950 tracking-tight">
                     Detalles del producto
                   </h3>
-                  <ChevronDown className="h-6 w-6 text-zinc-400" />
                 </div>
                 <div className="p-8 rounded-3xl bg-zinc-50 border border-zinc-100 text-base sm:text-lg text-zinc-700 space-y-6 font-medium">
                   {hasDimensions && (
