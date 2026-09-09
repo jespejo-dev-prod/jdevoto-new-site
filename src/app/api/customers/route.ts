@@ -175,7 +175,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
         passwordHash: hashedPassword,
         firstName: companyData.razonSocial.substring(0, 50),
         lastName: "",
-        role: UserRole.BUYER,
+        role: UserRole.COMPANY_ADMIN,
         companyId: customer.id,
         isActive: true,
       }

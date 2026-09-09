@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { CHILE_REGIONS } from '@/lib/chile-data';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
+import { useApi } from '@/shared/infrastructure/api/use-api';
 
 interface CustomerFormProps {
   initialData?: Partial<Company> & { salesRepEmail?: string | null };
@@ -64,7 +65,28 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   const canEditCommercialTerms = isAdmin;
 
+  const { fetcher } = useApi();
   const [creditLimitDisplay, setCreditLimitDisplay] = useState('');
+  const [isCheckingRut, setIsCheckingRut] = useState(false);
+  const [rutDuplicateError, setRutDuplicateError] = useState<string | null>(null);
+  
+  const handleRutBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    const rut = e.target.value;
+    if (!rut || !!initialData?.id) return;
+
+    try {
+      setIsCheckingRut(true);
+      setRutDuplicateError(null);
+      const res = await fetcher(`/api/customers/check-rut?rut=${encodeURIComponent(rut)}`);
+      if (res.exists) {
+        setRutDuplicateError(`El RUT ya está registrado a nombre de: ${res.company?.razonSocial}`);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsCheckingRut(false);
+    }
+  };
 
   // Initial load formatting
   useEffect(() => {
@@ -244,16 +266,29 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-zinc-500 uppercase tracking-widest px-1">RUT Empresa</label>
-                <input 
-                  {...register('rut')}
-                  disabled={!!initialData?.id && !isAdmin}
-                  className={cn(
-                    "w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none transition-all disabled:opacity-50",
-                    errors.rut && "border-red-500/50 focus:border-red-500"
-                  )}
-                  placeholder="12345678-9"
-                />
-                {errors.rut && <p className="text-red-400 text-[10px] font-bold px-1">{errors.rut.message}</p>}
+                <div className="relative">
+                  <input 
+                    {...(() => {
+                      const { onBlur, ...rest } = register('rut');
+                      return {
+                        ...rest,
+                        onBlur: async (e: any) => {
+                          await onBlur(e);
+                          handleRutBlur(e);
+                        }
+                      };
+                    })()}
+                    disabled={!!initialData?.id && !isAdmin}
+                    className={cn(
+                      "w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none transition-all disabled:opacity-50",
+                      (errors.rut || rutDuplicateError) && "border-red-500/50 focus:border-red-500"
+                    )}
+                    placeholder="12345678-9"
+                  />
+                  {isCheckingRut && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-zinc-500" />}
+                </div>
+                {errors.rut && <p className="text-red-400 text-[10px] font-bold px-1">{errors.rut.message as string}</p>}
+                {!errors.rut && rutDuplicateError && <p className="text-red-400 text-[10px] font-bold px-1">{rutDuplicateError}</p>}
                 {!!initialData?.id && !isAdmin && (
                   <p className="text-sm text-zinc-400 px-1 italic mt-1">Solo administradores pueden modificar el RUT.</p>
                 )}
