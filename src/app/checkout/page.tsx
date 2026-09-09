@@ -396,7 +396,17 @@ export default function CheckoutPage() {
       toast.error('Error: No tienes una empresa/cliente asignado para hacer pedidos.');
       return;
     }
-    
+    if (shippingMethod === 'client_pays') {
+      if (!selectedCourier) {
+        toast.error('Por favor, selecciona un transporte de preferencia (flete por pagar).');
+        return;
+      }
+      if (selectedCourier === 'otro' && !customCourier.trim()) {
+        toast.error('Por favor, especifica el nombre del transporte.');
+        return;
+      }
+    }
+
     setIsProcessing(true);
     try {
       const orderPayload = {
@@ -854,6 +864,7 @@ export default function CheckoutPage() {
                                            }
                                         }}
                                         className="w-full h-12 rounded-xl border border-zinc-200 px-4 pr-10 text-sm font-semibold text-zinc-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-zinc-50 cursor-pointer appearance-none"
+                                     >
                                         <option value="" className="text-zinc-500">Selecciona un transporte...</option>
                                         <option value="Fedex">Fedex</option>
                                         <option value="G Y D">G Y D</option>

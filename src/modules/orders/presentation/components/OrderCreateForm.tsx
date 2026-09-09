@@ -525,6 +525,17 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     // El cliente (COMPANY_ADMIN) solo puede crear con estado PENDING
     const finalStatus = isClient ? OrderStatus.PENDING : (overrideStatus || orderStatus);
 
+    if (shippingMethod === 'client_pays') {
+      if (!selectedCourier) {
+        toast.error("Selecciona un transporte de preferencia (Por Pagar)");
+        return;
+      }
+      if (selectedCourier === 'otro' && !customCourier.trim()) {
+        toast.error("Especifica el nombre del transporte");
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     try {
       let finalCreatedAt: Date;
