@@ -854,15 +854,15 @@ export default function CheckoutPage() {
                                            }
                                         }}
                                         className="w-full h-12 rounded-xl border border-zinc-200 px-4 pr-10 text-sm font-semibold text-zinc-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-zinc-50 cursor-pointer appearance-none"
-                                     >
                                         <option value="" className="text-zinc-500">Selecciona un transporte...</option>
                                         <option value="Fedex">Fedex</option>
-                                        <option value="Starken">Starken</option>
+                                        <option value="G Y D">G Y D</option>
+                                        <option value="T. Espinoza">T. Espinoza</option>
+                                        <option value="Ecoex">Ecoex</option>
+                                        <option value="A.T.E.">A.T.E.</option>
+                                        <option value="Swisslog">Swisslog</option>
                                         <option value="Chilexpress">Chilexpress</option>
-                                        <option value="Blue Express">Blue Express</option>
-                                        <option value="Pullman Cargo">Pullman Cargo</option>
-                                        <option value="Varmontt">Varmontt</option>
-
+                                        <option value="Starken">Starken</option>
                                         <option value="otro">Otro (Especificar...)</option>
                                      </select>
                                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
