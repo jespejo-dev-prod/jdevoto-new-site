@@ -764,12 +764,10 @@ export default function CheckoutPage() {
                      <div className="pt-6 border-t border-zinc-100 grid grid-cols-1 gap-6">
                         {/* Selector de tipo de flete */}
                         {region && comuna && (() => {
-                           const showClientPaysOption = subtotalAfterCompany < freeShippingMin || isInsularValparaiso;
                            return (
                              <div className="space-y-3">
                                 <Label className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">Modalidad de Flete</Label>
-                                <div className={`grid gap-4 ${showClientPaysOption ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
-                                   {showClientPaysOption && (
+                                <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                                      <label className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${shippingMethod === 'client_pays' ? 'border-primary bg-primary/5' : 'border-zinc-200 hover:bg-zinc-50'}`}>
                                         <div className="flex items-center gap-3">
                                            <input type="radio" name="shippingMethod" checked={shippingMethod === 'client_pays'} onChange={() => setShippingMethod('client_pays')} className="hidden" />
@@ -782,7 +780,6 @@ export default function CheckoutPage() {
                                            </div>
                                         </div>
                                      </label>
-                                   )}
 
                                    {(() => {
                                       if (isInsularValparaiso) {
