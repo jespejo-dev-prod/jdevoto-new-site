@@ -108,14 +108,20 @@ export async function generateMetadata({
       alt: `${product.name}${brandName ? ` — ${brandName}` : ""}`,
     }));
 
+    const fallbackTitle = `${product.name}${brandName ? ` | ${brandName}` : ""}`;
+    const fallbackTitleOG = `${product.name}${brandName ? ` — ${brandName}` : ""} | J. Devoto`;
+    const finalTitle = product.seoTitle ? product.seoTitle : fallbackTitle;
+    const finalTitleOG = product.seoTitle ? product.seoTitle : fallbackTitleOG;
+    const finalDesc = product.seoDescription ? product.seoDescription : metaDesc;
+
     return {
-      title: `${product.name}${brandName ? ` | ${brandName}` : ""}`,
-      description: metaDesc,
+      title: finalTitle,
+      description: finalDesc,
       alternates: { canonical: canonicalUrl },
       robots: { index: true, follow: true },
       openGraph: {
-        title: `${product.name}${brandName ? ` — ${brandName}` : ""} | J. Devoto`,
-        description: metaDesc,
+        title: finalTitleOG,
+        description: finalDesc,
         url: canonicalUrl,
         type: "website",
         locale: "es_CL",
@@ -124,8 +130,8 @@ export async function generateMetadata({
       },
       twitter: {
         card: "summary_large_image",
-        title: `${product.name}${brandName ? ` | ${brandName}` : ""} | J. Devoto`,
-        description: metaDesc,
+        title: finalTitleOG,
+        description: finalDesc,
         images: ogImages.length > 0 ? [ogImages[0].url] : [],
       },
     };

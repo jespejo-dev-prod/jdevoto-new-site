@@ -30,6 +30,8 @@ export async function getProductDetailsUseCase(slugOrId: string) {
     height: true,
     brandId: true,
     categoryId: true,
+    seoTitle: true,
+    seoDescription: true,
     specifications: true,
     category: { select: { id: true, name: true, slug: true, isOutlet: true } },
     brand: { select: { id: true, name: true, slug: true } },

@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let categoryPages: MetadataRoute.Sitemap = [];
   try {
     const categories = await prisma.category.findMany({
-      where: { parentId: null, isOutlet: false },
+      where: { isOutlet: false },
       select: { slug: true, updatedAt: true },
       orderBy: { name: 'asc' },
     });

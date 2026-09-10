@@ -766,6 +766,14 @@ export class OrderService {
             email: true,
             phone: true
           }
+        },
+        salesRep: {
+          select: {
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true
+          }
         }
       }
     });
