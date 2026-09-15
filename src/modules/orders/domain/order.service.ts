@@ -26,7 +26,7 @@ import type {
   PaginatedResult,
 } from "@/types/domain";
 import { TAX_RATE } from "@/types/domain";
-import { OrderStatus, Prisma, UserRole } from "@prisma/client";
+import { OrderStatus, PaymentStatus, Prisma, UserRole } from "@prisma/client";
 import type { GetOrdersQuery } from "@/validations/order.schemas";
 
 // ============================================================
@@ -448,7 +448,7 @@ export class OrderService {
     const updated = await prisma.$transaction(async (tx) => {
       let finalStatus = newStatus;
       let finalInternalNotes = internalNotes || '';
-      let finalPaymentStatus = undefined;
+      let finalPaymentStatus: PaymentStatus | undefined = undefined;
 
       // SI PASA DE DRAFT A CONFIRMED Y ES CON CRÉDITO, VALIDAR LÍMITE DE CRÉDITO
       if (order.status === OrderStatus.DRAFT && newStatus === OrderStatus.CONFIRMED && order.paymentMethod === 'credit_b2b') {
@@ -464,8 +464,8 @@ export class OrderService {
       }
 
       // Si el pedido se confirma y es por transferencia, asumimos que el pago fue recibido
-      if (newStatus === OrderStatus.CONFIRMED && order.paymentMethod === 'transfer' && order.paymentStatus !== 'PAID') {
-        finalPaymentStatus = 'PAID';
+      if (newStatus === OrderStatus.CONFIRMED && order.paymentMethod === 'transfer' && order.paymentStatus !== PaymentStatus.PAID) {
+        finalPaymentStatus = PaymentStatus.PAID;
       }
 
       const updatedOrder = await tx.order.update({
