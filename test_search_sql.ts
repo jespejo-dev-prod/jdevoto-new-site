@@ -1,0 +1,1 @@
+﻿import { prisma } from './src/lib/client'; async function main() { const param = '%MT-1840%'; const rows = await prisma.$queryRawUnsafe('SELECT id, name, sku, "factoryCode" FROM products p WHERE p."isActive" = true AND p."isDeleted" = false AND (p.name ILIKE $1 OR p.sku ILIKE $2 OR p."factoryCode" ILIKE $3)', param, param, param); console.log(rows); } main();
