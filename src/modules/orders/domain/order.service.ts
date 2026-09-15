@@ -702,7 +702,8 @@ export class OrderService {
           if (!customerEmail) {
             customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
           }
-          await sendOrderStatusUpdateEmail(populatedOrder, customerEmail);
+          const isPaymentUpdate = input.paymentStatus !== undefined && input.status === undefined;
+          await sendOrderStatusUpdateEmail(populatedOrder, customerEmail, isPaymentUpdate);
         }
       } catch (err) {
         console.error("Error al enviar correo de actualización de pedido:", err);

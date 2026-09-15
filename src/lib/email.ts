@@ -752,7 +752,7 @@ export async function sendNotificationEmail(email: string, title: string, messag
   }
 }
 
-export async function sendOrderStatusUpdateEmail(order: any, customerEmail: string) {
+export async function sendOrderStatusUpdateEmail(order: any, customerEmail: string, isPaymentUpdate: boolean = false) {
   try {
     const transporter = await getTransporter();
 
@@ -764,10 +764,38 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
       }
     }
 
-    const htmlContent = generateOrderHtml(order, customerEmail, bankConfig);
+    const paymentStatusLabels: Record<string, string> = {
+      'PENDING': 'Pendiente',
+      'PAID': 'Pagado',
+      'PARTIALLY_PAID': 'Pago Parcial',
+      'OVERDUE': 'Atrasado',
+      'REFUNDED': 'Reembolsado'
+    };
+    
+    const paymentLabel = paymentStatusLabels[order.paymentStatus] || order.paymentStatus;
     const statusConfig = getStatusConfig(order.status);
     const shortOrderNumber = order.orderNumber.split('-').pop();
-    const subject = `Actualización de estado pedido #${shortOrderNumber} -> ${statusConfig.label}`;
+    
+    let subject = `Actualización de estado pedido #${shortOrderNumber} -> ${statusConfig.label}`;
+    let adminTitle = `Pedido Actualizado (Admin)`;
+    let adminDesc = `El pedido #${shortOrderNumber} del cliente ha cambiado a estado: ${statusConfig.label}.`;
+    
+    if (isPaymentUpdate) {
+      subject = `Actualización de pago pedido #${shortOrderNumber} -> ${paymentLabel}`;
+      adminTitle = `Pago Actualizado (Admin)`;
+      adminDesc = `El pago del pedido #${shortOrderNumber} ha cambiado a estado: ${paymentLabel}.`;
+    }
+
+    const htmlContent = generateOrderHtml(
+      order, 
+      customerEmail, 
+      bankConfig,
+      false,
+      undefined,
+      undefined,
+      isPaymentUpdate ? `Estado de Pago: ${paymentLabel}` : undefined,
+      isPaymentUpdate ? `El estado de pago de tu pedido ha sido actualizado.` : undefined
+    );
 
     // Add CCs
     const ccEmails = new Set<string>();
@@ -778,7 +806,7 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
 
     const promises = [];
     promises.push(transporter.sendMail({
-      from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
+      from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
       to: customerEmail,
       cc: Array.from(ccEmails),
       subject,
@@ -791,14 +819,14 @@ export async function sendOrderStatusUpdateEmail(order: any, customerEmail: stri
         customerEmail, 
         bankConfig, 
         true, 
-        `Pedido Actualizado (Admin)`, 
-        `El pedido #${shortOrderNumber} del cliente ha cambiado a estado: ${statusConfig.label}.`
+        adminTitle, 
+        adminDesc
       );
       promises.push(
         transporter.sendMail({
-          from: `"Jdevoto.cl" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
+          from: `"${process.env.STORE_NAME || 'Jdevoto.cl'}" <${process.env.SMTP_USER || 'ventas@jdevoto.cl'}>`,
           to: process.env.ADMIN_NOTIFICATION_EMAIL.trim(),
-          subject: `Actualización de Pedido: #${shortOrderNumber} -> ${statusConfig.label}`,
+          subject: isPaymentUpdate ? `Actualización de Pago: #${shortOrderNumber} -> ${paymentLabel}` : `Actualización de Pedido: #${shortOrderNumber} -> ${statusConfig.label}`,
           html: adminHtmlContent,
         })
       );

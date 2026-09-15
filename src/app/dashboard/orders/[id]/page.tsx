@@ -460,7 +460,10 @@ export default function OrderDetailPage() {
  value={order.paymentStatus}
  onChange={(e) => {
    if (confirm(`¿Cambiar el estado de pago?`)) {
-     updateOrder.mutate({ paymentStatus: e.target.value });
+     updateOrder.mutate(
+       { paymentStatus: e.target.value },
+       { onSuccess: () => toast.success("Estado de pago actualizado") }
+     );
    }
  }}
  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
