@@ -448,6 +448,7 @@ export class OrderService {
     const updated = await prisma.$transaction(async (tx) => {
       let finalStatus = newStatus;
       let finalInternalNotes = internalNotes || '';
+      let finalPaymentStatus = undefined;
 
       // SI PASA DE DRAFT A CONFIRMED Y ES CON CRÉDITO, VALIDAR LÍMITE DE CRÉDITO
       if (order.status === OrderStatus.DRAFT && newStatus === OrderStatus.CONFIRMED && order.paymentMethod === 'credit_b2b') {
@@ -462,11 +463,17 @@ export class OrderService {
         }
       }
 
+      // Si el pedido se confirma y es por transferencia, asumimos que el pago fue recibido
+      if (newStatus === OrderStatus.CONFIRMED && order.paymentMethod === 'transfer' && order.paymentStatus !== 'PAID') {
+        finalPaymentStatus = 'PAID';
+      }
+
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: {
           status: finalStatus,
           ...(finalInternalNotes ? { internalNotes: finalInternalNotes } : {}),
+          ...(finalPaymentStatus ? { paymentStatus: finalPaymentStatus } : {}),
           ...timestampFields,
         },
         include: {
@@ -656,6 +663,7 @@ export class OrderService {
           notes: input.notes !== undefined ? input.notes : undefined,
           status: input.status || undefined,
           paymentMethod: input.paymentMethod || undefined,
+          paymentStatus: input.paymentStatus || undefined,
           shippingAddress: input.shippingAddress ? (input.shippingAddress as any) : undefined,
           billingAddress: input.billingAddress ? (input.billingAddress as any) : undefined,
           subtotalNet,

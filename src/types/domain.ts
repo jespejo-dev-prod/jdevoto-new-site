@@ -116,6 +116,7 @@ export interface CreateOrderInput {
   notes?: string;
   status?: OrderStatus;
   paymentMethod?: string;
+  paymentStatus?: PaymentStatus;
   createdAt?: Date;
   shippingAddress?: Record<string, unknown>;
   billingAddress?: Record<string, unknown>;

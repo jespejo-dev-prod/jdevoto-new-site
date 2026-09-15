@@ -453,7 +453,28 @@ export default function OrderDetailPage() {
  </div>
  )}
 
- <div className="space-y-3 pt-4">
+ {canChangeStatus && (
+ <div className="space-y-3 mt-4 pt-4 border-t border-zinc-800">
+ <p className="text-xs text-zinc-500 uppercase font-bold tracking-widest px-1">Estado de Pago</p>
+ <select 
+ value={order.paymentStatus}
+ onChange={(e) => {
+   if (confirm(`¿Cambiar el estado de pago?`)) {
+     updateOrder.mutate({ paymentStatus: e.target.value });
+   }
+ }}
+ className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
+ >
+ <option value="PENDING">Pendiente</option>
+ <option value="PAID">Pagado</option>
+ <option value="PARTIALLY_PAID">Pago Parcial</option>
+ <option value="OVERDUE">Atrasado</option>
+ <option value="REFUNDED">Reembolsado</option>
+ </select>
+ </div>
+ )}
+
+ <div className="space-y-3 pt-4 border-t border-zinc-800 mt-4">
  <button 
  onClick={handleSendEmail}
  disabled={isSendingEmail}
