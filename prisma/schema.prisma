@@ -147,7 +147,6 @@ model Product {
   width          Decimal?        @db.Decimal(15, 2)
   isDeleted      Boolean         @default(false)
   stockReserved  BigInt          @default(0)
-  factoryCode    String?
   orderItems     OrderItem[]
   priceListItems PriceListItem[]
   images         ProductImage[]
