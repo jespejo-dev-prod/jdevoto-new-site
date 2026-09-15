@@ -427,7 +427,7 @@ export default function OrderDetailPage() {
  <select 
  value={order.status}
  onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
- className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
+ className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:border-primary/50 outline-none cursor-pointer"
  >
  {/* Estados principales */}
  <option value={OrderStatus.PENDING}>{STATUS_CONFIG[OrderStatus.PENDING]?.label ||"Pendiente"}</option>
@@ -466,7 +466,7 @@ export default function OrderDetailPage() {
      );
    }
  }}
- className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:border-primary/50 outline-none appearance-none cursor-pointer"
+ className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:border-primary/50 outline-none cursor-pointer"
  >
  <option value="PENDING">Pendiente</option>
  <option value="PAID">Pagado</option>
