@@ -6,7 +6,7 @@ import { UserRole } from "@prisma/client";
 
 export const GET = withApiHandler(async (req: NextRequest) => {
   const user = extractUserFromRequest(req);
-  requireRole(user, [UserRole.ADMIN]);
+  requireRole(user, [UserRole.ADMIN, 'VIEWER' as UserRole]);
 
   const { searchParams } = req.nextUrl;
   const search = searchParams.get("search") || "";

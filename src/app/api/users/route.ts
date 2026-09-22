@@ -19,7 +19,7 @@ const CreateUserSchema = z.object({
 
 export const GET = withApiHandler(async (req: NextRequest) => {
   const user = extractUserFromRequest(req);
-  requireRole(user, [UserRole.ADMIN, UserRole.COMPANY_ADMIN]);
+  requireRole(user, [UserRole.ADMIN, UserRole.COMPANY_ADMIN, 'VIEWER' as UserRole]);
 
   const searchParams = req.nextUrl.searchParams;
   const search = searchParams.get("search") || "";

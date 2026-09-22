@@ -18,11 +18,16 @@ const UpdateUserSchema = z.object({
 
 export const GET = withApiHandler(async (req: NextRequest, { params }: RouteContext<{ id: string }>) => {
   const currentUser = extractUserFromRequest(req);
-  requireRole(currentUser, [UserRole.ADMIN, UserRole.COMPANY_ADMIN]);
+  requireRole(currentUser, [UserRole.ADMIN, UserRole.COMPANY_ADMIN, 'VIEWER' as UserRole]);
   
   const { id } = await params;
   const user = await prisma.user.findUnique({
     where: { id },
+    include: {
+      company: {
+        select: { id: true, razonSocial: true, rut: true }
+      }
+    }
   });
 
   if (!user) {

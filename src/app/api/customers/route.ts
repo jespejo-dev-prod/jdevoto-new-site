@@ -12,7 +12,7 @@ import { sendNewUserPasswordEmail, sendNewCustomerAdminNotification, sendSetupPa
 
 export const GET = withApiHandler(async (req: NextRequest) => {
   const user = extractUserFromRequest(req);
-  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP]);
+  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP, UserRole.SUPER_ADMIN, 'VIEWER' as UserRole]);
 
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search") || "";

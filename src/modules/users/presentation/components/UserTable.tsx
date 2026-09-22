@@ -129,7 +129,7 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                     )}
 
                     {/* Botón de Reset Password */}
-                    {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && (
+                    {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && currentUser?.role !== 'VIEWER' && (
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
@@ -144,7 +144,7 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                     )}
                     
                     {/* Botón de Editar */}
-                    {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && (
+                    {!(currentUser?.role === 'ADMIN' && (u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')) && currentUser?.role !== 'VIEWER' && (
                       <Link 
                         href={`/dashboard/users/${u.id}`}
                         onClick={(e) => e.stopPropagation()}
@@ -155,7 +155,7 @@ export function UserTable({ users, isLoading, onDelete, onResetPassword }: UserT
                     )}
 
                     {/* Botón de Eliminar */}
-                    {u.email !== 'jespejo@jdevoto.cl' && u.role !== 'SUPER_ADMIN' && !(currentUser?.role === 'ADMIN' && u.role === 'ADMIN') && (
+                    {u.email !== 'jespejo@jdevoto.cl' && u.role !== 'SUPER_ADMIN' && !(currentUser?.role === 'ADMIN' && u.role === 'ADMIN') && currentUser?.role !== 'VIEWER' && (
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();

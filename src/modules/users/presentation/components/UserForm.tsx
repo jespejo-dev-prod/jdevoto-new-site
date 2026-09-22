@@ -186,6 +186,7 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
                   <option value="COMPANY_ADMIN">Administrador empresa</option>
                   <option value="SALES_REP">Vendedor</option>
                   <option value="ADMIN">Administrador del sistema</option>
+                  <option value="VIEWER">Visualizador (Solo Lectura)</option>
                   {user?.role === 'SUPER_ADMIN' && (
                     <option value="SUPER_ADMIN">Super Administrador</option>
                   )}
@@ -213,7 +214,7 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
                 tabIndex={fixedCompany ? -1 : 0}
               >
                 <span className={formData.companyId ? "text-white" : "text-zinc-500"}>
-                  {selectedCompany ? `${selectedCompany.razonSocial} (${selectedCompany.rut})` : "Seleccione una empresa (Requerido)"}
+                  {selectedCompany ? `${selectedCompany.razonSocial || 'Sin Razón Social'} (${selectedCompany.rut})` : "Seleccione una empresa (Requerido)"}
                 </span>
                 {!fixedCompany && <ChevronDown className="w-4 h-4 text-zinc-500" />}
               </div>
@@ -260,7 +261,7 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
                             className={`p-3.5 rounded-xl cursor-pointer text-sm flex justify-between items-center transition-all ${formData.companyId === company.id ? 'bg-primary/10 text-primary border border-primary/20' : 'hover:bg-zinc-800/60 text-zinc-300 border border-transparent'}`}
                           >
                             <div className="flex flex-col gap-1.5">
-                              <div className="font-bold text-white text-base">{company.razonSocial}</div>
+                              <div className="font-bold text-white text-base">{company.razonSocial || 'Sin Razón Social'}</div>
                               <div className="text-xs text-zinc-400 font-medium flex items-center gap-1.5">
                                 <span className="px-2 py-0.5 rounded-md bg-zinc-800/80 text-zinc-300 border border-zinc-700/50">{company.rut}</span>
                               </div>
@@ -280,13 +281,16 @@ export function UserForm({ onSubmit, isSubmitting, onSuccess, initialData, fixed
         )}
       </div>
       <div className="flex justify-end pt-2">
-         <button 
-           disabled={isSubmitting}
-           className="px-8 py-2.5 bg-white text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center gap-2"
-         >
-           {isSubmitting && <Loader2 className="w-3 h-3 animate-spin" />}
-           {initialData ? "Actualizar Usuario" : "Guardar Usuario"}
-         </button>
+         {user?.role !== 'VIEWER' && (
+           <button 
+             type="submit"
+             disabled={isSubmitting}
+             className="px-8 py-2.5 bg-white text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+           >
+             {isSubmitting && <Loader2 className="w-3 h-3 animate-spin" />}
+             {initialData ? "Actualizar Usuario" : "Guardar Usuario"}
+           </button>
+         )}
       </div>
     </form>
   );

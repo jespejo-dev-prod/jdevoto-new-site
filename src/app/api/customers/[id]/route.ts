@@ -9,7 +9,7 @@ import { logAuditAction } from "@/lib/audit";
 
 export const GET = withApiHandler(async (req: NextRequest, { params }: RouteContext<{ id: string }>) => {
   const user = extractUserFromRequest(req);
-  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP, UserRole.COMPANY_ADMIN, UserRole.BUYER]);
+  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP, UserRole.COMPANY_ADMIN, UserRole.BUYER, UserRole.SUPER_ADMIN, 'VIEWER' as UserRole]);
 
   const { id } = await params;
 

@@ -620,39 +620,41 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                )}
             </div>
 
-            <div className="space-y-3 pt-6">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-primary text-black h-14 rounded-2xl font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50"
-              >
-                {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-                Guardar Cambios
-              </button>
-
-              {onDelete && (
+            {user?.role !== 'VIEWER' && (
+              <div className="space-y-3 pt-6">
                 <button
-                  type="button"
-                  onClick={onDelete}
-                  className="w-full bg-red-500/5 text-red-500/60 border border-red-500/10 h-14 rounded-2xl font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-3 text-sm"
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-primary text-black h-14 rounded-2xl font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50"
                 >
-                  <Trash2 className="h-4 w-4" />
-                  {initialData?.isActive ? 'Desactivar Cliente' : 'Eliminar Definitivamente'}
+                  {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+                  Guardar Cambios
                 </button>
-              )}
 
-              {onActivate && !initialData?.isActive && (
-                <button
-                  type="button"
-                  onClick={onActivate}
-                  disabled={isActivating}
-                  className="w-full bg-emerald-500 text-black h-14 rounded-2xl font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 disabled:opacity-50"
-                >
-                  {isActivating ? <Loader2 className="h-5 w-5 animate-spin" /> : <RotateCcw className="h-5 w-5" />}
-                  Reactivar Cliente
-                </button>
-              )}
-            </div>
+                {onDelete && (
+                  <button
+                    type="button"
+                    onClick={onDelete}
+                    className="w-full bg-red-500/5 text-red-500/60 border border-red-500/10 h-14 rounded-2xl font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-3 text-sm"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {initialData?.isActive ? 'Desactivar Cliente' : 'Eliminar Definitivamente'}
+                  </button>
+                )}
+
+                {onActivate && !initialData?.isActive && (
+                  <button
+                    type="button"
+                    onClick={onActivate}
+                    disabled={isActivating}
+                    className="w-full bg-emerald-500 text-black h-14 rounded-2xl font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                  >
+                    {isActivating ? <Loader2 className="h-5 w-5 animate-spin" /> : <RotateCcw className="h-5 w-5" />}
+                    Reactivar Cliente
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

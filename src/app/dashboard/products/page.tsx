@@ -39,7 +39,7 @@ function ProductSkeleton() {
 }
 
 // ─── Empty State ─────────────────────────────────────────────────────────────
-function EmptyState({ hasFilters }: { hasFilters: boolean }) {
+function EmptyState({ hasFilters, role }: { hasFilters: boolean, role?: string }) {
  return (
  <div className="col-span-full flex flex-col items-center justify-center py-24 text-center">
  <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-4">
@@ -53,7 +53,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
  ? 'Prueba con otros términos de búsqueda o limpia los filtros.'
  : 'Comienza añadiendo tu primer producto al catálogo.'}
  </p>
- {!hasFilters && (
+ {!hasFilters && role !== 'VIEWER' && (
  <Link href="/dashboard/products/new">
  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs transition-all shadow-lg shadow-primary/20">
  <Plus className="h-4 w-4" />
@@ -67,7 +67,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 export default function ProductsPage() {
- const { accessToken } = useAuth();
+ const { accessToken, user } = useAuth();
  const searchParams = useSearchParams();
  const urlSearch = searchParams.get('search') || '';
 
@@ -183,7 +183,7 @@ export default function ProductsPage() {
  };
 
  return (
-  <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+  <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN, 'VIEWER' as UserRole]}>
   <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
 
  {/* Header */}
@@ -197,32 +197,36 @@ export default function ProductsPage() {
  </p>
  </div>
  <div className="flex items-center gap-3">
- <button
- onClick={handleToggleHideOutOfStock}
- disabled={isUpdatingSetting}
- className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50 ${
- hideOutOfStock
- ? 'bg-rose-600 text-white'
- : 'bg-zinc-900 text-zinc-300 border border-zinc-800'
- }`}
- >
- {isUpdatingSetting ? (
- <span className="animate-spin h-3.5 w-3.5 border-2 border-current border-t-transparent rounded-full" />
- ) : (
- <span className={`h-2 w-2 rounded-full ${hideOutOfStock ? 'bg-white animate-pulse' : 'bg-zinc-500'}`} />
- )}
- {hideOutOfStock ? 'Ocultando Sin Stock' : 'Ocultar Sin Stock del Catálogo'}
- </button>
+ {user?.role !== 'VIEWER' && (
+   <>
+     <button
+     onClick={handleToggleHideOutOfStock}
+     disabled={isUpdatingSetting}
+     className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50 ${
+     hideOutOfStock
+     ? 'bg-rose-600 text-white'
+     : 'bg-zinc-900 text-zinc-300 border border-zinc-800'
+     }`}
+     >
+     {isUpdatingSetting ? (
+     <span className="animate-spin h-3.5 w-3.5 border-2 border-current border-t-transparent rounded-full" />
+     ) : (
+     <span className={`h-2 w-2 rounded-full ${hideOutOfStock ? 'bg-white animate-pulse' : 'bg-zinc-500'}`} />
+     )}
+     {hideOutOfStock ? 'Ocultando Sin Stock' : 'Ocultar Sin Stock del Catálogo'}
+     </button>
 
- <Link href="/dashboard/products/new">
- <button
- id="btn-new-product"
- className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity"
- >
- <Plus className="h-4 w-4" />
- Nuevo Producto
- </button>
- </Link>
+     <Link href="/dashboard/products/new">
+     <button
+     id="btn-new-product"
+     className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity"
+     >
+     <Plus className="h-4 w-4" />
+     Nuevo Producto
+     </button>
+     </Link>
+   </>
+ )}
  </div>
  </div>
 
@@ -282,7 +286,7 @@ export default function ProductsPage() {
  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
  >
  {products.length === 0 ? (
- <EmptyState hasFilters={hasFilters} />
+ <EmptyState hasFilters={hasFilters} role={user?.role} />
  ) : (
  products.map((product, index) => (
  <ProductCard
@@ -301,7 +305,7 @@ export default function ProductsPage() {
  >
  {products.length === 0 ? (
  <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-12 flex justify-center">
- <EmptyState hasFilters={hasFilters} />
+ <EmptyState hasFilters={hasFilters} role={user?.role} />
  </div>
  ) : (
  <ProductTable

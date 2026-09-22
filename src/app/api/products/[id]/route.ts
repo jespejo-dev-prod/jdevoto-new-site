@@ -36,7 +36,7 @@ export const GET = withApiHandler(async (req: NextRequest, ctx: RouteContext) =>
 
   if (!product) throw new NotFoundError("Producto", id);
 
-  const isSuperOrAdmin = user && (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN);
+  const isSuperOrAdmin = user && (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN || user.role === 'VIEWER');
   if (!isSuperOrAdmin && Number(product.basePrice) === 0) {
     throw new NotFoundError("Producto", id);
   }

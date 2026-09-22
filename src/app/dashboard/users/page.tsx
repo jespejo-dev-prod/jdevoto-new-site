@@ -39,7 +39,7 @@ export default function UsersPage() {
   });
 
   return (
-    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.COMPANY_ADMIN]}>
+    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.COMPANY_ADMIN, 'VIEWER' as UserRole]}>
       <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex items-center justify-between">
           <div>
@@ -49,12 +49,14 @@ export default function UsersPage() {
               {meta && <span className="ml-2 text-primary/50 text-sm tracking-widest uppercase">Total DB: {meta.total}</span>}
             </p>
           </div>
-          <Link 
-            href="/dashboard/users/new"
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity"
-          >
-            <UserPlus className="w-4 h-4" /> Añadir Miembro
-          </Link>
+          {user?.role !== 'VIEWER' && (
+            <Link 
+              href="/dashboard/users/new"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity"
+            >
+              <UserPlus className="w-4 h-4" /> Añadir Miembro
+            </Link>
+          )}
         </div>
 
         {/* Buscador y Filtros */}
@@ -82,6 +84,7 @@ export default function UsersPage() {
               <option value={UserRole.COMPANY_ADMIN}>Admin de Empresa</option>
               <option value={UserRole.SALES_REP}>Vendedor</option>
               <option value={UserRole.BUYER}>Comprador</option>
+              <option value="VIEWER">Visualizador</option>
             </select>
           </div>
         </div>

@@ -49,7 +49,7 @@ export default function AnalyticsPage() {
   const { summary, dailySales, statusDistribution, topCustomers } = stats;
 
   return (
-    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN, 'VIEWER' as UserRole]}>
     <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

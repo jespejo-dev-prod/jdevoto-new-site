@@ -124,10 +124,10 @@ export function Sidebar() {
  if (item.label ==="Pagos" && !isAdminOrSuper) return false;
  // My Company no es para ADMIN/SUPER_ADMIN (ya está cubierto COMPANY_ADMIN arriba)
  if (item.label ==="Mi Empresa") return false;
- // Team solo para ADMIN/SUPER_ADMIN o COMPANY_ADMIN
- if (item.label === 'Equipo' && !isAdminOrSuper) return false;
- // Vendedores solo para ADMIN/SUPER_ADMIN
- if (item.label === 'Vendedores' && !isAdminOrSuper) return false;
+ // Team solo para ADMIN/SUPER_ADMIN, COMPANY_ADMIN o VIEWER
+ if (item.label === 'Equipo' && !isAdminOrSuper && user?.role !== 'VIEWER') return false;
+ // Vendedores solo para ADMIN/SUPER_ADMIN o VIEWER
+ if (item.label === 'Vendedores' && !isAdminOrSuper && user?.role !== 'VIEWER') return false;
  // Emails Masivos solo para ADMIN/SUPER_ADMIN
  if (item.label === 'Emails Masivos' && !isAdminOrSuper) return false;
 
@@ -138,12 +138,25 @@ export function Sidebar() {
     }
   }
 
+  // VIEWER solo debe ver Estadísticas, Pedidos, Equipo, Vendedores, Productos, Clientes, Categorías, Marcas
+  if (user?.role === 'VIEWER') {
+    if (!['Estadísticas', 'Pedidos', 'Equipo', 'Vendedores', 'Productos', 'Clientes', 'Categorías', 'Marcas'].includes(item.label)) {
+      return false;
+    }
+  }
+
   return true;
  }).map(item => {
   if (user?.role === 'SALES_REP' && item.label === 'Estadísticas') {
     return {
       ...item,
       subItems: item.subItems?.filter(sub => sub.label !== 'Exportar Data (CSV)')
+    };
+  }
+  if (user?.role === 'VIEWER' && item.label === 'Productos') {
+    return {
+      ...item,
+      subItems: item.subItems?.filter(sub => !['Actualizar Catálogo (CSV/Excel)', 'Nuevo Producto'].includes(sub.label))
     };
   }
   return item;

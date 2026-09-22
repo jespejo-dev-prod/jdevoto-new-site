@@ -40,7 +40,7 @@ export const GET = withApiHandler(async (req: NextRequest) => {
   const query = GetProductsQuerySchema.parse(rawParams);
 
   // Para el dashboard de admin/sales_rep: pueden ver productos inactivos
-  const isPrivileged = user && (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN || user.role === UserRole.SALES_REP);
+  const isPrivileged = user && (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN || user.role === UserRole.SALES_REP || user.role === 'VIEWER');
   const includeInactive =
     req.nextUrl.searchParams.get("includeInactive") === "true" && isPrivileged;
 
@@ -96,8 +96,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
         }
       : {}),
     ...((query.inStock || hideOutOfStock) ? { stockQuantity: { gt: 0 } } : {}),
-    ...((user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN) ? { basePrice: { gt: 0 } } : {}),
-    ...(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN ? {} : { sku: { not: "TEST-001" } }),
+    ...((user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN && user?.role !== 'VIEWER') ? { basePrice: { gt: 0 } } : {}),
+    ...(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === 'VIEWER' ? {} : { sku: { not: "TEST-001" } }),
   };
 
   const skip = (query.page - 1) * query.limit;

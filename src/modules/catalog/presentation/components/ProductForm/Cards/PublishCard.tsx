@@ -4,6 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/auth-context";
 
 import { useApi } from "@/shared/infrastructure/api/use-api";
 
@@ -19,6 +20,7 @@ export function PublishCard({ isSubmitting, isEditing = false }: PublishCardProp
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const api = useApi();
+  const { user } = useAuth();
 
   const handleSendToTrash = async () => {
     if (!isEditing || !params.id) return;
@@ -69,44 +71,46 @@ export function PublishCard({ isSubmitting, isEditing = false }: PublishCardProp
           <span className="text-zinc-300 font-bold">{isEditing ? 'Ahora' : 'Inmediato'}</span>
         </div>
       </div>
-      <div className="flex gap-2 pt-2">
-        {isEditing ? (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleSendToTrash}
-            disabled={isDeleting || isSubmitting}
-            className="text-xs font-bold h-10 flex-1 text-red-500 hover:bg-red-500/10 hover:text-red-400"
-          >
-            {isDeleting ? "Enviando..." : "Papelera"}
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => router.push("/dashboard/products")}
-            className="text-xs font-bold h-10 flex-1 text-zinc-400 hover:bg-zinc-800"
-          >
-            Cancelar
-          </Button>
-        )}
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-primary text-primary-foreground font-black text-xs uppercase h-10 flex-1 shadow-lg shadow-primary/20 gap-1.5"
-        >
-          {isSubmitting ? (
-            '...'
-          ) : isEditing ? (
-            <>
-              <Save className="h-3 w-3" />
-              Guardar
-            </>
+      {user?.role !== 'VIEWER' && (
+        <div className="flex gap-2 pt-2">
+          {isEditing ? (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleSendToTrash}
+              disabled={isDeleting || isSubmitting}
+              className="text-xs font-bold h-10 flex-1 text-red-500 hover:bg-red-500/10 hover:text-red-400"
+            >
+              {isDeleting ? "Enviando..." : "Papelera"}
+            </Button>
           ) : (
-            'Publicar'
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push("/dashboard/products")}
+              className="text-xs font-bold h-10 flex-1 text-zinc-400 hover:bg-zinc-800"
+            >
+              Cancelar
+            </Button>
           )}
-        </Button>
-      </div>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-primary text-primary-foreground font-black text-xs uppercase h-10 flex-1 shadow-lg shadow-primary/20 gap-1.5"
+          >
+            {isSubmitting ? (
+              '...'
+            ) : isEditing ? (
+              <>
+                <Save className="h-3 w-3" />
+                Guardar
+              </>
+            ) : (
+              'Publicar'
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

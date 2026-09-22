@@ -32,7 +32,7 @@ const ProductRow = memo(function ProductRow({
   isDeleting?: boolean;
   variant: 'dashboard' | 'catalog';
 }) {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
   const api = useApi();
   const queryClient = useQueryClient();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -187,39 +187,51 @@ const ProductRow = memo(function ProductRow({
         <td className="px-1.5 lg:px-2.5 py-3 text-right">
           <div className="flex justify-end items-center gap-2">
             {isDashboard ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setIsQuickEditing(!isQuickEditing)}
-                  className={cn(
-                    "p-2 rounded-lg border transition-all shadow-sm",
-                    isQuickEditing 
-                      ? "bg-primary border-primary text-primary-foreground" 
-                      : "bg-zinc-900 border-zinc-800 text-emerald-400 hover:text-emerald-300 hover:border-emerald-400/40"
-                  )}
-                  title="Edición rápida"
-                >
-                  <Zap className="h-4 w-4" />
-                </button>
+              user?.role !== 'VIEWER' ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsQuickEditing(!isQuickEditing)}
+                    className={cn(
+                      "p-2 rounded-lg border transition-all shadow-sm",
+                      isQuickEditing 
+                        ? "bg-primary border-primary text-primary-foreground" 
+                        : "bg-zinc-900 border-zinc-800 text-emerald-400 hover:text-emerald-300 hover:border-emerald-400/40"
+                    )}
+                    title="Edición rápida"
+                  >
+                    <Zap className="h-4 w-4" />
+                  </button>
+                  <Link href={`/dashboard/products/${product.id}/edit`}>
+                    <button
+                      type="button"
+                      className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-primary hover:border-primary/40 transition-all shadow-sm"
+                      title="Editar"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => onDelete?.(product.id, product.name)}
+                    disabled={isDeleting}
+                    className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-500/40 transition-all disabled:opacity-50 shadow-sm"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </>
+              ) : (
                 <Link href={`/dashboard/products/${product.id}/edit`}>
                   <button
                     type="button"
                     className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-primary hover:border-primary/40 transition-all shadow-sm"
-                    title="Editar"
+                    title="Ver"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => onDelete?.(product.id, product.name)}
-                  disabled={isDeleting}
-                  className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-500/40 transition-all disabled:opacity-50 shadow-sm"
-                  title="Eliminar"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </>
+              )
             ) : (
               <div className="flex items-center gap-1.5">
                 {isAuthenticated && (

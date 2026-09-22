@@ -18,11 +18,12 @@ import { RoleGuard } from '@/components/auth/role-guard';
 import { UserRole } from '@prisma/client';
 
 export default function CustomersPage() {
- const { user } = useAuth();
+ const { user, accessToken } = useAuth();
  const [page, setPage] = useState(1);
  const [limit, setLimit] = useState(100);
  const [searchTerm, setSearchTerm] = useState('');
  const [debouncedSearch, setDebouncedSearch] = useState('');
+ const [isExporting, setIsExporting] = useState(false);
  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
  // Debounce search
@@ -49,7 +50,7 @@ export default function CustomersPage() {
  });
 
  return (
-  <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SALES_REP]}>
+ <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES_REP, 'VIEWER' as UserRole]}>
   <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  {/* Header */}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -65,12 +66,44 @@ export default function CustomersPage() {
  </div>
 
   <div className="flex items-center gap-3">
-    <Link href="/dashboard/customers/new">
-      <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
-        <UserPlus className="w-4 h-4" />
-        Nuevo Cliente
+    {user?.role === 'VIEWER' && (
+      <button 
+        disabled={isExporting}
+        onClick={async () => {
+          try {
+            setIsExporting(true);
+            const res = await fetch('/api/customers/export', {
+              headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            if (!res.ok) throw new Error('Error al exportar');
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `clientes_b2b_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+          } catch(e) {
+            console.error(e);
+            alert('Error al descargar el archivo');
+          } finally {
+            setIsExporting(false);
+          }
+        }}
+        className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-zinc-700 transition-colors border border-zinc-700 disabled:opacity-50">
+        {isExporting ? 'Exportando...' : 'Exportar Excel/CSV'}
       </button>
-    </Link>
+    )}
+    {user?.role !== 'VIEWER' && (
+      <Link href="/dashboard/customers/new">
+        <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+          <UserPlus className="w-4 h-4" />
+          Nuevo Cliente
+        </button>
+      </Link>
+    )}
   </div>
  </div>
 

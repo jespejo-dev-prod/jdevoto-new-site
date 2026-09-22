@@ -7,8 +7,10 @@ import { UserRole } from "@prisma/client";
 import { useSalesReps } from "@/modules/users/presentation/hooks/useSalesReps";
 import { SalesRepTable } from "@/modules/users/presentation/components/SalesRepTable";
 import Link from "next/link";
+import { useAuth } from "@/context/auth-context";
 
 export default function VendedoresPage() {
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,7 +44,7 @@ export default function VendedoresPage() {
   });
 
   return (
-    <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+    <RoleGuard allowedRoles={[UserRole.ADMIN, 'VIEWER' as UserRole]}>
       <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
         <div className="flex items-center justify-between">
           <div>
@@ -52,11 +54,13 @@ export default function VendedoresPage() {
               {meta && <span className="ml-2 text-primary/50 text-sm tracking-widest uppercase">Total: {meta.total}</span>}
             </p>
           </div>
-          <Link href="/dashboard/vendedores/nuevo">
-            <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
-              <UserPlus className="w-4 h-4" /> Añadir Vendedor
-            </button>
-          </Link>
+          {user?.role !== 'VIEWER' && (
+            <Link href="/dashboard/vendedores/nuevo">
+              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity">
+                <UserPlus className="w-4 h-4" /> Añadir Vendedor
+              </button>
+            </Link>
+          )}
         </div>
 
         {/* Buscador */}

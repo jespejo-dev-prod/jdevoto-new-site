@@ -114,53 +114,55 @@ const CustomerRow = memo(function CustomerRow({
       </td>
 
       <td className="p-4 pr-8 text-right">
-        <div className="flex justify-end items-center gap-2">
-          {!customer.isActive && (
-            <button
-              type="button"
-              onClick={() => onReactivate(customer.id, customer.razonSocial)}
-              disabled={isReactivating}
-              className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all opacity-50 group-hover:opacity-100"
-              title="Reactivar Cliente"
-            >
-              <RefreshCcw className={cn("h-4 w-4", isReactivating && "animate-spin")} />
-            </button>
-          )}
-          <Link href={`/dashboard/customers/${customer.id}`}>
-            <button
-              type="button"
-              className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-primary hover:border-primary/40 transition-all opacity-50 group-hover:opacity-100"
-              title="Ver detalle / Editar"
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
-          </Link>
-          
-          {userRole === 'SALES_REP' ? (
-            <button
-              type="button"
-              onClick={() => onUnassign(customer.id, customer.razonSocial)}
-              disabled={isUnassigning}
-              className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-orange-400 hover:border-orange-500/40 transition-all disabled:opacity-50 opacity-50 group-hover:opacity-100"
-              title="Desvincular de mi cartera"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => onDelete(customer.id, customer.razonSocial, customer.isActive)}
-              disabled={isDeleting}
-              className={cn(
-                "p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-400 transition-all disabled:opacity-50 opacity-50 group-hover:opacity-100",
-                customer.isActive ? "hover:text-red-400 hover:border-red-500/40" : "hover:bg-red-500 hover:text-white border-red-500/20"
-              )}
-              title={customer.isActive ? "Desactivar" : "Eliminar Definitivamente"}
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+        {userRole !== 'VIEWER' && (
+          <div className="flex justify-end items-center gap-2">
+            {!customer.isActive && (
+              <button
+                type="button"
+                onClick={() => onReactivate(customer.id, customer.razonSocial)}
+                disabled={isReactivating}
+                className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all opacity-50 group-hover:opacity-100"
+                title="Reactivar Cliente"
+              >
+                <RefreshCcw className={cn("h-4 w-4", isReactivating && "animate-spin")} />
+              </button>
+            )}
+            <Link href={`/dashboard/customers/${customer.id}`}>
+              <button
+                type="button"
+                className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-primary hover:border-primary/40 transition-all opacity-50 group-hover:opacity-100"
+                title="Ver detalle / Editar"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            </Link>
+            
+            {userRole === 'SALES_REP' ? (
+              <button
+                type="button"
+                onClick={() => onUnassign(customer.id, customer.razonSocial)}
+                disabled={isUnassigning}
+                className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-orange-400 hover:border-orange-500/40 transition-all disabled:opacity-50 opacity-50 group-hover:opacity-100"
+                title="Desvincular de mi cartera"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onDelete(customer.id, customer.razonSocial, customer.isActive)}
+                disabled={isDeleting}
+                className={cn(
+                  "p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-400 transition-all disabled:opacity-50 opacity-50 group-hover:opacity-100",
+                  customer.isActive ? "hover:text-red-400 hover:border-red-500/40" : "hover:bg-red-500 hover:text-white border-red-500/20"
+                )}
+                title={customer.isActive ? "Desactivar" : "Eliminar Definitivamente"}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        )}
       </td>
     </tr>
   );

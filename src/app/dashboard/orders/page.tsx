@@ -23,6 +23,7 @@ import { OrderStatus } from '@prisma/client';
 import { cn } from '@/lib/utils';
 import { CompanyFilter } from '@/components/dashboard/CompanyFilter';
 import { Suspense } from 'react';
+import { useAuth } from '@/context/auth-context';
 
 const TABS = [
  { id: '', label: 'Todas', icon: ShoppingBag },
@@ -36,72 +37,106 @@ const TABS = [
 ];
 
 export default function OrdersPage() {
- const searchParams = useSearchParams();
- const urlSearch = searchParams.get('search') || '';
+  const { user, accessToken } = useAuth();
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
 
- const [activeTab, setActiveTab] = useState<OrderStatus | ''>('');
- const [page, setPage] = useState(1);
- const [searchTerm, setSearchTerm] = useState(urlSearch);
- const [debouncedSearch, setDebouncedSearch] = useState(urlSearch);
- const [fromDate, setFromDate] = useState<string>('');
- const [toDate, setToDate] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<OrderStatus | ''>('');
+  const [isExporting, setIsExporting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(urlSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(urlSearch);
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
 
- // Sync state with URL search param
- useEffect(() => {
- setSearchTerm(urlSearch);
- setDebouncedSearch(urlSearch);
- setPage(1);
- }, [urlSearch]);
+  // Sync state with URL search param
+  useEffect(() => {
+  setSearchTerm(urlSearch);
+  setDebouncedSearch(urlSearch);
+  setPage(1);
+  }, [urlSearch]);
 
- // Debounce search
- useEffect(() => {
- if (searchTerm === urlSearch) return; // avoid double execution on mount
- const timer = setTimeout(() => {
- setDebouncedSearch(searchTerm);
- setPage(1);
- }, 400);
- return () => clearTimeout(timer);
- }, [searchTerm, urlSearch]);
+  // Debounce search
+  useEffect(() => {
+  if (searchTerm === urlSearch) return; // avoid double execution on mount
+  const timer = setTimeout(() => {
+  setDebouncedSearch(searchTerm);
+  setPage(1);
+  }, 400);
+  return () => clearTimeout(timer);
+  }, [searchTerm, urlSearch]);
 
- const { data, isLoading } = useOrders({ 
- page, 
- status: activeTab,
- limit: 10,
- search: debouncedSearch,
- from: fromDate ? new Date(fromDate) : undefined,
- to: toDate ? new Date(toDate) : undefined,
- companyId: searchParams.get('companyId') || undefined,
- });
+  const { data, isLoading } = useOrders({ 
+  page, 
+  status: activeTab,
+  limit: 10,
+  search: debouncedSearch,
+  from: fromDate ? new Date(fromDate) : undefined,
+  to: toDate ? new Date(toDate) : undefined,
+  companyId: searchParams.get('companyId') || undefined,
+  });
 
- const orders = data?.data || [];
- const meta = data?.meta;
+  const orders = data?.data || [];
+  const meta = data?.meta;
 
- return (
- <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
- {/* Header */}
- <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
- <div>
- <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
- <ShoppingBag className="h-8 w-8 text-primary" />
- Pedidos B2B
- </h1>
- <p className="text-base text-zinc-500 mt-1 font-medium">
- Gestiona el ciclo de vida de las órdenes de tus clientes. 
- {meta && <span className="ml-2 text-primary/50 text-xs tracking-widest uppercase">Total DB: {meta.total}</span>}
- </p>
- </div>
+  return (
+  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
+  {/* Header */}
+  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div>
+  <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+  <ShoppingBag className="h-8 w-8 text-primary" />
+  Pedidos B2B
+  </h1>
+  <p className="text-base text-zinc-500 mt-1 font-medium">
+  Gestiona el ciclo de vida de las órdenes de tus clientes. 
+  {meta && <span className="ml-2 text-primary/50 text-xs tracking-widest uppercase">Total DB: {meta.total}</span>}
+  </p>
+  </div>
 
- <div className="flex flex-col sm:flex-row items-center gap-3">
- <Suspense fallback={<div className="h-10 w-48 bg-zinc-900 rounded-xl animate-pulse"></div>}>
- <CompanyFilter basePath="/dashboard/orders" />
- </Suspense>
- <Link href="/dashboard/orders/new">
- <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap">
- <Plus className="h-4 w-4" />
- Nuevo Pedido
- </button>
- </Link>
- </div>
+  <div className="flex flex-col sm:flex-row items-center gap-3">
+  <Suspense fallback={<div className="h-10 w-48 bg-zinc-900 rounded-xl animate-pulse"></div>}>
+  <CompanyFilter basePath="/dashboard/orders" />
+  </Suspense>
+  {user?.role === 'VIEWER' && (
+    <button 
+      disabled={isExporting}
+      onClick={async () => {
+        try {
+          setIsExporting(true);
+          const res = await fetch('/api/orders/export', {
+            headers: { Authorization: `Bearer ${accessToken}` }
+          });
+          if (!res.ok) throw new Error('Error al exportar');
+          const blob = await res.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `pedidos_b2b_${new Date().toISOString().split('T')[0]}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        } catch(e) {
+          console.error(e);
+          alert('Error al descargar el archivo');
+        } finally {
+          setIsExporting(false);
+        }
+      }}
+      className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-zinc-700 transition-colors border border-zinc-700 whitespace-nowrap disabled:opacity-50">
+      {isExporting ? 'Exportando...' : 'Exportar Excel/CSV'}
+    </button>
+  )}
+  {user?.role !== 'VIEWER' && (
+    <Link href="/dashboard/orders/new">
+    <button className="flex items-center gap-2 px-4 py-2 bg-primary text-black rounded-xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap">
+    <Plus className="h-4 w-4" />
+    Nuevo Pedido
+    </button>
+    </Link>
+  )}
+  </div>
  </div>
 
  {/* Filters & Search */}

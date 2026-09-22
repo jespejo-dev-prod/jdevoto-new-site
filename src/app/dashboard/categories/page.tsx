@@ -8,7 +8,7 @@ import { CategoryList } from"@/modules/catalog/presentation/components/Taxonomy/
 
 export default function CategoriesPage() {
  return (
- <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+ <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN, 'VIEWER' as UserRole]}>
  <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
  <div>
  <h1 className="text-3xl font-bold text-white tracking-tight">Categorías</h1>

@@ -3,6 +3,7 @@ import { Mail, CheckCircle2, Loader2, Users, Building, Plus, X } from "lucide-re
 import { UserForm } from "./UserForm";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useAuth } from "@/context/auth-context";
 
 interface SalesRepTableProps {
   salesReps: any[];
@@ -13,6 +14,7 @@ interface SalesRepTableProps {
 }
 
 export function SalesRepTable({ salesReps, isLoading, onAssignCompany, onRemoveCompany, onDelete }: SalesRepTableProps) {
+  const { user } = useAuth();
   return (
     <>
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-x-auto shadow-2xl">
@@ -87,24 +89,28 @@ export function SalesRepTable({ salesReps, isLoading, onAssignCompany, onRemoveC
                               Ver Cartera
                             </Button>
                           </Link>
-                          <Link href={`/dashboard/vendedores/${rep.id}/editar`}>
-                            <Button
-                              variant="ghost"
-                              className="h-8 px-2 text-sm text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800"
-                              title="Editar vendedor"
-                            >
-                              Editar
-                            </Button>
-                          </Link>
-                          {onDelete && (
-                            <Button
-                              onClick={() => onDelete(rep.id)}
-                              variant="ghost"
-                              className="h-8 px-2 text-sm text-zinc-500 hover:text-red-400 hover:bg-red-400/10"
-                              title="Eliminar vendedor"
-                            >
-                              Eliminar
-                            </Button>
+                          {user?.role !== 'VIEWER' && (
+                            <>
+                              <Link href={`/dashboard/vendedores/${rep.id}/editar`}>
+                                <Button
+                                  variant="ghost"
+                                  className="h-8 px-2 text-sm text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800"
+                                  title="Editar vendedor"
+                                >
+                                  Editar
+                                </Button>
+                              </Link>
+                              {onDelete && (
+                                <Button
+                                  onClick={() => onDelete(rep.id)}
+                                  variant="ghost"
+                                  className="h-8 px-2 text-sm text-zinc-500 hover:text-red-400 hover:bg-red-400/10"
+                                  title="Eliminar vendedor"
+                                >
+                                  Eliminar
+                                </Button>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>

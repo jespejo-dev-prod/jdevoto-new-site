@@ -4,6 +4,8 @@ import { Database } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { translateRole } from '@/lib/role-translations';
+import { RoleGuard } from '@/components/auth/role-guard';
+import { UserRole } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +47,7 @@ export default async function RawDataPage() {
   }));
 
   return (
+    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN, 'VIEWER' as UserRole]}>
     <div className="py-8 px-4 sm:px-8 w-full max-w-none space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -124,5 +127,6 @@ export default async function RawDataPage() {
         </div>
       </div>
     </div>
+    </RoleGuard>
   );
 }

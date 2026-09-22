@@ -4,6 +4,7 @@ export const ROLE_TRANSLATIONS: Record<string, string> = {
   SALES_REP: "Vendedor",
   COMPANY_ADMIN: "Administrador empresa",
   BUYER: "Comprador",
+  VIEWER: "Visualizador",
 };
 
 export function translateRole(role: string | null | undefined): string {

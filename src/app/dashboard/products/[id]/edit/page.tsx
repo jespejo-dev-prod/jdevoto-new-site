@@ -48,7 +48,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
  };
 
  return (
- <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SALES_REP]}>
+ <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES_REP, 'VIEWER' as UserRole]}>
  <EditProductForm product={serialized as any} />
  </RoleGuard>
  );

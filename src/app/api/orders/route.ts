@@ -52,6 +52,10 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   const body = await req.json();
   const data = CreateOrderSchema.parse(body);
 
+  if (user.role === 'VIEWER') {
+    throw new ForbiddenError("No estás autorizado a crear pedidos");
+  }
+
   // Validar campos de dirección (street, region, comuna)
   if (!data.shippingAddress?.street || !data.shippingAddress?.region || !data.shippingAddress?.comuna) {
     throw new ValidationError("La dirección de envío es incompleta. Falta calle/número, región o comuna.");

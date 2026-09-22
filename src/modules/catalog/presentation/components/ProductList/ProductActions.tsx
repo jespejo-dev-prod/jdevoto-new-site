@@ -36,13 +36,13 @@ export function ProductActions({
             <button
               type="button"
               className="p-2.5 rounded-2xl bg-zinc-900/90 backdrop-blur border border-zinc-700 text-zinc-300 hover:text-primary hover:border-primary/50 transition-transform transition-opacity transition-colors shadow-xl"
-              title="Editar producto"
+              title={user?.role === 'VIEWER' ? "Ver producto" : "Editar producto"}
               onClick={(e) => e.stopPropagation()}
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
           </Link>
-          {onDelete && (
+          {onDelete && user?.role !== 'VIEWER' && (
             <button
               type="button"
               onClick={(e) => {
