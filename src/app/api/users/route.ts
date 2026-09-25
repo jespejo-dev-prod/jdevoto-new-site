@@ -203,7 +203,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
       }
 
       // Verificamos si no hay cambios reales
-      const targetCompanyId = data.companyId ?? currentUser.companyId;
+      const targetCompanyId = data.companyId === "" ? null : (data.companyId ?? currentUser.companyId ?? null);
       if (existing.role === data.role && existing.companyId === targetCompanyId) {
         return NextResponse.json({ error: "El correo electrónico ya está registrado con este mismo rol y empresa" }, { status: 400 });
       }
