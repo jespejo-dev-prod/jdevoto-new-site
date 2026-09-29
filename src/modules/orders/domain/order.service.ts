@@ -389,11 +389,11 @@ export class OrderService {
       return newOrder;
     });
 
-    // Enviar correo si el pedido fue creado con éxito y no requiere pago online pendiente
+    // Enviar correo si el pedido fue creado con éxito
     const isOnlinePayment = order.paymentMethod === 'webpay' || order.paymentMethod === 'mercadopago';
     
-    // No enviar correo para borradores
-    if (!isOnlinePayment && order.status !== 'DRAFT') {
+    // No enviar correo para borradores. Si es pago online, forzamos enviar info de transferencia como respaldo.
+    if (order.status !== 'DRAFT') {
       try {
         const { sendOrderEmail } = await import('@/lib/email');
         let customerEmail = (order.billingAddress as any)?.email;
@@ -401,7 +401,7 @@ export class OrderService {
           const user = await prisma.user.findUnique({ where: { id: createdById }, select: { email: true } });
           customerEmail = user?.email || "ventas@tutiendab2b.cl";
         }
-        await sendOrderEmail(order, customerEmail);
+        await sendOrderEmail(order, customerEmail, isOnlinePayment);
       } catch (err) {
         console.error("Error al enviar correo del pedido:", err);
       }
@@ -551,9 +551,9 @@ export class OrderService {
       );
     }
 
-    if (order.status !== OrderStatus.DRAFT && userRole && userRole !== UserRole.ADMIN && userRole !== UserRole.SUPER_ADMIN && input.items) {
+    if (order.status !== OrderStatus.DRAFT && order.status !== OrderStatus.PENDING && userRole && userRole !== UserRole.ADMIN && userRole !== UserRole.SUPER_ADMIN && input.items) {
       throw new BusinessRuleError(
-        "Solo los administradores pueden editar los ítems de un pedido que ya no es Borrador.",
+        "Solo los administradores pueden editar los ítems de un pedido que ya no es Borrador o Pendiente.",
         "UPDATE_NOT_ALLOWED"
       );
     }
@@ -690,20 +690,28 @@ export class OrderService {
         const populatedOrder = await prisma.order.findUnique({
           where: { id: orderId },
           include: {
-            items: { include: { product: { select: { sku: true, name: true } } } },
+            items: { include: { product: { select: { sku: true, name: true, images: { where: { isPrimary: true }, take: 1 } } } } },
             company: { select: { razonSocial: true, rut: true, telefono: true, giro: true, email: true, billingEmail: true } },
             createdBy: { select: { phone: true, firstName: true, lastName: true, email: true } },
             salesRep: { select: { email: true, firstName: true, lastName: true, phone: true } },
           }
         });
         if (populatedOrder) {
-          const { sendOrderStatusUpdateEmail } = await import('@/lib/email');
+          const { sendOrderStatusUpdateEmail, sendOrderEmail } = await import('@/lib/email');
           let customerEmail = (populatedOrder.billingAddress as any)?.email;
           if (!customerEmail) {
             customerEmail = populatedOrder.createdBy?.email || "ventas@tutiendab2b.cl";
           }
-          const isPaymentUpdate = input.paymentStatus !== undefined && input.status === undefined;
-          await sendOrderStatusUpdateEmail(populatedOrder, customerEmail, isPaymentUpdate);
+          
+          const isCustomerRole = userRole === UserRole.BUYER || userRole === UserRole.COMPANY_ADMIN;
+          
+          if (populatedOrder.status === OrderStatus.PENDING && isCustomerRole) {
+            // Re-enviar instrucciones de pago con totales actualizados
+            await sendOrderEmail(populatedOrder, customerEmail, true);
+          } else {
+            const isPaymentUpdate = input.paymentStatus !== undefined && input.status === undefined;
+            await sendOrderStatusUpdateEmail(populatedOrder, customerEmail, isPaymentUpdate);
+          }
         }
       } catch (err) {
         console.error("Error al enviar correo de actualización de pedido:", err);

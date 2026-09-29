@@ -169,7 +169,9 @@ export default function OrderDetailPage() {
  </div>
 
  <div className="flex items-center gap-3 no-print">
- {((order.status === OrderStatus.DRAFT && user?.role !== 'VIEWER') || (isSuperAdminOrAdmin && ![OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REJECTED].includes(order.status))) && (
+ {((order.status === OrderStatus.DRAFT && user?.role !== 'VIEWER') || 
+     (order.status === OrderStatus.PENDING && order.paymentStatus !== 'PAID' && user?.role !== 'VIEWER') || 
+     (isSuperAdminOrAdmin && ![OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REJECTED].includes(order.status))) && (
  <Link href={`/dashboard/orders/${id}/edit`}>
  <button className="px-6 py-3 bg-zinc-800 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all shadow-xl flex items-center gap-2 cursor-pointer">
  <Pencil className="h-4 w-4 text-primary" />

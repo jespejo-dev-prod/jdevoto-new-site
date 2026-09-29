@@ -27,9 +27,30 @@ export const GET = withApiHandler(async (req: NextRequest, ctx: RouteContext) =>
 
 export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) => {
   const user = extractUserFromRequest(req);
-  requireRole(user, [UserRole.ADMIN, UserRole.SALES_REP]);
-
   const { id } = await ctx.params;
+  
+  // Verificamos el estado del pedido. Si está PENDING y no pagado, el comprador puede editarlo.
+  const orderTarget = await prisma.order.findUnique({
+    where: { id },
+    include: { company: true }
+  });
+  if (!orderTarget) throw new NotFoundError("Pedido", id);
+
+  const isBuyer = user.role === UserRole.BUYER || user.role === UserRole.COMPANY_ADMIN;
+  if (isBuyer) {
+    if (orderTarget.companyId !== user.companyId) {
+      throw new BusinessRuleError("No tienes permiso para editar este pedido.", "FORBIDDEN");
+    }
+    if (orderTarget.status !== OrderStatus.DRAFT && orderTarget.status !== OrderStatus.PENDING) {
+      throw new BusinessRuleError("Solo puedes editar pedidos en estado Borrador o Pendiente.", "UPDATE_NOT_ALLOWED");
+    }
+    if (orderTarget.paymentStatus === PaymentStatus.PAID) {
+      throw new BusinessRuleError("No puedes editar un pedido que ya está pagado.", "UPDATE_NOT_ALLOWED");
+    }
+  } else {
+    requireRole(user, [UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES_REP]);
+  }
+
   const body = await req.json();
   
   if (body.shippingAddress) {
@@ -40,11 +61,6 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
   
   // Validación estricta de IDOR para Vendedores (SALES_REP) siempre
   if (user.role === UserRole.SALES_REP) {
-    const orderTarget = await prisma.order.findUnique({
-      where: { id },
-      include: { company: true }
-    });
-    if (!orderTarget) throw new NotFoundError("Pedido", id);
     if (orderTarget.company?.salesRepId !== user.id) {
       throw new BusinessRuleError("No tienes permiso para editar un pedido que no pertenece a tu cartera.", "FORBIDDEN_ORDER_UPDATE");
     }
