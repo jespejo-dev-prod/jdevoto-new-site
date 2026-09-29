@@ -8,7 +8,7 @@ import { NextRequest } from "next/server";
 import { withApiHandler, ok, RouteContext } from "@/lib/api-handler";
 import { extractUserFromRequest, requireRole } from "@/lib/auth";
 import { orderService } from "@/modules/orders/domain/order.service";
-import { UserRole } from "@prisma/client";
+import { UserRole, OrderStatus, PaymentStatus } from "@prisma/client";
 import { ValidationError, BusinessRuleError, NotFoundError } from "@/lib/errors";
 import { prisma } from "@/lib/client";
 
