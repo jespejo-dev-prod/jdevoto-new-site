@@ -918,35 +918,35 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
             <table className="w-full text-left">
               <thead className="bg-zinc-950/40 text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800/80">
                 <tr>
-                  <th className="px-8 py-5">Artículo</th>
-                  <th className="px-6 py-5 text-right">Precio Neto</th>
-                  <th className="px-6 py-5 text-center">Cantidad</th>
-                  {isAdmin && <th className="px-4 py-5 text-center whitespace-nowrap">Dcto. Extra (%)</th>}
-                  <th className="px-8 py-5 text-right">Total</th>
+                  <th className="px-4 py-4">Artículo</th>
+                  <th className="px-3 py-4 text-right">Precio Neto</th>
+                  <th className="px-3 py-4 text-center">Cantidad</th>
+                  {isAdmin && <th className="px-3 py-4 text-center whitespace-nowrap">Dcto. (%)</th>}
+                  <th className="px-4 py-4 text-right">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/40">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={isAdmin ? 5 : 4} className="px-8 py-20 text-center text-zinc-500 text-sm uppercase font-bold tracking-widest italic">
+                    <td colSpan={isAdmin ? 5 : 4} className="px-4 py-20 text-center text-zinc-500 text-sm uppercase font-bold tracking-widest italic">
                       No hay productos agregados al pedido. Utiliza el buscador superior para agregar ítems.
                     </td>
                   </tr>
                 ) : (
                   items.map((item) => (
                     <tr key={item.productId} className="text-sm hover:bg-zinc-800/10 transition-colors">
-                      <td className="px-8 py-5">
-                        <div className="flex items-center gap-4">
-                          <div className="h-14 w-14 rounded-2xl bg-zinc-900 border border-zinc-800 relative overflow-hidden flex-shrink-0 shadow-md">
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-12 w-12 rounded-2xl bg-zinc-900 border border-zinc-800 relative overflow-hidden flex-shrink-0 shadow-md">
                             {item.image && <Image src={item.image} alt={item.name} fill className="object-cover" />}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-bold text-zinc-100 truncate max-w-[320px] text-sm md:text-base uppercase tracking-tight">{item.name}</p>
-                            <p className="text-[15px] font-extrabold text-amber-500 font-mono mt-1.5">SKU: {item.sku}</p>
+                            <p className="font-bold text-zinc-100 truncate w-[140px] md:w-[220px] lg:w-[320px] text-sm md:text-base uppercase tracking-tight">{item.name}</p>
+                            <p className="text-[13px] md:text-[15px] font-extrabold text-amber-500 font-mono mt-1">SKU: {item.sku}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-right">
+                      <td className="px-3 py-4 text-right">
                         <div className="flex flex-col items-end">
                           {(() => {
                             const totalDcto = item.discount + (item.extraDiscount || 0);
@@ -963,13 +963,13 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                           <span className="text-white font-black text-lg md:text-xl">{formatCurrency(item.price)}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-5">
-                        <div className="flex items-center justify-center gap-2">
+                      <td className="px-3 py-4">
+                        <div className="flex items-center justify-center gap-1 md:gap-2">
                           <button 
                             type="button"
                             tabIndex={-1}
                             onClick={() => updateQty(item.productId, -1)} 
-                            className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-500 hover:text-white transition-all border border-zinc-850"
+                            className="p-1.5 md:p-2 hover:bg-zinc-800 rounded-lg text-zinc-500 hover:text-white transition-all border border-zinc-850"
                           >
                             <Minus className="h-4 w-4" />
                           </button>
@@ -1005,14 +1005,14 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
 
                               setItems(items.map(i => i.productId === item.productId ? { ...i, quantity: cleanQty } : i));
                             }}
-                            className="w-16 bg-zinc-950 border border-zinc-800 rounded-lg py-2 text-center font-bold text-white text-base outline-none focus:border-primary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-12 md:w-14 bg-zinc-950 border border-zinc-800 rounded-lg py-1.5 md:py-2 text-center font-bold text-white text-sm md:text-base outline-none focus:border-primary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
 
                           <button 
                             type="button"
                             tabIndex={-1}
                             onClick={() => updateQty(item.productId, 1)} 
-                            className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-500 hover:text-white transition-all border border-zinc-850"
+                            className="p-1.5 md:p-2 hover:bg-zinc-800 rounded-lg text-zinc-500 hover:text-white transition-all border border-zinc-850"
                           >
                             <Plus className="h-4 w-4" />
                           </button>
@@ -1021,14 +1021,14 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                             type="button"
                             tabIndex={-1}
                             onClick={() => removeItem(item.productId)} 
-                            className="ml-3 p-2 hover:bg-red-500/10 text-zinc-655 hover:text-red-500 rounded-lg transition-all"
+                            className="ml-1 p-1.5 md:p-2 hover:bg-red-500/10 text-zinc-655 hover:text-red-500 rounded-lg transition-all"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
                       </td>
                       {isAdmin && (
-                        <td className="px-4 py-5 text-center">
+                        <td className="px-3 py-4 text-center">
                           <div className="flex items-center justify-center">
                             <input 
                               type="number"
@@ -1037,12 +1037,12 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                               placeholder="0"
                               value={item.extraDiscount === 0 ? '' : item.extraDiscount}
                               onChange={(e) => updateExtraDiscount(item.productId, e.target.value)}
-                              className="w-16 bg-zinc-950 border border-zinc-800 rounded-lg py-2 text-center font-bold text-white text-base outline-none focus:border-primary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-12 md:w-14 bg-zinc-950 border border-zinc-800 rounded-lg py-1.5 md:py-2 text-center font-bold text-white text-sm md:text-base outline-none focus:border-primary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                           </div>
                         </td>
                       )}
-                      <td className="px-8 py-5 text-right font-black text-white text-base md:text-lg">
+                      <td className="px-4 py-4 text-right font-black text-white text-base md:text-lg">
                         {formatCurrency(item.price * item.quantity)}
                       </td>
                     </tr>
