@@ -47,18 +47,20 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
     if (orderTarget.paymentStatus === PaymentStatus.PAID) {
       throw new BusinessRuleError("No puedes editar un pedido que ya está pagado.", "UPDATE_NOT_ALLOWED");
     }
-    
-    // Usuarios de cliente no pueden modificar descuentos extra
-    if (body.items) {
-      body.items.forEach((item: any) => {
-        delete item.discount;
-      });
-    }
   } else {
     requireRole(user, [UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES_REP]);
   }
 
   const body = await req.json();
+
+  // Solo Administradores pueden modificar descuentos extra manualmente
+  if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    if (body.items) {
+      body.items.forEach((item: any) => {
+        delete item.discount;
+      });
+    }
+  }
   
   if (body.shippingAddress) {
     if (!body.shippingAddress.street || !body.shippingAddress.region || !body.shippingAddress.comuna) {

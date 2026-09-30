@@ -36,7 +36,7 @@ import { CHILE_REGIONS } from '@/lib/chile-data';
 export function OrderCreateForm({ initialData }: { initialData?: any }) {
   const { user } = useAuth();
   const isClient = user?.role === 'COMPANY_ADMIN' || user?.role === 'BUYER';
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SALES_REP';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   
   const router = useRouter();
   const { fetcher } = useApi();
