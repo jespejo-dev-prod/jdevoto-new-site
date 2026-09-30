@@ -1028,9 +1028,10 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                               type="number"
                               min="0"
                               max="100"
-                              value={item.extraDiscount || 0}
+                              placeholder="0"
+                              value={item.extraDiscount === 0 ? '' : item.extraDiscount}
                               onChange={(e) => updateExtraDiscount(item.productId, e.target.value)}
-                              className="w-16 bg-zinc-950 border border-zinc-800 rounded-lg py-2 text-center font-bold text-white text-base outline-none focus:border-primary/50"
+                              className="w-16 bg-zinc-950 border border-zinc-800 rounded-lg py-2 text-center font-bold text-white text-base outline-none focus:border-primary/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                           </div>
                         </td>
