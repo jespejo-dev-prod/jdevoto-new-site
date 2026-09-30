@@ -948,12 +948,18 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                       </td>
                       <td className="px-6 py-5 text-right">
                         <div className="flex flex-col items-end">
-                          {item.discount > 0 && (
-                            <div className="flex items-center gap-2 mb-1.5">
-                              <span className="text-base font-bold text-zinc-500 line-through">{formatCurrency(item.basePrice)}</span>
-                              <span className="text-sm bg-primary/15 text-primary px-2.5 py-0.5 rounded-md font-bold">-{item.discount}%</span>
-                            </div>
-                          )}
+                          {(() => {
+                            const totalDcto = item.discount + (item.extraDiscount || 0);
+                            if (totalDcto > 0) {
+                              return (
+                                <div className="flex items-center gap-2 mb-1.5">
+                                  <span className="text-base font-bold text-zinc-500 line-through">{formatCurrency(item.basePrice)}</span>
+                                  <span className="text-sm bg-primary/15 text-primary px-2.5 py-0.5 rounded-md font-bold">-{totalDcto}%</span>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()}
                           <span className="text-white font-black text-lg md:text-xl">{formatCurrency(item.price)}</span>
                         </div>
                       </td>
