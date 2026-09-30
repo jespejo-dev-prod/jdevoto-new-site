@@ -96,6 +96,13 @@ export const POST = withApiHandler(async (req: NextRequest) => {
         `No estás autorizado a crear un pedido con estado '${data.status}'`
       );
     }
+    
+    // Usuarios de cliente no pueden aplicar descuentos extra manualmente
+    if (data.items) {
+      data.items.forEach(item => {
+        delete item.discount;
+      });
+    }
   }
 
   // Aplicar restricción para SALES_REP: solo pueden crear pedidos para clientes en su cartera

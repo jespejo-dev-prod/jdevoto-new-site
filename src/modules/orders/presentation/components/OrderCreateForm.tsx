@@ -137,27 +137,23 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     }
   }, [selectedCustomer]);
 
-  // Recalcular descuentos si cambia el cliente o al cargar
+  // Recalcular descuentos base si cambia el cliente (manteniendo el extraDiscount)
   useEffect(() => {
     if (selectedCustomer) {
       const defaultDiscount = Number(selectedCustomer.defaultDiscount || 0);
       setItems(prev => {
         let changed = false;
         const newItems = prev.map(item => {
-          // Conservar 0 si es promoción, pero si es un descuento normal, actualizarlo.
-          // Como no tenemos el motor de precios aquí, si el descuento actual es 0 y el base es distinto,
-          // podría ser una promoción, PERO si acabamos de abrir la página, `discount` podría ser 0 porque el cliente no tenía descuento.
-          // Solo reseteamos a 0 si es outlet o TEST-001.
-          let newDiscount = defaultDiscount;
+          let newBaseDiscount = defaultDiscount;
           if ((item.category as any)?.slug === 'outlet' || item.sku === 'TEST-001') {
-            newDiscount = 0;
+            newBaseDiscount = 0;
           }
-          if (item.discount !== newDiscount) {
+          if (item.discount !== newBaseDiscount) {
             changed = true;
             return {
               ...item,
-              discount: newDiscount,
-              price: item.basePrice * (1 - newDiscount / 100)
+              discount: newBaseDiscount,
+              price: item.basePrice * (1 - (newBaseDiscount + (item.extraDiscount || 0)) / 100)
             };
           }
           return item;
@@ -205,7 +201,6 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     }
   }, [selectedCustomer]);
   
-  // Carrito local
   const [items, setItems] = useState<Array<{
     productId: string;
     sku: string;
@@ -217,22 +212,34 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     price: number;
     basePrice: number;
     discount: number;
+    extraDiscount: number;
     image?: string;
     category?: string;
-  }>>(initialData?.items?.map((i: any) => ({
-    productId: i.productId,
-    sku: i.productSku || i.product?.sku || '',
-    name: i.productName || i.product?.name || '',
-    quantity: i.quantity,
-    minOrderQty: i.product?.minOrderQty || 1,
-    inner: i.product?.inner || 1,
-    stockQuantity: i.product?.stockQuantity !== undefined ? Number(i.product.stockQuantity) : 999999,
-    basePrice: Number(i.unitNetPrice),
-    price: Number(i.unitNetPrice) * (1 - Number(i.discount) / 100),
-    discount: Number(i.discount),
-    image: i.product?.images?.[0]?.url,
-    category: i.product?.category
-  })) || []);
+  }>>(initialData?.items?.map((i: any) => {
+    const defaultDcto = Number(initialData.company?.defaultDiscount || 0);
+    const totalDcto = Number(i.discount);
+    // Asumimos que si el descuento total es mayor al base del cliente, la diferencia es el extra.
+    // Si la categoría es outlet, defaultDcto es 0.
+    const isExcluded = i.product?.category?.slug === 'outlet' || i.productSku === 'TEST-001';
+    const baseDcto = isExcluded ? 0 : defaultDcto;
+    const extra = Math.max(0, totalDcto - baseDcto);
+    
+    return {
+      productId: i.productId,
+      sku: i.productSku || i.product?.sku || '',
+      name: i.productName || i.product?.name || '',
+      quantity: i.quantity,
+      minOrderQty: i.product?.minOrderQty || 1,
+      inner: i.product?.inner || 1,
+      stockQuantity: i.product?.stockQuantity !== undefined ? Number(i.product.stockQuantity) : 999999,
+      basePrice: Number(i.unitNetPrice),
+      price: Number(i.unitNetPrice) * (1 - totalDcto / 100),
+      discount: baseDcto,
+      extraDiscount: extra,
+      image: i.product?.images?.[0]?.url,
+      category: i.product?.category
+    };
+  }) || []);
 
   // Hooks de datos
   const { data: customers = [], isLoading: loadingCustomers } = useCustomers({ search: debouncedCustomerSearch, limit: 5 });
@@ -437,6 +444,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
         basePrice: product.basePrice,
         price: discountedPrice,
         discount: discountPercent,
+        extraDiscount: 0,
         image: product.images?.[0]?.url,
         category: product.category
       }]);
@@ -504,6 +512,26 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     }));
   };
 
+  const updateExtraDiscount = (productId: string, val: string | number) => {
+    let extra = typeof val === 'string' ? parseFloat(val) : val;
+    if (isNaN(extra) || extra < 0) extra = 0;
+    if (extra > 100) extra = 100;
+    
+    setItems(items.map(i => {
+      if (i.productId === productId) {
+        if (i.discount + extra > 100) {
+           extra = 100 - i.discount;
+        }
+        return { 
+          ...i, 
+          extraDiscount: extra,
+          price: i.basePrice * (1 - (i.discount + extra) / 100)
+        };
+      }
+      return i;
+    }));
+  };
+
   const handleSubmit = async (overrideStatus?: OrderStatus) => {
     if (!selectedCustomer) return toast.error("Selecciona un cliente");
     if (items.length === 0) return toast.error("Agrega al menos un producto al carrito");
@@ -556,7 +584,7 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
         items: items.map(i => ({ 
           productId: i.productId, 
           quantity: i.quantity,
-          discount: i.discount,
+          discount: i.discount + (i.extraDiscount || 0),
           unitNetPrice: i.basePrice
         })),
         shippingAddress: {
@@ -893,13 +921,14 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                   <th className="px-8 py-5">Artículo</th>
                   <th className="px-6 py-5 text-right">Precio Neto</th>
                   <th className="px-6 py-5 text-center">Cantidad</th>
+                  {isAdmin && <th className="px-4 py-5 text-center whitespace-nowrap">Dcto. Extra (%)</th>}
                   <th className="px-8 py-5 text-right">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/40">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-8 py-20 text-center text-zinc-500 text-sm uppercase font-bold tracking-widest italic">
+                    <td colSpan={isAdmin ? 5 : 4} className="px-8 py-20 text-center text-zinc-500 text-sm uppercase font-bold tracking-widest italic">
                       No hay productos agregados al pedido. Utiliza el buscador superior para agregar ítems.
                     </td>
                   </tr>
@@ -992,6 +1021,20 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
                           </button>
                         </div>
                       </td>
+                      {isAdmin && (
+                        <td className="px-4 py-5 text-center">
+                          <div className="flex items-center justify-center">
+                            <input 
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={item.extraDiscount || 0}
+                              onChange={(e) => updateExtraDiscount(item.productId, e.target.value)}
+                              className="w-16 bg-zinc-950 border border-zinc-800 rounded-lg py-2 text-center font-bold text-white text-base outline-none focus:border-primary/50"
+                            />
+                          </div>
+                        </td>
+                      )}
                       <td className="px-8 py-5 text-right font-black text-white text-base md:text-lg">
                         {formatCurrency(item.price * item.quantity)}
                       </td>

@@ -107,6 +107,7 @@ export interface ProductWithPrice {
 export interface CreateOrderItemInput {
   productId: string;
   quantity: number;
+  discount?: number;
 }
 
 export interface CreateOrderInput {

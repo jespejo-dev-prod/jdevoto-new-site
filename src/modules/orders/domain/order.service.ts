@@ -114,7 +114,12 @@ export class OrderService {
       const price = priceMap.get(item.productId)!;
 
       const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET' || product.sku === 'TEST-001';
-      const discount = isExcluded ? 0 : defaultDiscountPercent;
+      let discount = isExcluded ? 0 : defaultDiscountPercent;
+      
+      // Override con descuento extra manual si viene en el input
+      if (item.discount !== undefined && item.discount !== null) {
+        discount = item.discount;
+      }
       const unitNetPrice = price.discountedNetPrice;
 
       const lineNetTotal = round2(
@@ -129,7 +134,7 @@ export class OrderService {
         productName: product.name,
         quantity: item.quantity,
         unitNetPrice,
-        discount: isExcluded ? price.discountPercent : defaultDiscountPercent,
+        discount,
         lineNetTotal,
         lineTax,
         lineTotal,
@@ -601,7 +606,11 @@ export class OrderService {
           const price = priceMap.get(item.productId)!;
 
           const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET' || product.sku === 'TEST-001';
-          const discount = isExcluded ? 0 : defaultDiscountPercent;
+          let discount = isExcluded ? 0 : defaultDiscountPercent;
+          
+          if (item.discount !== undefined && item.discount !== null) {
+            discount = item.discount;
+          }
           const unitNetPrice = price.discountedNetPrice;
 
           const lineNetTotal = round2(
@@ -616,7 +625,7 @@ export class OrderService {
             productName: product.name,
             quantity: item.quantity,
             unitNetPrice,
-            discount: isExcluded ? price.discountPercent : defaultDiscountPercent,
+            discount,
             lineNetTotal,
             lineTax,
             lineTotal,
