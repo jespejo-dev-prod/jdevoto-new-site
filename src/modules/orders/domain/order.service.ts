@@ -194,7 +194,7 @@ export class OrderService {
     if (paymentMethod === 'credit_b2b' && company.paymentTermDiscount !== null && company.paymentTermDiscount !== undefined) {
       paymentDiscountPercent = Number(company.paymentTermDiscount);
     } else {
-      paymentDiscountPercent = await orderRulesService.getPaymentDiscountPercent(paymentMethod, paymentTermsDays);
+      paymentDiscountPercent = await orderRulesService.getPaymentDiscountPercent(paymentMethod || '', paymentTermsDays);
     }
 
     const paymentDiscountAmount = round2(baseSubtotalNet * (paymentDiscountPercent / 100));
@@ -601,7 +601,7 @@ export class OrderService {
         if (currentPaymentMethod === 'credit_b2b' && company.paymentTermDiscount !== null && company.paymentTermDiscount !== undefined) {
           paymentDiscountPercent = Number(company.paymentTermDiscount);
         } else {
-          paymentDiscountPercent = await orderRulesService.getPaymentDiscountPercent(currentPaymentMethod, paymentTermsDays);
+          paymentDiscountPercent = await orderRulesService.getPaymentDiscountPercent(currentPaymentMethod || '', paymentTermsDays);
         }
 
         paymentDiscountAmount = round2(baseSubtotalNet * (paymentDiscountPercent / 100));
