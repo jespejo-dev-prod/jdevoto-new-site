@@ -1,18 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET, PATCH } from '@/app/api/orders/[id]/route';
+import { GET, PATCH } from '../../src/app/api/orders/[id]/route';
 import { NextRequest } from 'next/server';
 import { UserRole } from '@prisma/client';
-import { extractUserFromRequest } from '@/lib/auth';
-import { prisma } from '@/lib/client';
-import { orderService } from '@/modules/orders/domain/order.service';
-import { BusinessRuleError } from '@/lib/errors';
+import { extractUserFromRequest } from '../../src/lib/auth';
+import { prisma } from '../../src/lib/client';
+import { orderService } from '../../src/modules/orders/domain/order.service';
+import { BusinessRuleError } from '../../src/lib/errors';
 
-vi.mock('@/lib/auth', () => ({
+vi.mock('../../src/lib/auth', () => ({
   extractUserFromRequest: vi.fn(),
   requireRole: vi.fn(),
 }));
 
-vi.mock('@/lib/client', () => ({
+vi.mock('../../src/lib/client', () => ({
   prisma: {
     order: {
       findUnique: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock('@/lib/client', () => ({
   }
 }));
 
-vi.mock('@/modules/orders/domain/order.service', () => ({
+vi.mock('../../src/modules/orders/domain/order.service', () => ({
   orderService: {
     getOrderById: vi.fn(),
     updateOrder: vi.fn(),
@@ -72,7 +72,7 @@ describe('IDOR en Orders API (Security Regression)', () => {
       body: JSON.stringify({ status: 'CANCELLED' })
     });
 
-    await expect(PATCH(req, { params: Promise.resolve({ id: 'order-123' }) } as any))
-      .rejects.toThrowError(BusinessRuleError);
+    const res = await PATCH(req, { params: Promise.resolve({ id: 'order-123' }) } as any);
+    expect(res.status).toBe(422);
   });
 });

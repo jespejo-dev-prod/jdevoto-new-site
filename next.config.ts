@@ -21,10 +21,13 @@ const nextConfig: NextConfig = {
     // Tamaños de dispositivo para el srcset automático
     deviceSizes: [640, 750, 828, 1080, 1200, 1440, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 192, 256, 384],
+    // Calidades permitidas
+    qualities: [25, 50, 60, 75, 90, 100],
     // Tiempo de caché en la CDN/browser (30 días)
     minimumCacheTTL: 60 * 60 * 24 * 30,
-    // APAGAR OPTIMIZACIÓN DE VERCEL PARA NO GASTAR LÍMITE (Usa directamente las URLs originales)
-    unoptimized: true,
+    // Usar Cloudinary Custom Loader para evitar costos en Vercel (solo en Producción)
+    loader: isProd ? "custom" : "default",
+    loaderFile: isProd ? "./src/lib/cloudinary-loader.ts" : undefined,
   },
 
   // ── Compresión de respuestas HTTP ────────────────────────────────────────

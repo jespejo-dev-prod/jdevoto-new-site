@@ -16,6 +16,7 @@
 
 import { prisma } from "@/lib/client";
 import { priceService } from "@/modules/pricing/domain/price.service";
+import { orderRulesService } from "./order-rules.service";
 import {
   NotFoundError,
   BusinessRuleError,
@@ -168,53 +169,21 @@ export class OrderService {
     if (reqShippingMethod === "free") {
       const region = (shippingAddress as any)?.region || "";
       const comuna = (shippingAddress as any)?.comuna || "";
-      const r = region.toUpperCase();
-      const c = comuna.toUpperCase();
 
-      if (c.includes("JUAN FERNANDEZ") || c.includes("ISLA DE PASCUA")) {
+      try {
+        const freeShippingMin = await orderRulesService.getFreeShippingMinAmount(region, comuna);
+        
+        if (baseSubtotalNet < freeShippingMin) {
+          throw new BusinessRuleError(
+            `El subtotal neto del pedido ($${baseSubtotalNet.toLocaleString("es-CL")}) ` +
+              `es inferior al mínimo requerido para flete incluido en su zona ($${freeShippingMin.toLocaleString("es-CL")} netos).`,
+            "FREE_SHIPPING_MINIMUM_NOT_MET"
+          );
+        }
+      } catch (error: any) {
         throw new BusinessRuleError(
-          "El despacho gratuito (Flete Incluido) no está disponible para territorio insular. Debe seleccionar Flete por Pagar.",
+          error.message || "Error al validar flete incluido.",
           "FREE_SHIPPING_NOT_AVAILABLE_FOR_INSULAR"
-        );
-      }
-
-      let freeShippingMin = 250000;
-
-      // Zonas Extremas $1.000.000 (Sur)
-      if (
-        r.includes("AYSEN") || 
-        r.includes("MAGALLANES") ||
-        c.includes("PUNTA ARENAS") || 
-        c.includes("NATALES") || 
-        c.includes("AYSEN") ||
-        c.includes("CISNES") ||
-        c.includes("PUERTO AYSEN") ||
-        c.includes("COIHAIQUE") ||
-        c.includes("COCHRANE") ||
-        c.includes("PORVENIR")
-      ) {
-        freeShippingMin = 1000000;
-      }
-      // Zonas Extremas $500.000 (Norte + Calama)
-      else if (
-        r.includes("TARAPACA") ||
-        r.includes("ARICA") ||
-        c.includes("ARICA") || 
-        c.includes("IQUIQUE") || 
-        c.includes("CALAMA")
-      ) {
-        freeShippingMin = 500000;
-      }
-      // Región Metropolitana y Valparaíso $100.000
-      else if (r.includes("METROPOLITANA") || r.includes("VALPARAISO")) {
-        freeShippingMin = 100000;
-      }
-
-      if (baseSubtotalNet < freeShippingMin) {
-        throw new BusinessRuleError(
-          `El subtotal neto del pedido ($${baseSubtotalNet.toLocaleString("es-CL")}) ` +
-            `es inferior al mínimo requerido para flete incluido en su zona ($${freeShippingMin.toLocaleString("es-CL")} netos).`,
-          "FREE_SHIPPING_MINIMUM_NOT_MET"
         );
       }
     }
@@ -222,20 +191,10 @@ export class OrderService {
     // Calcular descuento por medio de pago y plazo
     const paymentTermsDays = company.paymentTerms;
     let paymentDiscountPercent = 0;
-    if (paymentMethod === 'credit_b2b') {
-      if (company.paymentTermDiscount !== null && company.paymentTermDiscount !== undefined) {
-        paymentDiscountPercent = Number(company.paymentTermDiscount);
-      } else {
-        if (paymentTermsDays === 90) paymentDiscountPercent = 0;
-        else if (paymentTermsDays === 61) paymentDiscountPercent = 0;
-        else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
-        else if (paymentTermsDays === 32) paymentDiscountPercent = 0;
-        else if (paymentTermsDays === 31) paymentDiscountPercent = 10;
-        else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
-        else if (paymentTermsDays === 0) paymentDiscountPercent = 10;
-      }
-    } else if (paymentMethod === 'webpay' || paymentMethod === 'transfer' || paymentMethod === 'mercadopago') {
-      paymentDiscountPercent = 10;
+    if (paymentMethod === 'credit_b2b' && company.paymentTermDiscount !== null && company.paymentTermDiscount !== undefined) {
+      paymentDiscountPercent = Number(company.paymentTermDiscount);
+    } else {
+      paymentDiscountPercent = await orderRulesService.getPaymentDiscountPercent(paymentMethod, paymentTermsDays);
     }
 
     const paymentDiscountAmount = round2(baseSubtotalNet * (paymentDiscountPercent / 100));
@@ -639,20 +598,10 @@ export class OrderService {
         const currentPaymentMethod = input.paymentMethod || order.paymentMethod;
         const paymentTermsDays = company.paymentTerms;
         let paymentDiscountPercent = 0;
-        if (currentPaymentMethod === 'credit_b2b') {
-          if (company.paymentTermDiscount !== null && company.paymentTermDiscount !== undefined) {
-            paymentDiscountPercent = Number(company.paymentTermDiscount);
-          } else {
-            if (paymentTermsDays === 90) paymentDiscountPercent = 0;
-            else if (paymentTermsDays === 61) paymentDiscountPercent = 0;
-            else if (paymentTermsDays === 60) paymentDiscountPercent = 4;
-            else if (paymentTermsDays === 32) paymentDiscountPercent = 0;
-            else if (paymentTermsDays === 31) paymentDiscountPercent = 10;
-            else if (paymentTermsDays === 30) paymentDiscountPercent = 7;
-            else if (paymentTermsDays === 0) paymentDiscountPercent = 0;
-          }
-        } else if (currentPaymentMethod === 'webpay' || currentPaymentMethod === 'transfer' || currentPaymentMethod === 'mercadopago') {
-          paymentDiscountPercent = 10;
+        if (currentPaymentMethod === 'credit_b2b' && company.paymentTermDiscount !== null && company.paymentTermDiscount !== undefined) {
+          paymentDiscountPercent = Number(company.paymentTermDiscount);
+        } else {
+          paymentDiscountPercent = await orderRulesService.getPaymentDiscountPercent(currentPaymentMethod, paymentTermsDays);
         }
 
         paymentDiscountAmount = round2(baseSubtotalNet * (paymentDiscountPercent / 100));

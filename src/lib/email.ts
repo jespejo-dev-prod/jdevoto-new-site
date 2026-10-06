@@ -4,31 +4,52 @@ import nodemailer from 'nodemailer';
 let transporterInstance: nodemailer.Transporter | null = null;
 
 export async function getTransporter() {
-  if (transporterInstance) return transporterInstance;
+  if (!transporterInstance) {
+    // Use real SMTP if configured
+    if (process.env.SMTP_HOST) {
+      transporterInstance = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+    } else {
+      // Development mode: Create a fake Ethereal account
+      const testAccount = await nodemailer.createTestAccount();
+      transporterInstance = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+    }
 
-  // Use real SMTP if configured
-  if (process.env.SMTP_HOST) {
-    transporterInstance = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-  } else {
-    // Development mode: Create a fake Ethereal account
-    const testAccount = await nodemailer.createTestAccount();
-    transporterInstance = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
+    // Interceptor para evitar enviar correos a clientes reales estando en localhost
+    const isLocalhost = process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_APP_URL?.includes('localhost');
+    if (isLocalhost) {
+      const originalSendMail = transporterInstance.sendMail.bind(transporterInstance);
+      transporterInstance.sendMail = async (mailOptions: any) => {
+        const redirectEmail = process.env.LOCAL_TEST_EMAIL || 'jespejo@jdevoto.cl';
+        const originalTo = mailOptions.to;
+        mailOptions.subject = `[LOCAL DEV -> OriginalTo: ${originalTo}] ${mailOptions.subject}`;
+        mailOptions.to = redirectEmail;
+        // Evitamos CC y BCC para no enviarle a nadie más accidentalmente
+        if (mailOptions.cc) {
+          mailOptions.subject += ` [CC: ${mailOptions.cc}]`;
+          delete mailOptions.cc;
+        }
+        if (mailOptions.bcc) {
+          delete mailOptions.bcc;
+        }
+        return originalSendMail(mailOptions);
+      };
+    }
   }
 
   return transporterInstance;
