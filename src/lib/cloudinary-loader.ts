@@ -29,11 +29,15 @@ export default function cloudinaryLoader({
   if (src.startsWith('/')) {
     // Cloudinary no puede hacer fetch a "localhost". 
     // En desarrollo, simplemente devolvemos la ruta nativa para que cargue desde el disco sin optimizar por cloudinary.
-    if (process.env.NODE_ENV !== 'production') {
-      return `${src}?w=${width}&q=${quality || 75}`;
+    // Vercel protege sus URLs de preview con autenticación por defecto (Vercel Auth).
+    // Esto significa que los servidores de Cloudinary reciben un error 401 cuando intentan descargar la imagen.
+    // Solución: En entornos preview, devolvemos la ruta relativa para que el navegador del usuario la cargue directo.
+    const isVercelPreview = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' || (process.env.NEXT_PUBLIC_VERCEL_URL && !process.env.NEXT_PUBLIC_VERCEL_URL.includes('jdevoto.cl'));
+    
+    if (isVercelPreview) {
+      return src;
     }
-    // En producción (y Vercel Previews), necesitamos la URL absoluta para que Cloudinary haga fetch.
-    // NEXT_PUBLIC_VERCEL_URL es inyectada automáticamente por Vercel en cada branch/preview.
+
     const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : '';
     const baseUrl = vercelUrl || process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
     urlForCloudinary = `${baseUrl}${src}`;
