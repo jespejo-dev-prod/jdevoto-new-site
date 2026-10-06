@@ -32,8 +32,10 @@ export default function cloudinaryLoader({
     if (process.env.NODE_ENV !== 'production') {
       return `${src}?w=${width}&q=${quality || 75}`;
     }
-    // En producción, usamos el dominio público
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
+    // En producción (y Vercel Previews), necesitamos la URL absoluta para que Cloudinary haga fetch.
+    // NEXT_PUBLIC_VERCEL_URL es inyectada automáticamente por Vercel en cada branch/preview.
+    const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : '';
+    const baseUrl = vercelUrl || process.env.NEXT_PUBLIC_APP_URL || 'https://www.jdevoto.cl';
     urlForCloudinary = `${baseUrl}${src}`;
   }
 
