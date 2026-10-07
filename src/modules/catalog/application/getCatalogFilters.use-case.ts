@@ -44,7 +44,7 @@ export type CatalogFiltersData = {
  * TTL: 1 hora. unstable_cache automáticamente incluye los argumentos en la key de caché.
  */
 export const getCatalogFiltersUseCase = unstable_cache(
-  async (categoryQuery?: string, brandQuery?: string): Promise<CatalogFiltersData> => {
+  async (categoryQuery?: string, brandQuery?: string, subcategoriesQuery?: string): Promise<CatalogFiltersData> => {
     const baseProductFilter = {
       isActive: true,
       isDeleted: false,
@@ -67,19 +67,30 @@ export const getCatalogFiltersUseCase = unstable_cache(
 
     // 2. Filtro de Categoría (para contar en marcas)
     let categoryFilter = {};
-    if (categoryQuery) {
-      // Necesitamos resolver si es padre para incluir hijos
-      const cat = await prisma.category.findFirst({
-        where: {
-          OR: [{ id: categoryQuery }, { slug: categoryQuery }]
-        },
-        include: { children: true }
-      });
-      if (cat) {
-        const catIds = [cat.id, ...cat.children.map(c => c.id)];
-        categoryFilter = {
-          categoryId: { in: catIds }
-        };
+    if (categoryQuery || subcategoriesQuery) {
+      let finalCatIds: string[] = [];
+
+      // Si hay subcategorías seleccionadas, estas mandan (son más específicas para el conteo de marcas)
+      if (subcategoriesQuery) {
+         const subSlugs = subcategoriesQuery.split(',').map(s => s.trim());
+         const subCats = await prisma.category.findMany({
+            where: { OR: [{ id: { in: subSlugs } }, { slug: { in: subSlugs } }] },
+            select: { id: true }
+         });
+         finalCatIds = subCats.map(c => c.id);
+      } else if (categoryQuery) {
+         // Si no hay subcategorías, usamos la categoría padre y todos sus hijos
+         const cat = await prisma.category.findFirst({
+            where: { OR: [{ id: categoryQuery }, { slug: categoryQuery }] },
+            include: { children: true }
+         });
+         if (cat) {
+            finalCatIds = [cat.id, ...cat.children.map(c => c.id)];
+         }
+      }
+
+      if (finalCatIds.length > 0) {
+        categoryFilter = { categoryId: { in: finalCatIds } };
       }
     }
 

@@ -92,7 +92,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
   const filters = parseFilters(slug, searchParams);
 
   const [filtersData, user] = await Promise.all([
-    getCatalogFiltersUseCase(filters.categoryQuery, filters.brandsQuery),
+    getCatalogFiltersUseCase(filters.categoryQuery, filters.brandsQuery, filters.subcategoriesQuery),
     getServerUser(),
   ]);
 
