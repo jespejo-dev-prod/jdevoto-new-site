@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo, useEffect } from 'react';
 import { 
@@ -244,10 +244,10 @@ export default function CheckoutPage() {
       setRazonSocial(user.company?.razonSocial || `${user.firstName} ${user.lastName}`);
       setRutEmpresa(user.company?.rut || '');
       
-      // Auto-rellenar opciones de despacho (Mock)
-      setRegion('METROPOLITANA DE SANTIAGO');
-      setComuna('PROVIDENCIA'); // Tiene que ser una comuna válida para la región
-      setShippingStreet('Av. Providencia 1234, Of 502');
+      // Auto-rellenar opciones de despacho
+      if (user.company?.region) setRegion(user.company.region);
+      if (user.company?.comuna) setComuna(user.company.comuna);
+      if (user.company?.direccion) setShippingStreet(user.company.direccion);
     }
   }, [user]);
 

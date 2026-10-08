@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { 
@@ -71,17 +71,17 @@ export default function ProfilePage() {
 
       if (user.company) {
         setCompanyEmail(user.company.email || user.email || '');
-        setCompanyPhone(user.company.telefono || user.phone || '+56 9 1234 5678');
+        setCompanyPhone(user.company.telefono || user.phone || '');
         setCompanyRazonSocial(user.company.razonSocial || '');
         setCompanyRut(user.company.rut || '');
-        setCompanyGiro(user.company.giro || 'Venta de artículos electrónicos');
+        setCompanyGiro(user.company.giro || '');
 
-        setShippingStreet(user.company.shippingStreet || 'Av. Providencia');
-        setShippingNumber(user.company.shippingNumber || '1234');
-        setShippingApartment(user.company.shippingApartment || 'Of 502');
-        setShippingCommune(user.company.shippingCommune || 'PROVIDENCIA');
-        setShippingCity(user.company.shippingCity || 'Santiago');
-        setShippingRegion(user.company.shippingRegion || 'METROPOLITANA DE SANTIAGO');
+        setShippingStreet(user.company.shippingStreet || '');
+        setShippingNumber(user.company.shippingNumber || '');
+        setShippingApartment(user.company.shippingApartment || '');
+        setShippingCommune(user.company.shippingCommune || '');
+        setShippingCity(user.company.shippingCity || '');
+        setShippingRegion(user.company.shippingRegion || '');
       }
 
       // Check 2FA status using user.twoFactorEnabled

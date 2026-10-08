@@ -307,7 +307,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     "w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none transition-all",
                     errors.razonSocial && "border-red-500/50"
                   )}
-                  placeholder="Ej: J. Devoto"
+                  
                 />
                 {errors.razonSocial && <p className="text-red-400 text-[10px] font-bold px-1">{errors.razonSocial.message}</p>}
               </div>
@@ -329,7 +329,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     <input 
                       {...register('direccion')} 
                       className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
-                      placeholder="Ej: Av. Apoquindo 4501"
+                      
                     />
                   </div>
                   <div className="md:col-span-4 space-y-2">
@@ -337,7 +337,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     <input 
                       {...register('region')} 
                       className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
-                      placeholder="Ej: Metropolitana de Santiago"
+                      
                     />
                   </div>
                   <div className="md:col-span-4 space-y-2">
@@ -345,7 +345,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     <input 
                       {...register('comuna')} 
                       className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
-                      placeholder="Ej: Las Condes"
+                      
                     />
                   </div>
                   <div className="md:col-span-4 space-y-2">
@@ -353,7 +353,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                     <input 
                       {...register('ciudad')} 
                       className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
-                      placeholder="Ej: Santiago"
+                      
                     />
                   </div>
                 </div>
@@ -442,7 +442,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   type="text"
                   {...register('shippingRegion')} 
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
-                  placeholder="Ej: Metropolitana de Santiago"
+                  
                 />
               </div>
               <div className="md:col-span-4 space-y-2">
@@ -451,7 +451,7 @@ export function CustomerForm({ initialData, onSubmit, isSubmitting, onDelete, on
                   type="text"
                   {...register('shippingCommune')} 
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl h-12 px-4 text-white focus:border-primary/50 outline-none" 
-                  placeholder="Ej: Providencia"
+                  
                 />
               </div>
               <div className="md:col-span-4 space-y-2">

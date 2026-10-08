@@ -227,7 +227,7 @@ export default function RegisterPage() {
                 <div>
                   <Input
                     id="calleNumero"
-                    placeholder="Calle y número (Ej: Av. Apoquindo 4501)"
+                    
                     disabled={isSubmitting}
                     {...register("calleNumero")}
                     className={`bg-zinc-900/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:ring-primary h-14 text-base rounded-full px-4 ${errors.calleNumero ? "border-red-500 focus-visible:ring-red-500" : ""}`}

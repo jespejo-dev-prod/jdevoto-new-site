@@ -536,6 +536,10 @@ export function OrderCreateForm({ initialData }: { initialData?: any }) {
     if (!selectedCustomer) return toast.error("Selecciona un cliente");
     if (items.length === 0) return toast.error("Agrega al menos un producto al carrito");
 
+    if (!shippingAddress.street || !shippingAddress.commune || !shippingAddress.region) {
+      return toast.error("La dirección de despacho es requerida (Calle, Comuna y Región).");
+    }
+
     if (totals.baseNet < 100000) {
       return toast.error(`El subtotal neto debe ser de al menos $100.000. Te faltan $${(100000 - totals.baseNet).toLocaleString('es-CL')} netos.`);
     }
