@@ -245,9 +245,9 @@ export default function CheckoutPage() {
       setRutEmpresa(user.company?.rut || '');
       
       // Auto-rellenar opciones de despacho
-      if (user.company?.region) setRegion(user.company.region);
-      if (user.company?.comuna) setComuna(user.company.comuna);
-      if (user.company?.direccion) setShippingStreet(user.company.direccion);
+      if (user.company?.shippingRegion) setRegion(user.company.shippingRegion);
+      if (user.company?.shippingCommune) setComuna(user.company.shippingCommune);
+      if (user.company?.shippingStreet) setShippingStreet(user.company.shippingStreet);
     }
   }, [user]);
 
