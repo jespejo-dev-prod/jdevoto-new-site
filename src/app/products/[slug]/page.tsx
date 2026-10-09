@@ -604,7 +604,7 @@ async function RelatedProductsSection({
     category: { select: { id: true, name: true, isOutlet: true } },
     brand: { select: { id: true, name: true } },
     images: {
-      where: { isPrimary: true },
+      orderBy: [{ isPrimary: 'desc' }, { position: 'asc' }],
       take: 1,
       select: { url: true, isPrimary: true },
     },

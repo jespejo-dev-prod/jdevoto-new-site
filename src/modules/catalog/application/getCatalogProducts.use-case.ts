@@ -219,7 +219,7 @@ export async function getCatalogProductsUseCase(
     category: { select: { id: true, name: true, isOutlet: true } },
     brand: { select: { id: true, name: true } },
     images: {
-      where: { isPrimary: true },
+      orderBy: [{ isPrimary: 'desc' }, { position: 'asc' }],
       take: 1,
       select: { url: true, isPrimary: true },
     },
@@ -337,7 +337,8 @@ export async function getCatalogProductsUseCase(
       LEFT JOIN LATERAL (
         SELECT url, "isPrimary"
         FROM product_images
-        WHERE "productId" = p.id AND "isPrimary" = true
+        WHERE "productId" = p.id
+        ORDER BY "isPrimary" DESC, "position" ASC
         LIMIT 1
       ) img ON true
       WHERE ${whereClause}
