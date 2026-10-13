@@ -219,7 +219,7 @@ export async function getCatalogProductsUseCase(
     category: { select: { id: true, name: true, isOutlet: true } },
     brand: { select: { id: true, name: true } },
     images: {
-      orderBy: [{ isPrimary: 'desc' }, { position: 'asc' }],
+      orderBy: [{ isPrimary: 'desc' as const }, { position: 'asc' as const }],
       take: 1,
       select: { url: true, isPrimary: true },
     },
