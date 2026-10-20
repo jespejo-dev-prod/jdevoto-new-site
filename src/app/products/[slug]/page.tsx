@@ -350,10 +350,10 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                       </tr>
                       <tr className="group">
                         <td className="py-2.5 text-zinc-500 group-hover:text-zinc-700 transition-colors">
-                          Unidades Inner
+                          Unidades por empaque (Inner)
                         </td>
-                        <td className="py-2.5 text-right text-zinc-950">
-                          {product.inner ?? 1}
+                        <td className="py-2.5 text-right text-zinc-950 font-bold">
+                          {product.inner ?? 1} {product.unit || 'unidades'}
                         </td>
                       </tr>
                     </tbody>

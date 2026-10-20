@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, Filter, LayoutGrid, List as ListIcon, ArrowUpDown, X } from 'lucide-react';
+import { Search, Filter, LayoutGrid, List as ListIcon, ArrowUpDown, X, FileSpreadsheet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProductsFilterBarProps {
@@ -193,9 +193,25 @@ export function ProductsFilterBar({
         )}
       </div>
 
-      {/* Vista grid/lista */}
-      <div className={cn("flex items-center gap-2 border-l pl-4 ml-2 hidden lg:flex flex-shrink-0", isDashboard ? "border-zinc-800" : "border-zinc-100")}>
-        <div className={cn("flex p-1 rounded-xl border", isDashboard ? "bg-zinc-950 border-zinc-800" : "bg-zinc-50 border-zinc-100")}>
+      {/* Acciones y Vista grid/lista */}
+      <div className={cn("flex items-center gap-2 border-l pl-4 ml-2 flex-shrink-0", isDashboard ? "border-zinc-800" : "border-zinc-100")}>
+        <a
+          href="/api/products/price-list/export"
+          download
+          className={cn(
+            "flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all border shadow-xs cursor-pointer select-none",
+            isDashboard
+              ? "bg-zinc-950 border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700"
+              : "bg-white border-zinc-200 text-zinc-700 hover:text-primary hover:border-primary/40 hover:bg-zinc-50/50"
+          )}
+          title="Descargar lista de precios completa en Excel (.xlsx)"
+        >
+          <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+          <span className="hidden sm:inline">Lista Excel (.xlsx)</span>
+          <span className="sm:hidden">Excel</span>
+        </a>
+
+        <div className={cn("hidden lg:flex p-1 rounded-xl border", isDashboard ? "bg-zinc-950 border-zinc-800" : "bg-zinc-50 border-zinc-100")}>
           <button
             id="view-grid"
             onClick={() => onViewChange('grid')}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Minus, Plus, Truck, ShieldCheck, CheckCircle2, RotateCcw, Lock, ShoppingCart as ShoppingCartIcon, Pencil, Heart } from 'lucide-react';
+import { Minus, Plus, Truck, ShieldCheck, CheckCircle2, RotateCcw, Lock, ShoppingCart as ShoppingCartIcon, Pencil, Heart, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AddToCartAction } from '../AddToCartAction/AddToCartAction';
 import { useCart } from '@/context/CartContext';
@@ -202,6 +202,15 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
             <CheckCircle2 className="h-5 w-5 text-[#70b363]" />
             <span className="text-[#70b363] font-black text-[15px] sm:text-[16px]">
               {product.stockQuantity} disponibles
+            </span>
+          </div>
+        )}
+
+        {product.inner && product.inner > 1 && (
+          <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-blue-50/80 border border-blue-200/80 rounded-xl text-blue-900 text-xs font-semibold shadow-xs">
+            <Package className="h-4 w-4 text-blue-600 shrink-0" />
+            <span>
+              Empaque mínimo: <strong className="font-bold text-blue-950">{product.inner} {product.unit || 'unidades'}</strong> por paquete
             </span>
           </div>
         )}

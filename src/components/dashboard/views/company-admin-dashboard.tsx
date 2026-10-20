@@ -1,7 +1,7 @@
 'use client';
 
 
-import { ShoppingCart, Building2, Users } from 'lucide-react';
+import { ShoppingCart, Building2, Users, FileSpreadsheet } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/auth-context';
 import { TransactionTable } from '@/components/dashboard/transaction-table';
@@ -21,6 +21,15 @@ export function CompanyAdminDashboard() {
           <p className="text-sm text-zinc-500">Administra tus compras y accesos de equipo.</p>
         </div>
         <div className="flex gap-3 flex-wrap shrink-0">
+          <a
+            href="/api/products/price-list/export"
+            download
+            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-all border border-zinc-800 flex items-center gap-2 cursor-pointer shadow-sm"
+            title="Descargar lista de precios completa en formato Excel"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            Descargar Lista Excel
+          </a>
           <Link href="/dashboard/my-company">
             <button className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-all border border-zinc-800 flex items-center gap-2">
               <Building2 className="w-4 h-4" />

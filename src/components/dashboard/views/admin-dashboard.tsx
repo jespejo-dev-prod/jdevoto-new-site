@@ -12,7 +12,8 @@ import {
   Plus,
   ArrowRight,
   Database,
-  ExternalLink
+  ExternalLink,
+  FileSpreadsheet
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -57,6 +58,17 @@ export function AdminDashboard() {
             Centro de Mando Operativo
           </h1>
           <p className="text-zinc-500 mt-1 font-medium">Gestión en tiempo real de pedidos, stock y clientes corporativos.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <a
+            href="/api/products/price-list/export"
+            download
+            className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-all border border-zinc-800 flex items-center gap-2 cursor-pointer shadow-sm"
+            title="Descargar lista de precios completa en Excel"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            Descargar Lista Excel
+          </a>
         </div>
       </div>
 
