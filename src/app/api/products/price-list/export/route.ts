@@ -40,11 +40,22 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 3. Cargar todos los productos activos
+    // 3. Cargar productos activos excluyendo pruebas y productos sin precio/stock
     const products = await prisma.product.findMany({
       where: {
         isActive: true,
         isDeleted: false,
+        basePrice: { gt: 0 },
+        NOT: [
+          { sku: { contains: "TEST", mode: "insensitive" } },
+          { name: { contains: "TEST", mode: "insensitive" } },
+          {
+            AND: [
+              { stockQuantity: { lte: 0 } },
+              { basePrice: { lte: 0 } },
+            ],
+          },
+        ],
       },
       include: {
         category: {
@@ -67,11 +78,22 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    // Filtro adicional de seguridad en memoria (elimina cualquier test o stock 0 y precio 0)
+    const validProducts = products.filter((p) => {
+      const skuUpper = p.sku.toUpperCase();
+      const nameUpper = p.name.toUpperCase();
+      const isTest = skuUpper.includes("TEST") || nameUpper.includes("TEST") || skuUpper.startsWith("PRUEBA");
+      const isZeroBoth = Number(p.stockQuantity) <= 0 && Number(p.basePrice) <= 0;
+      const isZeroPrice = Number(p.basePrice) <= 0;
+
+      return !isTest && !isZeroBoth && !isZeroPrice;
+    });
+
     // 4. Calcular precios B2B (con descuentos específicos de empresa / promociones)
-    const prices = await priceService.getPricesForProducts(products as any, companyId);
+    const prices = await priceService.getPricesForProducts(validProducts as any, companyId);
 
     // 5. Construir filas de la planilla Excel
-    const dataRows = products.map((p, index) => {
+    const dataRows = validProducts.map((p, index) => {
       const price = prices[index];
       const baseNet = price ? price.unitNetPrice : Number(p.basePrice);
       const discountPct = price ? price.discountPercent : 0;
