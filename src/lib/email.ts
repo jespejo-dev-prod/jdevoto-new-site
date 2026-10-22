@@ -1,4 +1,15 @@
+import 'dotenv/config';
 import nodemailer from 'nodemailer';
+
+const cleanEnv = (val?: string) => val ? val.replace(/^["']|["']$/g, '').trim() : undefined;
+
+function getEmailLogoUrl(): string {
+  const envUrl = cleanEnv(process.env.NEXT_PUBLIC_APP_URL);
+  if (envUrl && !envUrl.includes('localhost') && envUrl.startsWith('http')) {
+    return `${envUrl}/logo-svg.png`;
+  }
+  return 'https://www.jdevoto.cl/logo-svg.png';
+}
 
 // Cache transporter to avoid recreating test accounts constantly
 let transporterInstance: nodemailer.Transporter | null = null;
@@ -6,15 +17,16 @@ let transporterInstance: nodemailer.Transporter | null = null;
 export async function getTransporter() {
   if (transporterInstance) return transporterInstance;
 
+  const smtpHost = cleanEnv(process.env.SMTP_HOST);
   // Use real SMTP if configured
-  if (process.env.SMTP_HOST) {
+  if (smtpHost) {
     transporterInstance = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
+      host: smtpHost,
+      port: Number(cleanEnv(process.env.SMTP_PORT)) || 587,
+      secure: cleanEnv(process.env.SMTP_SECURE) === 'true',
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: cleanEnv(process.env.SMTP_USER),
+        pass: cleanEnv(process.env.SMTP_PASS),
       },
     });
   } else {
@@ -29,6 +41,28 @@ export async function getTransporter() {
         pass: testAccount.pass,
       },
     });
+  }
+
+  // Interceptor para evitar enviar correos a clientes reales estando en localhost
+  const isLocalhost = process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_APP_URL?.includes('localhost');
+  if (isLocalhost) {
+    const originalSendMail = transporterInstance.sendMail.bind(transporterInstance);
+    transporterInstance.sendMail = async (mailOptions: any) => {
+      const redirectEmail = cleanEnv(process.env.LOCAL_TEST_EMAIL) || 'jespejo@jdevoto.cl';
+      const originalTo = mailOptions.to;
+      mailOptions.subject = `[LOCAL DEV -> OriginalTo: ${originalTo}] ${mailOptions.subject}`;
+      mailOptions.to = redirectEmail;
+      // Evitamos CC y BCC para no enviarle a nadie más accidentalmente
+      if (mailOptions.cc) {
+        const ccStr = Array.isArray(mailOptions.cc) ? mailOptions.cc.join(', ') : mailOptions.cc;
+        mailOptions.subject += ` [CC: ${ccStr}]`;
+        delete mailOptions.cc;
+      }
+      if (mailOptions.bcc) {
+        delete mailOptions.bcc;
+      }
+      return originalSendMail(mailOptions);
+    };
   }
 
   return transporterInstance;
@@ -243,31 +277,61 @@ function generateOrderHtml(
   const totalGross = Number(order.totalGross) || 0;
   const discountPct = baseSubtotalNet > 0 ? Math.round((discountAmount / baseSubtotalNet) * 100) : 0;
 
-  const itemsHtml = items.map((item: any) => `
+  const companyDiscount = Number(company.defaultDiscount) || 0;
+
+  const itemsHtml = items.map((item: any) => {
+    const qty = Number(item.quantity) || 1;
+    const unitNetPrice = Number(item.unitNetPrice) || 0;
+    const itemDiscount = Number(item.discount) || 0;
+    const lineNetTotal = item.lineNetTotal !== undefined && item.lineNetTotal !== null
+      ? Number(item.lineNetTotal)
+      : Math.round(unitNetPrice * qty * (1 - itemDiscount / 100));
+
+    const isCompanyDiscount = companyDiscount > 0 && itemDiscount === companyDiscount;
+    const discountLabel = isCompanyDiscount 
+      ? `-${itemDiscount}% Dcto. Empresa` 
+      : `-${itemDiscount}% Dcto.`;
+
+    return `
     <tr>
-      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2;">
-        ${item.productName || item.product?.name || 'Producto'}
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; vertical-align: top; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div style="font-weight: 600; color: #1e293b; font-size: 12px; line-height: 1.3;">
+          ${item.productName || item.product?.name || 'Producto'}
+        </div>
       </td>
-      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2; font-weight: 500;">
-        ${item.quantity}
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; vertical-align: top; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; line-height: 1.3;">
+        <span style="font-family: monospace, Courier, sans-serif; font-weight: 600; color: #475569;">${item.productSku || item.product?.sku || '-'}</span>
       </td>
-      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #334155; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2; font-weight: 500;">
-        ${formatMoney(item.unitNetPrice)}
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: center; vertical-align: top; color: #1e293b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; font-weight: 600; line-height: 1.3;">
+        ${qty}
       </td>
-      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.2;">
-        ${item.productSku || item.product?.sku || '-'}
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: right; vertical-align: top; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.3;">
+        <div style="font-size: 12px; font-weight: 600; color: #1e293b; white-space: nowrap;">
+          ${formatMoney(unitNetPrice)} <span style="font-size: 10px; font-weight: 400; color: #64748b;">c/u Neto</span>
+        </div>
+        ${itemDiscount > 0 ? `
+        <div style="margin-top: 3px;">
+          <span style="display: inline-block; padding: 1px 5px; font-size: 10px; font-weight: 700; color: #1d4ed8; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; text-transform: uppercase; white-space: nowrap;">
+            (${discountLabel})
+          </span>
+        </div>
+        ` : ''}
+      </td>
+      <td style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: right; vertical-align: top; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.3;">
+        <span style="font-weight: 700; color: #0f172a; white-space: nowrap;">
+          ${formatMoney(lineNetTotal)}
+        </span>
       </td>
     </tr>
-  `).join('');
+    `;
+  }).join('');
 
   const creatorName = `${createdBy.firstName || ''} ${createdBy.lastName || ''}`.trim();
   const creatorFormatted = creatorName 
     ? creatorName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') 
     : 'un cliente';
 
-  const logoUrl = process.env.NEXT_PUBLIC_APP_URL 
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/logo-svg.png` 
-    : 'https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png';
+  const logoUrl = getEmailLogoUrl();
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
@@ -377,45 +441,48 @@ function generateOrderHtml(
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.2;">
                   <thead>
                     <tr style="background-color: #f8fafc;">
-                      <th width="50%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Producto</th>
-                      <th width="12%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Cantidad</th>
-                      <th width="20%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Precio</th>
-                      <th width="18%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">SKU</th>
+                      <th width="38%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Producto</th>
+                      <th width="14%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">SKU</th>
+                      <th width="10%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: center; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Cantidad</th>
+                      <th width="20%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: right; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Precio</th>
+                      <th width="18%" style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: right; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Total Neto</th>
                     </tr>
                   </thead>
                   <tbody>
                     ${itemsHtml}
                     
-                    <!-- Subtotal -->
+                    <!-- Subtotal Neto -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Subtotal:</td>
-                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2;">${formatMoney(baseSubtotalNet)}</td>
+                      <td colspan="4" style="border: 1px solid #d1d5db; padding: 6px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2; text-align: right;">Subtotal Neto:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2; text-align: right; white-space: nowrap;">${formatMoney(baseSubtotalNet)}</td>
                     </tr>
                     
-                    <!-- Descuento Especial -->
+                    <!-- Dcto. Pago -->
                     ${discountAmount > 0 ? `
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #16a34a; font-size: 12px; line-height: 1.2;">Descuento Especial (${discountPct}%):</td>
-                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #16a34a; font-weight: 600; font-size: 12px; line-height: 1.2;">-${formatMoney(discountAmount)}</td>
+                      <td colspan="4" style="border: 1px solid #d1d5db; padding: 6px 8px; font-weight: 700; color: #16a34a; font-size: 12px; line-height: 1.2; text-align: right;">Dcto. Pago (${discountPct}%):</td>
+                      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #16a34a; font-weight: 600; font-size: 12px; line-height: 1.2; text-align: right; white-space: nowrap;">-${formatMoney(discountAmount)}</td>
+                    </tr>
+                    ` : ''}
+
+                    <!-- Total Neto (si hubo descuento por pago) -->
+                    ${discountAmount > 0 ? `
+                    <tr>
+                      <td colspan="4" style="border: 1px solid #d1d5db; padding: 6px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2; text-align: right;">Total Neto:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2; text-align: right; white-space: nowrap;">${formatMoney(totalNet)}</td>
                     </tr>
                     ` : ''}
 
                     <!-- IVA -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">IVA:</td>
-                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2;">${formatMoney(taxAmount)}</td>
+                      <td colspan="4" style="border: 1px solid #d1d5db; padding: 6px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2; text-align: right;">IVA (19%):</td>
+                      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2; text-align: right; white-space: nowrap;">${formatMoney(taxAmount)}</td>
                     </tr>
 
-                    <!-- Total Neto -->
+                    <!-- Total Final -->
                     <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #374151; font-size: 12px; line-height: 1.2;">Total Neto:</td>
-                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #374151; font-weight: 600; font-size: 12px; line-height: 1.2;">${formatMoney(totalNet)}</td>
-                    </tr>
-
-                    <!-- Total -->
-                    <tr>
-                      <td colspan="3" style="border: 1px solid #d1d5db; padding: 4px 8px; font-weight: 700; color: #0f172a; font-size: 13px; background-color: #f8fafc; line-height: 1.2;">Total:</td>
-                      <td style="border: 1px solid #d1d5db; padding: 4px 8px; color: #1e3a8a; font-size: 14px; font-weight: 800; background-color: #f8fafc; line-height: 1.2;">${formatMoney(totalGross)}</td>
+                      <td colspan="4" style="border: 1px solid #d1d5db; padding: 6px 8px; font-weight: 700; color: #0f172a; font-size: 13px; background-color: #f8fafc; line-height: 1.2; text-align: right;">Total:</td>
+                      <td style="border: 1px solid #d1d5db; padding: 6px 8px; color: #1e3a8a; font-size: 14px; font-weight: 800; background-color: #f8fafc; line-height: 1.2; text-align: right; white-space: nowrap;">${formatMoney(totalGross)}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -985,7 +1052,7 @@ export async function sendUserDeletedAdminNotification(email: string, role: stri
     
     if (process.env.ADMIN_NOTIFICATION_EMAIL) {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const logoUrl = `${appUrl}/logo-svg.png`;
+      const logoUrl = getEmailLogoUrl();
       const adminHtml = `
       <!DOCTYPE html>
       <html>
@@ -1052,7 +1119,7 @@ export async function sendUserUpdatedAdminNotification(email: string, role: stri
     
     if (process.env.ADMIN_NOTIFICATION_EMAIL) {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const logoUrl = `${appUrl}/logo-svg.png`;
+      const logoUrl = getEmailLogoUrl();
       const title = isReactivated ? "Usuario reactivado" : "Rol actualizado";
       const description = isReactivated 
         ? "Un usuario previamente desactivado ha sido reactivado en la plataforma B2B:"
@@ -1169,7 +1236,7 @@ export async function sendSetupPasswordEmail(email: string, token: string, roleN
     // Notificar al admin con un correo propio y con estilo
     if (process.env.ADMIN_NOTIFICATION_EMAIL) {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const logoUrl = `${appUrl}/logo-svg.png`;
+      const logoUrl = getEmailLogoUrl();
       const adminHtml = `
       <!DOCTYPE html>
       <html>
@@ -1251,9 +1318,7 @@ function generateWishlistHtml(items: any[], userDetails: any) {
     ? creatorName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') 
     : 'un cliente';
 
-  const logoUrl = process.env.NEXT_PUBLIC_APP_URL 
-    ? `${process.env.NEXT_PUBLIC_APP_URL}/logo-svg.png` 
-    : 'https://www.jdevoto.cl/wp-content/uploads/2024/06/logo-svg.png';
+  const logoUrl = getEmailLogoUrl();
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
