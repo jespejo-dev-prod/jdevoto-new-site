@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
 import { AdminEditButton } from "./AdminEditButton";
+import { TestProductGuard } from "./TestProductGuard";
 import { AuthRender } from "@/components/auth/auth-render";
 import sanitizeHtml from 'sanitize-html';
 
@@ -75,11 +76,7 @@ export async function generateMetadata({
     const product = await getCachedProduct(slug);
     
     if (product.sku === 'TEST-001' || Number(product.basePrice) === 0) {
-      const { getServerUser } = await import('@/lib/server-auth');
-      const user = await getServerUser();
-      if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN') {
-        return { title: "No Encontrado" };
-      }
+      return { title: "Producto no disponible", robots: { index: false } };
     }
 
     const brandName =
@@ -156,12 +153,8 @@ export default async function DynamicProductPage(props: ProductPageProps) {
   try {
     product = await getCachedProduct(params.slug);
     
-    if (product.sku === 'TEST-001' || Number(product.basePrice) === 0) {
-      const { getServerUser } = await import('@/lib/server-auth');
-      const user = await getServerUser();
-      if (user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN') {
-        notFound();
-      }
+    if (Number(product.basePrice) === 0) {
+      notFound();
     }
   } catch {
     notFound();
@@ -258,6 +251,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans selection:bg-primary/20">
+      <TestProductGuard sku={product.sku} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
