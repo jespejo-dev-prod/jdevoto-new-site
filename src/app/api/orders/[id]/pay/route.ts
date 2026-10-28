@@ -37,15 +37,33 @@ export const PATCH = withApiHandler(async (req: NextRequest, ctx: RouteContext) 
 
     // Validación y ajuste de crédito B2B
     if (isCreditB2B && !wasCreditB2B) {
-      const company = await tx.company.findUnique({ where: { id: order.companyId } });
+      const company = await tx.company.findUnique({
+        where: { id: order.companyId },
+        include: { salesRep: { select: { id: true, email: true } } }
+      });
       if (!company) throw new ValidationError("Empresa no encontrada");
       
-      const rowsAffected = await tx.$executeRaw`
-        UPDATE "companies"
-        SET "creditUsed" = "creditUsed" + ${Number(order.totalGross)}
-        WHERE "id" = ${order.companyId}
-          AND "creditLimit" - "creditUsed" >= ${Number(order.totalGross)}
-      `;
+      const hasPaymentTerms = Number(company.paymentTerms) > 0;
+      const salesRepEmail = (company as any).salesRep?.email?.toLowerCase().trim();
+      const isCasaMatriz = salesRepEmail === 'ventasweb@jdevoto.cl';
+      const hasAssignedRep = Boolean(company.salesRepId || (company as any).salesRep);
+      const isExempt = hasPaymentTerms && hasAssignedRep && !isCasaMatriz;
+
+      let rowsAffected = 0;
+      if (isExempt) {
+        rowsAffected = await tx.$executeRaw`
+          UPDATE "companies"
+          SET "creditUsed" = "creditUsed" + ${Number(order.totalGross)}
+          WHERE "id" = ${order.companyId}
+        `;
+      } else {
+        rowsAffected = await tx.$executeRaw`
+          UPDATE "companies"
+          SET "creditUsed" = "creditUsed" + ${Number(order.totalGross)}
+          WHERE "id" = ${order.companyId}
+            AND "creditLimit" - "creditUsed" >= ${Number(order.totalGross)}
+        `;
+      }
 
       if (rowsAffected === 0) {
         throw new ValidationError("Crédito B2B insuficiente (o consumido por otra operación concurrente).");

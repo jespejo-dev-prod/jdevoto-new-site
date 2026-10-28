@@ -49,6 +49,11 @@ export class OrderService {
     // 1. Verificar que la empresa existe y está activa
     const company = await prisma.company.findUnique({
       where: { id: companyId, isActive: true },
+      include: {
+        salesRep: {
+          select: { id: true, email: true, firstName: true, lastName: true }
+        }
+      }
     });
     if (!company) throw new NotFoundError("Empresa", companyId);
 
@@ -250,15 +255,35 @@ export class OrderService {
 
     // 8. Verificar límite de crédito disponible de la empresa
     // SOLO si el pedido NO es un borrador (DRAFT) Y es con crédito directo
+    let isExemptFromCreditLimit = false;
+    let overdueOrdersCount = 0;
+
     if (status !== OrderStatus.DRAFT && paymentMethod === 'credit_b2b') {
       const availableCredit =
         Number(company.creditLimit) - Number(company.creditUsed);
+      const hasPaymentTerms = Number(company.paymentTerms) > 0;
+      const salesRepEmail = (company as any).salesRep?.email?.toLowerCase().trim();
+      const isCasaMatriz = salesRepEmail === 'ventasweb@jdevoto.cl';
+      const hasAssignedRep = Boolean(company.salesRepId || (company as any).salesRep);
 
-      if (totalGross > availableCredit) {
-        // En vez de bloquear, forzamos a PENDING para revisión manual
-        finalStatus = OrderStatus.PENDING;
-        finalInternalNotes = (finalInternalNotes ? finalInternalNotes + '\n' : '') + 
-          `[SISTEMA] Pedido excede límite de crédito. Disponible: $${availableCredit.toLocaleString("es-CL")}, Requerido: $${totalGross.toLocaleString("es-CL")}. Enviado a revisión.`;
+      // Regla de Negocio:
+      // Clientes con plazo de pago comercial y vendedor asignado (que no sea Casa Matriz ventasweb@jdevoto.cl):
+      // El pedido pasa igual.
+      // Solo los clientes sin vendedor o pertenecientes a Casa Matriz no pueden procesar sin cupo de crédito disponible.
+      isExemptFromCreditLimit = hasPaymentTerms && hasAssignedRep && !isCasaMatriz;
+
+      if (!isExemptFromCreditLimit) {
+        if (Number(company.creditLimit) <= 0 || totalGross > availableCredit) {
+          throw new BusinessRuleError(
+            `Límite de crédito insuficiente para compras a crédito (Disponible: $${availableCredit.toLocaleString("es-CL")}, Requerido: $${totalGross.toLocaleString("es-CL")}). Por favor selecciona otro medio de pago o contacta a administración.`,
+            "INSUFFICIENT_CREDIT"
+          );
+        }
+      } else {
+        if (totalGross > availableCredit) {
+          finalInternalNotes = (finalInternalNotes ? finalInternalNotes + '\n' : '') + 
+            `[SISTEMA] Pedido aprobado bajo condición comercial con vendedor asignado (${(company as any).salesRep?.firstName || ''} ${(company as any).salesRep?.lastName || ''}).`;
+        }
       }
 
       // 8.1 Verificar que no tenga facturas vencidas
@@ -270,6 +295,7 @@ export class OrderService {
           status: { notIn: [OrderStatus.CANCELLED, OrderStatus.DRAFT] }
         }
       });
+      overdueOrdersCount = overdueOrders;
 
       if (overdueOrders > 0) {
         finalStatus = OrderStatus.PENDING;
@@ -299,11 +325,11 @@ export class OrderService {
         attributedSalesRepId = user.id;
       }
 
-      // Validar regla de negocio: Crédito B2B debe quedar CONFIRMED (no pending) si hay cupo
-      // EXCEPTO si el usuario es ADMIN o SUPER_ADMIN, los cuales deben quedar como pendientes.
+      // Validar regla de negocio: Crédito B2B debe quedar CONFIRMED (no pending) si hay cupo o si está exento por vendedor
+      // EXCEPTO si el usuario es ADMIN o SUPER_ADMIN, o si tiene facturas vencidas.
       const availableCreditForCheck = Number(company.creditLimit) - Number(company.creditUsed);
-      if (paymentMethod === 'credit_b2b' && finalStatus === 'PENDING' && totalGross <= availableCreditForCheck) {
-        if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+      if (paymentMethod === 'credit_b2b' && finalStatus === 'PENDING' && (isExemptFromCreditLimit || totalGross <= availableCreditForCheck)) {
+        if (overdueOrdersCount === 0 && user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
           finalStatus = 'CONFIRMED';
         }
       }
@@ -369,9 +395,8 @@ export class OrderService {
       if (paymentMethod === 'credit_b2b') {
         let rowsAffected = 0;
         
-        // Si el pedido quedó PENDING (ya sea por admin o porque superó el límite y va a revisión),
-        // permitimos que se registre el uso de crédito (pudiendo sobrepasar el límite temporalmente)
-        if (finalStatus === 'PENDING') {
+        // Si está exento por vendedor o quedó PENDING, permitimos registrar el crédito usado sin validar contra creditLimit
+        if (isExemptFromCreditLimit || finalStatus === 'PENDING') {
           rowsAffected = await tx.$executeRaw`
             UPDATE "companies"
             SET "creditUsed" = "creditUsed" + ${totalGross}
@@ -457,14 +482,25 @@ export class OrderService {
 
       // SI PASA DE DRAFT A CONFIRMED Y ES CON CRÉDITO, VALIDAR LÍMITE DE CRÉDITO
       if (order.status === OrderStatus.DRAFT && newStatus === OrderStatus.CONFIRMED && order.paymentMethod === 'credit_b2b') {
-        const company = await tx.company.findUnique({ where: { id: order.companyId } });
+        const company = await tx.company.findUnique({
+          where: { id: order.companyId },
+          include: { salesRep: { select: { id: true, email: true } } }
+        });
         if (!company) throw new NotFoundError("Empresa", order.companyId);
 
-        const availableCredit = Number(company.creditLimit) - Number(company.creditUsed);
-        if (availableCredit < 0 || Number(order.totalGross) > availableCredit) {
-          finalStatus = OrderStatus.PENDING;
-          finalInternalNotes = (finalInternalNotes ? finalInternalNotes + '\n' : '') + 
-            `[SISTEMA] El pedido pasó a revisión (PENDING) porque excede el límite de crédito disponible ($${availableCredit.toLocaleString("es-CL")}).`;
+        const hasPaymentTerms = Number(company.paymentTerms) > 0;
+        const salesRepEmail = (company as any).salesRep?.email?.toLowerCase().trim();
+        const isCasaMatriz = salesRepEmail === 'ventasweb@jdevoto.cl';
+        const hasAssignedRep = Boolean(company.salesRepId || (company as any).salesRep);
+        const isExempt = hasPaymentTerms && hasAssignedRep && !isCasaMatriz;
+
+        if (!isExempt) {
+          const availableCredit = Number(company.creditLimit) - Number(company.creditUsed);
+          if (availableCredit < 0 || Number(order.totalGross) > availableCredit) {
+            finalStatus = OrderStatus.PENDING;
+            finalInternalNotes = (finalInternalNotes ? finalInternalNotes + '\n' : '') + 
+              `[SISTEMA] El pedido pasó a revisión (PENDING) porque excede el límite de crédito disponible (${availableCredit.toLocaleString("es-CL")}).`;
+          }
         }
       }
 

@@ -163,12 +163,23 @@ export interface AuthenticatedUser {
     defaultDiscount?: any;
     paymentTerms?: number;
     paymentTermDiscount?: any;
+    direccion?: string | null;
+    comuna?: string | null;
+    ciudad?: string | null;
+    region?: string | null;
     shippingStreet?: string | null;
     shippingNumber?: string | null;
     shippingApartment?: string | null;
     shippingCommune?: string | null;
     shippingCity?: string | null;
     shippingRegion?: string | null;
+    salesRepId?: string | null;
+    salesRep?: {
+      id: string;
+      email: string;
+      firstName?: string | null;
+      lastName?: string | null;
+    } | null;
   };
 }
 

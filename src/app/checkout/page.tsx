@@ -111,6 +111,7 @@ export default function CheckoutPage() {
 
   const [bankConfig, setBankConfig] = useState<any>(null);
   const [mpConfig, setMpConfig] = useState<any>(null);
+  const [extraCompanyInfo, setExtraCompanyInfo] = useState<{ salesRepId?: string | null; salesRep?: { email: string } | null } | null>(null);
 
   const [isVerifyingAddress, setIsVerifyingAddress] = useState(false);
   const [addressWarning, setAddressWarning] = useState<string | null>(null);
@@ -237,6 +238,26 @@ export default function CheckoutPage() {
     }
   }, [accessToken]);
 
+  // Cargar información de vendedor si no viene pre-cargada
+  useEffect(() => {
+    const targetCompanyId = effectiveCompany?.id;
+    if (targetCompanyId && accessToken && !(effectiveCompany as any)?.salesRep && user?.role !== 'SALES_REP') {
+      fetch(`/api/customers/${targetCompanyId}`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.data) {
+            setExtraCompanyInfo({
+              salesRepId: data.data.salesRepId,
+              salesRep: data.data.salesRep
+            });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [effectiveCompany?.id, accessToken, user?.role, (effectiveCompany as any)?.salesRep]);
+
   // Auto-fill user data if available
   useEffect(() => {
     if (user) {
@@ -244,10 +265,32 @@ export default function CheckoutPage() {
       setRazonSocial(user.company?.razonSocial || `${user.firstName} ${user.lastName}`);
       setRutEmpresa(user.company?.rut || '');
       
-      // Auto-rellenar opciones de despacho
-      if (user.company?.shippingRegion) setRegion(user.company.shippingRegion);
-      if (user.company?.shippingCommune) setComuna(user.company.shippingCommune);
+      // Auto-rellenar opciones de despacho con tolerancia a mayúsculas/minúsculas o typos
+      const rawReg = (user.company?.shippingRegion || user.company?.region || '').toLowerCase().trim();
+      if (rawReg) {
+        const matched = CHILE_REGIONS.find(r => 
+          r.name.toLowerCase() === rawReg || 
+          rawReg.includes(r.name.toLowerCase()) || 
+          r.name.toLowerCase().includes(rawReg) ||
+          (rawReg.includes("antofag") && r.name === "ANTOFAGASTA")
+        );
+        const resolvedRegion = matched ? matched.name : user.company?.shippingRegion || user.company?.region || '';
+        setRegion(resolvedRegion);
+
+        const rawCom = (user.company?.shippingCommune || user.company?.comuna || '').toLowerCase().trim();
+        if (rawCom && matched) {
+          const matchedCom = matched.comunas.find(c => 
+            c.name.toLowerCase() === rawCom || 
+            c.name.toLowerCase().includes(rawCom) || 
+            rawCom.includes(c.name.toLowerCase())
+          );
+          setComuna(matchedCom ? matchedCom.name : user.company?.shippingCommune || user.company?.comuna || '');
+        } else if (rawCom) {
+          setComuna(user.company?.shippingCommune || user.company?.comuna || '');
+        }
+      }
       if (user.company?.shippingStreet) setShippingStreet(user.company.shippingStreet);
+      else if (user.company?.direccion) setShippingStreet(user.company.direccion);
     }
   }, [user]);
 
@@ -376,7 +419,21 @@ export default function CheckoutPage() {
   const creditLimit = effectiveCompany?.creditLimit ? Number(effectiveCompany.creditLimit) : 0;
   const creditUsed = effectiveCompany?.creditUsed ? Number(effectiveCompany.creditUsed) : 0;
   const availableCredit = creditLimit - creditUsed;
-  const hasEnoughCredit = paymentMethod !== 'credit_b2b' || grandTotal <= availableCredit;
+
+  // Regla de Negocio:
+  // Todos los clientes con plazo de pago comercial (> 0 días) y vendedor asignado (que no sea Casa Matriz ventasweb@jdevoto.cl)
+  // pueden procesar su pedido por Crédito Directo B2B sin ser bloqueados por límite de crédito.
+  // Solo los clientes sin vendedor o que pertenezcan a Casa Matriz requieren cupo de crédito disponible asignado.
+  const activeSalesRepId = (effectiveCompany as any)?.salesRepId ?? extraCompanyInfo?.salesRepId;
+  const activeSalesRep = (effectiveCompany as any)?.salesRep ?? extraCompanyInfo?.salesRep;
+  const salesRepEmail = activeSalesRep?.email || (user?.role === 'SALES_REP' ? user.email : null);
+  const hasAssignedRep = Boolean(activeSalesRepId || activeSalesRep || user?.role === 'SALES_REP');
+  const isCasaMatriz = salesRepEmail?.toLowerCase().trim() === 'ventasweb@jdevoto.cl';
+  const hasPaymentTerms = paymentTermsDays > 0;
+
+  const isExemptFromCreditLimit = hasPaymentTerms && hasAssignedRep && !isCasaMatriz;
+
+  const hasEnoughCredit = paymentMethod !== 'credit_b2b' || isExemptFromCreditLimit || grandTotal <= availableCredit;
 
   // Credit Validation
   const isCourierValid = shippingMethod === 'free' || (

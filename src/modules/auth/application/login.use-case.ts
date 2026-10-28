@@ -15,7 +15,7 @@ export async function loginUseCase({ email, password }: LoginInput) {
   // 1. Buscar usuario activo
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase(), isActive: true },
-    include: { company: { select: { id: true, rut: true, razonSocial: true, email: true, billingEmail: true, telefono: true, giro: true, creditLimit: true, creditUsed: true, defaultDiscount: true, paymentTerms: true, paymentTermDiscount: true, shippingStreet: true, shippingNumber: true, shippingApartment: true, shippingCommune: true, shippingCity: true, shippingRegion: true } } },
+    include: { company: { select: { id: true, rut: true, razonSocial: true, email: true, billingEmail: true, telefono: true, giro: true, creditLimit: true, creditUsed: true, defaultDiscount: true, paymentTerms: true, paymentTermDiscount: true, shippingStreet: true, shippingNumber: true, shippingApartment: true, shippingCommune: true, shippingCity: true, shippingRegion: true, salesRepId: true, salesRep: { select: { id: true, email: true, firstName: true, lastName: true } } } } },
   });
 
   if (!user) {

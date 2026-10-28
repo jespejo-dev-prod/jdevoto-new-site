@@ -67,12 +67,31 @@ export const POST = withApiHandler(async (req: NextRequest) => {
     const regName = data.shippingAddress.region.trim().toUpperCase();
     const comName = data.shippingAddress.comuna.trim().toUpperCase();
 
-    const matchedRegion = CHILE_REGIONS.find(r => r.name.trim().toUpperCase() === regName);
+    let matchedRegion = CHILE_REGIONS.find(r => r.name.trim().toUpperCase() === regName);
+    if (!matchedRegion) {
+      matchedRegion = CHILE_REGIONS.find(r => 
+        regName.includes(r.name.trim().toUpperCase()) ||
+        r.name.trim().toUpperCase().includes(regName) ||
+        (regName.includes("ANTOFAG") && r.name === "ANTOFAGASTA")
+      );
+      if (matchedRegion) {
+        data.shippingAddress.region = matchedRegion.name;
+      }
+    }
     if (!matchedRegion) {
       throw new ValidationError(`La región de despacho '${data.shippingAddress.region}' no es válida en Chile.`);
     }
 
-    const matchedCommune = matchedRegion.comunas.find(c => c.name.trim().toUpperCase() === comName);
+    let matchedCommune = matchedRegion.comunas.find(c => c.name.trim().toUpperCase() === comName);
+    if (!matchedCommune) {
+      matchedCommune = matchedRegion.comunas.find(c => 
+        comName.includes(c.name.trim().toUpperCase()) ||
+        c.name.trim().toUpperCase().includes(comName)
+      );
+      if (matchedCommune) {
+        data.shippingAddress.comuna = matchedCommune.name;
+      }
+    }
     if (!matchedCommune) {
       throw new ValidationError(`La comuna de despacho '${data.shippingAddress.comuna}' no pertenece a la región '${data.shippingAddress.region}'.`);
     }
