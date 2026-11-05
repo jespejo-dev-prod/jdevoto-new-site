@@ -137,8 +137,8 @@ export const PATCH = withApiHandler(async (req: NextRequest, { params }: RouteCo
   });
 
   const { revalidateTag } = require("next/cache");
-  revalidateTag("companies");
-  revalidateTag("price-lists");
+  revalidateTag("companies", { expire: 0 });
+  revalidateTag("price-lists", { expire: 0 });
 
   return ok(updated);
 });

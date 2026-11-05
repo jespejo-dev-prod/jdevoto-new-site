@@ -305,7 +305,7 @@ export const POST = withApiHandler(async (req: NextRequest) => {
   });
 
   const { revalidateTag } = require("next/cache");
-  revalidateTag("products");
+  revalidateTag("products", { expire: 0 });
 
   return created(product);
 });
