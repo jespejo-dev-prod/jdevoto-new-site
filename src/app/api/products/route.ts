@@ -95,8 +95,16 @@ export const GET = withApiHandler(async (req: NextRequest) => {
           ],
         }
       : {}),
-    ...((query.inStock || hideOutOfStock) ? { stockQuantity: { gt: 0 } } : {}),
-    ...((user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN && user?.role !== 'VIEWER') ? { basePrice: { gt: 0 } } : {}),
+    ...(query.outOfStock
+      ? { stockQuantity: { lte: 0 } }
+      : (query.inStock || hideOutOfStock)
+      ? { stockQuantity: { gt: 0 } }
+      : {}),
+    ...(query.zeroPrice
+      ? { basePrice: { lte: 0 } }
+      : !isPrivileged
+      ? { basePrice: { gt: 0 } }
+      : {}),
     ...(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === 'VIEWER' ? {} : { sku: { not: "TEST-001" } }),
   };
 

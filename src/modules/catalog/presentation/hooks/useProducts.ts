@@ -34,6 +34,8 @@ export interface UseProductsParams {
   limit?: number;
   includeInactive?: boolean;
   status?: 'all' | 'published' | 'draft' | 'trash';
+  outOfStock?: boolean;
+  zeroPrice?: boolean;
 }
 
 export interface ProductsResponse {
@@ -46,10 +48,10 @@ export interface ProductsResponse {
 export function useProducts(params: UseProductsParams = {}) {
   const { accessToken } = useAuth();
   const api = useApi(); // <- Usamos useApi
-  const { search, categoryId, brandId, page = 1, limit = 16, includeInactive = false, status = 'all' } = params;
+  const { search, categoryId, brandId, page = 1, limit = 16, includeInactive = false, status = 'all', outOfStock, zeroPrice } = params;
 
   return useQuery({
-    queryKey: ['dashboard-products', search, categoryId, brandId, page, limit, includeInactive, status],
+    queryKey: ['dashboard-products', search, categoryId, brandId, page, limit, includeInactive, status, outOfStock, zeroPrice],
     queryFn: async (): Promise<ProductsResponse> => {
       const sp = new URLSearchParams();
       sp.set('page', String(page));
@@ -60,6 +62,8 @@ export function useProducts(params: UseProductsParams = {}) {
       if (brandId)         sp.set('brandId', brandId);
       if (includeInactive) sp.set('includeInactive', 'true');
       if (status)          sp.set('status', status);
+      if (outOfStock)      sp.set('outOfStock', 'true');
+      if (zeroPrice)       sp.set('zeroPrice', 'true');
 
       // api.get ya parsea y devuelve { data, meta } si existe
       const response = await api.get(`/api/products?${sp.toString()}`);

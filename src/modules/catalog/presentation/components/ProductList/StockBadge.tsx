@@ -14,7 +14,7 @@ interface StockBadgeProps {
 }
 
 export function StockBadge({ stock, stockAlert = 5, showLabel = true }: StockBadgeProps) {
-  if (stock === 0) {
+  if (stock <= 0) {
     return (
       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold bg-red-500/15 text-red-400 border border-red-500/20">
         <AlertCircle className="h-3.5 w-3.5" />

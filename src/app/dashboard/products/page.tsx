@@ -85,6 +85,8 @@ export default function ProductsPage() {
  const [brandId, setBrandId] = useState('');
  const [page, setPage] = useState(1);
  const [status, setStatus] = useState<'all' | 'published' | 'draft' | 'trash'>('all');
+ const [outOfStock, setOutOfStock] = useState(false);
+ const [zeroPrice, setZeroPrice] = useState(false);
 
  const [hideOutOfStock, setHideOutOfStock] = useState(false);
  const [isUpdatingSetting, setIsUpdatingSetting] = useState(false);
@@ -93,7 +95,9 @@ export default function ProductsPage() {
  useEffect(() => {
  setSearch(urlSearch);
  setPage(1);
- }, [urlSearch]);
+  if (searchParams.get('outOfStock') === 'true') setOutOfStock(true);
+  if (searchParams.get('zeroPrice') === 'true') setZeroPrice(true);
+ }, [urlSearch, searchParams]);
 
  // Load initial setting on component mount
  useEffect(() => {
@@ -145,6 +149,8 @@ export default function ProductsPage() {
  limit: 16,
  includeInactive: true,
  status,
+ outOfStock,
+ zeroPrice,
  });
 
  const { data: categoriesData = [] } = useCategories();
@@ -155,7 +161,7 @@ export default function ProductsPage() {
  const total = data?.total ?? 0;
  const totalPages = data?.totalPages ?? 1;
 
- const hasFilters = !!search || !!categoryId || !!brandId;
+ const hasFilters = !!search || !!categoryId || !!brandId || outOfStock || zeroPrice;
 
  const handleDelete = useCallback(
  (id: string, name: string) => {
@@ -179,6 +185,46 @@ export default function ProductsPage() {
 
  const handleBrandChange = (value: string) => {
  setBrandId(value);
+ setPage(1);
+ };
+
+ const handleToggleOutOfStock = () => {
+ if (outOfStock && !zeroPrice) {
+ setOutOfStock(false);
+ } else {
+ setOutOfStock(true);
+ setZeroPrice(false);
+ }
+ setPage(1);
+ };
+
+ const handleToggleZeroPrice = () => {
+ if (zeroPrice && !outOfStock) {
+ setZeroPrice(false);
+ } else {
+ setZeroPrice(true);
+ setOutOfStock(false);
+ }
+ setPage(1);
+ };
+
+ const handleToggleBoth = () => {
+ if (outOfStock && zeroPrice) {
+ setOutOfStock(false);
+ setZeroPrice(false);
+ } else {
+ setOutOfStock(true);
+ setZeroPrice(true);
+ }
+ setPage(1);
+ };
+
+ const handleClearFilters = () => {
+ setSearch('');
+ setCategoryId('');
+ setBrandId('');
+ setOutOfStock(false);
+ setZeroPrice(false);
  setPage(1);
  };
 
@@ -268,6 +314,12 @@ export default function ProductsPage() {
  view={view}
  onViewChange={setView}
  total={isLoading ? undefined : total}
+ outOfStock={outOfStock}
+ onToggleOutOfStock={handleToggleOutOfStock}
+ zeroPrice={zeroPrice}
+ onToggleZeroPrice={handleToggleZeroPrice}
+ onToggleBoth={handleToggleBoth}
+ onClearFilters={handleClearFilters}
  />
 
  {/* Products Grid / List */}

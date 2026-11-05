@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, Filter, LayoutGrid, List as ListIcon, ArrowUpDown, X, FileSpreadsheet } from 'lucide-react';
+import { Search, Filter, LayoutGrid, List as ListIcon, ArrowUpDown, X, FileSpreadsheet, PackageX, CircleDollarSign, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProductsFilterBarProps {
@@ -20,6 +20,11 @@ interface ProductsFilterBarProps {
   limit?: number;
   onLimitChange?: (limit: number) => void;
   onClearFilters?: () => void;
+  outOfStock?: boolean;
+  onToggleOutOfStock?: () => void;
+  zeroPrice?: boolean;
+  onToggleZeroPrice?: () => void;
+  onToggleBoth?: () => void;
 }
 
 const DEBOUNCE_MS = 350;
@@ -40,6 +45,11 @@ export function ProductsFilterBar({
   limit = 24,
   onLimitChange,
   onClearFilters,
+  outOfStock = false,
+  onToggleOutOfStock,
+  zeroPrice = false,
+  onToggleZeroPrice,
+  onToggleBoth,
 }: ProductsFilterBarProps) {
   const isDashboard = variant === 'dashboard';
   const [localSearch, setLocalSearch] = useState(search);
@@ -57,7 +67,7 @@ export function ProductsFilterBar({
     return () => clearTimeout(timer);
   }, [localSearch]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const hasActiveFilters = !!search || !!categoryId || !!brandId;
+  const hasActiveFilters = !!search || !!categoryId || !!brandId || outOfStock || zeroPrice;
 
   const containerClasses = cn(
     "flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-3xl border backdrop-blur-sm shadow-sm",
@@ -143,6 +153,74 @@ export function ProductsFilterBar({
               ))}
             </select>
             <Filter className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
+          </div>
+        )}
+
+        {/* Botones de filtro rápido: Sin Stock, Precio $0, Ambos */}
+        {isDashboard && (onToggleOutOfStock || onToggleZeroPrice) && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {onToggleOutOfStock && (
+              <button
+                type="button"
+                id="btn-filter-out-of-stock"
+                onClick={onToggleOutOfStock}
+                className={cn(
+                  "h-12 px-3.5 rounded-2xl border text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer select-none",
+                  outOfStock && !zeroPrice
+                    ? "bg-rose-500/15 border-rose-500 text-rose-300 shadow-sm shadow-rose-950/40"
+                    : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
+                )}
+                title="Filtrar productos sin stock (inventario en 0)"
+              >
+                <PackageX className="h-4 w-4 text-rose-400" />
+                <span>Sin Stock</span>
+                {outOfStock && !zeroPrice && (
+                  <span className="flex h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse ml-0.5" />
+                )}
+              </button>
+            )}
+
+            {onToggleZeroPrice && (
+              <button
+                type="button"
+                id="btn-filter-zero-price"
+                onClick={onToggleZeroPrice}
+                className={cn(
+                  "h-12 px-3.5 rounded-2xl border text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer select-none",
+                  zeroPrice && !outOfStock
+                    ? "bg-amber-500/15 border-amber-500 text-amber-300 shadow-sm shadow-amber-950/40"
+                    : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
+                )}
+                title="Filtrar productos con precio $0"
+              >
+                <CircleDollarSign className="h-4 w-4 text-amber-400" />
+                <span>Precio $0</span>
+                {zeroPrice && !outOfStock && (
+                  <span className="flex h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse ml-0.5" />
+                )}
+              </button>
+            )}
+
+            {onToggleBoth && (
+              <button
+                type="button"
+                id="btn-filter-both"
+                onClick={onToggleBoth}
+                className={cn(
+                  "h-12 px-3.5 rounded-2xl border text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer select-none",
+                  outOfStock && zeroPrice
+                    ? "bg-red-500/20 border-red-500 text-red-300 shadow-sm shadow-red-950/40"
+                    : "bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
+                )}
+                title="Filtrar productos sin stock Y con precio $0"
+              >
+                <AlertTriangle className="h-4 w-4 text-red-400" />
+                <span>Sin Stock y $0</span>
+                {outOfStock && zeroPrice && (
+                  <span className="flex h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse ml-0.5" />
+                )}
+              </button>
+            )}
           </div>
         )}
 

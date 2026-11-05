@@ -18,7 +18,21 @@ export const GetProductsQuerySchema = z.object({
   search: z.string().min(1).max(100).optional(),
   minPrice: z.coerce.number().min(0).optional(),
   maxPrice: z.coerce.number().min(0).optional(),
-  inStock: z.coerce.boolean().optional(),
+  inStock: z.preprocess((val) => {
+    if (val === 'true' || val === true || val === 1 || val === '1') return true;
+    if (val === 'false' || val === false || val === 0 || val === '0') return false;
+    return undefined;
+  }, z.boolean().optional()),
+  outOfStock: z.preprocess((val) => {
+    if (val === 'true' || val === true || val === 1 || val === '1') return true;
+    if (val === 'false' || val === false || val === 0 || val === '0') return false;
+    return undefined;
+  }, z.boolean().optional()),
+  zeroPrice: z.preprocess((val) => {
+    if (val === 'true' || val === true || val === 1 || val === '1') return true;
+    if (val === 'false' || val === false || val === 0 || val === '0') return false;
+    return undefined;
+  }, z.boolean().optional()),
 });
 
 export type GetProductsQuery = z.infer<typeof GetProductsQuerySchema>;
