@@ -47,7 +47,7 @@ export const CreateProductSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Slug solo permite letras minúsculas, números y guiones"),
   description: z.string().max(5000).optional(),
   unit: z.enum(["UN", "KG", "LT", "MT", "M2", "M3", "PAR", "CJA", "BOL"]).default("UN"),
-  basePrice: z.coerce.number().positive("El precio debe ser mayor a 0").max(999999999999.99, "Precio demasiado grande"),
+  basePrice: z.coerce.number().min(0, "El precio no puede ser negativo").max(999999999999.99, "Precio demasiado grande"),
   stockQuantity: z.coerce.number().min(0, "El stock no puede ser negativo").max(1000000000000, "Stock demasiado grande").default(0),
   minOrderQty: z.coerce.number().int().min(1, "Pedido mínimo es 1").default(1),
   stockAlert: z.coerce.number().int().min(0).default(5),
@@ -93,5 +93,11 @@ export const CreateProductSchema = z.object({
 
 export type CreateProductInput = z.infer<typeof CreateProductSchema>;
 
-export const UpdateProductSchema = CreateProductSchema.partial().omit({ sku: true });
+export const UpdateProductSchema = CreateProductSchema.partial()
+  .omit({ sku: true })
+  .extend({
+    categoryId: z.string().nullable().optional(),
+    brandId: z.string().nullable().optional(),
+    basePrice: z.coerce.number().min(0, "El precio no puede ser negativo").max(999999999999.99, "Precio demasiado grande").optional(),
+  });
 export type UpdateProductInput = z.infer<typeof UpdateProductSchema>;
