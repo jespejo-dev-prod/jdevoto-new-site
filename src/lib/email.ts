@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import nodemailer from 'nodemailer';
+import { isRcCarProduct } from '@/lib/rc-campaign';
 
 const cleanEnv = (val?: string) => val ? val.replace(/^["']|["']$/g, '').trim() : undefined;
 
@@ -279,6 +280,21 @@ function generateOrderHtml(
 
   const companyDiscount = Number(company.defaultDiscount) || 0;
 
+  const hasAnyRcDiscount = items.some((item: any) => {
+    const qty = Number(item.quantity) || 1;
+    const unitNetPrice = Number(item.unitNetPrice) || 0;
+    const itemDiscount = Number(item.discount) || 0;
+    const lineNetTotal = item.lineNetTotal !== undefined && item.lineNetTotal !== null
+      ? Number(item.lineNetTotal)
+      : Math.round(unitNetPrice * qty * (1 - itemDiscount / 100));
+    const isRc = isRcCarProduct({
+      sku: item.productSku || item.sku || item.product?.sku,
+      name: item.productName || item.name || item.product?.name,
+    });
+    const expectedLineWithoutRc = Math.round(unitNetPrice * qty * (1 - itemDiscount / 100));
+    return isRc && expectedLineWithoutRc > 0 && (lineNetTotal < expectedLineWithoutRc * 0.9);
+  });
+
   const itemsHtml = items.map((item: any) => {
     const qty = Number(item.quantity) || 1;
     const unitNetPrice = Number(item.unitNetPrice) || 0;
@@ -291,6 +307,13 @@ function generateOrderHtml(
     const discountLabel = isCompanyDiscount 
       ? `-${itemDiscount}% Dcto. Empresa` 
       : `-${itemDiscount}% Dcto.`;
+
+    const isRc = isRcCarProduct({
+      sku: item.productSku || item.sku || item.product?.sku,
+      name: item.productName || item.name || item.product?.name,
+    });
+    const expectedLineWithoutRc = Math.round(unitNetPrice * qty * (1 - itemDiscount / 100));
+    const hasRcDiscount = isRc && expectedLineWithoutRc > 0 && (lineNetTotal < expectedLineWithoutRc * 0.9);
 
     return `
     <tr>
@@ -316,11 +339,27 @@ function generateOrderHtml(
           </span>
         </div>
         ` : ''}
+        ${hasRcDiscount ? `
+        <div style="margin-top: 3px;">
+          <span style="display: inline-block; padding: 1px 6px; font-size: 10px; font-weight: 700; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; text-transform: uppercase; white-space: nowrap;">
+            🏎️ -20% Dcto. Autos RC
+          </span>
+        </div>
+        ` : ''}
       </td>
       <td style="border: 1px solid #d1d5db; padding: 6px 8px; text-align: right; vertical-align: top; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1.3;">
+        ${hasRcDiscount ? `
+        <div style="font-size: 10px; color: #94a3b8; text-decoration: line-through; white-space: nowrap;">
+          ${formatMoney(expectedLineWithoutRc)}
+        </div>
+        <span style="font-weight: 800; color: #d97706; white-space: nowrap;">
+          ${formatMoney(lineNetTotal)}
+        </span>
+        ` : `
         <span style="font-weight: 700; color: #0f172a; white-space: nowrap;">
           ${formatMoney(lineNetTotal)}
         </span>
+        `}
       </td>
     </tr>
     `;
@@ -436,6 +475,18 @@ function generateOrderHtml(
                     </tr>
                   </table>
                 </div>
+
+                ${hasAnyRcDiscount ? `
+                <!-- Campaña Autos RC Alert -->
+                <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #d97706; border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  <div style="font-size: 13px; font-weight: 700; color: #92400e;">
+                    🏎️ ¡Campaña Autos RC Aplicada! (-20% Extra)
+                  </div>
+                  <div style="font-size: 12px; color: #b45309; margin-top: 3px; line-height: 1.4;">
+                    Este pedido cumplió la meta de $200.000 netos en autos radiocontrolados. Se aplicó un <strong>20% de descuento adicional</strong> directamente sobre el valor de cada vehículo a control remoto.
+                  </div>
+                </div>
+                ` : ''}
 
                 <!-- Products Table -->
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.2;">

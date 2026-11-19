@@ -34,6 +34,7 @@ export interface CartItem {
   stockQuantity: number;  // Stock disponible (para validar máximo)
   brandName?: string;     // Marca del producto
   categoryName?: string;  // Categoría del producto
+  categorySlug?: string;  // Slug de categoría (ej: 'regalos-radiocontrolados')
   validTo?: string | null; // Fecha de término de promoción
 }
 
@@ -62,6 +63,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
  */
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const isLoadedRef = React.useRef(false);
   const [selectedClientForOrder, setClientForOrder] = useState<any>(null);
   const { accessToken } = useAuth();
 
@@ -141,6 +143,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           let priceSource: string = fresh.price?.priceSource || 'BASE_PRICE';
           const brandName: string = fresh.brand?.name || '';
           const categoryName: string = fresh.category?.name || '';
+          const categorySlug: string = fresh.category?.slug || '';
           const validTo: string | null = fresh.price?.validTo || null;
 
           // Client-side safety net: discard server response if server cache
@@ -161,6 +164,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             item.priceSource !== priceSource ||
             item.brandName !== brandName ||
             item.categoryName !== categoryName ||
+            item.categorySlug !== categorySlug ||
             item.validTo !== validTo;
 
           if (!needsUpdate) return item;
@@ -187,6 +191,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             inner: safeInner,
             brandName,
             categoryName,
+            categorySlug,
             validTo,
           };
         });
@@ -198,27 +203,44 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [accessToken]);
 
   /**
-   * Carga el carrito desde localStorage y sincroniza los precios al montar.
+   * Carga el carrito desde localStorage al montar una sola vez.
    */
   useEffect(() => {
-    const savedCart = localStorage.getItem('jdevoto_cart');
-    if (savedCart) {
+    if (typeof window !== 'undefined') {
       try {
-        setItems(JSON.parse(savedCart));
+        const savedCart = localStorage.getItem('jdevoto_cart');
+        if (savedCart) {
+          const parsed = JSON.parse(savedCart);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setItems(parsed);
+            itemsRef.current = parsed;
+          }
+        }
       } catch (e) {
         console.error('Failed to parse cart', e);
+      } finally {
+        isLoadedRef.current = true;
       }
     }
-    syncPrices();
-  }, [accessToken, syncPrices]);
+  }, []);
 
   /**
-   * Sincroniza el carrito en localStorage cada vez que cambia el array de items.
-   * Se ejecuta DESPUÉS de cada render donde items haya cambiado.
+   * Sincroniza el carrito en localStorage cada vez que cambia el array de items,
+   * pero SOLO DESPUÉS de haber cargado el carrito inicial desde localStorage.
    */
   useEffect(() => {
+    if (!isLoadedRef.current) return;
     localStorage.setItem('jdevoto_cart', JSON.stringify(items));
   }, [items]);
+
+  /**
+   * Sincroniza precios con la base de datos cuando se monta o cambia el token.
+   */
+  useEffect(() => {
+    if (isLoadedRef.current && itemsRef.current.length > 0) {
+      syncPrices();
+    }
+  }, [accessToken, syncPrices]);
 
   /**
    * addItem
@@ -250,6 +272,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const brandName = product.brand?.name || product.brandName || '';
     const categoryName = product.category?.name || product.categoryName || '';
+    const categorySlug = product.category?.slug || product.categorySlug || '';
     const image = product.images?.[0]?.url || product.image || '';
 
     setItems(prevItems => {
@@ -279,6 +302,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               priceSource: priceSource || item.priceSource || 'BASE_PRICE',
               brandName: brandName || item.brandName || '',
               categoryName: categoryName || item.categoryName || '',
+              categorySlug: categorySlug || item.categorySlug || '',
               validTo: validTo || item.validTo || null,
             }
             : item
@@ -311,6 +335,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         stockQuantity: product.stockQuantity || 0,
         brandName: brandName,
         categoryName: categoryName,
+        categorySlug: categorySlug,
         validTo: validTo || null,
       };
 

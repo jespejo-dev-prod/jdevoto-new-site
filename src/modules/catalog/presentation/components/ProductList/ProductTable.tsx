@@ -13,6 +13,7 @@ import { useCategories } from '@/modules/catalog/application/hooks/useCatalogDat
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { isRcCarProduct } from '@/lib/rc-campaign';
 
 interface ProductTableProps {
   products: any[];
@@ -41,6 +42,7 @@ const ProductRow = memo(function ProductRow({
   const isDashboard = variant === 'dashboard';
   const isSaved = isInWishlist(product.id);
   const primaryImage = product.images?.[0] ?? null;
+  const isRcCar = !isDashboard && isRcCarProduct(product);
   const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500&auto=format&fit=crop&q=60';
   
   const [imgSrc, setImgSrc] = useState(primaryImage?.url || '');
@@ -123,6 +125,11 @@ const ProductRow = memo(function ProductRow({
               <span className="block w-full whitespace-normal leading-normal">
                 {product.name}
               </span>
+              {isRcCar && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300/90 w-fit my-0.5">
+                  🏎️ 20% EXTRA RC
+                </span>
+              )}
               {!isDashboard && (
                 <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[9px] sm:text-[10px] text-zinc-400 font-bold uppercase md:hidden">
                   <span>SKU: {product.sku}</span>

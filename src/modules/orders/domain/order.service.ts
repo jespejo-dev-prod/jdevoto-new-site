@@ -26,6 +26,7 @@ import type {
   PaginatedResult,
 } from "@/types/domain";
 import { TAX_RATE } from "@/types/domain";
+import { isRcCarProduct } from "@/lib/rc-campaign";
 import { OrderStatus, PaymentStatus, Prisma, UserRole } from "@prisma/client";
 import type { GetOrdersQuery } from "@/validations/order.schemas";
 
@@ -114,10 +115,25 @@ export class OrderService {
     // 6. Construir ítems del pedido con cálculos de precio aplicando descuento corporativo
     const defaultDiscountPercent = Number(company.defaultDiscount) || 0;
 
+    // Campaña Autos RC (20% adicional si meta $200.000 alcanzada sobre Subtotal Neto con dcto empresa)
+    const rcItemsTotal = items.reduce((acc, item) => {
+      const product = productMap.get(item.productId);
+      if (product && isRcCarProduct(product)) {
+        const price = priceMap.get(item.productId);
+        const isExcluded = price?.priceSource === 'PROMOTION' || price?.priceSource === 'OUTLET' || product.sku === 'TEST-001';
+        const discount = isExcluded ? 0 : defaultDiscountPercent;
+        const itemNet = ((price?.discountedNetPrice || 0) * item.quantity) * (1 - discount / 100);
+        return acc + itemNet;
+      }
+      return acc;
+    }, 0);
+    const isRcCampaignMet = Math.round(rcItemsTotal) >= 200000;
+
     const orderItemsData = items.map((item) => {
       const product = productMap.get(item.productId)!;
       const price = priceMap.get(item.productId)!;
 
+      const isRc = isRcCarProduct(product);
       const isExcluded = price.priceSource === 'PROMOTION' || price.priceSource === 'OUTLET' || product.sku === 'TEST-001';
       let discount = isExcluded ? 0 : defaultDiscountPercent;
       
@@ -127,8 +143,11 @@ export class OrderService {
       }
       const unitNetPrice = price.discountedNetPrice;
 
+      // Si la campaña RC está activa: 20% de descuento adicional
+      const rcAdditional = (isRc && isRcCampaignMet) ? 0.20 : 0;
+
       const lineNetTotal = round2(
-        (unitNetPrice * item.quantity) * (1 - discount / 100)
+        (unitNetPrice * item.quantity) * (1 - discount / 100) * (1 - rcAdditional)
       );
       const lineTax = round2(lineNetTotal * TAX_RATE);
       const lineTotal = round2(lineNetTotal + lineTax);

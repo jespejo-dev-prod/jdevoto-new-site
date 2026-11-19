@@ -43,6 +43,7 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<WishlistItem[]>([]);
+  const isLoadedRef = React.useRef(false);
   const { accessToken } = useAuth();
 
   // 1. Cargar desde localStorage al montar y sincronizar precios/stock
@@ -55,7 +56,11 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         setItems(loadedItems);
       } catch (e) {
         console.error('Failed to parse wishlist', e);
+      } finally {
+        isLoadedRef.current = true;
       }
+    } else {
+      isLoadedRef.current = true;
     }
 
     if (loadedItems.length > 0) {
@@ -124,8 +129,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     }
   }, [accessToken]);
 
-  // 2. Persistir en localStorage cuando cambia el estado
+  // 2. Persistir en localStorage cuando cambia el estado (solo tras carga inicial)
   useEffect(() => {
+    if (!isLoadedRef.current) return;
     localStorage.setItem('jdevoto_wishlist', JSON.stringify(items));
   }, [items]);
 

@@ -12,6 +12,7 @@ import { useTrackingContext } from '@/components/providers/TrackingProvider';
 
 import { CategoriesMenu, type Category } from './categories-menu';
 import { translateRole } from '@/lib/role-translations';
+import { calculateRcCampaignProgress } from '@/lib/rc-campaign';
 
 const FIREWORK_PARTICLES = [
   { dx: -32, dy: -32, color: 'bg-yellow-250' },
@@ -60,6 +61,7 @@ export function PublicHeader() {
 
   const [isMobile, setIsMobile] = useState(false);
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [shouldAnimateRc, setShouldAnimateRc] = useState(false);
 
   useEffect(() => {
     // Usar breakpoint 768 (md) para consistencia con los menús colapsables
@@ -94,10 +96,10 @@ export function PublicHeader() {
   };
 
   // Alturas fijas: nav es ~73px (mobile) o ~77px (desktop)
-  // Progress bar es exactamente 46px
+  // Con 2 barras de progreso (mínimo 46px + campaña RC 46px = 92px)
   const showProgressBar = !!user && itemCount > 0;
   const topOffset = showProgressBar 
-    ? (isMobile ? '190px' : '123px')
+    ? (isMobile ? '236px' : '169px')
     : (isMobile ? '144px' : '77px');
   const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
   const companyDiscountPercent = effectiveCompany?.defaultDiscount ? Number(effectiveCompany.defaultDiscount) : 0;
@@ -121,6 +123,15 @@ export function PublicHeader() {
   const percent = Math.min(100, (roundedSubtotal / 100000) * 100);
   const isMinimumMet = roundedSubtotal >= 100000;
 
+  // Métricas Campaña 20% Autos RC (Meta $200.000)
+  const rcProgress = calculateRcCampaignProgress(items, companyDiscountPercent);
+  const {
+    rcBaseNet,
+    rcPercent,
+    isRcCampaignMet,
+    formattedRcBaseNet,
+  } = rcProgress;
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -137,6 +148,27 @@ export function PublicHeader() {
       }
     }
   }, [isMinimumMet]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (!isRcCampaignMet) {
+      sessionStorage.removeItem('hasCelebratedRcCampaign');
+      setShouldAnimateRc(false);
+    } else {
+      const hasCelebrated = sessionStorage.getItem('hasCelebratedRcCampaign');
+      if (!hasCelebrated) {
+        setShouldAnimateRc(true);
+        sessionStorage.setItem('hasCelebratedRcCampaign', 'true');
+        const timer = setTimeout(() => {
+          setShouldAnimateRc(false);
+        }, 2700);
+        return () => clearTimeout(timer);
+      } else {
+        setShouldAnimateRc(false);
+      }
+    }
+  }, [isRcCampaignMet]);
 
   return (
     <header className="sticky top-0 z-50 w-full flex flex-col">
@@ -407,6 +439,132 @@ export function PublicHeader() {
             </span>
           </div>
         </div>
+      )}
+
+      {/* Barra de progreso Campaña 20% Autos RC (Amarilla/Ámbar) */}
+      {showProgressBar && (
+        <Link
+          href="/categorias/regalos?subcategories=regalos-radiocontrolados"
+          onClick={() => {
+            if (isRcCampaignMet) {
+              setShouldAnimateRc(false);
+              setTimeout(() => setShouldAnimateRc(true), 40);
+              setTimeout(() => setShouldAnimateRc(false), 2700);
+            }
+          }}
+          className="relative h-[46px] flex items-center justify-between sm:justify-center gap-3 sm:gap-6 px-4 sm:px-8 text-xs sm:text-[13px] font-bold uppercase tracking-wider select-none transition-all duration-300 bg-[#f59e0b] hover:bg-[#d97706] text-white border-b border-[#b45309] shadow-sm cursor-pointer group overflow-hidden"
+          title="Ver campaña 20% descuento en autos a control remoto"
+        >
+          {/* Animación especial de auto de carreras cruzando a toda velocidad cuando se alcanzan los $200.000 */}
+          {shouldAnimateRc && (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
+              <style>{`
+                @keyframes rc-car-rush {
+                  0% {
+                    transform: translateX(-180px) translateY(-50%) skewX(-3deg);
+                    opacity: 0;
+                  }
+                  8% {
+                    opacity: 1;
+                  }
+                  50% {
+                    transform: translateX(50vw) translateY(-52%) scale(1.15) skewX(-1deg);
+                  }
+                  90% {
+                    opacity: 1;
+                  }
+                  100% {
+                    transform: translateX(120vw) translateY(-50%) skewX(-3deg);
+                    opacity: 0;
+                  }
+                }
+                @keyframes rc-flag-wave {
+                  0%, 100% { transform: rotate(-10deg); }
+                  50% { transform: rotate(15deg); }
+                }
+                @keyframes rc-shine-sweep {
+                  0% { transform: translateX(-100%); }
+                  100% { transform: translateX(250%); }
+                }
+              `}</style>
+
+              {/* Destello de velocidad sobre la pista amarilla */}
+              <div 
+                className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                style={{ animation: 'rc-shine-sweep 1.8s ease-in-out' }}
+              />
+
+              <div 
+                className="absolute top-1/2 flex items-center select-none"
+                style={{
+                  animation: 'rc-car-rush 2.4s cubic-bezier(0.2, 0.95, 0.35, 1) forwards'
+                }}
+              >
+                <span className="text-2xl -mr-1 animate-pulse">💨</span>
+                <span className="text-base -mr-0.5">🔥</span>
+                <div className="relative w-20 h-10 shrink-0 drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+                  <Image
+                    src="/images/rc-car-cutout-right.webp"
+                    alt="Auto RC Recortado"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                <span className="text-xl -ml-0.5 inline-block" style={{ animation: 'rc-flag-wave 0.3s infinite' }}>🏁</span>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 truncate font-black relative z-10">
+            {isRcCampaignMet ? (
+              <span className="flex items-center gap-1.5">
+                <span className="text-base animate-bounce">🏎️💨</span>
+                <span>🎉</span>
+                <span className="hidden sm:inline">¡META RC ALCANZADA! </span>
+                <span>20% DESC EN AUTOS RC APLICADO</span>
+                <span className="hidden md:inline font-mono"> | AUTOS RC: ${formattedRcBaseNet}</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 truncate">
+                <span className="text-sm">🏎️</span>
+                <span>CAMPAÑA 20% DESC EN AUTOS RC</span>
+                <span className="hidden xs:inline"> META <span className="text-amber-100 font-black">$200.000.-</span></span>
+                {rcBaseNet > 0 && (
+                  <span className="hidden md:inline text-amber-100 font-normal normal-case">
+                    (Llevas ${formattedRcBaseNet})
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 relative z-10">
+            {/* Barra de progreso con autito que avanza */}
+            <div className="relative flex items-center">
+              <div className="w-20 sm:w-44 h-3 rounded-full overflow-hidden relative border bg-amber-900/40 border-amber-800/60 shadow-inner">
+                <div 
+                  className="h-full transition-all duration-500 ease-out bg-[#0284c7]"
+                  style={{ width: `${rcPercent}%` }}
+                />
+              </div>
+              {/* Autito posicionado al final del avance */}
+              <div 
+                className={`absolute -top-2 transition-all duration-500 ease-out pointer-events-none select-none ${
+                  isRcCampaignMet ? 'text-base animate-bounce' : 'text-xs'
+                }`}
+                style={{
+                  left: `calc(${Math.min(92, Math.max(0, rcPercent))}% - 8px)`
+                }}
+              >
+                {isRcCampaignMet ? '🏁' : '🏎️'}
+              </div>
+            </div>
+            <span className="text-xs font-black min-w-[34px] text-right font-mono">
+              {Math.round(rcPercent)}%
+            </span>
+          </div>
+        </Link>
       )}
 
       {/* Menú de Categorías Desktop/Móvil */}

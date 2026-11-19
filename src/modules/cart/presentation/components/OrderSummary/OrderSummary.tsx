@@ -8,6 +8,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/auth-context';
 import { useCustomers } from '@/modules/customers/presentation/hooks/useCustomers';
 import { cn } from '@/lib/utils';
+import { calculateRcCampaignProgress } from '@/lib/rc-campaign';
 
 export function OrderSummary() {
   const { items, subtotal = 0, selectedClientForOrder } = useCart();
@@ -64,7 +65,13 @@ export function OrderSummary() {
   const companyDiscountPercent = effectiveCompany?.defaultDiscount ? Number(effectiveCompany.defaultDiscount) : 0;
   const companyDiscountAmount = Math.round(nonExcludedBaseNet * (companyDiscountPercent / 100));
   const netAfterCompanyDiscount = nonExcludedBaseNet - companyDiscountAmount;
-  const finalNet = excludedBaseNet + netAfterCompanyDiscount;
+  const subtotalBeforeRc = excludedBaseNet + netAfterCompanyDiscount;
+
+  // Campaña 20% Autos RC (Meta $200.000)
+  const rcProgress = calculateRcCampaignProgress(items, companyDiscountPercent);
+  const { isRcCampaignMet, rcDiscountAmount, rcNetAfterCompany, formattedRcMissing, formattedRcDiscount } = rcProgress;
+
+  const finalNet = subtotalBeforeRc - rcDiscountAmount;
 
   const paymentDiscountAmount = Math.round(finalNet * (activePaymentDiscountPercent / 100));
   const netAfterPayment = finalNet - paymentDiscountAmount;
@@ -103,26 +110,26 @@ export function OrderSummary() {
            </div>
         </div>
 
-        <div className="flex justify-between font-semibold text-zinc-400 uppercase tracking-wide">
+        <div className="flex justify-between items-center font-semibold text-zinc-400 uppercase tracking-wide gap-2">
           <span>Subtotal Neto</span>
-          <span className="text-zinc-900 font-bold">$ {finalNet.toLocaleString('es-CL')}</span>
+          <span className="text-zinc-900 font-bold whitespace-nowrap">$ {finalNet.toLocaleString('es-CL')}</span>
         </div>
 
         {paymentDiscountAmount > 0 && (
-          <div className="flex justify-between font-semibold text-emerald-600 uppercase tracking-wide">
-            <span>Dcto. Pago ({activePaymentDiscountPercent}%)</span>
-            <span className="font-bold">- $ {paymentDiscountAmount.toLocaleString('es-CL')}</span>
+          <div className="flex justify-between items-center font-semibold text-emerald-600 uppercase tracking-wide gap-2">
+            <span className="text-xs sm:text-sm">Dcto. Pago ({activePaymentDiscountPercent}%)</span>
+            <span className="font-bold whitespace-nowrap shrink-0 text-emerald-600">- $ {paymentDiscountAmount.toLocaleString('es-CL')}</span>
           </div>
         )}
 
-        <div className="flex justify-between font-semibold text-zinc-400 uppercase tracking-wide">
+        <div className="flex justify-between items-center font-semibold text-zinc-400 uppercase tracking-wide gap-2">
           <span>IVA (19%)</span>
-          <span className="text-zinc-900 font-bold">$ {finalIva.toLocaleString('es-CL')}</span>
+          <span className="text-zinc-900 font-bold whitespace-nowrap">$ {finalIva.toLocaleString('es-CL')}</span>
         </div>
         
-        <div className="flex justify-between font-semibold text-zinc-400 uppercase tracking-wide">
+        <div className="flex justify-between items-center font-semibold text-zinc-400 uppercase tracking-wide gap-2">
           <span>Envío estimado</span>
-          <span className="text-zinc-500 font-bold tracking-wider">---</span>
+          <span className="text-zinc-500 font-bold tracking-wider whitespace-nowrap">---</span>
         </div>
         
         <div className="pt-4 border-t border-zinc-100 flex justify-between items-baseline">
@@ -132,6 +139,27 @@ export function OrderSummary() {
       </div>
 
       <div className="space-y-4">
+        {!isEmpty && rcNetAfterCompany > 0 && !isRcCampaignMet && (
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-900 text-[11px] font-bold uppercase tracking-wider space-y-1.5 animate-in fade-in">
+            <div className="flex items-center gap-1.5 text-amber-800">
+              <span className="text-sm">🏎️</span> Campaña Autos RC: 20% Dcto. Adicional
+            </div>
+            <p className="font-semibold text-amber-800 tracking-normal leading-relaxed normal-case">
+              Llevas <strong>${rcNetAfterCompany.toLocaleString('es-CL')}</strong> en autos RC. Agrega <strong>${formattedRcMissing}</strong> más en autos radiocontrolados para activar automáticamente tu <strong>20% de descuento adicional</strong>.
+            </p>
+          </div>
+        )}
+
+        {!isEmpty && isRcCampaignMet && (
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-emerald-900 text-[11px] font-bold uppercase tracking-wider space-y-1.5 animate-in fade-in">
+            <div className="flex items-center gap-1.5 text-emerald-800">
+              <span className="text-sm">🎉</span> ¡Campaña Autos RC Activada!
+            </div>
+            <p className="font-semibold text-emerald-800 tracking-normal leading-relaxed normal-case">
+              ¡Felicitaciones! Has superado la meta de $200.000 en autos RC. El <strong>20% de descuento adicional</strong> está aplicado directamente en el precio de cada auto a control remoto (ahorro total: <strong>${formattedRcDiscount}</strong>).</p>
+          </div>
+        )}
+
         {!isEmpty && finalNet < 100000 && !isTestBypass && (
           <div className="p-4 rounded-2xl bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-bold uppercase tracking-wider space-y-1.5 animate-in fade-in zoom-in">
             <div className="flex items-center gap-2">

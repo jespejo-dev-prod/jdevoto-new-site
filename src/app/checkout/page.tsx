@@ -17,6 +17,7 @@ import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { toast } from 'sonner';
 import { PromoCountdownBanner } from '@/components/cart/PromoCountdownBanner';
+import { calculateRcCampaignProgress, isRcCarProduct } from '@/lib/rc-campaign';
 
 import { useRouter } from 'next/navigation';
 
@@ -54,6 +55,11 @@ export default function CheckoutPage() {
   // 3. Net after company discount
   const netAfterCompanyDiscount = nonExcludedBaseNet - companyDiscountAmount;
   const subtotalAfterCompany = excludedBaseNet + netAfterCompanyDiscount;
+
+  // 4. Campaña Autos RC (20% adicional si meta $200.000 alcanzada)
+  const rcProgress = calculateRcCampaignProgress(items, companyDiscountPercent);
+  const { isRcCampaignMet, rcDiscountAmount, rcBaseNet } = rcProgress;
+  const subtotalAfterRc = subtotalAfterCompany - rcDiscountAmount;
   
   // States
   const [step, setStep] = useState(1);
@@ -405,10 +411,10 @@ export default function CheckoutPage() {
   const shippingCost = 0; // Both shipping options are $0 in invoice (freight to be paid by client or free shipping)
   
   // 4. Payment discount amount — applied to the total subtotal after company discount
-  const paymentDiscountAmount = Math.round(subtotalAfterCompany * (activePaymentDiscountPercent / 100));
+  const paymentDiscountAmount = Math.round(subtotalAfterRc * (activePaymentDiscountPercent / 100));
   
   // 5. Final Net
-  const finalNet = subtotalAfterCompany - paymentDiscountAmount;
+  const finalNet = subtotalAfterRc - paymentDiscountAmount;
   
   // 6. Final IVA (19%)
   const finalIva = Math.round(finalNet * 0.19);
@@ -1074,24 +1080,37 @@ export default function CheckoutPage() {
                          const isExcluded = item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET' || item.sku === 'TEST-001';
                          const companyDiscount = isExcluded ? 0 : companyDiscountPercent;
                          const discountedPrice = item.price * (1 - companyDiscount / 100);
-                         const lineTotal = Math.round(discountedPrice * item.quantity);
+                         const isRc = isRcCarProduct(item);
+                         const rcAdditionalDiscount = (isRc && isRcCampaignMet) ? 20 : 0;
+                         const priceAfterCompany = Math.round(discountedPrice);
+                         const finalItemUnitPrice = rcAdditionalDiscount > 0 ? Math.round(discountedPrice * 0.8) : priceAfterCompany;
+                         const lineTotal = rcAdditionalDiscount > 0 ? Math.round(discountedPrice * 0.8 * item.quantity) : Math.round(discountedPrice * item.quantity);
+                         const preRcLineTotal = Math.round(discountedPrice * item.quantity);
 
                          return (
-                           <div key={item.id} className="flex gap-4">
-                              <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 flex items-center justify-center p-1 relative">
-                                 {item.image && <Image src={item.image} alt={item.name} fill className="object-contain p-1" />}
-                              </div>
-                              <div className="flex-1 flex flex-col justify-center">
-                                 <span className="text-sm font-semibold text-zinc-200 line-clamp-1">{item.name}</span>
-                                 <span className="text-xs text-zinc-400 font-semibold mt-0.5">
-                                   Cant: {item.quantity} x ${Math.round(discountedPrice).toLocaleString('es-CL')}
-                                   {companyDiscount > 0 && <span className="text-[11px] text-emerald-400 ml-1.5">(-{companyDiscount}%)</span>}
-                                 </span>
-                              </div>
-                              <div className="flex items-center text-sm font-bold text-zinc-100">
-                                 ${lineTotal.toLocaleString('es-CL')}
-                              </div>
-                           </div>
+                            <div key={item.id} className="flex gap-4">
+                               <div className="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 flex items-center justify-center p-1 relative">
+                                  {item.image && <Image src={item.image} alt={item.name} fill className="object-contain p-1" />}
+                               </div>
+                               <div className="flex-1 flex flex-col justify-center">
+                                  <span className="text-sm font-semibold text-zinc-200 line-clamp-1">{item.name}</span>
+                                  <span className="text-xs text-zinc-400 font-semibold mt-0.5">
+                                    Cant: {item.quantity} x ${finalItemUnitPrice.toLocaleString('es-CL')}
+                                    {companyDiscount > 0 && <span className="text-[11px] text-emerald-400 ml-1.5">(-{companyDiscount}%)</span>}
+                                    {rcAdditionalDiscount > 0 && <span className="text-[11px] text-amber-400 ml-1.5 font-bold">(-20% RC)</span>}
+                                  </span>
+                               </div>
+                               <div className="flex flex-col items-end justify-center text-sm font-bold">
+                                  {rcAdditionalDiscount > 0 ? (
+                                    <>
+                                      <span className="text-xs text-zinc-500 line-through">${preRcLineTotal.toLocaleString('es-CL')}</span>
+                                      <span className="text-amber-400">${lineTotal.toLocaleString('es-CL')}</span>
+                                    </>
+                                  ) : (
+                                    <span className="text-zinc-100">${lineTotal.toLocaleString('es-CL')}</span>
+                                  )}
+                               </div>
+                            </div>
                          );
                       })
                     )}
@@ -1119,7 +1138,7 @@ export default function CheckoutPage() {
                     <div className="space-y-4 text-xs sm:text-sm">
                        <div className="flex justify-between items-center font-semibold text-zinc-400 uppercase tracking-wider gap-2">
                           <span>Subtotal Neto</span>
-                          <span className="whitespace-nowrap text-zinc-100 font-bold">$ {subtotalAfterCompany.toLocaleString('es-CL')}</span>
+                          <span className="whitespace-nowrap text-zinc-100 font-bold">$ {subtotalAfterRc.toLocaleString('es-CL')}</span>
                        </div>
 
                        {paymentDiscountAmount > 0 && (

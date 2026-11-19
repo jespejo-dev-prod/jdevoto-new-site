@@ -6,13 +6,14 @@ import { QuantitySelector } from '@/components/ui/quantity-selector';
 import { CartItem as CartItemType, useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import { useAuth } from '@/context/auth-context';
+import { isRcCarProduct, calculateRcCampaignProgress } from '@/lib/rc-campaign';
 
 interface CartItemProps {
   item: CartItemType;
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { updateQuantity, removeItem, selectedClientForOrder } = useCart();
+  const { updateQuantity, removeItem, selectedClientForOrder, items } = useCart();
   const { user } = useAuth();
 
   const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
@@ -20,8 +21,16 @@ export function CartItem({ item }: CartItemProps) {
   const isExcluded = item.priceSource === 'PROMOTION' || item.priceSource === 'OUTLET' || item.sku === 'TEST-001';
   const companyDiscount = isExcluded ? 0 : companyDiscountPercent;
 
+  // Campaña Autos RC (20% adicional si meta $200.000 alcanzada)
+  const isRc = isRcCarProduct(item);
+  const { isRcCampaignMet, rcMissingAmount } = calculateRcCampaignProgress(items, companyDiscountPercent);
+  const rcAdditionalDiscount = (isRc && isRcCampaignMet) ? 20 : 0;
+
   const discountedPrice = item.price * (1 - companyDiscount / 100);
-  const lineTotal = Math.round(discountedPrice * item.quantity);
+  const priceAfterCompany = Math.round(discountedPrice);
+  const finalUnitPrice = rcAdditionalDiscount > 0 ? Math.round(discountedPrice * 0.8) : priceAfterCompany;
+  const preRcLineTotal = Math.round(discountedPrice * item.quantity);
+  const lineTotal = rcAdditionalDiscount > 0 ? Math.round(discountedPrice * 0.8 * item.quantity) : Math.round(discountedPrice * item.quantity);
 
   return (
     <div className="bg-white p-4 sm:p-6 rounded-[24px] sm:rounded-[32px] border border-zinc-200 shadow-sm hover:shadow-md transition-shadow flex gap-4 sm:gap-6 items-start sm:items-center">
@@ -57,11 +66,24 @@ export function CartItem({ item }: CartItemProps) {
                 </>
               )}
             </div>
-            {item.discountPercent > 0 && (
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] sm:text-xs font-bold text-emerald-600 uppercase tracking-tight">
-                {item.discountPercent}% OFF • {item.priceSource.replace('_', ' ')}
-              </div>
-            )}
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              {item.discountPercent > 0 && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] sm:text-xs font-bold text-emerald-600 uppercase tracking-tight">
+                  {item.discountPercent}% OFF • {item.priceSource.replace('_', ' ')}
+                </div>
+              )}
+              {isRc && (
+                isRcCampaignMet ? (
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-[10px] sm:text-xs font-black text-amber-700 uppercase tracking-tight">
+                    🏎️ +20% Dcto. Campaña RC
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-[10px] sm:text-xs font-bold text-zinc-600 uppercase tracking-tight">
+                    🏎️ Campaña RC: 20% Dcto. desde $200.000
+                  </div>
+                )
+              )}
+            </div>
           </div>
           <button 
             onClick={() => removeItem(item.id)} 
@@ -92,26 +114,73 @@ export function CartItem({ item }: CartItemProps) {
           />
           
           <div className="text-left sm:text-right">
-            <div className="text-lg sm:text-xl font-black text-zinc-950">
-              $ {lineTotal.toLocaleString('es-CL')}{' '}
-              <span className="text-xs sm:text-sm font-bold text-zinc-400 uppercase">Neto</span>
-            </div>
-            <div className="flex flex-col items-start sm:items-end">
-              {item.discountPercent > 0 && (
-                <span className="text-xs sm:text-[13px] font-bold text-zinc-400 line-through uppercase tracking-wide">
-                  $ {Math.round(item.originalPrice).toLocaleString('es-CL')}
-                </span>
-              )}
-              {companyDiscount > 0 ? (
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[10px] sm:text-xs font-bold text-blue-600 uppercase tracking-tight mt-1">
-                  $ {Math.round(item.price).toLocaleString('es-CL')} c/u Neto (-{companyDiscount}% Dcto. Empresa)
-                </span>
-              ) : (
-                <span className="text-xs sm:text-[13px] font-bold text-zinc-400 uppercase tracking-wide">
-                  $ {Math.round(item.price).toLocaleString('es-CL')} c/u Neto
-                </span>
-              )}
-            </div>
+            {rcAdditionalDiscount > 0 ? (
+              <div className="flex flex-col items-start sm:items-end gap-1.5">
+                <div className="flex items-baseline justify-start sm:justify-end gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-zinc-400 line-through">
+                    $ {preRcLineTotal.toLocaleString('es-CL')}
+                  </span>
+                  <span className="text-lg sm:text-xl font-black text-amber-600">
+                    $ {lineTotal.toLocaleString('es-CL')}{' '}
+                    <span className="text-xs sm:text-sm font-bold text-zinc-400 uppercase">Neto</span>
+                  </span>
+                </div>
+
+                {/* Desglose paso a paso de cómo se calcula el valor unitario */}
+                <div className="p-2 sm:p-2.5 rounded-xl bg-amber-50/90 border border-amber-200/90 text-left sm:text-right space-y-1.5">
+                  <div className="text-xs sm:text-[13px] font-semibold text-zinc-600 flex flex-wrap items-center justify-start sm:justify-end gap-1.5">
+                    <span>Lista: <span className="line-through text-zinc-400">${Math.round(item.price).toLocaleString('es-CL')}</span></span>
+                    {companyDiscount > 0 && (
+                      <>
+                        <span className="text-zinc-300">•</span>
+                        <span className="text-blue-600 font-bold">-{companyDiscount}% Empresa: ${priceAfterCompany.toLocaleString('es-CL')}</span>
+                      </>
+                    )}
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-black text-amber-900 flex flex-wrap items-center justify-start sm:justify-end gap-1.5">
+                    <span className="text-amber-700">🏎️ -20% Campaña RC:</span>
+                    <span className="font-mono text-zinc-400 line-through font-normal text-xs sm:text-[13px]">${priceAfterCompany.toLocaleString('es-CL')}</span>
+                    <span className="text-zinc-400 font-normal">➜</span>
+                    <span className="font-mono text-amber-600 font-black text-sm sm:text-[15px] bg-white px-2.5 py-0.5 rounded-lg border border-amber-300 shadow-xs">
+                      ${finalUnitPrice.toLocaleString('es-CL')} c/u
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-start sm:items-end gap-1">
+                <div className="text-lg sm:text-xl font-black text-zinc-950">
+                  $ {lineTotal.toLocaleString('es-CL')}{' '}
+                  <span className="text-xs sm:text-sm font-bold text-zinc-400 uppercase">Neto</span>
+                </div>
+                
+                {companyDiscount > 0 ? (
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-blue-50/80 border border-blue-100/90 text-left sm:text-right">
+                    <div className="text-xs sm:text-[13px] font-semibold text-zinc-600 flex flex-wrap items-center justify-start sm:justify-end gap-1.5">
+                      <span>Lista: <span className="line-through text-zinc-400">${Math.round(item.price).toLocaleString('es-CL')}</span></span>
+                      <span className="text-zinc-300">•</span>
+                      <span className="text-blue-700 font-bold">
+                        -{companyDiscount}% Empresa: <span className="font-black">${priceAfterCompany.toLocaleString('es-CL')} c/u</span>
+                      </span>
+                    </div>
+                  </div>
+                ) : item.discountPercent > 0 ? (
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-100/90 text-left sm:text-right">
+                    <div className="text-xs sm:text-[13px] font-semibold text-zinc-600 flex flex-wrap items-center justify-start sm:justify-end gap-1.5">
+                      <span>Lista: <span className="line-through text-zinc-400">${Math.round(item.originalPrice).toLocaleString('es-CL')}</span></span>
+                      <span className="text-zinc-300">•</span>
+                      <span className="text-emerald-700 font-bold">
+                        -{item.discountPercent}% Promo: <span className="font-black">${priceAfterCompany.toLocaleString('es-CL')} c/u</span>
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-xs sm:text-sm font-bold text-zinc-400 uppercase tracking-wide">
+                    ${Math.round(item.price).toLocaleString('es-CL')} c/u Neto
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

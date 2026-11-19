@@ -10,6 +10,7 @@ import { ProductActions } from './ProductActions';
 import { cn } from '@/lib/utils';
 import { useTrackingContext } from '@/components/providers/TrackingProvider';
 import { useAuth } from '@/context/auth-context';
+import { isRcCarProduct } from '@/lib/rc-campaign';
 
 interface ProductCardProps {
   product: any;
@@ -38,6 +39,7 @@ export const ProductCard = memo(function ProductCard({
   const isAuthenticated = clientIsAuthenticated || serverIsAuthenticated;
   
   const isDashboard = variant === 'dashboard';
+  const isRcCar = !isDashboard && isRcCarProduct(product);
   const primaryImage = product.images?.[0] ?? null;
   const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500&auto=format&fit=crop&q=60';
 
@@ -54,7 +56,9 @@ export const ProductCard = memo(function ProductCard({
     "group relative rounded-2xl border transition-transform transition-opacity transition-colors duration-300 ease-out flex flex-col overflow-hidden",
     isDashboard 
       ? "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:shadow-primary/5 hover:-translate-y-0.5" 
-      : "border-zinc-100 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-zinc-200 hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1"
+      : isRcCar
+        ? "border-amber-200/90 bg-white shadow-[0_4px_20px_rgba(245,158,11,0.06)] hover:border-amber-400 hover:shadow-[0_12px_30px_rgba(245,158,11,0.15)] hover:-translate-y-1"
+        : "border-zinc-100 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-zinc-200 hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1"
   );
 
   const linkHref = isDashboard 
@@ -97,7 +101,12 @@ export const ProductCard = memo(function ProductCard({
         />
 
         {/* Badges */}
-        <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 z-10 pointer-events-none">
+          {isRcCar && (
+            <span className="px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-md flex items-center gap-1 w-fit border border-amber-600/30">
+              <span className="text-xs">🏎️</span> 20% EXTRA RC
+            </span>
+          )}
           {!isDashboard && priceSource === 'PROMOTION' && discountPercent > 0 && (
             <span className="px-2.5 py-1 rounded-full bg-primary text-zinc-950 text-[11px] font-black uppercase tracking-wider shadow-md">
               {discountPercent}% OFF
@@ -245,6 +254,12 @@ export const ProductCard = memo(function ProductCard({
                         )}>Neto</span>
                       </>
                     )}
+                    {isRcCar && (
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-amber-800 bg-amber-50/90 border border-amber-200/80 px-2 py-0.5 rounded-md w-fit mt-1">
+                        <span>🏎️</span>
+                        <span>20% Extra sobre $200.000</span>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="flex flex-col">
@@ -252,6 +267,12 @@ export const ProductCard = memo(function ProductCard({
                       🔒 Inicia sesión
                     </span>
                     <span className="text-[10px] sm:text-[11px] text-zinc-400 font-bold uppercase mt-0.5">Para ver precios</span>
+                    {isRcCar && (
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[10.5px] font-bold text-amber-800 bg-amber-50/90 border border-amber-200/80 px-2 py-0.5 rounded-md w-fit mt-1">
+                        <span>🏎️</span>
+                        <span>20% Extra en autos RC</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

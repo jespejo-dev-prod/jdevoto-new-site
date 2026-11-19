@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { TAX_RATE } from '@/types/domain';
 import { cn } from '@/lib/utils';
+import { isRcCarProduct } from '@/lib/rc-campaign';
 
 interface BuyBoxProps {
   product: any;
@@ -40,6 +41,7 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
   const { addItem } = useCart();
   const isSaved = isInWishlist(product.id);
   const minQty = product.inner || 1;
+  const isRcCar = isRcCarProduct(product);
   const [quantity, setQuantity] = useState(minQty);
 
   // Precio neto base como valor inicial instantáneo (sin IVA)
@@ -167,6 +169,18 @@ export function BuyBox({ product, slug }: BuyBoxProps) {
         <div className="flex items-center gap-2 text-[#00a650] text-[13px] sm:text-[14px] font-black uppercase tracking-widest pt-1">
           <div className="h-2.5 w-2.5 rounded-full bg-[#00a650] animate-pulse" /> Listos para despacho
         </div>
+
+        {isRcCar && (
+          <div className="p-3.5 bg-amber-50 border border-amber-200/90 rounded-2xl flex items-start gap-2.5 text-xs text-amber-900 mt-2">
+            <span className="text-base shrink-0">🏎️</span>
+            <div>
+              <p className="font-black uppercase tracking-wider text-amber-800">Campaña Autos RC: 20% Dcto. Extra</p>
+              <p className="font-semibold text-amber-900/80 mt-0.5 normal-case">
+                Alcanza $200.000 netos en autos radiocontrolados para activar un 20% de descuento adicional acumulable.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4 pt-4 border-t border-zinc-100">
