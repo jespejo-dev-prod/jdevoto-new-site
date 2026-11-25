@@ -181,7 +181,7 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
 
   return (
     <div 
-      className="relative aspect-[16/9] sm:aspect-[2/1] md:aspect-auto md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[24px] sm:rounded-[32px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group touch-pan-y"
+      className="relative aspect-[1600/850] md:aspect-auto md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[20px] sm:rounded-[32px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group touch-pan-y"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -220,7 +220,7 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
                     alt={slide.altText || slide.title || "Banner"}
                     fill
                     sizes="(max-width: 768px) 100vw, 1px"
-                    className={`${slide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-85'} md:hidden ${safeImageClass}`}
+                    className={`${slide.hideOverlay ? 'object-contain sm:object-cover opacity-100' : 'object-cover opacity-85'} md:hidden ${safeImageClass}`}
                     priority={idx === 0}
                     quality={60}
                     fetchPriority={idx === 0 ? "high" : "auto"}
@@ -250,7 +250,7 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
                   alt={slide.altText || slide.title || "Banner"}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
-                  className={`${slide.hideOverlay ? 'object-cover opacity-100' : 'object-cover opacity-85 md:opacity-95'} ${safeImageClass}`}
+                  className={`${slide.hideOverlay ? 'object-contain sm:object-cover md:object-cover opacity-100' : 'object-cover opacity-85 md:opacity-95'} ${safeImageClass}`}
                   priority={idx === 0}
                   quality={60}
                   fetchPriority={idx === 0 ? "high" : "auto"}
