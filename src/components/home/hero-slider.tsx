@@ -181,7 +181,7 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
 
   return (
     <div 
-      className="relative aspect-square sm:aspect-[4/5] md:aspect-auto md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[36px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group touch-pan-y"
+      className="relative aspect-[16/9] sm:aspect-[2/1] md:aspect-auto md:h-[500px] lg:h-[580px] w-full overflow-hidden rounded-[24px] sm:rounded-[32px] md:rounded-[40px] bg-zinc-100 border border-zinc-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.04)] group touch-pan-y"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -275,107 +275,115 @@ export function HeroSlider({ initialSlides }: { initialSlides?: any[] | null }) 
         })}
       </div>
 
-      {/* Text Container: Pure CSS Animations */}
-      <div
-        key={current}
-        className="absolute inset-0 flex flex-col md:flex-row items-center justify-between select-none"
-      >
-        <div className="relative z-10 flex flex-col justify-center px-8 md:px-16 lg:px-24 h-full md:w-[50%] lg:w-[45%] text-left pt-12 md:pt-0">
-          
-          {/* Badge */}
-          {activeSlide.badge && (
-            <div className={`mb-4 delay-100 ${
-              activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
-              activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
-              activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
-              activeSlide.textAnimation === 'none' ? '' :
-              'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
-            }`}>
-              <span className={`inline-flex items-center gap-2 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${activeSlide.badgeColor || ""}`}>
-                {activeSlide.badgeIcon && (
-                  <activeSlide.badgeIcon className="h-3.5 w-3.5" />
-                )}
-                {activeSlide.badge}
-              </span>
-            </div>
-          )}
+      {/* Text Container: Pure CSS Animations (hidden if slide has hideOverlay) */}
+      {!activeSlide.hideOverlay && (
+        <div
+          key={current}
+          className="absolute inset-0 flex flex-col md:flex-row items-center justify-between select-none"
+        >
+          <div className="relative z-10 flex flex-col justify-center px-6 sm:px-10 md:px-16 lg:px-24 h-full md:w-[50%] lg:w-[45%] text-left pt-6 sm:pt-10 md:pt-0">
+            
+            {/* Badge */}
+            {activeSlide.badge && (
+              <div className={`mb-2 sm:mb-4 delay-100 ${
+                activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'none' ? '' :
+                'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
+              }`}>
+                <span className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full border ${activeSlide.badgeColor || ""}`}>
+                  {activeSlide.badgeIcon && (
+                    <activeSlide.badgeIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  )}
+                  {activeSlide.badge}
+                </span>
+              </div>
+            )}
 
-          {/* Title */}
-          <h1 className={`text-4xl md:text-5xl lg:text-6xl font-black max-w-xl leading-[1.1] tracking-tight uppercase delay-200 ${
-            activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'none' ? '' :
-            'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
-          } ${
-            activeSlide.title.toLowerCase().includes('outlet') ? 'text-red-600' :
-            activeSlide.title.toLowerCase().includes('despacho gratis') ? 'text-emerald-600' :
-            (activeSlide.title.toLowerCase().includes('ferreteria') || activeSlide.title.toLowerCase().includes('ferretería')) ? 'text-[#6F4E37]' :
-            'text-zinc-950'
-          }`}>
-            {activeSlide.title}
-          </h1>
+            {/* Title */}
+            {activeSlide.title && (
+              <h1 className={`text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black max-w-xl leading-[1.1] tracking-tight uppercase delay-200 ${
+                activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'none' ? '' :
+                'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
+              } ${
+                activeSlide.title.toLowerCase().includes('outlet') ? 'text-red-600' :
+                activeSlide.title.toLowerCase().includes('despacho gratis') ? 'text-emerald-600' :
+                (activeSlide.title.toLowerCase().includes('ferreteria') || activeSlide.title.toLowerCase().includes('ferretería')) ? 'text-[#6F4E37]' :
+                'text-zinc-950'
+              }`}>
+                {activeSlide.title}
+              </h1>
+            )}
 
-          {/* Description */}
-          <p className={`text-sm md:text-base lg:text-lg text-zinc-600 mt-4 max-w-md font-semibold leading-relaxed delay-300 ${
-            activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'none' ? '' :
-            'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
-          }`}>
-            {activeSlide.description}
-          </p>
+            {/* Description */}
+            {activeSlide.description && (
+              <p className={`text-xs sm:text-sm md:text-base lg:text-lg text-zinc-600 mt-2 sm:mt-4 max-w-md font-semibold leading-relaxed delay-300 line-clamp-2 sm:line-clamp-none ${
+                activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'none' ? '' :
+                'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
+              }`}>
+                {activeSlide.description}
+              </p>
+            )}
 
-          {/* CTA Button */}
-          <div className={`mt-8 delay-500 ${
-            activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
-            activeSlide.textAnimation === 'none' ? '' :
-            'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
-          }`}>
-            <Link
-              href={activeSlide.href}
-              className="inline-flex items-center justify-center px-8 py-3.5 bg-zinc-950 text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 transition-colors shadow-xl shadow-zinc-900/10 hover:scale-[1.03] active:scale-95 duration-300"
-            >
-              {activeSlide.cta}
-            </Link>
+            {/* CTA Button */}
+            {activeSlide.cta && (
+              <div className={`mt-4 sm:mt-6 md:mt-8 delay-500 ${
+                activeSlide.textAnimation === 'fade' ? 'animate-in fade-in duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'slide-left' ? 'animate-in fade-in slide-in-from-left-8 duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'zoom' ? 'animate-in fade-in zoom-in-95 duration-500 fill-mode-both' :
+                activeSlide.textAnimation === 'none' ? '' :
+                'animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both'
+              }`}>
+                <Link
+                  href={activeSlide.href}
+                  className="inline-flex items-center justify-center px-5 sm:px-8 py-2.5 sm:py-3.5 bg-zinc-950 text-white font-black uppercase tracking-widest text-[10px] sm:text-xs rounded-xl hover:bg-zinc-800 transition-colors shadow-xl shadow-zinc-900/10 hover:scale-[1.03] active:scale-95 duration-300"
+                >
+                  {activeSlide.cta}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
 
       {/* Navigation Buttons (Sleek Circle Controls) */}
       <button
         onClick={prevSlide}
-        className="absolute left-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/90 shadow-sm z-20"
+        className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 h-9 w-9 sm:h-12 sm:w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/90 shadow-sm z-20"
         aria-label="Anterior"
       >
-        <ChevronLeft className="h-6 w-6" />
+        <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
       </button>
 
       <button
         onClick={nextSlide}
-        className="absolute right-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/90 shadow-sm z-20"
+        className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 h-9 w-9 sm:h-12 sm:w-12 rounded-full bg-white/60 backdrop-blur-md border border-zinc-200/50 flex items-center justify-center text-zinc-500 hover:text-zinc-950 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/90 shadow-sm z-20"
         aria-label="Siguiente"
       >
-        <ChevronRight className="h-5 w-5" />
+        <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
       </button>
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2.5 z-20">
+      <div className="absolute bottom-3 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2.5 z-20">
         {activeSlides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrent(idx)}
-            className="h-8 w-8 flex items-center justify-center focus:outline-none"
+            className="h-6 w-6 sm:h-8 sm:w-8 flex items-center justify-center focus:outline-none"
             aria-label={`Slide ${idx + 1}`}
           >
             <span 
-              className={`h-1.5 rounded-full transition-all duration-500 ${
+              className={`h-1 sm:h-1.5 rounded-full transition-all duration-500 ${
                 idx === current
-                  ? "w-8 bg-zinc-950"
-                  : "w-2 bg-zinc-300 hover:bg-zinc-400"
+                  ? "w-6 sm:w-8 bg-zinc-950"
+                  : "w-1.5 sm:w-2 bg-zinc-300 hover:bg-zinc-400"
               }`}
             />
           </button>
