@@ -65,9 +65,26 @@ export function PublicHeader() {
   const [isAtTop, setIsAtTop] = useState(true);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsAtTop(window.scrollY <= 10);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          setIsAtTop((prev) => {
+            // Zona muerta (histéresis) para evitar oscilaciones o rebotes al scrollear de abajo hacia arriba:
+            // Al bajar: se oculta al pasar de 60px (más que la altura de la barra)
+            // Al subir: se vuelve a mostrar solo al llegar prácticamente arriba del todo (<= 10px)
+            if (scrollY > 60) return false;
+            if (scrollY <= 10) return true;
+            return prev;
+          });
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
+
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -386,7 +403,7 @@ export function PublicHeader() {
           isAtTop ? 'h-9 opacity-100 border-b border-zinc-900' : 'h-0 opacity-0 pointer-events-none border-b-0'
         }`}
       >
-        <span className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-center select-none">
+        <span className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-center select-none whitespace-nowrap">
           Transferencia Bancaria | 10% OFF
         </span>
       </div>
