@@ -107,8 +107,23 @@ export async function generateMetadata({
 
     const fallbackTitle = `${product.name}${brandName ? ` | ${brandName}` : ""}`;
     const fallbackTitleOG = `${product.name}${brandName ? ` — ${brandName}` : ""} | J. Devoto`;
-    const finalTitle = product.seoTitle ? product.seoTitle : fallbackTitle;
-    const finalTitleOG = product.seoTitle ? product.seoTitle : fallbackTitleOG;
+
+    // Optimización SEO: asegurar que el nombre comercial completo del producto y la marca siempre estén presentes en el Title
+    let finalTitle = fallbackTitle;
+    if (product.seoTitle) {
+      const seoUpper = product.seoTitle.toUpperCase();
+      const nameUpper = product.name.toUpperCase();
+      const brandUpper = brandName.toUpperCase();
+
+      if (seoUpper === nameUpper || (brandUpper && seoUpper.includes(brandUpper))) {
+        finalTitle = product.seoTitle;
+      } else if (brandUpper && !seoUpper.includes(brandUpper)) {
+        finalTitle = `${product.name} - ${product.seoTitle} | ${brandName}`;
+      } else {
+        finalTitle = `${product.name} - ${product.seoTitle}`;
+      }
+    }
+    const finalTitleOG = finalTitle;
     const finalDesc = product.seoDescription ? product.seoDescription : metaDesc;
 
     return {
@@ -195,8 +210,15 @@ export default async function DynamicProductPage(props: ProductPageProps) {
   // Precio base con IVA para el JSON-LD (el BuyBox lo actualizará con precio B2B)
   const basePriceGross = Math.round(Number(product.basePrice) * (1 + TAX_RATE));
 
+  // Extraer código de barra si existe en specifications
+  const specsList = Array.isArray(product.specifications) ? (product.specifications as any[]) : [];
+  const barcodeSpec = specsList.find(
+    (s: any) => s && (s.name === "Código de Barra" || s.name === "Código de Barras" || s.name === "EAN" || s.name === "GTIN")
+  );
+  const barcodeValue = barcodeSpec?.value || null;
+
   // JSON-LD: Producto
-  const productJsonLd = {
+  const productJsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
@@ -204,6 +226,7 @@ export default async function DynamicProductPage(props: ProductPageProps) {
     description: cleanDescription,
     sku: product.sku,
     mpn: product.sku,
+    ...(barcodeValue ? { gtin: barcodeValue, gtin13: barcodeValue.length === 13 ? barcodeValue : undefined } : {}),
     brand: { "@type": "Brand", name: brandName || "J. Devoto" },
     category: (product.category as any)?.name,
     offers: {
@@ -216,6 +239,42 @@ export default async function DynamicProductPage(props: ProductPageProps) {
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
       seller: { "@type": "Organization", name: "Comercial J. Devoto" },
+      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "0",
+          currency: "CLP"
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "CL"
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: 2,
+            unitCode: "DAY"
+          },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: 3,
+            unitCode: "DAY"
+          }
+        }
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "CL",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 10,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn"
+      }
     },
   };
 
@@ -529,6 +588,16 @@ export default async function DynamicProductPage(props: ProductPageProps) {
                       {product.sku}
                     </span>
                   </div>
+                  {barcodeValue && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-500 uppercase font-black text-xs sm:text-[13px] tracking-widest">
+                        Código de Barra
+                      </span>
+                      <span className="text-zinc-950 font-mono font-bold tracking-wider">
+                        {barcodeValue}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
