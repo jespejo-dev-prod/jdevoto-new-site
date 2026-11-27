@@ -62,6 +62,16 @@ export function PublicHeader() {
   const [isMobile, setIsMobile] = useState(false);
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const [shouldAnimateRc, setShouldAnimateRc] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsAtTop(window.scrollY <= 10);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     // Usar breakpoint 768 (md) para consistencia con los menús colapsables
@@ -97,10 +107,13 @@ export function PublicHeader() {
 
   // Alturas fijas: nav es ~73px (mobile) o ~77px (desktop)
   // Con 2 barras de progreso (mínimo 46px + campaña RC 46px = 92px)
+  // Barra transferencia bancaria: 36px cuando está arriba en el scroll
   const showProgressBar = !!user && itemCount > 0;
-  const topOffset = showProgressBar 
-    ? (isMobile ? '236px' : '169px')
-    : (isMobile ? '144px' : '77px');
+  const bannerHeight = isAtTop ? 36 : 0;
+  const baseOffset = showProgressBar 
+    ? (isMobile ? 236 : 169)
+    : (isMobile ? 144 : 77);
+  const topOffset = `${baseOffset + bannerHeight}px`;
   const effectiveCompany = user?.role === 'SALES_REP' ? selectedClientForOrder : user?.company;
   const companyDiscountPercent = effectiveCompany?.defaultDiscount ? Number(effectiveCompany.defaultDiscount) : 0;
   const excludedSubtotal = items
@@ -365,6 +378,17 @@ export function PublicHeader() {
             <Search className="h-3.5 w-3.5 text-[#1d2e5d]" />
           </button>
         </form>
+      </div>
+
+      {/* Barra Transferencia Bancaria - Visible solo cuando está arriba el scroll */}
+      <div 
+        className={`bg-black text-white transition-all duration-300 ease-in-out overflow-hidden z-20 flex items-center justify-center px-4 ${
+          isAtTop ? 'h-9 opacity-100 border-b border-zinc-900' : 'h-0 opacity-0 pointer-events-none border-b-0'
+        }`}
+      >
+        <span className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-center select-none">
+          Transferencia Bancaria | 10% OFF
+        </span>
       </div>
 
       {/* Barra de progreso de compra mínima */}
