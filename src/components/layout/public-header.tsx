@@ -404,7 +404,7 @@ export function PublicHeader() {
         }`}
       >
         <span className="text-xs sm:text-[13px] font-black uppercase tracking-wider text-center select-none whitespace-nowrap">
-          Transferencia Bancaria | 10% OFF
+          10% de descuento pagando con Transferencia
         </span>
       </div>
 
